@@ -52,7 +52,8 @@ const Dashboard = () => {
     fetchData();
   }, [user, consultationId]);
 
-  const getHouseData = (houseNum: number) => houses.find((h) => h.id === houseNum);
+  const housesArray = Object.values(cityDatabase);
+  const getHouseData = (houseNum: number) => cityDatabase[houseNum];
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
     return houseNum > consultation.houses_unlocked;
