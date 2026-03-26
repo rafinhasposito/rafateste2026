@@ -145,6 +145,7 @@ const Index = () => {
     <>
       <StarryBackground />
       <ScanningOverlay visible={isScanning} mode={mode} year={year} />
+      {user && <UserMenu />}
 
       {/* ===== HERO SECTION ===== */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden">
