@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import StarryBackground from "@/components/StarryBackground";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { houses } from "@/data/houses";
+import { cityDatabase } from "@/data/houses";
 
 interface ConsultationResult {
   id: string;
