@@ -63,21 +63,42 @@ const Index = () => {
     else { showAlert("Permissão negada ou erro. Digite manualmente."); }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<boolean> => {
     if (!user) {
       navigate("/auth");
-      return;
+      return false;
     }
 
     setSubmitted(true);
-    if (!name.trim()) { showAlert("Digite seu nome."); return; }
-    if (!birthdate) { showAlert("Informe a data de nascimento."); return; }
-    if (!birthtime) { showAlert("Informe a hora de nascimento."); return; }
-    if (!birthPlaceValid) { showAlert("Selecione o local de nascimento na lista."); return; }
-    if (!originValid) { showAlert("Selecione a cidade de origem na lista."); return; }
+    if (!name.trim()) {
+      showAlert("Digite seu nome.");
+      return false;
+    }
+    if (!birthdate) {
+      showAlert("Informe a data de nascimento.");
+      return false;
+    }
+    if (!birthtime) {
+      showAlert("Informe a hora de nascimento.");
+      return false;
+    }
+    if (!birthPlaceValid) {
+      showAlert("Selecione o local de nascimento na lista.");
+      return false;
+    }
+    if (!originValid) {
+      showAlert("Selecione a cidade de origem na lista.");
+      return false;
+    }
     if (mode === "futuro") {
-      if (!goal) { showAlert("Selecione uma Casa no grid."); return; }
-      if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); return; }
+      if (!goal) {
+        showAlert("Selecione uma Casa no grid.");
+        return false;
+      }
+      if (intent.length < 50) {
+        showAlert("O manifesto exige mínimo de 50 caracteres.");
+        return false;
+      }
     }
 
     setIsScanning(true);
@@ -89,23 +110,33 @@ const Index = () => {
       const timeoutId = setTimeout(() => controller.abort(), 120000);
       let endpoint = `${API_URL}/find_all_cities`;
       const payload: Record<string, unknown> = {
-        name: name.trim(), place_of_birth: birthPlace.trim(),
-        dob: dataFormatada, time: birthtime, target_year: year,
+        name: name.trim(),
+        place_of_birth: birthPlace.trim(),
+        dob: dataFormatada,
+        time: birthtime,
+        target_year: year,
       };
+
       if (mode === "futuro") {
-        payload.intent = intent.trim(); payload.alvoId = goal;
+        payload.intent = intent.trim();
+        payload.alvoId = goal;
         payload.prompt_mestre = `Aja como o Mestre Astrólogo. O usuário não é vítima do destino, é o arquiteto da própria linha do tempo. Crie um Relatório para ${name}, manifesto: '${intent}'. Confirme o destino como útero físico para a Casa ${goal}. Use linguagem magnética.`;
-      } else { endpoint = `${API_URL}/audit_past`; payload.past_city = origin.trim(); }
+      } else {
+        endpoint = `${API_URL}/audit_past`;
+        payload.past_city = origin.trim();
+      }
 
       const response = await fetch(endpoint, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload), signal: controller.signal,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
       });
       clearTimeout(timeoutId);
+
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na comunicação.");
 
-      // Save consultation to database
       const { data: consultation, error: dbError } = await supabase
         .from("consultations")
         .insert({
@@ -128,16 +159,33 @@ const Index = () => {
       setIsScanning(false);
 
       if (dbError) {
-        showAlert("Cálculo concluído, mas erro ao salvar. Tente novamente.");
+        showAlert("Cálculo concluído. Abrindo resultado... (não foi possível salvar no histórico)");
         console.error(dbError);
-        return;
+        navigate("/dashboard", {
+          state: {
+            tempConsultation: {
+              name: name.trim(),
+              year,
+              mode,
+              goal,
+              houses_unlocked: 1,
+              result: data,
+              created_at: new Date().toISOString(),
+            },
+          },
+        });
+        return true;
       }
 
       navigate(`/dashboard?id=${consultation.id}`);
+      return true;
     } catch (error: unknown) {
       setIsScanning(false);
       const err = error as Error;
-      showAlert(err.name === "AbortError" ? "A IA demorou a responder. Tente novamente." : "Falha na Matrix: " + err.message);
+      showAlert(
+        err.name === "AbortError" ? "A IA demorou a responder. Tente novamente." : "Falha na Matrix: " + err.message,
+      );
+      return false;
     }
   };
 
