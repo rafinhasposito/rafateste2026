@@ -14,7 +14,128 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      consultations: {
+        Row: {
+          birth_place: string
+          birthdate: string
+          birthtime: string
+          created_at: string
+          goal: number | null
+          houses_unlocked: number
+          id: string
+          intent: string | null
+          mode: string
+          name: string
+          origin: string | null
+          result: Json | null
+          user_id: string
+          year: string
+        }
+        Insert: {
+          birth_place: string
+          birthdate: string
+          birthtime: string
+          created_at?: string
+          goal?: number | null
+          houses_unlocked?: number
+          id?: string
+          intent?: string | null
+          mode?: string
+          name: string
+          origin?: string | null
+          result?: Json | null
+          user_id: string
+          year: string
+        }
+        Update: {
+          birth_place?: string
+          birthdate?: string
+          birthtime?: string
+          created_at?: string
+          goal?: number | null
+          houses_unlocked?: number
+          id?: string
+          intent?: string | null
+          mode?: string
+          name?: string
+          origin?: string | null
+          result?: Json | null
+          user_id?: string
+          year?: string
+        }
+        Relationships: []
+      }
+      credit_transactions: {
+        Row: {
+          amount: number
+          consultation_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          consultation_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          consultation_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_consultation_id_fkey"
+            columns: ["consultation_id"]
+            isOneToOne: false
+            referencedRelation: "consultations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          credits: number
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          credits?: number
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          credits?: number
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
