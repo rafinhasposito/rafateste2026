@@ -4,8 +4,7 @@ import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete from "@/components/CityAutocomplete";
 import GoalCards from "@/components/GoalCards";
-import SwipeButton from "@/components/SwipeButton";
-import HoldButton from "@/components/HoldButton";
+import ConstellationSubmit from "@/components/ConstellationSubmit";
 import { useAlert } from "@/hooks/useAlert";
 import { API_URL, detectUserLocation } from "@/lib/astro";
 
@@ -40,7 +39,7 @@ const Index = () => {
   const [year, setYear] = useState("2026");
   const [goal, setGoal] = useState<number | null>(null);
   const [intent, setIntent] = useState("");
-  const [protocolAccepted, setProtocolAccepted] = useState(false);
+  
   const [submitted, setSubmitted] = useState(false);
   const [mantraIndex, setMantraIndex] = useState(0);
 
@@ -68,7 +67,7 @@ const Index = () => {
     if (mode === "futuro") {
       if (!goal) { showAlert("Selecione uma Casa no grid."); return; }
       if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); return; }
-      if (!protocolAccepted) { showAlert("Deslize para aceitar o Protocolo das 24 Horas."); return; }
+      
     }
 
     setIsScanning(true);
@@ -369,19 +368,14 @@ const Index = () => {
                   />
                 </div>
 
-                {/* Swipe */}
-                <div className="mb-10">
-                  <SwipeButton checked={protocolAccepted} onComplete={() => setProtocolAccepted(true)} />
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Submit */}
-          <HoldButton
+          <ConstellationSubmit
             onComplete={handleSubmit}
-            label={mode === "futuro" ? "Segure para Calcular a Rota" : "Segure para Auditar Minha História"}
-            sublabel="Pressione e segure por 2 segundos"
+            label={mode === "futuro" ? "Calcular Rota Estelar" : "Auditar Minha História"}
           />
 
           {/* Bottom Accent */}
