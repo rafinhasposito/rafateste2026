@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete from "@/components/CityAutocomplete";
 import GoalCards from "@/components/GoalCards";
 import ConstellationSubmit from "@/components/ConstellationSubmit";
+import UserMenu from "@/components/UserMenu";
 import { useAlert } from "@/hooks/useAlert";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { API_URL, detectUserLocation } from "@/lib/astro";
 
 type Mode = "futuro" | "passado";
@@ -26,6 +30,8 @@ const stats = [
 
 const Index = () => {
   const { showAlert } = useAlert();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("futuro");
   const [isScanning, setIsScanning] = useState(false);
 
@@ -58,6 +64,11 @@ const Index = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
     setSubmitted(true);
     if (!name.trim()) { showAlert("Digite seu nome."); return; }
     if (!birthdate) { showAlert("Informe a data de nascimento."); return; }
@@ -67,7 +78,6 @@ const Index = () => {
     if (mode === "futuro") {
       if (!goal) { showAlert("Selecione uma Casa no grid."); return; }
       if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); return; }
-      
     }
 
     setIsScanning(true);
@@ -94,9 +104,36 @@ const Index = () => {
       clearTimeout(timeoutId);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na comunicação.");
-      console.log("Resultado:", data);
-      showAlert("Cálculo concluído! (Dashboard em construção)");
+
+      // Save consultation to database
+      const { data: consultation, error: dbError } = await supabase
+        .from("consultations")
+        .insert({
+          user_id: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime,
+          birth_place: birthPlace.trim(),
+          origin: origin.trim(),
+          year,
+          mode,
+          goal,
+          intent: intent.trim() || null,
+          result: data,
+          houses_unlocked: 1,
+        })
+        .select()
+        .single();
+
       setIsScanning(false);
+
+      if (dbError) {
+        showAlert("Cálculo concluído, mas erro ao salvar. Tente novamente.");
+        console.error(dbError);
+        return;
+      }
+
+      navigate(`/dashboard?id=${consultation.id}`);
     } catch (error: unknown) {
       setIsScanning(false);
       const err = error as Error;
@@ -108,6 +145,7 @@ const Index = () => {
     <>
       <StarryBackground />
       <ScanningOverlay visible={isScanning} mode={mode} year={year} />
+      {user && <UserMenu />}
 
       {/* ===== HERO SECTION ===== */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden">
