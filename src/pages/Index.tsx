@@ -30,6 +30,8 @@ const stats = [
 
 const Index = () => {
   const { showAlert } = useAlert();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("futuro");
   const [isScanning, setIsScanning] = useState(false);
 
