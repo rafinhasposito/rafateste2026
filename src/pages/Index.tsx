@@ -86,7 +86,7 @@ const Index = () => {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
       let endpoint = `${API_URL}/find_all_cities`;
       const payload: Record<string, unknown> = {
         name: name.trim(), place_of_birth: birthPlace.trim(),
