@@ -13,7 +13,23 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        cinzel: ["Cinzel", "serif"],
+        outfit: ["Outfit", "sans-serif"],
+        space: ["Space Grotesk", "sans-serif"],
+        signature: ["Great Vibes", "cursive"],
+      },
       colors: {
+        quantum: {
+          950: "hsl(var(--quantum-950))",
+          900: "hsl(var(--quantum-900))",
+          800: "hsl(var(--quantum-800))",
+        },
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          dark: "hsl(var(--gold-dark))",
+          light: "hsl(var(--gold-light))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
@@ -12,11 +12,17 @@ import { API_URL, detectUserLocation } from "@/lib/astro";
 type Mode = "futuro" | "passado";
 
 const mantras = [
-  '"Você desperta como Cocriador da sua realidade."',
-  '"O destino não é fixo — é uma coordenada a ser escolhida."',
-  '"Onde você ancora o seu Sol, define os próximos 12 meses."',
-  '"A ignorância do mapa estelar é o maior luxo que você não pode pagar."',
-  '"O universo respeita quem se move com propósito."',
+  "Você desperta como Cocriador da sua realidade.",
+  "O destino não é fixo — é uma coordenada a ser escolhida.",
+  "Onde você ancora o seu Sol, define os próximos 12 meses.",
+  "O universo respeita quem se move com propósito.",
+  "A posição geográfica dita a frequência do seu ano.",
+];
+
+const stats = [
+  { value: "12", label: "Casas Astrológicas" },
+  { value: "365", label: "Dias Calculados" },
+  { value: "±0.01°", label: "Precisão GPS" },
 ];
 
 const Index = () => {
@@ -24,7 +30,6 @@ const Index = () => {
   const [mode, setMode] = useState<Mode>("futuro");
   const [isScanning, setIsScanning] = useState(false);
 
-  // Form state
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [birthtime, setBirthtime] = useState("");
@@ -37,34 +42,29 @@ const Index = () => {
   const [intent, setIntent] = useState("");
   const [protocolAccepted, setProtocolAccepted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
-  // Mantra rotation
   const [mantraIndex, setMantraIndex] = useState(0);
-  useState(() => {
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setMantraIndex((i) => (i + 1) % mantras.length);
     }, 5000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   const handleDetectLocation = async () => {
-    showAlert("Captando coordenadas...");
+    showAlert("Captando coordenadas via satélite...");
     const loc = await detectUserLocation();
-    if (loc) {
-      setOrigin(loc);
-      setOriginValid(true);
-    } else {
-      showAlert("Permissão negada ou erro. Digite manualmente.");
-    }
+    if (loc) { setOrigin(loc); setOriginValid(true); }
+    else { showAlert("Permissão negada ou erro. Digite manualmente."); }
   };
 
   const handleSubmit = async () => {
+    setSubmitted(true);
     if (!name.trim()) { showAlert("Digite seu nome."); return; }
     if (!birthdate) { showAlert("Informe a data de nascimento."); return; }
     if (!birthtime) { showAlert("Informe a hora de nascimento."); return; }
     if (!birthPlaceValid) { showAlert("Selecione o local de nascimento na lista."); return; }
     if (!originValid) { showAlert("Selecione a cidade de origem na lista."); return; }
-
     if (mode === "futuro") {
       if (!goal) { showAlert("Selecione uma Casa no grid."); return; }
       if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); return; }
@@ -72,257 +72,242 @@ const Index = () => {
     }
 
     setIsScanning(true);
-
     const [ano, mes, dia] = birthdate.split("-");
     const dataFormatada = `${dia}/${mes}/${ano}`;
 
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
-
       let endpoint = `${API_URL}/find_all_cities`;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const payload: any = {
-        name: name.trim(),
-        place_of_birth: birthPlace.trim(),
-        dob: dataFormatada,
-        time: birthtime,
-        target_year: year,
+      const payload: Record<string, unknown> = {
+        name: name.trim(), place_of_birth: birthPlace.trim(),
+        dob: dataFormatada, time: birthtime, target_year: year,
       };
-
       if (mode === "futuro") {
-        payload.intent = intent.trim();
-        payload.alvoId = goal;
+        payload.intent = intent.trim(); payload.alvoId = goal;
         payload.prompt_mestre = `Aja como o Mestre Astrólogo. O usuário não é vítima do destino, é o arquiteto da própria linha do tempo. Crie um Relatório para ${name}, manifesto: '${intent}'. Confirme o destino como útero físico para a Casa ${goal}. Use linguagem magnética.`;
-      } else {
-        endpoint = `${API_URL}/audit_past`;
-        payload.past_city = origin.trim();
-      }
+      } else { endpoint = `${API_URL}/audit_past`; payload.past_city = origin.trim(); }
 
       const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload), signal: controller.signal,
       });
-
       clearTimeout(timeoutId);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na comunicação.");
-
-      // TODO: Navigate to results page with data
       console.log("Resultado:", data);
       showAlert("Cálculo concluído! (Dashboard em construção)");
       setIsScanning(false);
     } catch (error: unknown) {
       setIsScanning(false);
       const err = error as Error;
-      showAlert(
-        err.name === "AbortError"
-          ? "A IA demorou a responder. Tente novamente."
-          : "Falha na Matrix: " + err.message
-      );
+      showAlert(err.name === "AbortError" ? "A IA demorou a responder. Tente novamente." : "Falha na Matrix: " + err.message);
     }
   };
 
   return (
     <>
       <StarryBackground />
-      <div className="dynamic-bg" />
       <ScanningOverlay visible={isScanning} mode={mode} year={year} />
 
-      <div className="max-w-6xl mx-auto px-4 py-12 md:py-20 flex flex-col items-center justify-center min-h-screen screen-fade">
-        {/* HEADER */}
-        <header className="text-center mb-8 md:mb-16 mt-8">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary text-[9px] md:text-[11px] font-black uppercase tracking-[0.3em] shadow-[var(--shadow-gold-sm)]"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-              <path d="M2 12h20" />
-            </svg>
-            Astrologia de Relocalização
-          </motion.div>
+      {/* ===== HERO SECTION ===== */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden">
+        {/* Orbital rings decoration */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="orbital-ring w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-30" style={{ "--speed": "80s" } as React.CSSProperties}>
+            <div className="orbital-dot" />
+          </div>
+          <div className="orbital-ring w-[350px] h-[350px] md:w-[500px] md:h-[500px] opacity-20" style={{ "--speed": "50s", animationDirection: "reverse" } as React.CSSProperties}>
+            <div className="orbital-dot" style={{ opacity: 0.5 }} />
+          </div>
+          <div className="orbital-ring w-[200px] h-[200px] md:w-[300px] md:h-[300px] opacity-15" style={{ "--speed": "30s" } as React.CSSProperties} />
+        </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="font-cinzel text-4xl md:text-5xl lg:text-7xl font-bold mb-6 text-foreground uppercase leading-[1.1] drop-shadow-2xl"
-          >
-            DESCUBRA ONDE PASSAR <br />
-            <span className="gold-gradient tracking-widest">SEU PRÓXIMO ANIVERSÁRIO</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-sm md:text-xl font-light tracking-wider max-w-4xl mx-auto leading-relaxed px-4"
-          >
-            E assuma o controle absoluto dos próximos 12 meses. Destrave o{" "}
-            <strong className="text-primary font-bold border-b border-primary/50 pb-1">
-              GPS exato da sua Prosperidade, Casamento ou Sucesso
-            </strong>{" "}
-            mudando a sua coordenada geográfica.
-          </motion.p>
-        </header>
-
-        {/* MODE SELECTOR */}
+        {/* GPS Pin Icon */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col md:flex-row justify-center gap-4 mb-10 w-full max-w-2xl mx-auto bg-quantum-900/50 p-2 rounded-3xl border border-primary/20 shadow-[var(--shadow-gold-sm)] relative z-10"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mb-8 float-gentle"
         >
-          <button
-            onClick={() => setMode("futuro")}
-            className={`flex-1 py-4 px-6 rounded-2xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all transform hover:scale-105 flex items-center justify-center gap-3 ${
-              mode === "futuro"
-                ? "bg-primary text-primary-foreground shadow-[var(--shadow-gold-sm)]"
-                : "text-muted-foreground hover:text-foreground border border-transparent hover:border-foreground/10"
-            }`}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-              <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-              <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-              <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-            </svg>
-            Projetar Meu Futuro
-          </button>
-          <button
-            onClick={() => setMode("passado")}
-            className={`flex-1 py-4 px-6 rounded-2xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${
-              mode === "passado"
-                ? "bg-primary text-primary-foreground shadow-[var(--shadow-gold-sm)]"
-                : "text-muted-foreground hover:text-foreground border border-transparent hover:border-foreground/10"
-            }`}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-              <path d="M3 3v5h5" />
-              <path d="M12 7v5l4 2" />
-            </svg>
-            Auditar Meu Passado
-          </button>
+          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/20 flex items-center justify-center backdrop-blur-sm">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-gold-dark to-gold flex items-center justify-center shadow-[0_0_40px_hsl(var(--gold)/0.4)]">
+              <svg className="w-6 h-6 md:w-7 md:h-7 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+          </div>
+          <div className="absolute -inset-4 rounded-full border border-gold/10 pulse-ring" />
         </motion.div>
 
-        {/* FORM */}
+        {/* Badge */}
         <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-6 inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm"
+        >
+          <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
+          <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.3em] text-gold">
+            Protocolo Solar · Astrologia de Relocalização
+          </span>
+        </motion.div>
+
+        {/* Main Heading */}
+        <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="panel-cockpit w-full p-6 md:p-16 relative overflow-hidden shadow-2xl z-0"
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="font-cinzel text-center text-4xl md:text-6xl lg:text-[5.5rem] font-bold mb-6 leading-[1.05] tracking-tight max-w-5xl"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-10 md:mb-16">
-            {/* LEFT COLUMN */}
-            <div className="space-y-8 md:space-y-12">
+          <span className="text-foreground block mb-2">DESCUBRA ONDE PASSAR</span>
+          <span className="gold-gradient text-glow-gold block">SEU PRÓXIMO ANIVERSÁRIO</span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center text-muted-foreground text-sm md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-10 px-4"
+        >
+          Assuma o controle absoluto dos próximos 12 meses.
+          Destrave o <span className="text-gold font-medium">GPS exato</span> da sua{" "}
+          <span className="text-foreground font-medium">Prosperidade</span>,{" "}
+          <span className="text-foreground font-medium">Casamento</span> ou{" "}
+          <span className="text-foreground font-medium">Sucesso</span>{" "}
+          mudando a sua coordenada geográfica.
+        </motion.p>
+
+        {/* Stats Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="flex items-center gap-6 md:gap-12 mb-12"
+        >
+          {stats.map((s, i) => (
+            <div key={i} className="text-center">
+              <p className="text-gold font-cinzel text-xl md:text-2xl font-bold">{s.value}</p>
+              <p className="text-muted-foreground text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-medium">{s.label}</p>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* CTA Arrow */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="flex flex-col items-center gap-2 text-muted-foreground/40 cursor-pointer hover:text-gold/60 transition-colors"
+          onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}
+        >
+          <span className="text-[9px] uppercase tracking-[0.3em] font-medium">Iniciar Protocolo</span>
+          <motion.svg
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </motion.svg>
+        </motion.div>
+      </section>
+
+      {/* ===== FORM SECTION ===== */}
+      <section id="form-section" className="relative px-4 pb-20 max-w-5xl mx-auto">
+        {/* Mode Selector */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex justify-center gap-2 mb-8 w-full max-w-lg mx-auto"
+        >
+          {(["futuro", "passado"] as Mode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`flex-1 py-3.5 px-4 rounded-xl text-[10px] md:text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-300 flex items-center justify-center gap-2.5 ${
+                mode === m
+                  ? "bg-gold text-background shadow-[0_4px_20px_hsl(var(--gold)/0.3)]"
+                  : "bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
+              }`}
+            >
+              {m === "futuro" ? (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                  <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" /><path d="M12 7v5l4 2" />
+                </svg>
+              )}
+              {m === "futuro" ? "Projetar Futuro" : "Auditar Passado"}
+            </button>
+          ))}
+        </motion.div>
+
+        {/* Main Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="glass-panel glass-panel-glow p-6 md:p-12 lg:p-16 relative"
+        >
+          {/* Top Accent Line */}
+          <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+
+          {/* Section Header */}
+          <div className="text-center mb-10 md:mb-14">
+            <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
+              {mode === "futuro" ? "Calibração Estelar" : "Resgate da Linha do Tempo"}
+            </h2>
+            <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
+              {mode === "futuro"
+                ? "Insira suas coordenadas natais para que o algoritmo astrofísico calcule a rota exata da sua prosperidade."
+                : "Insira os dados do ano que deseja auditar e descubra o que o Universo havia preparado para você."}
+            </p>
+          </div>
+
+          {/* Form Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-10">
+            {/* LEFT */}
+            <div className="space-y-7">
               <div>
-                <div className="key-indicator">
-                  <span className="key-icon">I</span> Assinatura do Cocriador
-                </div>
-                <input
-                  type="text"
-                  className="quantum-input text-lg"
-                  placeholder="Digite seu nome completo"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
+                <div className="field-label"><span className="label-dot" /> Nome Completo</div>
+                <input type="text" className="quantum-input" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-10">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="key-indicator">
-                    <span className="key-icon">IV</span> Janela Natal
-                  </div>
-                  <label className="block text-[9px] font-bold text-muted-foreground uppercase mb-2 tracking-widest">
-                    Data exata
-                  </label>
-                  <input
-                    type="date"
-                    className="quantum-input"
-                    value={birthdate}
-                    onChange={(e) => setBirthdate(e.target.value)}
-                    required
-                  />
+                  <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
+                  <input type="date" className="quantum-input" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
                 </div>
                 <div>
-                  <div className="key-indicator hidden sm:flex opacity-0">
-                    <span className="key-icon">.</span>
-                  </div>
-                  <label className="block text-[9px] font-bold text-primary/80 uppercase mb-2 tracking-widest">
-                    Hora exata
-                  </label>
-                  <input
-                    type="time"
-                    className="quantum-input"
-                    value={birthtime}
-                    onChange={(e) => setBirthtime(e.target.value)}
-                    required
-                  />
+                  <div className="field-label"><span className="label-dot" /> Hora Exata</div>
+                  <input type="time" className="quantum-input" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
                 </div>
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
-            <div className="space-y-8 md:space-y-12">
+            {/* RIGHT */}
+            <div className="space-y-7">
               <div>
-                <div className="key-indicator">
-                  <span className="key-icon">II</span> Local de Nascimento
-                </div>
-                <label className="block text-[9px] font-bold text-muted-foreground uppercase mb-2 tracking-widest">
-                  Onde você nasceu?
-                </label>
-                <CityAutocomplete
-                  value={birthPlace}
-                  onChange={(val, valid) => {
-                    setBirthPlace(val);
-                    setBirthPlaceValid(valid);
-                  }}
-                  placeholder="Digite a cidade e selecione"
-                  required
-                  invalid={submitted && !birthPlaceValid}
-                />
+                <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
+                <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
               </div>
               <div>
-                <div className="key-indicator">
-                  <span className="key-icon">III</span> Ponto de Partida
-                </div>
+                <div className="field-label"><span className="label-dot" /> {mode === "futuro" ? "Onde Você Está Hoje" : "Onde Passou o Aniversário"}</div>
                 <div className="flex gap-3">
                   <div className="flex-grow">
-                    <label className="block text-[9px] font-bold text-primary uppercase mb-2 tracking-widest">
-                      {mode === "futuro"
-                        ? "Em qual cidade você está hoje?"
-                        : "Em qual cidade passou o aniversário?"}
-                    </label>
-                    <CityAutocomplete
-                      value={origin}
-                      onChange={(val, valid) => {
-                        setOrigin(val);
-                        setOriginValid(valid);
-                      }}
-                      placeholder="Digite e selecione"
-                      required
-                      invalid={submitted && !originValid}
-                    />
+                    <CityAutocomplete value={origin} onChange={(v, valid) => { setOrigin(v); setOriginValid(valid); }} placeholder="Digite e selecione" invalid={submitted && !originValid} />
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleDetectLocation}
-                    className="bg-primary/10 border border-primary/30 px-4 md:px-6 rounded-xl md:rounded-2xl text-primary mt-6 h-[45px] md:h-[55px] hover:bg-primary/30 transition shadow-inner"
-                    aria-label="Localização atual"
-                  >
+                  <button type="button" onClick={handleDetectLocation} className="shrink-0 w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all flex items-center justify-center mt-0" aria-label="GPS">
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="2" x2="5" y1="12" y2="12" />
-                      <line x1="19" x2="22" y1="12" y2="12" />
-                      <line x1="12" x2="12" y1="2" y2="5" />
-                      <line x1="12" x2="12" y1="19" y2="22" />
-                      <circle cx="12" cy="12" r="7" />
-                      <circle cx="12" cy="12" r="3" />
+                      <circle cx="12" cy="12" r="7" /><circle cx="12" cy="12" r="3" />
+                      <line x1="12" y1="2" x2="12" y2="5" /><line x1="12" y1="19" x2="12" y2="22" />
+                      <line x1="2" y1="12" x2="5" y2="12" /><line x1="19" y1="12" x2="22" y2="12" />
                     </svg>
                   </button>
                 </div>
@@ -330,127 +315,98 @@ const Index = () => {
             </div>
           </div>
 
-          {/* BOTTOM SECTION */}
-          <div className="bg-black/40 p-6 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-foreground/5 mb-8 shadow-inner">
-            {/* Year */}
-            <div className="mb-12 w-full md:w-1/2 mx-auto">
-              <label className="block text-[10px] md:text-xs font-bold text-primary uppercase mb-3 tracking-widest text-center">
-                {mode === "futuro"
-                  ? "Qual será o Ano do seu Próximo Aniversário?"
-                  : "Qual ano você quer auditar?"}
-              </label>
-              <input
-                type="number"
-                className="quantum-input text-center text-3xl font-black text-primary h-20"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Cocriador Section - Future only */}
-            <AnimatePresence>
-              {mode === "futuro" && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <div className="mb-12 text-center max-w-3xl mx-auto">
-                    <h3 className="font-cinzel text-lg md:text-2xl text-foreground font-bold uppercase tracking-widest mb-3 flex items-center justify-center gap-3">
-                      <svg className="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" />
-                        <path d="m21 2-9.6 9.6" />
-                        <circle cx="7.5" cy="15.5" r="5.5" />
-                      </svg>
-                      O Despertar do Cocriador
-                    </h3>
-                    <p className="text-muted-foreground text-xs md:text-sm leading-relaxed font-light mb-6 px-2 md:px-8">
-                      O dia do seu aniversário não é apenas uma data; é a semente cirúrgica de 24 horas que dita as regras
-                      de todo o seu próximo ano. Ao decidir onde ancorar a sua abóbada celeste, você abandona a posição de
-                      vítima do destino e se torna o Arquiteto absoluto do seu renascimento.
-                    </p>
-                    <div className="h-px w-24 bg-primary/50 mx-auto mb-5" />
-                    <div className="h-8 flex items-center justify-center px-4">
-                      <AnimatePresence mode="wait">
-                        <motion.p
-                          key={mantraIndex}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="text-primary font-cinzel font-bold text-[10px] md:text-xs tracking-[0.2em] uppercase drop-shadow-md"
-                        >
-                          {mantras[mantraIndex]}
-                        </motion.p>
-                      </AnimatePresence>
-                    </div>
-                  </div>
-
-                  {/* Goal Cards */}
-                  <div className="mb-10">
-                    <div className="key-indicator mb-8">
-                      <span className="key-icon">V</span> Diretrizes Quânticas
-                    </div>
-                    <label className="block text-sm font-bold text-foreground uppercase mb-6 tracking-widest flex items-center justify-center gap-3 border-b border-foreground/10 pb-4">
-                      <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <circle cx="12" cy="12" r="6" />
-                        <circle cx="12" cy="12" r="2" />
-                      </svg>
-                      Qual área você exige transformar neste ciclo?
-                    </label>
-                    <GoalCards selectedGoal={goal} onSelect={setGoal} />
-                  </div>
-
-                  {/* Intent */}
-                  <div className="mb-8">
-                    <div className="flex justify-between items-end mb-4">
-                      <label className="block text-xs font-bold text-primary uppercase tracking-widest">
-                        Sua Intenção Central
-                      </label>
-                      <span
-                        className={`text-[10px] font-mono ${
-                          intent.length < 50 ? "text-destructive" : "text-green-500"
-                        }`}
-                      >
-                        {intent.length} / 50 min
-                      </span>
-                    </div>
-                    <textarea
-                      className="quantum-input h-32 md:h-40 resize-none placeholder-muted-foreground/30 italic text-sm md:text-lg focus:shadow-[0_0_30px_hsl(var(--gold)/0.15)]"
-                      value={intent}
-                      onChange={(e) => setIntent(e.target.value)}
-                      placeholder="Descreva a realidade que já é sua. Ex: No meu próximo ano eu fecho a sociedade milionária da minha agência e lanço meu principal produto..."
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* Divider */}
+          <div className="flex items-center gap-4 mb-10">
+            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
+            <div className="w-2 h-2 rounded-full bg-gold/20 border border-gold/30" />
+            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
           </div>
 
-          {/* Swipe Button - Future only */}
-          {mode === "futuro" && (
-            <div className="mb-10">
-              <SwipeButton
-                checked={protocolAccepted}
-                onComplete={() => setProtocolAccepted(true)}
-              />
-            </div>
-          )}
+          {/* Year */}
+          <div className="mb-10 max-w-xs mx-auto text-center">
+            <div className="field-label justify-center"><span className="label-dot" /> {mode === "futuro" ? "Ano do Próximo Aniversário" : "Ano a Auditar"}</div>
+            <input type="number" className="quantum-input text-center text-3xl font-bold text-gold h-16 font-cinzel" value={year} onChange={(e) => setYear(e.target.value)} />
+          </div>
 
-          {/* Hold Button */}
+          {/* FUTURE-ONLY SECTIONS */}
+          <AnimatePresence>
+            {mode === "futuro" && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.5 }}>
+                {/* Mantra */}
+                <div className="text-center mb-10">
+                  <div className="h-px w-16 bg-gold/30 mx-auto mb-6" />
+                  <AnimatePresence mode="wait">
+                    <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
+                      "{mantras[mantraIndex]}"
+                    </motion.p>
+                  </AnimatePresence>
+                  <div className="h-px w-16 bg-gold/30 mx-auto mt-6" />
+                </div>
+
+                {/* Goal Selection */}
+                <div className="mb-10">
+                  <div className="text-center mb-8">
+                    <h3 className="font-cinzel text-lg md:text-xl font-bold text-foreground uppercase tracking-[0.1em] mb-2">
+                      Qual Área Você Exige Transformar?
+                    </h3>
+                    <p className="text-muted-foreground text-xs font-light">Selecione a Casa que representa o seu maior objetivo para este ciclo</p>
+                  </div>
+                  <GoalCards selectedGoal={goal} onSelect={setGoal} />
+                </div>
+
+                {/* Intent */}
+                <div className="mb-10">
+                  <div className="flex justify-between items-end mb-3">
+                    <div className="field-label mb-0"><span className="label-dot" /> Manifesto de Intenção</div>
+                    <span className={`text-[10px] font-mono ${intent.length < 50 ? "text-destructive/70" : "text-green-500/70"}`}>
+                      {intent.length}/50 min
+                    </span>
+                  </div>
+                  <textarea
+                    className="quantum-input h-32 md:h-36 resize-none text-sm md:text-base"
+                    value={intent} onChange={(e) => setIntent(e.target.value)}
+                    placeholder="Descreva com detalhes a realidade que já é sua. Ex: No meu próximo ano eu fecho a sociedade milionária da minha agência..."
+                  />
+                </div>
+
+                {/* Swipe */}
+                <div className="mb-10">
+                  <SwipeButton checked={protocolAccepted} onComplete={() => setProtocolAccepted(true)} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Submit */}
           <HoldButton
             onComplete={handleSubmit}
-            label={
-              mode === "futuro"
-                ? "Segure para Calcular a Rota"
-                : "Segure para Auditar Minha História"
-            }
-            sublabel="Pressione e segure por 2 segundos para selar seu destino"
+            label={mode === "futuro" ? "Segure para Calcular a Rota" : "Segure para Auditar Minha História"}
+            sublabel="Pressione e segure por 2 segundos"
           />
+
+          {/* Bottom Accent */}
+          <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
         </motion.div>
-      </div>
+
+        {/* Trust badges */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="flex flex-wrap justify-center gap-6 md:gap-10 mt-8 px-4"
+        >
+          {[
+            { icon: "🛡️", text: "Dados 100% Privados" },
+            { icon: "🔬", text: "Efemérides Suíças (JPL)" },
+            { icon: "🤖", text: "IA Mestre Astrólogo" },
+          ].map((b, i) => (
+            <div key={i} className="flex items-center gap-2 text-muted-foreground/50">
+              <span className="text-sm">{b.icon}</span>
+              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
+            </div>
+          ))}
+        </motion.div>
+      </section>
     </>
   );
 };
