@@ -64,6 +64,11 @@ const Index = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
     setSubmitted(true);
     if (!name.trim()) { showAlert("Digite seu nome."); return; }
     if (!birthdate) { showAlert("Informe a data de nascimento."); return; }
@@ -73,7 +78,6 @@ const Index = () => {
     if (mode === "futuro") {
       if (!goal) { showAlert("Selecione uma Casa no grid."); return; }
       if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); return; }
-      
     }
 
     setIsScanning(true);
@@ -100,9 +104,36 @@ const Index = () => {
       clearTimeout(timeoutId);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na comunicação.");
-      console.log("Resultado:", data);
-      showAlert("Cálculo concluído! (Dashboard em construção)");
+
+      // Save consultation to database
+      const { data: consultation, error: dbError } = await supabase
+        .from("consultations")
+        .insert({
+          user_id: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime,
+          birth_place: birthPlace.trim(),
+          origin: origin.trim(),
+          year,
+          mode,
+          goal,
+          intent: intent.trim() || null,
+          result: data,
+          houses_unlocked: 1,
+        })
+        .select()
+        .single();
+
       setIsScanning(false);
+
+      if (dbError) {
+        showAlert("Cálculo concluído, mas erro ao salvar. Tente novamente.");
+        console.error(dbError);
+        return;
+      }
+
+      navigate(`/dashboard?id=${consultation.id}`);
     } catch (error: unknown) {
       setIsScanning(false);
       const err = error as Error;
