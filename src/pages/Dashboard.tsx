@@ -2,18 +2,42 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import StarryBackground from "@/components/StarryBackground";
+import UserMenu from "@/components/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase } from "@/data/houses";
 
-interface ConsultationResult {
+interface CityOption {
+  city: string;
+  country: string;
+  continent: string;
+  display_name: string;
+  lat: number;
+  lon: number;
+}
+
+interface HouseResult {
+  city: CityOption;
+  options: {
+    nacional: CityOption | null;
+    acessivel: CityOption | null;
+    highticket: CityOption | null;
+  };
+}
+
+interface ApiResult {
+  results: Record<string, HouseResult>;
+  oraculo?: string;
+}
+
+interface ConsultationRow {
   id: string;
   name: string;
   year: string;
   mode: string;
   goal: number | null;
   houses_unlocked: number;
-  result: Record<string, unknown> | null;
+  result: ApiResult | null;
   created_at: string;
 }
 
@@ -23,43 +47,45 @@ const Dashboard = () => {
   const [searchParams] = useSearchParams();
   const consultationId = searchParams.get("id");
 
-  const [consultation, setConsultation] = useState<ConsultationResult | null>(null);
-  const [consultations, setConsultations] = useState<ConsultationResult[]>([]);
+  const [consultation, setConsultation] = useState<ConsultationRow | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
-      // Fetch all consultations
-      const { data: allConsultations } = await supabase
+      let query = supabase
         .from("consultations")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (allConsultations) {
-        setConsultations(allConsultations as unknown as ConsultationResult[]);
-        if (consultationId) {
-          const found = allConsultations.find((c) => c.id === consultationId);
-          if (found) setConsultation(found as unknown as ConsultationResult);
-        } else if (allConsultations.length > 0) {
-          setConsultation(allConsultations[0] as unknown as ConsultationResult);
-        }
+      if (consultationId) {
+        query = supabase
+          .from("consultations")
+          .select("*")
+          .eq("id", consultationId)
+          .eq("user_id", user.id);
+      }
+
+      const { data } = await query;
+      if (data && data.length > 0) {
+        setConsultation(data[0] as unknown as ConsultationRow);
       }
       setLoading(false);
     };
     fetchData();
   }, [user, consultationId]);
 
-  const housesArray = Object.values(cityDatabase);
-  const getHouseData = (houseNum: number) => cityDatabase[houseNum];
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
     return houseNum > consultation.houses_unlocked;
   };
 
-  const handleUnlockMore = () => navigate("/credits");
+  const getHouseResult = (houseNum: number): HouseResult | null => {
+    if (!consultation?.result?.results) return null;
+    return consultation.result.results[String(houseNum)] || null;
+  };
 
   if (loading) {
     return (
@@ -79,7 +105,7 @@ const Dashboard = () => {
         <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
           <h2 className="font-cinzel text-2xl font-bold text-foreground mb-4">Nenhuma Consulta Encontrada</h2>
           <p className="text-muted-foreground text-sm mb-8">Calcule sua primeira rota estelar para ver o dashboard.</p>
-          <button onClick={() => navigate("/")} className="px-8 py-3 rounded-xl bg-primary text-background font-bold text-sm uppercase tracking-widest">
+          <button onClick={() => navigate("/")} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm uppercase tracking-widest">
             Calcular Rota
           </button>
         </div>
@@ -87,22 +113,22 @@ const Dashboard = () => {
     );
   }
 
-  const resultData = consultation.result as Record<string, unknown> | null;
+  const houseData = cityDatabase;
+  const goalHouse = consultation.goal;
 
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen px-4 py-8 max-w-6xl mx-auto">
+      {user && <UserMenu />}
+      <div className="min-h-screen px-4 py-8 max-w-6xl mx-auto relative z-10">
         {/* Top Bar */}
         <div className="flex items-center justify-between mb-8">
           <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary transition-colors">
             ← Nova Consulta
           </button>
-          <div className="flex items-center gap-4">
-            <button onClick={() => navigate("/credits")} className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors font-semibold">
-              {profile?.credits ?? 0} Créditos
-            </button>
-          </div>
+          <button onClick={() => navigate("/credits")} className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors font-semibold">
+            {profile?.credits ?? 0} Créditos
+          </button>
         </div>
 
         {/* Header */}
@@ -115,138 +141,200 @@ const Dashboard = () => {
             Revolução Solar {consultation.year}
           </h1>
           <p className="text-muted-foreground text-sm font-light">{consultation.name}</p>
+          {goalHouse && (
+            <p className="text-primary/70 text-xs mt-2 uppercase tracking-widest">
+              Casa-alvo: {goalHouse} — {houseData[goalHouse]?.label}
+            </p>
+          )}
         </motion.div>
-
-        {/* Consultation History (if multiple) */}
-        {consultations.length > 1 && (
-          <div className="flex gap-2 justify-center mb-8 overflow-x-auto pb-2">
-            {consultations.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setConsultation(c)}
-                className={`px-4 py-2 rounded-lg text-[10px] uppercase tracking-widest font-medium transition-all whitespace-nowrap ${
-                  c.id === consultation.id
-                    ? "bg-primary/20 text-primary border border-primary/30"
-                    : "bg-secondary/30 text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {c.year} · {c.name.split(" ")[0]}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Houses Grid */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mb-12">
-          <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider text-center mb-6">
-            As 12 Casas da Revolução Solar
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {housesArray.map((house) => {
-              const locked = isHouseLocked(house.id);
-              const isSelected = selectedHouse === house.id;
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((houseNum) => {
+            const house = houseData[houseNum];
+            const result = getHouseResult(houseNum);
+            const locked = isHouseLocked(houseNum);
+            const isGoal = goalHouse === houseNum;
+            const isSelected = selectedHouse === houseNum;
 
-              return (
-                <motion.button
-                  key={house.id}
-                  onClick={() => !locked && setSelectedHouse(isSelected ? null : house.id)}
-                  whileHover={!locked ? { scale: 1.03 } : {}}
-                  whileTap={!locked ? { scale: 0.97 } : {}}
-                  className={`relative p-5 rounded-2xl border text-left transition-all duration-300 ${
-                    locked
-                      ? "border-muted/20 bg-card/30 opacity-50 cursor-not-allowed"
-                      : isSelected
-                        ? "border-primary/50 bg-primary/10 shadow-[0_0_30px_hsl(var(--gold)/0.1)]"
-                        : "border-border bg-card hover:border-primary/30"
-                  }`}
-                >
-                  {locked && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-background/60 backdrop-blur-sm z-10">
-                      <svg className="w-6 h-6 text-muted-foreground/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </svg>
-                    </div>
-                  )}
-                  <div className="text-2xl mb-2">{house.emoji}</div>
-                  <p className="text-primary font-cinzel text-xs font-bold uppercase tracking-wider">Casa {house.id}</p>
-                  <p className="text-foreground text-sm font-medium mt-1">{house.label}</p>
-                </motion.button>
-              );
-            })}
-          </div>
-        </motion.div>
+            return (
+              <motion.button
+                key={houseNum}
+                onClick={() => !locked && setSelectedHouse(isSelected ? null : houseNum)}
+                whileHover={!locked ? { scale: 1.02 } : {}}
+                whileTap={!locked ? { scale: 0.98 } : {}}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: houseNum * 0.05 }}
+                className={`relative p-5 rounded-2xl border text-left transition-all duration-300 ${
+                  locked
+                    ? "border-muted/20 bg-card/20 opacity-40 cursor-not-allowed"
+                    : isSelected
+                      ? "border-primary/50 bg-primary/10 shadow-[0_0_30px_hsl(var(--gold)/0.15)]"
+                      : isGoal
+                        ? "border-primary/30 bg-primary/5 hover:border-primary/50"
+                        : "border-border bg-card/50 hover:border-primary/30"
+                }`}
+              >
+                {locked && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-background/60 backdrop-blur-sm z-10">
+                    <svg className="w-6 h-6 text-muted-foreground/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                )}
+
+                {isGoal && (
+                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30">
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-primary">Alvo</span>
+                  </div>
+                )}
+
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">{house?.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-primary font-cinzel text-xs font-bold uppercase tracking-wider">Casa {houseNum}</p>
+                    <p className="text-foreground text-sm font-medium mt-0.5">{house?.label}</p>
+                    {result && !locked && (
+                      <div className="mt-2 flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5 text-primary/70 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                          <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        <span className="text-foreground/80 text-xs font-medium truncate">
+                          {result.city.display_name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
 
         {/* Selected House Detail */}
         <AnimatePresence>
-          {selectedHouse && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="glass-panel glass-panel-glow p-8 md:p-12 mb-12"
-            >
-              {(() => {
-                const h = getHouseData(selectedHouse);
-                if (!h) return null;
-                return (
-                  <>
-                    <div className="flex items-start gap-4 mb-6">
-                      <span className="text-4xl">{h.emoji}</span>
-                      <div>
-                        <h3 className="font-cinzel text-xl font-bold text-foreground uppercase tracking-wider">
-                          Casa {h.id} — {h.name}
-                        </h3>
-                        <p className="text-primary text-xs uppercase tracking-widest mt-1">{h.label}</p>
-                      </div>
-                    </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">{h.resumo} — {h.porque}</p>
+          {selectedHouse && (() => {
+            const house = houseData[selectedHouse];
+            const result = getHouseResult(selectedHouse);
+            if (!house) return null;
 
-                    {/* Oracle section */}
-                    <div className="bg-secondary/30 rounded-xl p-6 border border-primary/10">
-                      <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">Promessa da Casa {h.id}</p>
-                      <p className="text-foreground/80 text-sm italic leading-relaxed font-light">
-                        "{h.promessa_texto}"
+            return (
+              <motion.div
+                key={selectedHouse}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="glass-panel glass-panel-glow p-6 md:p-10 mb-12"
+              >
+                {/* House Header */}
+                <div className="flex items-start gap-4 mb-6">
+                  <span className="text-4xl">{house.emoji}</span>
+                  <div>
+                    <h3 className="font-cinzel text-xl font-bold text-foreground uppercase tracking-wider">
+                      Casa {house.id} — {house.name}
+                    </h3>
+                    <p className="text-primary text-xs uppercase tracking-widest mt-1">{house.label}</p>
+                  </div>
+                </div>
+
+                {/* House Description */}
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                  {house.resumo} — {house.porque}
+                </p>
+
+                {/* City Recommendation */}
+                {result && (
+                  <div className="space-y-4 mb-6">
+                    {/* Main City */}
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">
+                        📍 Destino Recomendado
                       </p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                          <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-foreground font-bold text-lg">{result.city.city}</p>
+                          <p className="text-muted-foreground text-xs">{result.city.country} · {result.city.continent}</p>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Result data if available */}
-                    {resultData && resultData[`casa_${selectedHouse}`] && (
-                      <div className="mt-6 bg-card/50 rounded-xl p-6 border border-border">
-                        <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">Resultado da Análise</p>
-                        <p className="text-foreground/70 text-sm leading-relaxed whitespace-pre-wrap">
-                          {String(resultData[`casa_${selectedHouse}`])}
-                        </p>
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-            </motion.div>
-          )}
+                    {/* Alternative Options */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {result.options.nacional && (
+                        <div className="bg-card/60 border border-border rounded-xl p-4">
+                          <p className="text-[9px] uppercase tracking-[0.2em] text-green-400 font-semibold mb-2">🇧🇷 Opção Nacional</p>
+                          <p className="text-foreground text-sm font-medium">{result.options.nacional.city}</p>
+                          <p className="text-muted-foreground text-[10px]">{result.options.nacional.country}</p>
+                        </div>
+                      )}
+                      {result.options.acessivel && (
+                        <div className="bg-card/60 border border-border rounded-xl p-4">
+                          <p className="text-[9px] uppercase tracking-[0.2em] text-blue-400 font-semibold mb-2">✈️ Mais Acessível</p>
+                          <p className="text-foreground text-sm font-medium">{result.options.acessivel.city}</p>
+                          <p className="text-muted-foreground text-[10px]">{result.options.acessivel.country}</p>
+                        </div>
+                      )}
+                      {result.options.highticket && (
+                        <div className="bg-card/60 border border-border rounded-xl p-4">
+                          <p className="text-[9px] uppercase tracking-[0.2em] text-primary font-semibold mb-2">👑 High Ticket</p>
+                          <p className="text-foreground text-sm font-medium">{result.options.highticket.city}</p>
+                          <p className="text-muted-foreground text-[10px]">{result.options.highticket.country}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* House Promise */}
+                <div className="bg-secondary/30 rounded-xl p-6 border border-primary/10 mb-6">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{house.promessa_titulo}</p>
+                  <p className="text-foreground/80 text-sm italic leading-relaxed font-light">
+                    "{house.promessa_texto}"
+                  </p>
+                </div>
+
+                {/* Areas */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-card/40 rounded-xl p-4 border border-border">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-primary font-semibold mb-2">💼 Profissional</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">{house.prof}</p>
+                  </div>
+                  <div className="bg-card/40 rounded-xl p-4 border border-border">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-primary font-semibold mb-2">❤️ Amor</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">{house.amor}</p>
+                  </div>
+                  <div className="bg-card/40 rounded-xl p-4 border border-border">
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-primary font-semibold mb-2">🧘 Pessoal</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">{house.pessoal}</p>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })()}
         </AnimatePresence>
 
         {/* Unlock More CTA */}
         {consultation.houses_unlocked < 12 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-12">
             <div className="glass-panel p-8 max-w-lg mx-auto">
               <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-2">
                 Desbloqueie Mais Casas
               </h3>
               <p className="text-muted-foreground text-xs font-light mb-6">
-                {consultation.houses_unlocked === 1
-                  ? "Você está vendo 1 casa. Use 1 crédito para ver 3 casas ou 2 créditos para o mapa completo."
-                  : consultation.houses_unlocked === 3
-                    ? "Você desbloqueou 3 casas. Use mais 1 crédito para ver todas as 12."
-                    : `${consultation.houses_unlocked} casas desbloqueadas.`}
+                Você está vendo {consultation.houses_unlocked} de 12 casas. Compre créditos para desbloquear o mapa completo.
               </p>
               <button
-                onClick={handleUnlockMore}
-                className="px-8 py-3.5 rounded-xl bg-primary text-background font-bold text-xs uppercase tracking-[0.2em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all"
+                onClick={() => navigate("/credits")}
+                className="px-8 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.2em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all"
               >
                 Comprar Créditos
               </button>
