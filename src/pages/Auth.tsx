@@ -1,8 +1,21 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import { lovable } from "@/integrations/lovable";
+import { useAuth } from "@/hooks/useAuth";
 
 const Auth = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/", { replace: true });
+    }
+  }, [user, loading, navigate]);
+
   const handleGoogleLogin = async () => {
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
@@ -11,6 +24,19 @@ const Auth = () => {
       console.error("Login error:", result.error);
     }
   };
+
+  if (loading) {
+    return (
+      <>
+        <StarryBackground />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-primary font-cinzel text-lg animate-pulse">Verificando sessão...</div>
+        </div>
+      </>
+    );
+  }
+
+  if (user) return null; // Will redirect via useEffect
 
   return (
     <>
@@ -21,7 +47,6 @@ const Auth = () => {
           animate={{ opacity: 1, y: 0 }}
           className="glass-panel glass-panel-glow p-8 md:p-14 max-w-md w-full text-center"
         >
-          {/* GPS Icon */}
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-primary/20 flex items-center justify-center mx-auto mb-6">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-dark to-primary flex items-center justify-center shadow-[0_0_40px_hsl(var(--gold)/0.4)]">
               <svg className="w-6 h-6 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
