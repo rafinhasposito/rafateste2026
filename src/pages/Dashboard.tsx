@@ -78,6 +78,16 @@ const Dashboard = () => {
     fetchData();
   }, [user, consultationId]);
 
+  // Auto-select the goal house when consultation loads
+  useEffect(() => {
+    if (consultation && !initialHouseSet) {
+      if (consultation.goal) {
+        setSelectedHouse(consultation.goal);
+      }
+      setInitialHouseSet(true);
+    }
+  }, [consultation, initialHouseSet]);
+
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
     return houseNum > consultation.houses_unlocked;
