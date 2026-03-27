@@ -49,6 +49,7 @@ const Dashboard = () => {
 
   const [consultation, setConsultation] = useState<ConsultationRow | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
+  const [initialHouseSet, setInitialHouseSet] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
