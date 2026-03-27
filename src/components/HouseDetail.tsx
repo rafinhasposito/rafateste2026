@@ -23,6 +23,7 @@ interface HouseResult {
 interface HouseDetailProps {
   house: HouseData;
   result: HouseResult | null;
+  mode: "passado" | "presente" | "futuro";
   onClose: () => void;
 }
 
@@ -40,7 +41,7 @@ const countryFlags: Record<string, string> = {
 
 const getFlag = (country: string) => countryFlags[country] || "🌍";
 
-const getMapUrl = (lat: number, lon: number, city: string) =>
+const getMapUrl = (lat: number, lon: number) =>
   `https://maps.google.com/maps?q=${lat},${lon}&z=6&output=embed`;
 
 const RadarBar = ({ label, value, toneClass }: { label: string; value: number; toneClass: string }) => (
@@ -80,10 +81,9 @@ const DestinationCard = ({
         <p className="text-muted-foreground text-[11px]">{city.country} · {city.continent}</p>
       </div>
     </div>
-    {/* Mini map */}
     <div className="mt-3 rounded-lg overflow-hidden border border-border/30 h-24 bg-background/50">
       <iframe
-        src={getMapUrl(city.lat, city.lon, city.city)}
+        src={getMapUrl(city.lat, city.lon)}
         className="w-full h-full border-0 opacity-70 group-hover/dest:opacity-100 transition-opacity pointer-events-none"
         loading="lazy"
         title={`Mapa de ${city.city}`}
@@ -95,18 +95,55 @@ const DestinationCard = ({
   </div>
 );
 
-const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
+const HouseDetail = ({ house, result, mode, onClose }: HouseDetailProps) => {
   const bgGradient = houseColors[house.id];
   const archetype = getHouseArchetype(house.name);
   const sign = houseSigns[house.id];
+  const isPast = mode === "passado";
+  const isFuture = mode === "futuro";
+
+  // Time-aware text selection
+  const beneficio = isPast ? house.beneficio_passado : house.beneficio;
+  const ideal = isPast ? house.ideal_passado : house.ideal;
+  const pessoal = isPast ? house.pessoal_passado : house.pessoal;
+  const amor = isPast ? house.amor_passado : house.amor;
+  const prof = isPast ? house.prof_passado : house.prof;
+  const mainText = isPast ? house.past_text : house.porque;
+
+  // Time-aware labels
+  const promessaTitulo = isPast
+    ? "O Que o Universo Preparou Naquele Ciclo"
+    : isFuture
+      ? "A Promessa do Universo Para Este Ciclo"
+      : "A Energia Ativa Neste Momento";
+
+  const leituraTitulo = isPast
+    ? "Análise Retroativa da Casa"
+    : isFuture
+      ? "Leitura de Ativação da Casa"
+      : "Energia em Ação";
+
+  const leituraTexto = isPast
+    ? `Naquele ciclo, quem ativou a Casa ${house.id} focou em ${house.label}, canalizando a energia de ${archetype}. Veja abaixo como essa frequência se manifestou.`
+    : isFuture
+      ? `Quem escolhe a Casa ${house.id} ativa foco em ${house.label}, com energia de ${archetype}. Escolha uma das cidades calculadas e passe 24h no local para ancorar essa frequência.`
+      : `A Casa ${house.id} está ativa com foco em ${house.label}, canalizando ${archetype}. As cidades abaixo potencializam essa energia.`;
+
+  const destinoLabel = isPast ? "Onde a Energia se Ancorou" : "Destinos Calculados";
+  const destinoDesc = isPast
+    ? "As cidades abaixo representam os pontos de ancoragem energética daquele ciclo."
+    : "A matemática pode retornar 1, 2 ou 3 rotas, conforme viabilidade astrológica de cada casa.";
+
+  const areaLabels = isPast
+    ? { prof: "Cenário Profissional", amor: "Cenário Afetivo", pessoal: "Cenário Pessoal" }
+    : { prof: "Profissional", amor: "Amor", pessoal: "Pessoal" };
 
   const destinations: { city: CityOption; label: string; toneClass: string }[] = [];
 
   if (result) {
-    // Always show main city as the primary recommendation
     destinations.push({
       city: result.city,
-      label: "Destino Principal",
+      label: isPast ? "Destino Ativado" : "Destino Principal",
       toneClass: "text-primary",
     });
 
@@ -144,20 +181,19 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
       className="rounded-3xl border border-primary/20 overflow-hidden mb-12"
       style={{ background: bgGradient }}
     >
-      {/* Close button */}
       <div className="flex justify-end p-4 pb-0">
-        <button onClick={onClose} className="text-foreground/30 hover:text-foreground/60 transition-colors text-sm">✕ Fechar</button>
+        <button onClick={onClose} className="text-foreground/30 hover:text-foreground/60 transition-colors text-sm">Fechar</button>
       </div>
 
       <div className="p-6 md:p-10 pt-2">
-        {/* House Header */}
+        {/* Header */}
         <div className="flex items-start gap-4 mb-2">
           <div className="flex-1">
             <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wider">
               Casa {house.id}
             </h3>
             <p className="text-primary text-sm uppercase tracking-[0.3em] mt-1 font-semibold">{house.label}</p>
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
               <span className="text-foreground/40 text-xs">{archetype}</span>
               <span className="text-foreground/20">·</span>
               <span className="text-foreground/40 text-xs">{sign}</span>
@@ -169,18 +205,22 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
           </div>
         </div>
 
+        {/* Mode badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/15 bg-primary/5 mt-3 mb-5">
+          <div className={`w-1.5 h-1.5 rounded-full ${isPast ? 'bg-amber-400' : isFuture ? 'bg-emerald-400' : 'bg-blue-400'}`} />
+          <span className="text-[9px] uppercase tracking-[0.3em] text-primary font-semibold">
+            {isPast ? "Análise do Passado" : isFuture ? "Previsão Futura" : "Momento Presente"}
+          </span>
+        </div>
+
+        {/* Leitura */}
         <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">Leitura de Ativação da Casa</p>
-          <p className="text-foreground/80 text-sm leading-relaxed font-light mb-2">
-            Quem escolhe a Casa {house.id} ativa foco em <span className="text-foreground font-medium">{house.label}</span>, com energia de <span className="text-foreground font-medium">{archetype}</span>.
-          </p>
-          <p className="text-foreground/70 text-xs leading-relaxed">
-            Escolha uma das cidades calculadas e passe 24h no local para ancorar essa frequência no seu ciclo solar.
-          </p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{leituraTitulo}</p>
+          <p className="text-foreground/80 text-sm leading-relaxed font-light">{leituraTexto}</p>
         </div>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mt-4 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           {house.tags.map((tag) => (
             <span key={tag} className="text-[10px] px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary uppercase tracking-wider font-medium">
               {tag}
@@ -188,21 +228,27 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
           ))}
         </div>
 
-        {/* House resumo */}
+        {/* Main resumo */}
         <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
           <p className="text-primary font-cinzel text-sm font-bold uppercase tracking-wider mb-2">{house.resumo}</p>
-          <p className="text-foreground/70 text-sm leading-relaxed">{house.porque}</p>
+          <p className="text-foreground/70 text-sm leading-relaxed">{mainText}</p>
         </div>
 
-        {/* ═══════ DESTINATIONS ═══════ */}
+        {/* Sombra (past only) */}
+        {isPast && house.sombra && (
+          <div className="bg-destructive/5 border border-destructive/15 rounded-xl p-5 mb-6">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-destructive font-semibold mb-3">O Lado Sombra Daquele Ciclo</p>
+            <p className="text-foreground/70 text-xs leading-relaxed">{house.sombra}</p>
+          </div>
+        )}
+
+        {/* Destinations */}
         {destinations.length > 0 && (
           <div className="mb-8">
             <h4 className="font-cinzel text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">
-              Destinos Calculados
+              {destinoLabel}
             </h4>
-            <p className="text-foreground/60 text-[11px] mb-4 leading-relaxed">
-              A matemática pode retornar 1, 2 ou 3 rotas, conforme viabilidade astrológica de cada casa.
-            </p>
+            <p className="text-foreground/60 text-[11px] mb-4 leading-relaxed">{destinoDesc}</p>
             <div className={`grid grid-cols-1 ${destinations.length >= 3 ? 'md:grid-cols-3' : destinations.length === 2 ? 'md:grid-cols-2' : ''} gap-4`}>
               {destinations.map((d, i) => (
                 <DestinationCard key={i} {...d} />
@@ -211,7 +257,7 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
           </div>
         )}
 
-        {/* ═══════ RADAR ═══════ */}
+        {/* Radar */}
         <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
           <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.3em] mb-4">
             Radar de Impacto
@@ -223,39 +269,43 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
           </div>
         </div>
 
-        {/* ═══════ PROMISE ═══════ */}
+        {/* Promise */}
         <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{house.promessa_titulo}</p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{promessaTitulo}</p>
           <p className="text-foreground/80 text-sm italic leading-relaxed font-light">
             "{house.promessa_texto}"
           </p>
         </div>
 
-        {/* ═══════ AREAS ═══════ */}
+        {/* Areas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Profissional</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{house.prof}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.prof}</p>
+            <p className="text-foreground/60 text-xs leading-relaxed">{prof}</p>
           </div>
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Amor</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{house.amor}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.amor}</p>
+            <p className="text-foreground/60 text-xs leading-relaxed">{amor}</p>
           </div>
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Pessoal</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{house.pessoal}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.pessoal}</p>
+            <p className="text-foreground/60 text-xs leading-relaxed">{pessoal}</p>
           </div>
         </div>
 
-        {/* ═══════ BENEFÍCIO & IDEAL ═══════ */}
+        {/* Benefício & Ideal */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Benefício</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{house.beneficio}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">
+              {isPast ? "O Que Foi Colhido" : "Benefício"}
+            </p>
+            <p className="text-foreground/60 text-xs leading-relaxed">{beneficio}</p>
           </div>
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Ideal Para</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{house.ideal}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">
+              {isPast ? "O Que Era Necessário" : "Ideal Para"}
+            </p>
+            <p className="text-foreground/60 text-xs leading-relaxed">{ideal}</p>
           </div>
         </div>
       </div>
