@@ -49,6 +49,7 @@ const Dashboard = () => {
 
   const [consultation, setConsultation] = useState<ConsultationRow | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
+  const [initialHouseSet, setInitialHouseSet] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -76,6 +77,16 @@ const Dashboard = () => {
     };
     fetchData();
   }, [user, consultationId]);
+
+  // Auto-select the goal house when consultation loads
+  useEffect(() => {
+    if (consultation && !initialHouseSet) {
+      if (consultation.goal) {
+        setSelectedHouse(consultation.goal);
+      }
+      setInitialHouseSet(true);
+    }
+  }, [consultation, initialHouseSet]);
 
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
