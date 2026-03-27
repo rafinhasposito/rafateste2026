@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { HouseData, houseColors } from "@/data/houses";
+import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
 
 interface CityOption {
   city: string;
@@ -42,7 +43,7 @@ const getFlag = (country: string) => countryFlags[country] || "🌍";
 const getMapUrl = (lat: number, lon: number, city: string) =>
   `https://maps.google.com/maps?q=${lat},${lon}&z=6&output=embed`;
 
-const RadarBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
+const RadarBar = ({ label, value, toneClass }: { label: string; value: number; toneClass: string }) => (
   <div className="space-y-1">
     <div className="flex justify-between items-center">
       <span className="text-foreground/60 text-[10px] uppercase tracking-wider">{label}</span>
@@ -53,8 +54,7 @@ const RadarBar = ({ label, value, color }: { label: string; value: number; color
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
         transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-        className="h-full rounded-full"
-        style={{ background: color }}
+        className={`h-full rounded-full ${toneClass}`}
       />
     </div>
   </div>
@@ -63,17 +63,15 @@ const RadarBar = ({ label, value, color }: { label: string; value: number; color
 const DestinationCard = ({
   city,
   label,
-  emoji,
-  accent,
+  toneClass,
 }: {
   city: CityOption;
   label: string;
-  emoji: string;
-  accent: string;
+  toneClass: string;
 }) => (
   <div className="bg-card/40 border border-border/50 rounded-xl p-4 hover:border-primary/30 transition-all group/dest">
-    <p className="text-[9px] uppercase tracking-[0.2em] font-semibold mb-3" style={{ color: accent }}>
-      {emoji} {label}
+    <p className={`text-[9px] uppercase tracking-[0.2em] font-semibold mb-3 ${toneClass}`}>
+      {label}
     </p>
     <div className="flex items-center gap-3">
       <span className="text-2xl">{getFlag(city.country)}</span>
@@ -99,42 +97,40 @@ const DestinationCard = ({
 
 const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
   const bgGradient = houseColors[house.id];
+  const archetype = getHouseArchetype(house.name);
+  const sign = houseSigns[house.id];
 
-  const destinations: { city: CityOption; label: string; emoji: string; accent: string }[] = [];
+  const destinations: { city: CityOption; label: string; toneClass: string }[] = [];
 
   if (result) {
     // Always show main city as the primary recommendation
     destinations.push({
       city: result.city,
       label: "Destino Principal",
-      emoji: "⭐",
-      accent: "hsl(45, 90%, 55%)",
+      toneClass: "text-primary",
     });
 
     if (result.options.nacional) {
       destinations.push({
         city: result.options.nacional,
         label: "Opção Nacional",
-        emoji: "🇧🇷",
-        accent: "#22c55e",
+        toneClass: "text-foreground",
       });
     }
 
     if (result.options.acessivel && result.options.acessivel.city !== result.city.city) {
       destinations.push({
         city: result.options.acessivel,
-        label: "Mais Acessível",
-        emoji: "✈️",
-        accent: "#3b82f6",
+        label: "Rota Acessível",
+        toneClass: "text-muted-foreground",
       });
     }
 
     if (result.options.highticket && result.options.highticket.city !== result.city.city) {
       destinations.push({
         city: result.options.highticket,
-        label: "High Ticket",
-        emoji: "👑",
-        accent: "hsl(45, 90%, 55%)",
+        label: "Rota Premium",
+        toneClass: "text-primary",
       });
     }
   }
@@ -156,18 +152,31 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
       <div className="p-6 md:p-10 pt-2">
         {/* House Header */}
         <div className="flex items-start gap-4 mb-2">
-          <span className="text-5xl filter drop-shadow-xl">{house.emoji}</span>
           <div className="flex-1">
             <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wider">
               Casa {house.id}
             </h3>
             <p className="text-primary text-sm uppercase tracking-[0.3em] mt-1 font-semibold">{house.label}</p>
             <div className="flex items-center gap-3 mt-2">
+              <span className="text-foreground/40 text-xs">{archetype}</span>
+              <span className="text-foreground/20">·</span>
+              <span className="text-foreground/40 text-xs">{sign}</span>
+              <span className="text-foreground/20">·</span>
               <span className="text-foreground/40 text-xs">{house.regente}</span>
               <span className="text-foreground/20">·</span>
-              <span className="text-foreground/40 text-xs">💎 {house.cristal}</span>
+              <span className="text-foreground/40 text-xs">Cristal: {house.cristal}</span>
             </div>
           </div>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">Leitura de Ativação da Casa</p>
+          <p className="text-foreground/80 text-sm leading-relaxed font-light mb-2">
+            Quem escolhe a Casa {house.id} ativa foco em <span className="text-foreground font-medium">{house.label}</span>, com energia de <span className="text-foreground font-medium">{archetype}</span>.
+          </p>
+          <p className="text-foreground/70 text-xs leading-relaxed">
+            Escolha uma das cidades calculadas e passe 24h no local para ancorar essa frequência no seu ciclo solar.
+          </p>
         </div>
 
         {/* Tags */}
@@ -189,8 +198,11 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
         {destinations.length > 0 && (
           <div className="mb-8">
             <h4 className="font-cinzel text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">
-              📍 Destinos Calculados
+              Destinos Calculados
             </h4>
+            <p className="text-foreground/60 text-[11px] mb-4 leading-relaxed">
+              A matemática pode retornar 1, 2 ou 3 rotas, conforme viabilidade astrológica de cada casa.
+            </p>
             <div className={`grid grid-cols-1 ${destinations.length >= 3 ? 'md:grid-cols-3' : destinations.length === 2 ? 'md:grid-cols-2' : ''} gap-4`}>
               {destinations.map((d, i) => (
                 <DestinationCard key={i} {...d} />
@@ -202,12 +214,12 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
         {/* ═══════ RADAR ═══════ */}
         <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
           <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.3em] mb-4">
-            📊 Radar de Impacto
+            Radar de Impacto
           </h4>
           <div className="space-y-3">
-            <RadarBar label="💰 Dinheiro" value={house.radar.dinheiro} color="hsl(45, 90%, 55%)" />
-            <RadarBar label="❤️ Amor" value={house.radar.amor} color="#f43f5e" />
-            <RadarBar label="🧘 Saúde" value={house.radar.saude} color="#22c55e" />
+            <RadarBar label="Dinheiro" value={house.radar.dinheiro} toneClass="bg-primary" />
+            <RadarBar label="Amor" value={house.radar.amor} toneClass="bg-foreground/70" />
+            <RadarBar label="Saúde" value={house.radar.saude} toneClass="bg-muted-foreground" />
           </div>
         </div>
 
@@ -222,15 +234,15 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
         {/* ═══════ AREAS ═══════ */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">💼 Profissional</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Profissional</p>
             <p className="text-foreground/60 text-xs leading-relaxed">{house.prof}</p>
           </div>
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">❤️ Amor</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Amor</p>
             <p className="text-foreground/60 text-xs leading-relaxed">{house.amor}</p>
           </div>
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">🧘 Pessoal</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Pessoal</p>
             <p className="text-foreground/60 text-xs leading-relaxed">{house.pessoal}</p>
           </div>
         </div>
@@ -238,11 +250,11 @@ const HouseDetail = ({ house, result, onClose }: HouseDetailProps) => {
         {/* ═══════ BENEFÍCIO & IDEAL ═══════ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">✨ Benefício</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Benefício</p>
             <p className="text-foreground/60 text-xs leading-relaxed">{house.beneficio}</p>
           </div>
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">🎯 Ideal Para</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Ideal Para</p>
             <p className="text-foreground/60 text-xs leading-relaxed">{house.ideal}</p>
           </div>
         </div>
