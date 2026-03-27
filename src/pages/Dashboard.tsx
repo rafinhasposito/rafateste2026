@@ -51,15 +51,8 @@ const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: nu
   const goalHouse = consultation.goal;
 
   if (unlockedCount >= TOTAL_HOUSES) return false;
-
-  if (goalHouse && unlockedCount <= 1) {
-    return houseNum !== goalHouse;
-  }
-
-  if (goalHouse === houseNum) {
-    return false;
-  }
-
+  if (goalHouse && houseNum === goalHouse) return false;
+  if (goalHouse && unlockedCount <= 1) return houseNum !== goalHouse;
   return houseNum > unlockedCount;
 };
 
@@ -73,7 +66,7 @@ const Dashboard = () => {
   const [consultation, setConsultation] = useState<ConsultationRow | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [unlockingAll, setUnlockingAll] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -101,21 +94,19 @@ const Dashboard = () => {
     fetchData();
   }, [user, consultationId]);
 
+  // Auto-select goal house or first unlocked
   useEffect(() => {
     if (!consultation) {
       setSelectedHouse(null);
       return;
     }
-
     if (consultation.goal && !isHouseLockedByConsultation(consultation, consultation.goal)) {
       setSelectedHouse(consultation.goal);
       return;
     }
-
     const firstUnlocked = Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).find(
-      (houseNum) => !isHouseLockedByConsultation(consultation, houseNum)
+      (h) => !isHouseLockedByConsultation(consultation, h)
     ) ?? null;
-
     setSelectedHouse(firstUnlocked);
   }, [consultation?.id, consultation?.goal, consultation?.houses_unlocked]);
 
@@ -129,59 +120,61 @@ const Dashboard = () => {
     return consultation.result.results[String(houseNum)] || null;
   };
 
-  const handleUnlockAllHouses = async () => {
-    if (!user || !profile || !consultation || unlockingAll) return;
+  const handleUnlock = async (amount: number) => {
+    if (!user || !profile || !consultation || unlocking) return;
 
-    const creditsNeeded = Math.max(0, TOTAL_HOUSES - consultation.houses_unlocked);
+    const currentUnlocked = consultation.houses_unlocked;
+    const targetUnlocked = Math.min(currentUnlocked + amount, TOTAL_HOUSES);
+    const creditsNeeded = targetUnlocked - currentUnlocked;
 
-    if (creditsNeeded === 0) {
-      showAlert("Todas as casas já estão desbloqueadas.");
+    if (creditsNeeded <= 0) {
+      showAlert("Essas casas já estão desbloqueadas.");
       return;
     }
 
     if ((profile.credits ?? 0) < creditsNeeded) {
-      showAlert(`Você precisa de ${creditsNeeded} créditos para liberar todas as casas.`);
+      showAlert(`Você precisa de ${creditsNeeded} crédito${creditsNeeded > 1 ? "s" : ""}.`);
       return;
     }
 
-    setUnlockingAll(true);
+    setUnlocking(true);
 
     try {
-      const remainingCredits = profile.credits - creditsNeeded;
+      const remainingCredits = (profile.credits ?? 0) - creditsNeeded;
 
-      const [{ error: profileError }, { error: consultationError }, { error: transactionError }] = await Promise.all([
-        supabase
-          .from("profiles")
-          .update({ credits: remainingCredits })
-          .eq("user_id", user.id),
-        supabase
-          .from("consultations")
-          .update({ houses_unlocked: TOTAL_HOUSES })
-          .eq("id", consultation.id)
-          .eq("user_id", user.id),
-        supabase
-          .from("credit_transactions")
-          .insert({
-            user_id: user.id,
-            amount: -creditsNeeded,
-            type: "unlock_houses",
-            consultation_id: consultation.id,
-            description: "Desbloqueio de todas as casas do dashboard",
-          }),
-      ]);
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ credits: remainingCredits })
+        .eq("user_id", user.id);
 
-      if (profileError || consultationError || transactionError) {
-        throw profileError || consultationError || transactionError;
-      }
+      if (profileError) throw profileError;
 
-      setConsultation((prev) => (prev ? { ...prev, houses_unlocked: TOTAL_HOUSES } : prev));
+      const { error: consultationError } = await supabase
+        .from("consultations")
+        .update({ houses_unlocked: targetUnlocked })
+        .eq("id", consultation.id)
+        .eq("user_id", user.id);
+
+      if (consultationError) throw consultationError;
+
+      await supabase
+        .from("credit_transactions")
+        .insert({
+          user_id: user.id,
+          amount: -creditsNeeded,
+          type: "unlock_houses",
+          consultation_id: consultation.id,
+          description: `Desbloqueio de +${creditsNeeded} casa${creditsNeeded > 1 ? "s" : ""}`,
+        });
+
+      setConsultation((prev) => (prev ? { ...prev, houses_unlocked: targetUnlocked } : prev));
       await refreshProfile();
-      showAlert("Mapa completo desbloqueado com sucesso.");
+      showAlert(`${creditsNeeded} casa${creditsNeeded > 1 ? "s" : ""} desbloqueada${creditsNeeded > 1 ? "s" : ""} com sucesso.`);
     } catch (error) {
       console.error(error);
-      showAlert("Falha ao desbloquear as casas. Tente novamente.");
+      showAlert("Falha ao desbloquear. Tente novamente.");
     } finally {
-      setUnlockingAll(false);
+      setUnlocking(false);
     }
   };
 
@@ -212,12 +205,30 @@ const Dashboard = () => {
   }
 
   const goalHouse = consultation.goal;
-  const creditsNeededToUnlockAll = Math.max(0, TOTAL_HOUSES - consultation.houses_unlocked);
-  const hasEnoughCreditsForUnlockAll = (profile?.credits ?? 0) >= creditsNeededToUnlockAll;
+  const currentMode = (consultation.mode || "futuro") as "passado" | "presente" | "futuro";
+  const lockedCount = TOTAL_HOUSES - consultation.houses_unlocked;
+  const credits = profile?.credits ?? 0;
+
+  const modeLabel = currentMode === "passado" ? "Análise do Passado" : currentMode === "presente" ? "Momento Presente" : "Previsão Futura";
+  const modeDot = currentMode === "passado" ? "bg-amber-400" : currentMode === "presente" ? "bg-blue-400" : "bg-emerald-400";
+
   const oracleText = consultation.result?.oraculo
     || (goalHouse
-      ? (consultation.mode === "passado" ? fallbackOraclesPast[goalHouse] : fallbackOraclesFuture[goalHouse])
+      ? (currentMode === "passado" ? fallbackOraclesPast[goalHouse] : fallbackOraclesFuture[goalHouse])
       : null);
+
+  // Unlock tier options
+  const unlockOptions = [];
+  if (lockedCount > 0) {
+    if (lockedCount >= 1) unlockOptions.push({ amount: 1, label: "+1 Casa", cost: 1 });
+    if (lockedCount >= 3) unlockOptions.push({ amount: 3, label: "+3 Casas", cost: 3 });
+    if (lockedCount > 3) unlockOptions.push({ amount: lockedCount, label: `Todas (${lockedCount})`, cost: lockedCount });
+    else if (lockedCount === 3) {
+      // already have +3 option, skip "todas"
+    } else if (lockedCount === 2) {
+      unlockOptions.push({ amount: 2, label: "Todas (2)", cost: 2 });
+    }
+  }
 
   return (
     <>
@@ -230,15 +241,15 @@ const Dashboard = () => {
             ← Nova Consulta
           </button>
           <button onClick={() => navigate("/credits")} className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors font-semibold">
-            {profile?.credits ?? 0} Créditos
+            {credits} Créditos
           </button>
         </div>
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-primary/15 bg-primary/5 mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-primary">Mapa Calculado</span>
+            <div className={`w-1.5 h-1.5 rounded-full ${modeDot} animate-pulse`} />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-primary">{modeLabel}</span>
           </div>
           <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-2 uppercase tracking-wider">
             Revolução Solar {consultation.year}
@@ -260,7 +271,7 @@ const Dashboard = () => {
             className="max-w-3xl mx-auto mb-12 rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8"
           >
             <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3 text-center">
-              🔮 Oráculo do Mestre Astrólogo
+              {currentMode === "passado" ? "Análise do Mestre Astrólogo" : "Oráculo do Mestre Astrólogo"}
             </p>
             <p className="text-foreground/80 text-sm italic leading-relaxed text-center font-light">
               "{oracleText}"
@@ -268,7 +279,7 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* Selected House Detail (shows above grid) */}
+        {/* Selected House Detail */}
         <AnimatePresence>
           {selectedHouse && (() => {
             const house = cityDatabase[selectedHouse];
@@ -278,6 +289,7 @@ const Dashboard = () => {
               <HouseDetail
                 house={house}
                 result={result}
+                mode={currentMode}
                 onClose={() => setSelectedHouse(null)}
               />
             );
@@ -308,31 +320,33 @@ const Dashboard = () => {
           })}
         </div>
 
-        {/* Unlock More CTA */}
-        {consultation.houses_unlocked < TOTAL_HOUSES && (
+        {/* Unlock CTA */}
+        {lockedCount > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-12">
-            <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-8 max-w-lg mx-auto">
+            <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-8 max-w-xl mx-auto">
               <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-2">
                 Desbloqueie Mais Casas
               </h3>
               <p className="text-muted-foreground text-xs font-light mb-6">
-                Você está vendo {consultation.houses_unlocked} de {TOTAL_HOUSES} casas.
+                {consultation.houses_unlocked} de {TOTAL_HOUSES} casas visíveis · {credits} créditos disponíveis
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button
-                  onClick={handleUnlockAllHouses}
-                  disabled={unlockingAll || !hasEnoughCreditsForUnlockAll}
-                  className="px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {unlockingAll
-                    ? "Desbloqueando..."
-                    : hasEnoughCreditsForUnlockAll
-                      ? `Desbloquear tudo (${creditsNeededToUnlockAll} crédito${creditsNeededToUnlockAll > 1 ? "s" : ""})`
-                      : `Faltam ${Math.max(0, creditsNeededToUnlockAll - (profile?.credits ?? 0))} créditos`}
-                </button>
+                {unlockOptions.map((opt) => {
+                  const canAfford = credits >= opt.cost;
+                  return (
+                    <button
+                      key={opt.amount}
+                      onClick={() => handleUnlock(opt.amount)}
+                      disabled={unlocking || !canAfford}
+                      className="px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {unlocking ? "..." : `${opt.label} (${opt.cost} cr)`}
+                    </button>
+                  );
+                })}
                 <button
                   onClick={() => navigate("/credits")}
-                  className="px-6 py-3.5 rounded-xl border border-primary/25 bg-card/40 text-foreground font-bold text-xs uppercase tracking-[0.14em] hover:border-primary/40 transition-all"
+                  className="px-5 py-3 rounded-xl border border-primary/25 bg-card/40 text-foreground font-bold text-xs uppercase tracking-[0.14em] hover:border-primary/40 transition-all"
                 >
                   Comprar Créditos
                 </button>
