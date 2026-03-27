@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { HouseData, houseColors } from "@/data/houses";
+import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
 
 interface CityOption {
   city: string;
@@ -46,6 +47,9 @@ const getFlag = (country: string) => countryFlags[country] || "🌍";
 const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSelect }: HouseCardProps) => {
   const bgGradient = houseColors[houseNum];
 
+  const archetype = getHouseArchetype(house.name);
+  const sign = houseSigns[houseNum];
+
   return (
     <motion.button
       onClick={() => !locked && onSelect()}
@@ -82,16 +86,16 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
         {/* Goal badge */}
         {isGoal && (
           <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-primary/25 border border-primary/40 backdrop-blur-sm">
-            <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary">⭐ Alvo</span>
+            <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary">Casa-alvo</span>
           </div>
         )}
 
         {/* Header */}
         <div className="flex items-start gap-3 mb-3">
-          <span className="text-3xl filter drop-shadow-lg">{house.emoji}</span>
           <div className="flex-1 min-w-0">
             <p className="text-primary font-cinzel text-[11px] font-bold uppercase tracking-wider">Casa {houseNum}</p>
             <p className="text-foreground text-sm font-semibold mt-0.5">{house.label}</p>
+            <p className="text-foreground/50 text-[10px] mt-0.5">{archetype} · {sign}</p>
             <p className="text-foreground/50 text-[10px] mt-0.5">{house.regente}</p>
           </div>
         </div>
@@ -107,8 +111,8 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
 
         {/* Cristal */}
         <div className="flex items-center gap-1.5 mb-3">
-          <span className="text-xs">💎</span>
-          <span className="text-foreground/50 text-[10px]">{house.cristal}</span>
+          <span className="text-foreground/50 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
+          <span className="text-foreground/70 text-[10px]">{house.cristal}</span>
         </div>
 
         {/* Main City */}
