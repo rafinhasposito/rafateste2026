@@ -313,6 +313,8 @@ const Dashboard = () => {
                 house={house}
                 result={result}
                 mode={currentMode}
+                isGoal={goalHouse === selectedHouse}
+                originCity={consultation.origin}
                 onClose={() => setSelectedHouse(null)}
               />
             );
