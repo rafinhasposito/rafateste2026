@@ -105,6 +105,20 @@ const Index = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na comunicação.");
 
+      const rawHouse = mode === "passado"
+        ? (data?.house ?? data?.goal_house ?? data?.goalHouse ?? data?.casa)
+        : goal;
+      const parsedHouse = typeof rawHouse === "number"
+        ? rawHouse
+        : typeof rawHouse === "string"
+          ? parseInt(rawHouse, 10)
+          : null;
+      const resolvedHouse = parsedHouse && parsedHouse >= 1 && parsedHouse <= 12 ? parsedHouse : null;
+
+      if (mode === "passado" && !resolvedHouse) {
+        throw new Error("Não foi possível calcular em qual casa a cidade caiu nesse ano.");
+      }
+
       // Save consultation to database
       const { data: consultation, error: dbError } = await supabase
         .from("consultations")
@@ -117,7 +131,7 @@ const Index = () => {
           origin: origin.trim(),
           year,
           mode,
-          goal,
+          goal: resolvedHouse,
           intent: intent.trim() || null,
           result: data,
           houses_unlocked: 1,
