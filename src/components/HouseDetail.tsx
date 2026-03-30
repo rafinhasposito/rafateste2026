@@ -24,6 +24,8 @@ interface HouseDetailProps {
   house: HouseData;
   result: HouseResult | null;
   mode: "passado" | "presente" | "futuro";
+  isGoal?: boolean;
+  originCity?: string | null;
   onClose: () => void;
 }
 
@@ -95,7 +97,7 @@ const DestinationCard = ({
   </div>
 );
 
-const HouseDetail = ({ house, result, mode, onClose }: HouseDetailProps) => {
+const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: HouseDetailProps) => {
   const bgGradient = houseColors[house.id];
   const archetype = getHouseArchetype(house.name);
   const sign = houseSigns[house.id];
@@ -212,6 +214,16 @@ const HouseDetail = ({ house, result, mode, onClose }: HouseDetailProps) => {
             {isPast ? "Análise do Passado" : isFuture ? "Previsão Futura" : "Momento Presente"}
           </span>
         </div>
+
+        {/* Origin highlight for goal house in past mode */}
+        {isPast && isGoal && originCity && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5 mb-6">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-semibold mb-2">Cidade do Aniversário</p>
+            <p className="text-foreground/80 text-sm leading-relaxed">
+              Você passou o aniversário de {house.id === 1 ? "ciclo" : "ano"} em <span className="text-foreground font-semibold">{originCity}</span>, e o Sol se posicionou na Casa {house.id} — ativando a área de <span className="text-primary font-semibold">{house.label}</span>.
+            </p>
+          </div>
+        )}
 
         {/* Leitura */}
         <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">

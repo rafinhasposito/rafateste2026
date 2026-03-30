@@ -39,6 +39,8 @@ interface ConsultationRow {
   year: string;
   mode: string;
   goal: number | null;
+  origin: string | null;
+  birth_place: string;
   houses_unlocked: number;
   result: ApiResult | null;
   created_at: string;
@@ -255,10 +257,31 @@ const Dashboard = () => {
             Revolução Solar {consultation.year}
           </h1>
           <p className="text-muted-foreground text-sm font-light">{consultation.name}</p>
+
+          {/* Origin city + house highlight */}
           {goalHouse && (
-            <p className="text-primary/70 text-xs mt-2 uppercase tracking-widest">
-              Casa-alvo: {goalHouse} — {cityDatabase[goalHouse]?.label}
-            </p>
+            <div className="mt-4 inline-flex flex-col items-center gap-2 px-6 py-4 rounded-2xl border border-primary/20 bg-primary/5 backdrop-blur-sm">
+              {consultation.origin && (
+                <p className="text-foreground/80 text-sm font-light">
+                  {currentMode === "passado"
+                    ? `Você passou o aniversário em ${consultation.origin}`
+                    : currentMode === "presente"
+                      ? `Seu aniversário será em ${consultation.origin}`
+                      : `Cidade escolhida: ${consultation.origin}`}
+                </p>
+              )}
+              <p className="text-primary font-cinzel text-base font-bold uppercase tracking-wider">
+                {currentMode === "passado"
+                  ? `A energia caiu na Casa ${goalHouse}`
+                  : `Casa-alvo: ${goalHouse}`}
+                {" — "}{cityDatabase[goalHouse]?.label}
+              </p>
+              <p className="text-foreground/50 text-[11px] leading-relaxed max-w-md text-center">
+                {currentMode === "passado"
+                  ? `Naquele ciclo, a cidade ${consultation.origin || "escolhida"} posicionou o Sol na Casa ${goalHouse}, ativando a área de ${cityDatabase[goalHouse]?.label?.toLowerCase()}.`
+                  : `Quem ativa a Casa ${goalHouse} foca em ${cityDatabase[goalHouse]?.label?.toLowerCase()}. Escolha uma das cidades e passe 24h no local.`}
+              </p>
+            </div>
           )}
         </motion.div>
 
@@ -290,6 +313,8 @@ const Dashboard = () => {
                 house={house}
                 result={result}
                 mode={currentMode}
+                isGoal={goalHouse === selectedHouse}
+                originCity={consultation.origin}
                 onClose={() => setSelectedHouse(null)}
               />
             );
