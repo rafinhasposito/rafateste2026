@@ -31,6 +31,10 @@ interface HouseResult {
 interface ApiResult {
   results: Record<string, HouseResult>;
   oraculo?: string;
+  house?: number | string;
+  goal_house?: number | string;
+  goalHouse?: number | string;
+  casa?: number | string;
 }
 
 interface ConsultationRow {
@@ -48,9 +52,29 @@ interface ConsultationRow {
 
 const TOTAL_HOUSES = 12;
 
+const parseHouseNumber = (value: unknown): number | null => {
+  if (typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= TOTAL_HOUSES) return value;
+  if (typeof value === "string") {
+    const parsed = parseInt(value, 10);
+    if (Number.isInteger(parsed) && parsed >= 1 && parsed <= TOTAL_HOUSES) return parsed;
+  }
+  return null;
+};
+
+const getConsultationGoalHouse = (consultation: ConsultationRow | null): number | null => {
+  if (!consultation) return null;
+  return (
+    parseHouseNumber(consultation.goal)
+    ?? parseHouseNumber(consultation.result?.house)
+    ?? parseHouseNumber(consultation.result?.goal_house)
+    ?? parseHouseNumber(consultation.result?.goalHouse)
+    ?? parseHouseNumber(consultation.result?.casa)
+  );
+};
+
 const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: number) => {
   const unlockedCount = Math.max(consultation.houses_unlocked, 0);
-  const goalHouse = consultation.goal;
+  const goalHouse = getConsultationGoalHouse(consultation);
 
   if (unlockedCount >= TOTAL_HOUSES) return false;
   if (goalHouse && houseNum === goalHouse) return false;
@@ -102,15 +126,16 @@ const Dashboard = () => {
       setSelectedHouse(null);
       return;
     }
-    if (consultation.goal && !isHouseLockedByConsultation(consultation, consultation.goal)) {
-      setSelectedHouse(consultation.goal);
+    const resolvedGoalHouse = getConsultationGoalHouse(consultation);
+    if (resolvedGoalHouse && !isHouseLockedByConsultation(consultation, resolvedGoalHouse)) {
+      setSelectedHouse(resolvedGoalHouse);
       return;
     }
     const firstUnlocked = Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).find(
       (h) => !isHouseLockedByConsultation(consultation, h)
     ) ?? null;
     setSelectedHouse(firstUnlocked);
-  }, [consultation?.id, consultation?.goal, consultation?.houses_unlocked]);
+  }, [consultation?.id, consultation?.goal, consultation?.houses_unlocked, consultation?.result]);
 
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
@@ -206,9 +231,9 @@ const Dashboard = () => {
     );
   }
 
-  const goalHouse = consultation.goal;
+  const goalHouse = getConsultationGoalHouse(consultation);
   const currentMode = (consultation.mode || "futuro") as "passado" | "presente" | "futuro";
-  const lockedCount = TOTAL_HOUSES - consultation.houses_unlocked;
+  const lockedCount = Math.max(0, TOTAL_HOUSES - consultation.houses_unlocked);
   const credits = profile?.credits ?? 0;
 
   const modeLabel = currentMode === "passado" ? "Análise do Passado" : currentMode === "presente" ? "Momento Presente" : "Previsão Futura";
