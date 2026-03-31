@@ -42,6 +42,7 @@ const Index = () => {
   const [birthPlaceValid, setBirthPlaceValid] = useState(false);
   const [origin, setOrigin] = useState("");
   const [originValid, setOriginValid] = useState(false);
+  const [originCoords, setOriginCoords] = useState<CityCoords | null>(null);
   const [year, setYear] = useState("2026");
   const [goal, setGoal] = useState<number | null>(null);
   const [intent, setIntent] = useState("");
