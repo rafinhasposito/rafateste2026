@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
-import CityAutocomplete from "@/components/CityAutocomplete";
+import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import GoalCards from "@/components/GoalCards";
 import ConstellationSubmit from "@/components/ConstellationSubmit";
 import UserMenu from "@/components/UserMenu";
