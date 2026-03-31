@@ -96,7 +96,14 @@ const Index = () => {
       if (mode === "futuro") {
         payload.intent = intent.trim(); payload.alvoId = goal;
         payload.prompt_mestre = `Aja como o Mestre Astrólogo. O usuário não é vítima do destino, é o arquiteto da própria linha do tempo. Crie um Relatório para ${name}, manifesto: '${intent}'. Confirme o destino como útero físico para a Casa ${goal}. Use linguagem magnética.`;
-      } else { endpoint = `${API_URL}/audit_past`; payload.past_city = origin.trim(); }
+      } else {
+        endpoint = `${API_URL}/audit_past`;
+        payload.past_city = origin.trim();
+        if (originCoords) {
+          payload.past_lat = originCoords.lat;
+          payload.past_lon = originCoords.lon;
+        }
+      }
 
       const response = await fetch(endpoint, {
         method: "POST", headers: { "Content-Type": "application/json" },
