@@ -2,8 +2,10 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
-  onComplete: () => void;
+  onComplete: () => void | Promise<void>;
   label: string;
+  disabled?: boolean;
+  resetTrigger?: number;
 }
 
 const STARS = [
@@ -14,7 +16,7 @@ const STARS = [
   { x: 90, y: 40 },
 ];
 
-const ConstellationSubmit = ({ onComplete, label }: Props) => {
+const ConstellationSubmit = ({ onComplete, label, disabled = false, resetTrigger = 0 }: Props) => {
   const [holdProgress, setHoldProgress] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
   const [completed, setCompleted] = useState(false);
@@ -23,7 +25,7 @@ const ConstellationSubmit = ({ onComplete, label }: Props) => {
   const litCount = Math.floor(holdProgress * STARS.length);
 
   const startHold = useCallback(() => {
-    if (completed) return;
+    if (completed || disabled) return;
     setIsHolding(true);
     const start = Date.now();
     const duration = 2200;
@@ -38,7 +40,7 @@ const ConstellationSubmit = ({ onComplete, label }: Props) => {
         onComplete();
       }
     }, 25);
-  }, [completed, onComplete]);
+  }, [completed, disabled, onComplete]);
 
   const endHold = useCallback(() => {
     if (!isHolding) return;
@@ -51,16 +53,24 @@ const ConstellationSubmit = ({ onComplete, label }: Props) => {
 
   useEffect(() => () => clearInterval(intervalRef.current), []);
 
+  useEffect(() => {
+    clearInterval(intervalRef.current);
+    setHoldProgress(0);
+    setIsHolding(false);
+    setCompleted(false);
+  }, [resetTrigger]);
+
   return (
     <div className="w-full max-w-xl mx-auto mt-6 mb-4">
       <button
         type="button"
+        disabled={disabled}
         onMouseDown={startHold}
         onMouseUp={endHold}
         onMouseLeave={endHold}
         onTouchStart={startHold}
         onTouchEnd={endHold}
-        className="relative w-full rounded-2xl md:rounded-3xl border border-primary/20 bg-card overflow-hidden select-none touch-none transition-shadow duration-500 group focus:outline-none"
+        className="relative w-full rounded-2xl md:rounded-3xl border border-primary/20 bg-card overflow-hidden select-none touch-none transition-shadow duration-500 group focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
         style={{
           boxShadow: isHolding
             ? "0 0 60px hsla(38,85%,55%,0.2), inset 0 0 40px hsla(38,85%,55%,0.05)"
@@ -169,10 +179,10 @@ const ConstellationSubmit = ({ onComplete, label }: Props) => {
             </AnimatePresence>
 
             <span className="text-primary font-black uppercase tracking-[0.15em] md:tracking-[0.25em] text-xs md:text-sm">
-              {completed ? "Rota Calculada" : label}
+              {disabled ? "Processando" : completed ? "Rota Calculada" : label}
             </span>
             <span className="text-[8px] md:text-[9px] text-muted-foreground/60 tracking-[0.3em] uppercase font-space">
-              {completed ? "Protocolo selado" : isHolding ? "Selando protocolo..." : "Pressione e segure para selar"}
+              {disabled ? "Aguarde o retorno estelar" : completed ? "Protocolo selado" : isHolding ? "Selando protocolo..." : "Pressione e segure para selar"}
             </span>
           </div>
         </div>
