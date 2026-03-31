@@ -1,5 +1,13 @@
 export const API_URL = "https://protocolo-solar-api.onrender.com";
 
+export interface DetectedLocation {
+  label: string;
+  coords: {
+    lat: number;
+    lon: number;
+  };
+}
+
 export function calcularNumerologia(nome: string): number {
   const tabela: Record<string, number> = {
     a: 1, j: 1, s: 1, b: 2, k: 2, t: 2, c: 3, l: 3, u: 3,
@@ -24,7 +32,7 @@ export function calcularNumerologia(nome: string): number {
   return soma;
 }
 
-export async function detectUserLocation(): Promise<string | null> {
+export async function detectUserLocation(): Promise<DetectedLocation | null> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
       resolve(null);
@@ -43,7 +51,13 @@ export async function detectUserLocation(): Promise<string | null> {
               parts.push(d.address.city || d.address.town || d.address.village);
             if (d.address.state) parts.push(d.address.state);
             if (d.address.country) parts.push(d.address.country);
-            resolve(parts.join(", "));
+            resolve({
+              label: parts.join(", "),
+              coords: {
+                lat: p.coords.latitude,
+                lon: p.coords.longitude,
+              },
+            });
           } else {
             resolve(null);
           }

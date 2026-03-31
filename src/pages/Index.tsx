@@ -48,6 +48,7 @@ const Index = () => {
   const [intent, setIntent] = useState("");
   
   const [submitted, setSubmitted] = useState(false);
+  const [submitResetKey, setSubmitResetKey] = useState(0);
   const [mantraIndex, setMantraIndex] = useState(0);
 
   useEffect(() => {
@@ -60,9 +61,15 @@ const Index = () => {
   const handleDetectLocation = async () => {
     showAlert("Captando coordenadas via satélite...");
     const loc = await detectUserLocation();
-    if (loc) { setOrigin(loc); setOriginValid(true); }
+    if (loc) {
+      setOrigin(loc.label);
+      setOriginCoords(loc.coords);
+      setOriginValid(true);
+    }
     else { showAlert("Permissão negada ou erro. Digite manualmente."); }
   };
+
+  const resetSubmitButton = () => setSubmitResetKey((value) => value + 1);
 
   const handleSubmit = async () => {
     if (!user) {
@@ -71,14 +78,14 @@ const Index = () => {
     }
 
     setSubmitted(true);
-    if (!name.trim()) { showAlert("Digite seu nome."); return; }
-    if (!birthdate) { showAlert("Informe a data de nascimento."); return; }
-    if (!birthtime) { showAlert("Informe a hora de nascimento."); return; }
-    if (!birthPlaceValid) { showAlert("Selecione o local de nascimento na lista."); return; }
-    if (!originValid) { showAlert("Selecione a cidade de origem na lista."); return; }
+    if (!name.trim()) { showAlert("Digite seu nome."); resetSubmitButton(); return; }
+    if (!birthdate) { showAlert("Informe a data de nascimento."); resetSubmitButton(); return; }
+    if (!birthtime) { showAlert("Informe a hora de nascimento."); resetSubmitButton(); return; }
+    if (!birthPlaceValid) { showAlert("Selecione o local de nascimento na lista."); resetSubmitButton(); return; }
+    if (!originValid) { showAlert("Selecione a cidade de origem na lista."); resetSubmitButton(); return; }
     if (mode === "futuro") {
-      if (!goal) { showAlert("Selecione uma Casa no grid."); return; }
-      if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); return; }
+      if (!goal) { showAlert("Selecione uma Casa no grid."); resetSubmitButton(); return; }
+      if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); resetSubmitButton(); return; }
     }
 
     setIsScanning(true);
@@ -159,6 +166,11 @@ const Index = () => {
     } catch (error: unknown) {
       setIsScanning(false);
       const err = error as Error;
+      resetSubmitButton();
+      if (mode === "passado" && originCoords && /coordenadas da cidade informada/i.test(err.message)) {
+        showAlert("Falha na Matrix: o backend externo ignorou as coordenadas enviadas pelo app em /audit_past.");
+        return;
+      }
       showAlert(err.name === "AbortError" ? "A IA demorou a responder. Tente novamente." : "Falha na Matrix: " + err.message);
     }
   };
@@ -360,7 +372,7 @@ const Index = () => {
                 <div className="field-label"><span className="label-dot" /> {mode === "futuro" ? "Onde Você Está Hoje" : "Onde Passou o Aniversário"}</div>
                 <div className="flex gap-3">
                   <div className="flex-grow">
-                    <CityAutocomplete value={origin} onChange={(v, valid, coords) => { setOrigin(v); setOriginValid(valid); if (coords) setOriginCoords(coords); }} placeholder="Digite e selecione" invalid={submitted && !originValid} />
+                    <CityAutocomplete value={origin} onChange={(v, valid, coords) => { setOrigin(v); setOriginValid(valid); setOriginCoords(coords ?? null); }} placeholder="Digite e selecione" invalid={submitted && !originValid} />
                   </div>
                   <button type="button" onClick={handleDetectLocation} className="shrink-0 w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all flex items-center justify-center mt-0" aria-label="GPS">
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -435,7 +447,9 @@ const Index = () => {
           {/* Submit */}
           <ConstellationSubmit
             onComplete={handleSubmit}
+            disabled={isScanning}
             label={mode === "futuro" ? "Calcular Rota Estelar" : "Auditar Minha História"}
+            resetTrigger={submitResetKey}
           />
 
           {/* Bottom Accent */}
