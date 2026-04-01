@@ -65,7 +65,7 @@ const DestinationCard = ({
       {label}
     </p>
     <div className="flex items-center gap-3">
-      <span className="text-2xl">{getFlag(city.country)}</span>
+      <MapPin className="w-5 h-5 text-primary/60 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-foreground font-bold text-base">{city.city}</p>
         <p className="text-muted-foreground text-[11px]">{city.country} · {city.continent}</p>

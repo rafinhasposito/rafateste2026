@@ -27,7 +27,7 @@ const UserMenu = () => {
       </button>
 
       <button
-        onClick={() => navigate("/dashboard")}
+        onClick={() => navigate("/history")}
         className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/80 backdrop-blur-md hover:border-primary/30 transition-all"
       >
         <svg className="w-3.5 h-3.5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

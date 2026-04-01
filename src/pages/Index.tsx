@@ -464,12 +464,12 @@ const Index = () => {
           className="flex flex-wrap justify-center gap-6 md:gap-10 mt-8 px-4"
         >
           {[
-            { icon: "🛡️", text: "Dados 100% Privados" },
-            { icon: "🔬", text: "Efemérides Suíças (JPL)" },
-            { icon: "🤖", text: "IA Mestre Astrólogo" },
+            { text: "Dados 100% Privados" },
+            { text: "Efemérides Suíças (JPL)" },
+            { text: "IA Mestre Astrólogo" },
           ].map((b, i) => (
             <div key={i} className="flex items-center gap-2 text-muted-foreground/50">
-              <span className="text-sm">{b.icon}</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
               <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
             </div>
           ))}
