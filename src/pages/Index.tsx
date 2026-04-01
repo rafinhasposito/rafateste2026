@@ -5,6 +5,7 @@ import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import GoalCards from "@/components/GoalCards";
+import CityLookup from "@/components/CityLookup";
 import ConstellationSubmit from "@/components/ConstellationSubmit";
 import UserMenu from "@/components/UserMenu";
 import { useAlert } from "@/hooks/useAlert";
