@@ -172,7 +172,7 @@ const Index = () => {
           mode,
           goal: resolvedHouse,
           intent: intent.trim() || null,
-          result: data,
+          result: data as any,
           houses_unlocked: 1,
         })
         .select()
