@@ -30,19 +30,7 @@ interface HouseCardProps {
   onSelect: () => void;
 }
 
-const countryFlags: Record<string, string> = {
-  "França": "🇫🇷", "Espanha": "🇪🇸", "Portugal": "🇵🇹", "Portugal (Açores)": "🇵🇹",
-  "Argentina": "🇦🇷", "Brasil": "🇧🇷", "EUA": "🇺🇸", "México": "🇲🇽",
-  "Canadá": "🇨🇦", "Nova Zelândia": "🇳🇿", "Japão": "🇯🇵", "Austrália": "🇦🇺",
-  "Singapura": "🇸🇬", "Suécia": "🇸🇪", "Polónia": "🇵🇱", "Vietname": "🇻🇳",
-  "Índia": "🇮🇳", "Rússia": "🇷🇺", "Colômbia": "🇨🇴", "Fiji": "🇫🇯",
-  "Polinésia Francesa": "🇵🇫", "Itália": "🇮🇹", "Alemanha": "🇩🇪", "Reino Unido": "🇬🇧",
-  "Chile": "🇨🇱", "Peru": "🇵🇪", "Uruguai": "🇺🇾", "Tailândia": "🇹🇭",
-  "Coreia do Sul": "🇰🇷", "China": "🇨🇳", "Grécia": "🇬🇷", "Turquia": "🇹🇷",
-  "Egito": "🇪🇬", "Marrocos": "🇲🇦", "África do Sul": "🇿🇦",
-};
-
-const getFlag = (country: string) => countryFlags[country] || "🌍";
+import { MapPin } from "lucide-react";
 
 const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSelect }: HouseCardProps) => {
   const bgGradient = houseColors[houseNum];
@@ -119,15 +107,11 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
         {result && !locked && (
           <div className="mt-2 pt-3 border-t border-foreground/10">
             <div className="flex items-center gap-2">
-              <span className="text-base">{getFlag(result.city.country)}</span>
+              <MapPin className="w-4 h-4 text-primary/60 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-foreground font-semibold text-sm truncate">{result.city.city}</p>
                 <p className="text-foreground/40 text-[10px]">{result.city.country}</p>
               </div>
-              <svg className="w-4 h-4 text-primary/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
             </div>
           </div>
         )}

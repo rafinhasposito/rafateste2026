@@ -29,19 +29,7 @@ interface HouseDetailProps {
   onClose: () => void;
 }
 
-const countryFlags: Record<string, string> = {
-  "França": "🇫🇷", "Espanha": "🇪🇸", "Portugal": "🇵🇹", "Portugal (Açores)": "🇵🇹",
-  "Argentina": "🇦🇷", "Brasil": "🇧🇷", "EUA": "🇺🇸", "México": "🇲🇽",
-  "Canadá": "🇨🇦", "Nova Zelândia": "🇳🇿", "Japão": "🇯🇵", "Austrália": "🇦🇺",
-  "Singapura": "🇸🇬", "Suécia": "🇸🇪", "Polónia": "🇵🇱", "Vietname": "🇻🇳",
-  "Índia": "🇮🇳", "Rússia": "🇷🇺", "Colômbia": "🇨🇴", "Fiji": "🇫🇯",
-  "Polinésia Francesa": "🇵🇫", "Itália": "🇮🇹", "Alemanha": "🇩🇪", "Reino Unido": "🇬🇧",
-  "Chile": "🇨🇱", "Peru": "🇵🇪", "Uruguai": "🇺🇾", "Tailândia": "🇹🇭",
-  "Coreia do Sul": "🇰🇷", "China": "🇨🇳", "Grécia": "🇬🇷", "Turquia": "🇹🇷",
-  "Egito": "🇪🇬", "Marrocos": "🇲🇦", "África do Sul": "🇿🇦",
-};
-
-const getFlag = (country: string) => countryFlags[country] || "🌍";
+import { MapPin } from "lucide-react";
 
 const getMapUrl = (lat: number, lon: number) =>
   `https://maps.google.com/maps?q=${lat},${lon}&z=6&output=embed`;
@@ -77,7 +65,7 @@ const DestinationCard = ({
       {label}
     </p>
     <div className="flex items-center gap-3">
-      <span className="text-2xl">{getFlag(city.country)}</span>
+      <MapPin className="w-5 h-5 text-primary/60 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-foreground font-bold text-base">{city.city}</p>
         <p className="text-muted-foreground text-[11px]">{city.country} · {city.continent}</p>
