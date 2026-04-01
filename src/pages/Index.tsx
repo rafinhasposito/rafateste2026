@@ -424,6 +424,17 @@ const Index = () => {
             <input type="number" className="quantum-input text-center text-3xl font-bold text-gold h-16 font-cinzel" value={year} onChange={(e) => setYear(e.target.value)} />
           </div>
 
+          {/* City Lookup */}
+          <div className="mb-10">
+            <CityLookup
+              name={name}
+              birthdate={birthdate}
+              birthtime={birthtime}
+              birthPlace={birthPlace}
+              year={year}
+            />
+          </div>
+
           {/* FUTURE-ONLY SECTIONS */}
           <AnimatePresence>
             {mode === "futuro" && (
