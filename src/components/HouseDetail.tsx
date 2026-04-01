@@ -29,19 +29,7 @@ interface HouseDetailProps {
   onClose: () => void;
 }
 
-const countryFlags: Record<string, string> = {
-  "França": "🇫🇷", "Espanha": "🇪🇸", "Portugal": "🇵🇹", "Portugal (Açores)": "🇵🇹",
-  "Argentina": "🇦🇷", "Brasil": "🇧🇷", "EUA": "🇺🇸", "México": "🇲🇽",
-  "Canadá": "🇨🇦", "Nova Zelândia": "🇳🇿", "Japão": "🇯🇵", "Austrália": "🇦🇺",
-  "Singapura": "🇸🇬", "Suécia": "🇸🇪", "Polónia": "🇵🇱", "Vietname": "🇻🇳",
-  "Índia": "🇮🇳", "Rússia": "🇷🇺", "Colômbia": "🇨🇴", "Fiji": "🇫🇯",
-  "Polinésia Francesa": "🇵🇫", "Itália": "🇮🇹", "Alemanha": "🇩🇪", "Reino Unido": "🇬🇧",
-  "Chile": "🇨🇱", "Peru": "🇵🇪", "Uruguai": "🇺🇾", "Tailândia": "🇹🇭",
-  "Coreia do Sul": "🇰🇷", "China": "🇨🇳", "Grécia": "🇬🇷", "Turquia": "🇹🇷",
-  "Egito": "🇪🇬", "Marrocos": "🇲🇦", "África do Sul": "🇿🇦",
-};
-
-const getFlag = (country: string) => countryFlags[country] || "🌍";
+import { MapPin } from "lucide-react";
 
 const getMapUrl = (lat: number, lon: number) =>
   `https://maps.google.com/maps?q=${lat},${lon}&z=6&output=embed`;
