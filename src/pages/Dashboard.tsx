@@ -292,9 +292,23 @@ const Dashboard = () => {
                     ? `Você passou o aniversário em ${consultation.origin}`
                     : currentMode === "presente"
                       ? `Seu aniversário será em ${consultation.origin}`
-                      : `Cidade escolhida: ${consultation.origin}`}
+                      : `Cidade atual: ${consultation.origin}`}
                 </p>
               )}
+              {/* Show destination city for goal house */}
+              {(() => {
+                const goalResult = goalHouse ? getHouseResult(goalHouse) : null;
+                const destCity = goalResult?.city?.city;
+                const destCountry = goalResult?.city?.country;
+                if (destCity && currentMode !== "passado") {
+                  return (
+                    <p className="text-primary/80 text-xs font-medium mt-1">
+                      Destino Principal: {destCity}, {destCountry}
+                    </p>
+                  );
+                }
+                return null;
+              })()}
               <p className="text-primary font-cinzel text-base font-bold uppercase tracking-wider">
                 {currentMode === "passado"
                   ? `A energia caiu na Casa ${goalHouse}`
