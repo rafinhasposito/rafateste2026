@@ -5,6 +5,7 @@ import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import GoalCards from "@/components/GoalCards";
+import CityLookup from "@/components/CityLookup";
 import ConstellationSubmit from "@/components/ConstellationSubmit";
 import UserMenu from "@/components/UserMenu";
 import { useAlert } from "@/hooks/useAlert";
@@ -100,28 +101,52 @@ const Index = () => {
         name: name.trim(), place_of_birth: birthPlace.trim(),
         dob: dataFormatada, time: birthtime, target_year: year,
       };
+      let data: Record<string, unknown>;
+
       if (mode === "futuro") {
         payload.intent = intent.trim(); payload.alvoId = goal;
         payload.prompt_mestre = `Aja como o Mestre Astrólogo. O usuário não é vítima do destino, é o arquiteto da própria linha do tempo. Crie um Relatório para ${name}, manifesto: '${intent}'. Confirme o destino como útero físico para a Casa ${goal}. Use linguagem magnética.`;
+
+        const response = await fetch(endpoint, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload), signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        data = await response.json();
+        if (!response.ok) throw new Error((data as any).error || "Erro na comunicação.");
       } else {
-        endpoint = `${API_URL}/audit_past`;
-        payload.past_city = origin.trim();
-        if (originCoords) {
-          payload.past_lat = originCoords.lat;
-          payload.past_lon = originCoords.lon;
-        }
+        // Past mode: call both /audit_past AND /find_all_cities in parallel
+        const auditPayload = {
+          ...payload,
+          past_city: origin.trim(),
+          ...(originCoords ? { past_lat: originCoords.lat, past_lon: originCoords.lon } : {}),
+        };
+
+        const [auditRes, citiesRes] = await Promise.all([
+          fetch(`${API_URL}/audit_past`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(auditPayload), signal: controller.signal,
+          }),
+          fetch(`${API_URL}/find_all_cities`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload), signal: controller.signal,
+          }),
+        ]);
+        clearTimeout(timeoutId);
+
+        const auditData = await auditRes.json();
+        if (!auditRes.ok) throw new Error(auditData.error || "Erro na auditoria.");
+
+        const citiesData = await citiesRes.json();
+        // Merge: use audit house + oraculo, but add city matrix from find_all_cities
+        data = {
+          ...auditData,
+          results: citiesData.results || {},
+        };
       }
 
-      const response = await fetch(endpoint, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload), signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Erro na comunicação.");
-
       const rawHouse = mode === "passado"
-        ? (data?.house ?? data?.goal_house ?? data?.goalHouse ?? data?.casa)
+        ? ((data as any)?.house ?? (data as any)?.goal_house ?? (data as any)?.goalHouse ?? (data as any)?.casa)
         : goal;
       const parsedHouse = typeof rawHouse === "number"
         ? rawHouse
@@ -148,7 +173,7 @@ const Index = () => {
           mode,
           goal: resolvedHouse,
           intent: intent.trim() || null,
-          result: data,
+          result: data as any,
           houses_unlocked: 1,
         })
         .select()
@@ -397,6 +422,17 @@ const Index = () => {
           <div className="mb-10 max-w-xs mx-auto text-center">
             <div className="field-label justify-center"><span className="label-dot" /> {mode === "futuro" ? "Ano do Próximo Aniversário" : "Ano a Auditar"}</div>
             <input type="number" className="quantum-input text-center text-3xl font-bold text-gold h-16 font-cinzel" value={year} onChange={(e) => setYear(e.target.value)} />
+          </div>
+
+          {/* City Lookup */}
+          <div className="mb-10">
+            <CityLookup
+              name={name}
+              birthdate={birthdate}
+              birthtime={birthtime}
+              birthPlace={birthPlace}
+              year={year}
+            />
           </div>
 
           {/* FUTURE-ONLY SECTIONS */}
