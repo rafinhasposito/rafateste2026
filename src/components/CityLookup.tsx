@@ -12,15 +12,17 @@ interface CityLookupProps {
   birthtime: string;
   birthPlace: string;
   year: string;
+  onHouseFound?: (house: number, city: string) => void;
 }
 
 interface LookupResult {
   house: number;
   houseName: string;
   city: string;
+  houseData: typeof cityDatabase[1] | null;
 }
 
-const CityLookup = ({ name, birthdate, birthtime, birthPlace, year }: CityLookupProps) => {
+const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound }: CityLookupProps) => {
   const { showAlert } = useAlert();
   const [city, setCity] = useState("");
   const [cityValid, setCityValid] = useState(false);
@@ -64,13 +66,17 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year }: CityLookup
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
 
       const houseNum = data.house;
-      const houseData = cityDatabase[houseNum];
+      const houseData = cityDatabase[houseNum] || null;
 
-      setResult({
+      const lookupResult: LookupResult = {
         house: houseNum,
         houseName: houseData?.label || `Casa ${houseNum}`,
         city: city,
-      });
+        houseData,
+      };
+
+      setResult(lookupResult);
+      onHouseFound?.(houseNum, city);
     } catch (error) {
       const err = error as Error;
       showAlert("Erro: " + err.message);
@@ -80,15 +86,15 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year }: CityLookup
   };
 
   return (
-    <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
-      <div className="flex items-center gap-3 mb-4">
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-2">
         <Compass className="w-5 h-5 text-primary" />
         <h3 className="font-cinzel text-sm md:text-base font-bold text-foreground uppercase tracking-[0.1em]">
           Consultar por Cidade
         </h3>
       </div>
-      <p className="text-muted-foreground text-xs font-light mb-6">
-        Quer saber em qual casa cai uma cidade específica no ano {year}? Digite o destino abaixo.
+      <p className="text-muted-foreground text-xs font-light">
+        Digite a cidade onde deseja passar seu aniversário em {year}. O sistema calculará em qual casa astrológica ela se posiciona.
       </p>
 
       <div className="flex gap-3 items-start">
@@ -101,7 +107,7 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year }: CityLookup
               setCityCoords(coords ?? null);
               setResult(null);
             }}
-            placeholder="Ex: Nova York, Paris, Tóquio..."
+            placeholder="Ex: Nova York, Londres, Jerusalém..."
           />
         </div>
         <button
@@ -119,24 +125,53 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year }: CityLookup
       </div>
 
       <AnimatePresence>
-        {result && (
+        {result && result.houseData && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mt-6 rounded-xl border border-primary/25 bg-card/60 backdrop-blur-sm p-5"
+            className="rounded-xl border border-primary/25 bg-card/60 backdrop-blur-sm p-5 space-y-4"
           >
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-primary" />
               <p className="text-foreground font-semibold text-sm">{result.city}</p>
             </div>
-            <div className="bg-primary/10 rounded-lg p-4">
+
+            <div className="bg-primary/10 rounded-lg p-5 space-y-3">
               <p className="font-cinzel text-primary text-lg font-bold uppercase tracking-wider">
                 Casa {result.house} — {result.houseName}
               </p>
-              <p className="text-foreground/60 text-xs mt-2 leading-relaxed">
-                Se você passar seu aniversário de {year} em {result.city}, o Sol se posiciona na Casa {result.house}, ativando a área de {result.houseName.toLowerCase()}.
+              <p className="text-foreground/80 text-sm leading-relaxed">
+                {result.houseData.resumo}
               </p>
+              <p className="text-foreground/60 text-xs leading-relaxed">
+                {result.houseData.porque}
+              </p>
+            </div>
+
+            {/* Benefícios */}
+            <div className="space-y-3">
+              <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
+                Vantagens desta Casa
+              </h4>
+              <div className="grid gap-2">
+                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
+                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Benefício Principal</p>
+                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.beneficio}</p>
+                </div>
+                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
+                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Vida Pessoal</p>
+                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.pessoal}</p>
+                </div>
+                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
+                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Amor</p>
+                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.amor}</p>
+                </div>
+                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
+                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Profissional</p>
+                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.prof}</p>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
