@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { MapPin, Crown, Scroll } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
-import GoalCards from "@/components/GoalCards";
 import CityLookup from "@/components/CityLookup";
-import ConstellationSubmit from "@/components/ConstellationSubmit";
+import HouseLookup from "@/components/HouseLookup";
+import IntentLookup from "@/components/IntentLookup";
 import UserMenu from "@/components/UserMenu";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { API_URL, detectUserLocation } from "@/lib/astro";
+import { detectUserLocation } from "@/lib/astro";
 
 type Mode = "futuro" | "passado";
+type SearchPath = "cidade" | "casa" | "intencao" | null;
 
 const mantras = [
   "Você desperta como Cocriador da sua realidade.",
@@ -29,27 +30,43 @@ const stats = [
   { value: "±0.01°", label: "Precisão GPS" },
 ];
 
+const pathOptions = [
+  {
+    id: "cidade" as SearchPath,
+    icon: MapPin,
+    title: "Por Cidade",
+    desc: "Já sabe onde quer ir? Descubra qual casa a cidade ativa.",
+  },
+  {
+    id: "casa" as SearchPath,
+    icon: Crown,
+    title: "Por Casa",
+    desc: "Escolha a área da vida e veja as cidades ideais.",
+  },
+  {
+    id: "intencao" as SearchPath,
+    icon: Scroll,
+    title: "Por Intenção",
+    desc: "Descreva seu desejo e o sistema encontra a casa certa.",
+  },
+];
+
 const Index = () => {
   const { showAlert } = useAlert();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("futuro");
-  const [isScanning, setIsScanning] = useState(false);
+  const [isScanning] = useState(false);
+  const [searchPath, setSearchPath] = useState<SearchPath>(null);
 
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [birthtime, setBirthtime] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
   const [birthPlaceValid, setBirthPlaceValid] = useState(false);
-  const [origin, setOrigin] = useState("");
-  const [originValid, setOriginValid] = useState(false);
-  const [originCoords, setOriginCoords] = useState<CityCoords | null>(null);
   const [year, setYear] = useState("2026");
-  const [goal, setGoal] = useState<number | null>(null);
-  const [intent, setIntent] = useState("");
-  
+
   const [submitted, setSubmitted] = useState(false);
-  const [submitResetKey, setSubmitResetKey] = useState(0);
   const [mantraIndex, setMantraIndex] = useState(0);
 
   useEffect(() => {
@@ -59,146 +76,7 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleDetectLocation = async () => {
-    showAlert("Captando coordenadas via satélite...");
-    const loc = await detectUserLocation();
-    if (loc) {
-      setOrigin(loc.label);
-      setOriginCoords(loc.coords);
-      setOriginValid(true);
-    }
-    else { showAlert("Permissão negada ou erro. Digite manualmente."); }
-  };
-
-  const resetSubmitButton = () => setSubmitResetKey((value) => value + 1);
-
-  const handleSubmit = async () => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-
-    setSubmitted(true);
-    if (!name.trim()) { showAlert("Digite seu nome."); resetSubmitButton(); return; }
-    if (!birthdate) { showAlert("Informe a data de nascimento."); resetSubmitButton(); return; }
-    if (!birthtime) { showAlert("Informe a hora de nascimento."); resetSubmitButton(); return; }
-    if (!birthPlaceValid) { showAlert("Selecione o local de nascimento na lista."); resetSubmitButton(); return; }
-    if (!originValid) { showAlert("Selecione a cidade de origem na lista."); resetSubmitButton(); return; }
-    if (mode === "futuro") {
-      if (!goal) { showAlert("Selecione uma Casa no grid."); resetSubmitButton(); return; }
-      if (intent.length < 50) { showAlert("O manifesto exige mínimo de 50 caracteres."); resetSubmitButton(); return; }
-    }
-
-    setIsScanning(true);
-    const [ano, mes, dia] = birthdate.split("-");
-    const dataFormatada = `${dia}/${mes}/${ano}`;
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000);
-      let endpoint = `${API_URL}/find_all_cities`;
-      const payload: Record<string, unknown> = {
-        name: name.trim(), place_of_birth: birthPlace.trim(),
-        dob: dataFormatada, time: birthtime, target_year: year,
-      };
-      let data: Record<string, unknown>;
-
-      if (mode === "futuro") {
-        payload.intent = intent.trim(); payload.alvoId = goal;
-        payload.prompt_mestre = `Aja como o Mestre Astrólogo. O usuário não é vítima do destino, é o arquiteto da própria linha do tempo. Crie um Relatório para ${name}, manifesto: '${intent}'. Confirme o destino como útero físico para a Casa ${goal}. Use linguagem magnética.`;
-
-        const response = await fetch(endpoint, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload), signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-        data = await response.json();
-        if (!response.ok) throw new Error((data as any).error || "Erro na comunicação.");
-      } else {
-        // Past mode: call both /audit_past AND /find_all_cities in parallel
-        const auditPayload = {
-          ...payload,
-          past_city: origin.trim(),
-          ...(originCoords ? { past_lat: originCoords.lat, past_lon: originCoords.lon } : {}),
-        };
-
-        const [auditRes, citiesRes] = await Promise.all([
-          fetch(`${API_URL}/audit_past`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(auditPayload), signal: controller.signal,
-          }),
-          fetch(`${API_URL}/find_all_cities`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload), signal: controller.signal,
-          }),
-        ]);
-        clearTimeout(timeoutId);
-
-        const auditData = await auditRes.json();
-        if (!auditRes.ok) throw new Error(auditData.error || "Erro na auditoria.");
-
-        const citiesData = await citiesRes.json();
-        // Merge: use audit house + oraculo, but add city matrix from find_all_cities
-        data = {
-          ...auditData,
-          results: citiesData.results || {},
-        };
-      }
-
-      const rawHouse = mode === "passado"
-        ? ((data as any)?.house ?? (data as any)?.goal_house ?? (data as any)?.goalHouse ?? (data as any)?.casa)
-        : goal;
-      const parsedHouse = typeof rawHouse === "number"
-        ? rawHouse
-        : typeof rawHouse === "string"
-          ? parseInt(rawHouse, 10)
-          : null;
-      const resolvedHouse = parsedHouse && parsedHouse >= 1 && parsedHouse <= 12 ? parsedHouse : null;
-
-      if (mode === "passado" && !resolvedHouse) {
-        throw new Error("Não foi possível calcular em qual casa a cidade caiu nesse ano.");
-      }
-
-      // Save consultation to database
-      const { data: consultation, error: dbError } = await supabase
-        .from("consultations")
-        .insert({
-          user_id: user.id,
-          name: name.trim(),
-          birthdate,
-          birthtime,
-          birth_place: birthPlace.trim(),
-          origin: origin.trim(),
-          year,
-          mode,
-          goal: resolvedHouse,
-          intent: intent.trim() || null,
-          result: data as any,
-          houses_unlocked: 1,
-        })
-        .select()
-        .single();
-
-      setIsScanning(false);
-
-      if (dbError) {
-        showAlert("Cálculo concluído, mas erro ao salvar. Tente novamente.");
-        console.error(dbError);
-        return;
-      }
-
-      navigate(`/dashboard?id=${consultation.id}`);
-    } catch (error: unknown) {
-      setIsScanning(false);
-      const err = error as Error;
-      resetSubmitButton();
-      if (mode === "passado" && originCoords && /coordenadas da cidade informada/i.test(err.message)) {
-        showAlert("Falha na Matrix: o backend externo ignorou as coordenadas enviadas pelo app em /audit_past.");
-        return;
-      }
-      showAlert(err.name === "AbortError" ? "A IA demorou a responder. Tente novamente." : "Falha na Matrix: " + err.message);
-    }
-  };
+  const natalDataReady = !!(name.trim() && birthdate && birthtime && birthPlaceValid);
 
   return (
     <>
@@ -208,7 +86,6 @@ const Index = () => {
 
       {/* ===== HERO SECTION ===== */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden">
-        {/* Orbital rings decoration */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="orbital-ring w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-30" style={{ "--speed": "80s" } as React.CSSProperties}>
             <div className="orbital-dot" />
@@ -219,7 +96,6 @@ const Index = () => {
           <div className="orbital-ring w-[200px] h-[200px] md:w-[300px] md:h-[300px] opacity-15" style={{ "--speed": "30s" } as React.CSSProperties} />
         </div>
 
-        {/* GPS Pin Icon */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -237,37 +113,22 @@ const Index = () => {
           <div className="absolute -inset-4 rounded-full border border-gold/10 pulse-ring" />
         </motion.div>
 
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-6 inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm"
-        >
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="mb-6 inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm">
           <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
           <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.3em] text-gold">
             Protocolo Solar · Astrologia de Relocalização
           </span>
         </motion.div>
 
-        {/* Main Heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="font-cinzel text-center text-4xl md:text-6xl lg:text-[5.5rem] font-bold mb-6 leading-[1.05] tracking-tight max-w-5xl"
-        >
+        <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }}
+          className="font-cinzel text-center text-4xl md:text-6xl lg:text-[5.5rem] font-bold mb-6 leading-[1.05] tracking-tight max-w-5xl">
           <span className="text-foreground block mb-2">DESCUBRA ONDE PASSAR</span>
           <span className="gold-gradient text-glow-gold block">SEU PRÓXIMO ANIVERSÁRIO</span>
         </motion.h1>
 
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center text-muted-foreground text-sm md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-10 px-4"
-        >
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+          className="text-center text-muted-foreground text-sm md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-10 px-4">
           Assuma o controle absoluto dos próximos 12 meses.
           Destrave o <span className="text-gold font-medium">GPS exato</span> da sua{" "}
           <span className="text-foreground font-medium">Prosperidade</span>,{" "}
@@ -276,13 +137,8 @@ const Index = () => {
           mudando a sua coordenada geográfica.
         </motion.p>
 
-        {/* Stats Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="flex items-center gap-6 md:gap-12 mb-12"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+          className="flex items-center gap-6 md:gap-12 mb-12">
           {stats.map((s, i) => (
             <div key={i} className="text-center">
               <p className="text-gold font-cinzel text-xl md:text-2xl font-bold">{s.value}</p>
@@ -291,20 +147,12 @@ const Index = () => {
           ))}
         </motion.div>
 
-        {/* CTA Arrow */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
           className="flex flex-col items-center gap-2 text-muted-foreground/40 cursor-pointer hover:text-gold/60 transition-colors"
-          onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}
-        >
+          onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}>
           <span className="text-[9px] uppercase tracking-[0.3em] font-medium">Iniciar Protocolo</span>
-          <motion.svg
-            animate={{ y: [0, 6, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-          >
+          <motion.svg animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 2 }}
+            className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m6 9 6 6 6-6" />
           </motion.svg>
         </motion.div>
@@ -313,22 +161,15 @@ const Index = () => {
       {/* ===== FORM SECTION ===== */}
       <section id="form-section" className="relative px-4 pb-20 max-w-5xl mx-auto">
         {/* Mode Selector */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex justify-center gap-2 mb-8 w-full max-w-lg mx-auto"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          className="flex justify-center gap-2 mb-8 w-full max-w-lg mx-auto">
           {(["futuro", "passado"] as Mode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
+            <button key={m} onClick={() => { setMode(m); setSearchPath(null); }}
               className={`flex-1 py-3.5 px-4 rounded-xl text-[10px] md:text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-300 flex items-center justify-center gap-2.5 ${
                 mode === m
                   ? "bg-gold text-background shadow-[0_4px_20px_hsl(var(--gold)/0.3)]"
                   : "bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
-            >
+              }`}>
               {m === "futuro" ? (
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
@@ -346,16 +187,10 @@ const Index = () => {
         </motion.div>
 
         {/* Main Form Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="glass-panel glass-panel-glow p-6 md:p-12 lg:p-16 relative"
-        >
-          {/* Top Accent Line */}
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          className="glass-panel glass-panel-glow p-6 md:p-12 lg:p-16 relative">
           <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
 
-          {/* Section Header */}
           <div className="text-center mb-10 md:mb-14">
             <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
               {mode === "futuro" ? "Calibração Estelar" : "Resgate da Linha do Tempo"}
@@ -367,9 +202,8 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Form Grid */}
+          {/* Natal Data Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-10">
-            {/* LEFT */}
             <div className="space-y-7">
               <div>
                 <div className="field-label"><span className="label-dot" /> Nome Completo</div>
@@ -386,27 +220,14 @@ const Index = () => {
                 </div>
               </div>
             </div>
-
-            {/* RIGHT */}
             <div className="space-y-7">
               <div>
                 <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
                 <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
               </div>
               <div>
-                <div className="field-label"><span className="label-dot" /> {mode === "futuro" ? "Onde Você Está Hoje" : "Onde Passou o Aniversário"}</div>
-                <div className="flex gap-3">
-                  <div className="flex-grow">
-                    <CityAutocomplete value={origin} onChange={(v, valid, coords) => { setOrigin(v); setOriginValid(valid); setOriginCoords(coords ?? null); }} placeholder="Digite e selecione" invalid={submitted && !originValid} />
-                  </div>
-                  <button type="button" onClick={handleDetectLocation} className="shrink-0 w-12 h-12 rounded-xl bg-gold/10 border border-gold/20 text-gold hover:bg-gold/20 transition-all flex items-center justify-center mt-0" aria-label="GPS">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="7" /><circle cx="12" cy="12" r="3" />
-                      <line x1="12" y1="2" x2="12" y2="5" /><line x1="12" y1="19" x2="12" y2="22" />
-                      <line x1="2" y1="12" x2="5" y2="12" /><line x1="19" y1="12" x2="22" y2="12" />
-                    </svg>
-                  </button>
-                </div>
+                <div className="field-label"><span className="label-dot" /> {mode === "futuro" ? "Ano do Próximo Aniversário" : "Ano a Auditar"}</div>
+                <input type="number" className="quantum-input text-center text-2xl font-bold text-gold h-14 font-cinzel" value={year} onChange={(e) => setYear(e.target.value)} />
               </div>
             </div>
           </div>
@@ -418,87 +239,95 @@ const Index = () => {
             <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
           </div>
 
-          {/* Year */}
-          <div className="mb-10 max-w-xs mx-auto text-center">
-            <div className="field-label justify-center"><span className="label-dot" /> {mode === "futuro" ? "Ano do Próximo Aniversário" : "Ano a Auditar"}</div>
-            <input type="number" className="quantum-input text-center text-3xl font-bold text-gold h-16 font-cinzel" value={year} onChange={(e) => setYear(e.target.value)} />
+          {/* Mantra */}
+          <div className="text-center mb-10">
+            <AnimatePresence mode="wait">
+              <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
+                "{mantras[mantraIndex]}"
+              </motion.p>
+            </AnimatePresence>
           </div>
 
-          {/* City Lookup */}
+          {/* ===== 3-PATH DECISION ===== */}
           <div className="mb-10">
-            <CityLookup
-              name={name}
-              birthdate={birthdate}
-              birthtime={birthtime}
-              birthPlace={birthPlace}
-              year={year}
-            />
-          </div>
+            <div className="text-center mb-8">
+              <h3 className="font-cinzel text-lg md:text-xl font-bold text-foreground uppercase tracking-[0.1em] mb-2">
+                Como Deseja Consultar?
+              </h3>
+              <p className="text-muted-foreground text-xs font-light">
+                Escolha um dos três caminhos abaixo. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
+              </p>
+            </div>
 
-          {/* FUTURE-ONLY SECTIONS */}
-          <AnimatePresence>
-            {mode === "futuro" && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.5 }}>
-                {/* Mantra */}
-                <div className="text-center mb-10">
-                  <div className="h-px w-16 bg-gold/30 mx-auto mb-6" />
-                  <AnimatePresence mode="wait">
-                    <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
-                      "{mantras[mantraIndex]}"
-                    </motion.p>
-                  </AnimatePresence>
-                  <div className="h-px w-16 bg-gold/30 mx-auto mt-6" />
-                </div>
+            {/* Path Selector Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+              {pathOptions.map((opt) => {
+                const Icon = opt.icon;
+                const isSelected = searchPath === opt.id;
+                return (
+                  <motion.button
+                    key={opt.id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSearchPath(isSelected ? null : opt.id)}
+                    className={`p-5 rounded-xl border text-left transition-all duration-300 ${
+                      isSelected
+                        ? "border-primary bg-primary/10 shadow-[0_0_25px_hsl(var(--gold)/0.15)]"
+                        : "border-primary/15 bg-card/30 hover:border-primary/30 hover:bg-card/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <Icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className={`font-cinzel text-xs font-bold uppercase tracking-[0.1em] ${isSelected ? "text-primary" : "text-foreground"}`}>
+                        {opt.title}
+                      </span>
+                    </div>
+                    <p className="text-muted-foreground text-[11px] leading-relaxed">{opt.desc}</p>
+                  </motion.button>
+                );
+              })}
+            </div>
 
-                {/* Goal Selection */}
-                <div className="mb-10">
-                  <div className="text-center mb-8">
-                    <h3 className="font-cinzel text-lg md:text-xl font-bold text-foreground uppercase tracking-[0.1em] mb-2">
-                      Qual Área Você Exige Transformar?
-                    </h3>
-                    <p className="text-muted-foreground text-xs font-light">Selecione a Casa que representa o seu maior objetivo para este ciclo</p>
-                  </div>
-                  <GoalCards selectedGoal={goal} onSelect={setGoal} />
-                </div>
-
-                {/* Intent */}
-                <div className="mb-10">
-                  <div className="flex justify-between items-end mb-3">
-                    <div className="field-label mb-0"><span className="label-dot" /> Manifesto de Intenção</div>
-                    <span className={`text-[10px] font-mono ${intent.length < 50 ? "text-destructive/70" : "text-green-500/70"}`}>
-                      {intent.length}/50 min
-                    </span>
-                  </div>
-                  <textarea
-                    className="quantum-input h-32 md:h-36 resize-none text-sm md:text-base"
-                    value={intent} onChange={(e) => setIntent(e.target.value)}
-                    placeholder="Descreva com detalhes a realidade que já é sua. Ex: No meu próximo ano eu fecho a sociedade milionária da minha agência..."
-                  />
-                </div>
-
+            {/* Natal data warning */}
+            {searchPath && !natalDataReady && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 mb-6 text-center">
+                <p className="text-destructive text-xs font-semibold">
+                  Preencha todos os dados natais acima (nome, data, hora e cidade de nascimento) antes de continuar.
+                </p>
               </motion.div>
             )}
-          </AnimatePresence>
 
-          {/* Submit */}
-          <ConstellationSubmit
-            onComplete={handleSubmit}
-            disabled={isScanning}
-            label={mode === "futuro" ? "Calcular Rota Estelar" : "Auditar Minha História"}
-            resetTrigger={submitResetKey}
-          />
+            {/* Path Content */}
+            <AnimatePresence mode="wait">
+              {searchPath === "cidade" && (
+                <motion.div key="cidade" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
+                  className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
+                  <CityLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} />
+                </motion.div>
+              )}
+              {searchPath === "casa" && (
+                <motion.div key="casa" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
+                  className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
+                  <HouseLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} />
+                </motion.div>
+              )}
+              {searchPath === "intencao" && (
+                <motion.div key="intencao" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
+                  className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
+                  <IntentLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-          {/* Bottom Accent */}
           <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
         </motion.div>
 
         {/* Trust badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-6 md:gap-10 mt-8 px-4"
-        >
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+          className="flex flex-wrap justify-center gap-6 md:gap-10 mt-8 px-4">
           {[
             { text: "Dados 100% Privados" },
             { text: "Efemérides Suíças (JPL)" },
