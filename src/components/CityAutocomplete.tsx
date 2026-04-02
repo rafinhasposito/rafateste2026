@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { resolveSearchTerm } from "@/lib/cityAliases";
 
 export interface CityCoords {
   lat: number;
@@ -33,13 +34,18 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
 
   const fetchCities = useCallback(async (q: string) => {
     if (q.length < 3) { setSuggestions([]); return; }
+
+    // Resolve PT-BR aliases (e.g. "Nova York" → "New York")
+    const searchTerm = resolveSearchTerm(q);
+
     try {
-      const r = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5`);
+      const r = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchTerm)}&limit=6&lang=pt`);
       const d = await r.json();
       if (d.features) {
         const items: SuggestionItem[] = d.features.map((f: CityFeature) => {
           const p = f.properties;
-          const display = `${p.name || ""}, ${p.state || ""}, ${p.country || ""}`;
+          const parts = [p.name, p.state, p.country].filter(Boolean);
+          const display = parts.join(", ");
           const coords: CityCoords = {
             lon: f.geometry.coordinates[0],
             lat: f.geometry.coordinates[1],
@@ -49,7 +55,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
         setSuggestions(items);
         setShowSuggestions(true);
       }
-    } catch {}
+    } catch { /* silently fail */ }
   }, []);
 
   const handleInput = (val: string) => {
