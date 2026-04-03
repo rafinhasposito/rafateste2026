@@ -56,7 +56,7 @@ const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("futuro");
-  const [isScanning] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
   const [searchPath, setSearchPath] = useState<SearchPath>(null);
 
   const [name, setName] = useState("");
