@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Crown, Search, MapPin } from "lucide-react";
+import { Crown, Search } from "lucide-react";
 import { cityDatabase } from "@/data/houses";
 import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
 import GoalCards from "@/components/GoalCards";
+import CityDisplay from "@/components/CityDisplay";
 
 interface HouseLookupProps {
   name: string;
@@ -13,12 +14,15 @@ interface HouseLookupProps {
   birthPlace: string;
   year: string;
   onHouseSelected?: (house: number) => void;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
 interface CityOption {
   display_name: string;
   city: string;
   country: string;
+  lat?: number;
+  lon?: number;
 }
 
 interface HouseResult {
@@ -32,11 +36,16 @@ interface HouseResult {
   };
 }
 
-const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSelected }: HouseLookupProps) => {
+const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSelected, onLoadingChange }: HouseLookupProps) => {
   const { showAlert } = useAlert();
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HouseResult | null>(null);
+
+  const setLoadingState = (state: boolean) => {
+    setLoading(state);
+    onLoadingChange?.(state);
+  };
 
   const handleSelect = (houseNum: number) => {
     setSelectedHouse(houseNum);
@@ -53,7 +62,7 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
       return;
     }
 
-    setLoading(true);
+    setLoadingState(true);
     setResult(null);
 
     try {
@@ -91,8 +100,21 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
       const err = error as Error;
       showAlert("Erro: " + err.message);
     } finally {
-      setLoading(false);
+      setLoadingState(false);
     }
+  };
+
+  const renderCity = (city: CityOption | null, tier: "highticket" | "acessivel" | "nacional") => {
+    if (!city) return null;
+    return (
+      <CityDisplay
+        city={city.city || city.display_name}
+        country={city.country || ""}
+        lat={city.lat}
+        lon={city.lon}
+        tier={tier}
+      />
+    );
   };
 
   return (
@@ -139,60 +161,36 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
               </p>
             </div>
 
-            {/* Cidades */}
-            <div className="space-y-3">
-              <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
+            {/* Cities with maps + flags */}
+            <div className="space-y-4">
+              <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
                 Destinos Calculados
               </h4>
-              <div className="grid gap-2">
-                {result.cities.highticket && (
-                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-4">
-                    <span className="text-[9px] bg-primary/20 text-primary font-bold uppercase tracking-wider px-2 py-1 rounded-full">Alto Padrão</span>
-                    <p className="text-foreground font-semibold text-sm mt-2">{result.cities.highticket.display_name}</p>
-                  </div>
-                )}
-                {result.cities.acessivel && (
-                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-4">
-                    <span className="text-[9px] bg-accent/20 text-accent-foreground font-bold uppercase tracking-wider px-2 py-1 rounded-full">Médio Padrão</span>
-                    <p className="text-foreground font-semibold text-sm mt-2">{result.cities.acessivel.display_name}</p>
-                  </div>
-                )}
-                {result.cities.nacional && (
-                  <div className="rounded-lg bg-primary/5 border border-primary/10 p-4">
-                    <span className="text-[9px] bg-secondary text-secondary-foreground font-bold uppercase tracking-wider px-2 py-1 rounded-full">Nacional</span>
-                    <p className="text-foreground font-semibold text-sm mt-2">{result.cities.nacional.display_name}</p>
-                  </div>
-                )}
+              <div className="grid gap-3 md:grid-cols-3">
+                {renderCity(result.cities.highticket, "highticket")}
+                {renderCity(result.cities.acessivel, "acessivel")}
+                {renderCity(result.cities.nacional, "nacional")}
               </div>
             </div>
 
-            {/* Vantagens completas */}
+            {/* Benefits */}
             <div className="space-y-3">
               <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
                 Todas as Vantagens desta Casa
               </h4>
               <div className="grid gap-2">
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Benefício Principal</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.beneficio}</p>
-                </div>
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Ideal Para</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.ideal}</p>
-                </div>
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Vida Pessoal</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.pessoal}</p>
-                </div>
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Amor</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.amor}</p>
-                </div>
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Profissional</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.prof}</p>
-                </div>
+                {[
+                  { label: "Benefício Principal", text: result.houseData.beneficio },
+                  { label: "Ideal Para", text: result.houseData.ideal },
+                  { label: "Vida Pessoal", text: result.houseData.pessoal },
+                  { label: "Amor", text: result.houseData.amor },
+                  { label: "Profissional", text: result.houseData.prof },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-lg bg-primary/5 border border-primary/10 p-3">
+                    <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">{item.label}</p>
+                    <p className="text-foreground/80 text-xs leading-relaxed">{item.text}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
