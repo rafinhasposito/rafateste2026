@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { HouseData, houseColors } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
+import { getCountryFlag } from "@/lib/countryFlags";
+import { MapPin } from "lucide-react";
 
 interface CityOption {
   city: string;
@@ -30,13 +32,14 @@ interface HouseCardProps {
   onSelect: () => void;
 }
 
-import { MapPin } from "lucide-react";
-
 const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSelect }: HouseCardProps) => {
   const bgGradient = houseColors[houseNum];
-
   const archetype = getHouseArchetype(house.name);
   const sign = houseSigns[houseNum];
+
+  const cityName = result?.city?.city;
+  const countryName = result?.city?.country;
+  const flag = countryName ? getCountryFlag(countryName) : null;
 
   return (
     <motion.button
@@ -57,7 +60,6 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
       }`}
       style={!locked ? { background: bgGradient } : undefined}
     >
-      {/* Locked overlay */}
       {locked && (
         <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-background/80 backdrop-blur-md z-10">
           <div className="text-center">
@@ -71,14 +73,12 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
       )}
 
       <div className="p-5 relative z-[1]">
-        {/* Goal badge */}
         {isGoal && (
           <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-primary/25 border border-primary/40 backdrop-blur-sm">
             <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary">Casa-alvo</span>
           </div>
         )}
 
-        {/* Header */}
         <div className="flex items-start gap-3 mb-3">
           <div className="flex-1 min-w-0">
             <p className="text-primary font-cinzel text-[11px] font-bold uppercase tracking-wider">Casa {houseNum}</p>
@@ -88,7 +88,6 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
           </div>
         </div>
 
-        {/* Tags */}
         <div className="flex flex-wrap gap-1.5 mb-3">
           {house.tags.map((tag) => (
             <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full bg-foreground/5 border border-foreground/10 text-foreground/60 uppercase tracking-wider">
@@ -97,21 +96,21 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
           ))}
         </div>
 
-        {/* Cristal */}
         <div className="flex items-center gap-1.5 mb-3">
           <span className="text-foreground/50 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
           <span className="text-foreground/70 text-[10px]">{house.cristal}</span>
         </div>
 
-        {/* Main City */}
-        {result && !locked && (
+        {/* City with flag */}
+        {result && !locked && cityName && (
           <div className="mt-2 pt-3 border-t border-foreground/10">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-primary/60 shrink-0" />
+            <div className="flex items-center gap-2.5">
+              {flag && <span className="text-lg leading-none">{flag}</span>}
               <div className="flex-1 min-w-0">
-                <p className="text-foreground font-semibold text-sm truncate">{result.city.city}</p>
-                <p className="text-foreground/40 text-[10px]">{result.city.country}</p>
+                <p className="text-foreground font-semibold text-sm truncate">{cityName}</p>
+                <p className="text-foreground/40 text-[10px]">{countryName}</p>
               </div>
+              <MapPin className="w-3.5 h-3.5 text-primary/40 shrink-0" />
             </div>
           </div>
         )}
