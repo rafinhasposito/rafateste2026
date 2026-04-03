@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Search, Compass } from "lucide-react";
+import { Compass, Search } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
+import CityDisplay from "@/components/CityDisplay";
 import { API_URL } from "@/lib/astro";
 import { cityDatabase } from "@/data/houses";
 import { useAlert } from "@/hooks/useAlert";
@@ -13,22 +14,31 @@ interface CityLookupProps {
   birthPlace: string;
   year: string;
   onHouseFound?: (house: number, city: string) => void;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
 interface LookupResult {
   house: number;
   houseName: string;
   city: string;
+  country: string;
+  lat: number;
+  lon: number;
   houseData: typeof cityDatabase[1] | null;
 }
 
-const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound }: CityLookupProps) => {
+const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: CityLookupProps) => {
   const { showAlert } = useAlert();
   const [city, setCity] = useState("");
   const [cityValid, setCityValid] = useState(false);
   const [cityCoords, setCityCoords] = useState<CityCoords | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LookupResult | null>(null);
+
+  const setLoadingState = (state: boolean) => {
+    setLoading(state);
+    onLoadingChange?.(state);
+  };
 
   const handleLookup = async () => {
     if (!cityValid || !cityCoords) {
@@ -40,7 +50,7 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
       return;
     }
 
-    setLoading(true);
+    setLoadingState(true);
     setResult(null);
 
     try {
@@ -68,20 +78,25 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
       const houseNum = data.house;
       const houseData = cityDatabase[houseNum] || null;
 
-      const lookupResult: LookupResult = {
+      // Extract country from city string (e.g. "New York, New York, United States")
+      const cityParts = city.split(",").map(s => s.trim());
+      const countryName = cityParts.length > 1 ? cityParts[cityParts.length - 1] : "";
+
+      setResult({
         house: houseNum,
         houseName: houseData?.label || `Casa ${houseNum}`,
-        city: city,
+        city: cityParts[0],
+        country: countryName,
+        lat: cityCoords.lat,
+        lon: cityCoords.lon,
         houseData,
-      };
-
-      setResult(lookupResult);
+      });
       onHouseFound?.(houseNum, city);
     } catch (error) {
       const err = error as Error;
       showAlert("Erro: " + err.message);
     } finally {
-      setLoading(false);
+      setLoadingState(false);
     }
   };
 
@@ -130,13 +145,17 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="rounded-xl border border-primary/25 bg-card/60 backdrop-blur-sm p-5 space-y-4"
+            className="rounded-xl border border-primary/25 bg-card/60 backdrop-blur-sm p-5 space-y-5"
           >
-            <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-primary" />
-              <p className="text-foreground font-semibold text-sm">{result.city}</p>
-            </div>
+            {/* City with map + flag */}
+            <CityDisplay
+              city={result.city}
+              country={result.country}
+              lat={result.lat}
+              lon={result.lon}
+            />
 
+            {/* House info */}
             <div className="bg-primary/10 rounded-lg p-5 space-y-3">
               <p className="font-cinzel text-primary text-lg font-bold uppercase tracking-wider">
                 Casa {result.house} — {result.houseName}
@@ -149,28 +168,23 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
               </p>
             </div>
 
-            {/* Benefícios */}
+            {/* Benefits */}
             <div className="space-y-3">
               <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
                 Vantagens desta Casa
               </h4>
               <div className="grid gap-2">
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Benefício Principal</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.beneficio}</p>
-                </div>
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Vida Pessoal</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.pessoal}</p>
-                </div>
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Amor</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.amor}</p>
-                </div>
-                <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">Profissional</p>
-                  <p className="text-foreground/80 text-xs leading-relaxed">{result.houseData.prof}</p>
-                </div>
+                {[
+                  { label: "Benefício Principal", text: result.houseData.beneficio },
+                  { label: "Vida Pessoal", text: result.houseData.pessoal },
+                  { label: "Amor", text: result.houseData.amor },
+                  { label: "Profissional", text: result.houseData.prof },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-lg bg-primary/5 border border-primary/10 p-3">
+                    <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">{item.label}</p>
+                    <p className="text-foreground/80 text-xs leading-relaxed">{item.text}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>

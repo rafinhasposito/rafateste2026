@@ -56,7 +56,7 @@ const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("futuro");
-  const [isScanning] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
   const [searchPath, setSearchPath] = useState<SearchPath>(null);
 
   const [name, setName] = useState("");
@@ -304,19 +304,19 @@ const Index = () => {
               {searchPath === "cidade" && (
                 <motion.div key="cidade" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
                   className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
-                  <CityLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} />
+                  <CityLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
                 </motion.div>
               )}
               {searchPath === "casa" && (
                 <motion.div key="casa" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
                   className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
-                  <HouseLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} />
+                  <HouseLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
                 </motion.div>
               )}
               {searchPath === "intencao" && (
                 <motion.div key="intencao" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
                   className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
-                  <IntentLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} />
+                  <IntentLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
                 </motion.div>
               )}
             </AnimatePresence>
