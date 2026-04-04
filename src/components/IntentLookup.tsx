@@ -95,7 +95,19 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
 
       const houseResult = data.results?.[String(houseNum)];
-      const cities = houseResult?.options || { highticket: null, acessivel: null, nacional: null };
+      const rawOptions = houseResult?.options || {};
+      
+      const toArray = (v: any): CityOption[] => {
+        if (!v) return [];
+        if (Array.isArray(v)) return v;
+        return [v];
+      };
+
+      const cities = {
+        highticket: toArray(rawOptions.highticket),
+        acessivel: toArray(rawOptions.acessivel),
+        nacional: toArray(rawOptions.nacional),
+      };
 
       setResult({ house: houseNum, houseName: houseData.label, houseData, cities });
       onHouseFound?.(houseNum);

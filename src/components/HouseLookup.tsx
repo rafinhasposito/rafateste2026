@@ -90,7 +90,20 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
 
       const houseResult = data.results?.[String(selectedHouse)];
       const houseData = cityDatabase[selectedHouse];
-      const cities = houseResult?.options || { highticket: null, acessivel: null, nacional: null };
+      const rawOptions = houseResult?.options || {};
+      
+      // API returns arrays of up to 3 cities per tier
+      const toArray = (v: any): CityOption[] => {
+        if (!v) return [];
+        if (Array.isArray(v)) return v;
+        return [v];
+      };
+
+      const cities = {
+        highticket: toArray(rawOptions.highticket),
+        acessivel: toArray(rawOptions.acessivel),
+        nacional: toArray(rawOptions.nacional),
+      };
 
       setResult({
         house: selectedHouse,
