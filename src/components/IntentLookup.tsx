@@ -23,6 +23,9 @@ interface CityOption {
   country: string;
   lat?: number;
   lon?: number;
+  tags?: string[];
+  score?: number;
+  continent?: string;
 }
 
 interface IntentResult {
@@ -30,9 +33,9 @@ interface IntentResult {
   houseName: string;
   houseData: typeof cityDatabase[1];
   cities: {
-    highticket: CityOption | null;
-    acessivel: CityOption | null;
-    nacional: CityOption | null;
+    highticket: CityOption[];
+    acessivel: CityOption[];
+    nacional: CityOption[];
   };
 }
 
@@ -92,7 +95,19 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
 
       const houseResult = data.results?.[String(houseNum)];
-      const cities = houseResult?.options || { highticket: null, acessivel: null, nacional: null };
+      const rawOptions = houseResult?.options || {};
+      
+      const toArray = (v: any): CityOption[] => {
+        if (!v) return [];
+        if (Array.isArray(v)) return v;
+        return [v];
+      };
+
+      const cities = {
+        highticket: toArray(rawOptions.highticket),
+        acessivel: toArray(rawOptions.acessivel),
+        nacional: toArray(rawOptions.nacional),
+      };
 
       setResult({ house: houseNum, houseName: houseData.label, houseData, cities });
       onHouseFound?.(houseNum);
@@ -104,16 +119,21 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
     }
   };
 
-  const renderCity = (city: CityOption | null, tier: "highticket" | "acessivel" | "nacional") => {
-    if (!city) return null;
+  const renderTierSection = (cities: CityOption[], tier: "highticket" | "acessivel" | "nacional") => {
+    if (!cities || cities.length === 0) return null;
     return (
-      <CityDisplay
-        city={city.city || city.display_name}
-        country={city.country || ""}
-        lat={city.lat}
-        lon={city.lon}
-        tier={tier}
-      />
+      <div className="space-y-3">
+        {cities.map((city, idx) => (
+          <CityDisplay
+            key={`${tier}-${idx}`}
+            city={city.city || city.display_name}
+            country={city.country || ""}
+            lat={city.lat}
+            lon={city.lon}
+            tier={tier}
+          />
+        ))}
+      </div>
     );
   };
 
@@ -177,16 +197,38 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
               </p>
             </div>
 
-            {/* Cities with maps + flags */}
-            <div className="space-y-4">
+            {/* Cities grouped by tier */}
+            <div className="space-y-6">
               <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
                 Cidades Ideais para Este Ciclo
               </h4>
-              <div className="grid gap-3 md:grid-cols-3">
-                {renderCity(result.cities.highticket, "highticket")}
-                {renderCity(result.cities.acessivel, "acessivel")}
-                {renderCity(result.cities.nacional, "nacional")}
-              </div>
+
+              {result.cities.highticket.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-primary">✈️ Alto Padrão</p>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {renderTierSection(result.cities.highticket, "highticket")}
+                  </div>
+                </div>
+              )}
+
+              {result.cities.acessivel.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground">🌍 Médio Padrão</p>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {renderTierSection(result.cities.acessivel, "acessivel")}
+                  </div>
+                </div>
+              )}
+
+              {result.cities.nacional.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-secondary-foreground">🇧🇷 Nacional</p>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {renderTierSection(result.cities.nacional, "nacional")}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Benefits */}
