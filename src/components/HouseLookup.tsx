@@ -23,6 +23,9 @@ interface CityOption {
   country: string;
   lat?: number;
   lon?: number;
+  tags?: string[];
+  score?: number;
+  continent?: string;
 }
 
 interface HouseResult {
@@ -30,9 +33,9 @@ interface HouseResult {
   houseName: string;
   houseData: typeof cityDatabase[1];
   cities: {
-    highticket: CityOption | null;
-    acessivel: CityOption | null;
-    nacional: CityOption | null;
+    highticket: CityOption[];
+    acessivel: CityOption[];
+    nacional: CityOption[];
   };
 }
 
