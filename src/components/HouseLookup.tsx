@@ -120,16 +120,21 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
     }
   };
 
-  const renderCity = (city: CityOption | null, tier: "highticket" | "acessivel" | "nacional") => {
-    if (!city) return null;
+  const renderTierSection = (cities: CityOption[], tier: "highticket" | "acessivel" | "nacional") => {
+    if (!cities || cities.length === 0) return null;
     return (
-      <CityDisplay
-        city={city.city || city.display_name}
-        country={city.country || ""}
-        lat={city.lat}
-        lon={city.lon}
-        tier={tier}
-      />
+      <div className="space-y-3">
+        {cities.map((city, idx) => (
+          <CityDisplay
+            key={`${tier}-${idx}`}
+            city={city.city || city.display_name}
+            country={city.country || ""}
+            lat={city.lat}
+            lon={city.lon}
+            tier={tier}
+          />
+        ))}
+      </div>
     );
   };
 
@@ -177,16 +182,38 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
               </p>
             </div>
 
-            {/* Cities with maps + flags */}
-            <div className="space-y-4">
+            {/* Cities grouped by tier */}
+            <div className="space-y-6">
               <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
                 Destinos Calculados
               </h4>
-              <div className="grid gap-3 md:grid-cols-3">
-                {renderCity(result.cities.highticket, "highticket")}
-                {renderCity(result.cities.acessivel, "acessivel")}
-                {renderCity(result.cities.nacional, "nacional")}
-              </div>
+
+              {result.cities.highticket.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-primary">✈️ Alto Padrão</p>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {renderTierSection(result.cities.highticket, "highticket")}
+                  </div>
+                </div>
+              )}
+
+              {result.cities.acessivel.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground">🌍 Médio Padrão</p>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {renderTierSection(result.cities.acessivel, "acessivel")}
+                  </div>
+                </div>
+              )}
+
+              {result.cities.nacional.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-secondary-foreground">🇧🇷 Nacional</p>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {renderTierSection(result.cities.nacional, "nacional")}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Benefits */}
