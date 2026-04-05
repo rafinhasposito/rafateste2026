@@ -240,8 +240,11 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
           </div>
 
           <div className="relative">
-            {/* Blurred grid */}
-            <div className="select-none pointer-events-none">
+            {/* Blurred grid — clickable to reveal overlay */}
+            <div
+              className="select-none cursor-pointer"
+              onClick={() => setShowUnlockOverlay(true)}
+            >
               {Object.entries(continentGroups).map(([continent, citiesList]) => (
                 <div key={continent} className="mb-4">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/30 mb-2 pl-1">
@@ -267,26 +270,34 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
               ))}
             </div>
 
-            {/* Lock overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-card/80 backdrop-blur-xl border border-primary/20 shadow-[0_0_40px_hsl(var(--gold)/0.1)]">
-                <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center">
-                  <Lock className="w-6 h-6 text-primary" />
+            {/* Lock overlay — only visible after clicking */}
+            {showUnlockOverlay && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-card/80 backdrop-blur-xl border border-primary/20 shadow-[0_0_40px_hsl(var(--gold)/0.1)]">
+                  <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center">
+                    <Lock className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="font-cinzel text-sm font-bold text-foreground uppercase tracking-wider">
+                      Acesso Restrito
+                    </p>
+                    <p className="text-foreground/40 text-xs max-w-[260px]">
+                      Desbloqueie todas as coordenadas e destinos secundários
+                    </p>
+                  </div>
+                  <button className="mt-2 px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-[hsl(var(--gold-light))] text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] shadow-[0_0_30px_hsl(var(--gold)/0.25)] hover:shadow-[0_0_50px_hsl(var(--gold)/0.4)] transition-all duration-300 flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    Desbloquear Mapeamento Completo
+                  </button>
                 </div>
-                <div className="text-center space-y-1">
-                  <p className="font-cinzel text-sm font-bold text-foreground uppercase tracking-wider">
-                    Acesso Restrito
-                  </p>
-                  <p className="text-foreground/40 text-xs max-w-[260px]">
-                    Desbloqueie todas as coordenadas e destinos secundários
-                  </p>
-                </div>
-                <button className="mt-2 px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-[hsl(var(--gold-light))] text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] shadow-[0_0_30px_hsl(var(--gold)/0.25)] hover:shadow-[0_0_50px_hsl(var(--gold)/0.4)] transition-all duration-300 flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
-                  Desbloquear Mapeamento Completo
-                </button>
-              </div>
-            </div>
+              </motion.div>
+            )}
+          </div>
           </div>
         </div>
       )}
