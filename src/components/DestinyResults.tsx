@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 import { Lock, MapPin, Star, Heart, Briefcase, User, Sparkles, Globe, Crown, Gem, Eye } from "lucide-react";
 import { getCountryFlag } from "@/lib/countryFlags";
