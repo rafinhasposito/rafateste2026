@@ -5,7 +5,7 @@ import { cityDatabase } from "@/data/houses";
 import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
 import GoalCards from "@/components/GoalCards";
-import CityDisplay from "@/components/CityDisplay";
+import DestinyResults from "@/components/DestinyResults";
 
 interface HouseLookupProps {
   name: string;
