@@ -5,7 +5,7 @@ import { cityDatabase } from "@/data/houses";
 import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
 import GoalCards from "@/components/GoalCards";
-import CityDisplay from "@/components/CityDisplay";
+import DestinyResults from "@/components/DestinyResults";
 
 interface HouseLookupProps {
   name: string;
@@ -120,24 +120,6 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
     }
   };
 
-  const renderTierSection = (cities: CityOption[], tier: "highticket" | "acessivel" | "nacional") => {
-    if (!cities || cities.length === 0) return null;
-    return (
-      <div className="space-y-3">
-        {cities.map((city, idx) => (
-          <CityDisplay
-            key={`${tier}-${idx}`}
-            city={city.city || city.display_name}
-            country={city.country || ""}
-            lat={city.lat}
-            lon={city.lon}
-            tier={tier}
-          />
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-2">
@@ -167,76 +149,12 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
 
       <AnimatePresence>
         {result && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="rounded-xl border border-primary/25 bg-card/60 backdrop-blur-sm p-5 space-y-5"
-          >
-            <div className="bg-primary/10 rounded-lg p-5 space-y-3">
-              <p className="font-cinzel text-primary text-lg font-bold uppercase tracking-wider">
-                Casa {result.house} — {result.houseName}
-              </p>
-              <p className="text-foreground/80 text-sm leading-relaxed">
-                {result.houseData.resumo}: {result.houseData.porque}
-              </p>
-            </div>
-
-            {/* Cities grouped by tier */}
-            <div className="space-y-6">
-              <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
-                Destinos Calculados
-              </h4>
-
-              {result.cities.highticket.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-primary">✈️ Alto Padrão</p>
-                  <div className="grid gap-3 md:grid-cols-3">
-                    {renderTierSection(result.cities.highticket, "highticket")}
-                  </div>
-                </div>
-              )}
-
-              {result.cities.acessivel.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground">🌍 Médio Padrão</p>
-                  <div className="grid gap-3 md:grid-cols-3">
-                    {renderTierSection(result.cities.acessivel, "acessivel")}
-                  </div>
-                </div>
-              )}
-
-              {result.cities.nacional.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-secondary-foreground">🇧🇷 Nacional</p>
-                  <div className="grid gap-3 md:grid-cols-3">
-                    {renderTierSection(result.cities.nacional, "nacional")}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Benefits */}
-            <div className="space-y-3">
-              <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
-                Todas as Vantagens desta Casa
-              </h4>
-              <div className="grid gap-2">
-                {[
-                  { label: "Benefício Principal", text: result.houseData.beneficio },
-                  { label: "Ideal Para", text: result.houseData.ideal },
-                  { label: "Vida Pessoal", text: result.houseData.pessoal },
-                  { label: "Amor", text: result.houseData.amor },
-                  { label: "Profissional", text: result.houseData.prof },
-                ].map((item) => (
-                  <div key={item.label} className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                    <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">{item.label}</p>
-                    <p className="text-foreground/80 text-xs leading-relaxed">{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+          <DestinyResults
+            house={result.house}
+            houseName={result.houseName}
+            houseData={result.houseData}
+            cities={result.cities}
+          />
         )}
       </AnimatePresence>
     </div>
