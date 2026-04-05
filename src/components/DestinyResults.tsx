@@ -298,7 +298,6 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
               </motion.div>
             )}
           </div>
-          </div>
         </div>
       )}
     </motion.div>
