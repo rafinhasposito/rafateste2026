@@ -97,6 +97,7 @@ function groupByContinentMock(cities: CityOption[]): Record<string, CityOption[]
 
 const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsProps) => {
   const [showUnlockOverlay, setShowUnlockOverlay] = React.useState(false);
+  const [showCityModal, setShowCityModal] = React.useState(false);
 
   // Pick the #1 city (highest tier first)
   const allCities = [...cities.highticket, ...cities.acessivel, ...cities.nacional];
