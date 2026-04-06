@@ -228,6 +228,15 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
               </div>
             ))}
           </div>
+
+          {/* Explore button */}
+          <button
+            onClick={() => setShowCityModal(true)}
+            className="mt-2 px-6 py-3 rounded-xl bg-card/60 backdrop-blur-sm border border-primary/20 text-foreground/80 hover:text-foreground hover:border-primary/40 transition-all duration-300 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider"
+          >
+            <Search className="w-4 h-4 text-primary" />
+            Explorar Destino
+          </button>
         </div>
       </div>
 
