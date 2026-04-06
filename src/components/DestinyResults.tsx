@@ -1,8 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Lock, MapPin, Star, Heart, Briefcase, User, Sparkles, Globe, Crown, Gem, Eye } from "lucide-react";
+import { Lock, MapPin, Star, Heart, Briefcase, User, Sparkles, Globe, Crown, Gem, Eye, Search } from "lucide-react";
 import { getCountryFlag } from "@/lib/countryFlags";
 import type { HouseData } from "@/data/houses";
+import CityDetailsModal from "./CityDetailsModal";
 
 interface CityOption {
   display_name: string;
