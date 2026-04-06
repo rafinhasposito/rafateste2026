@@ -1,8 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Lock, MapPin, Star, Heart, Briefcase, User, Sparkles, Globe, Crown, Gem, Eye } from "lucide-react";
+import { Lock, MapPin, Star, Heart, Briefcase, User, Sparkles, Globe, Crown, Gem, Eye, Search } from "lucide-react";
 import { getCountryFlag } from "@/lib/countryFlags";
 import type { HouseData } from "@/data/houses";
+import CityDetailsModal from "./CityDetailsModal";
 
 interface CityOption {
   display_name: string;
@@ -96,6 +97,7 @@ function groupByContinentMock(cities: CityOption[]): Record<string, CityOption[]
 
 const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsProps) => {
   const [showUnlockOverlay, setShowUnlockOverlay] = React.useState(false);
+  const [showCityModal, setShowCityModal] = React.useState(false);
 
   // Pick the #1 city (highest tier first)
   const allCities = [...cities.highticket, ...cities.acessivel, ...cities.nacional];
@@ -226,6 +228,15 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
               </div>
             ))}
           </div>
+
+          {/* Explore button */}
+          <button
+            onClick={() => setShowCityModal(true)}
+            className="mt-2 px-6 py-3 rounded-xl bg-card/60 backdrop-blur-sm border border-primary/20 text-foreground/80 hover:text-foreground hover:border-primary/40 transition-all duration-300 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider"
+          >
+            <Search className="w-4 h-4 text-primary" />
+            Explorar Destino
+          </button>
         </div>
       </div>
 
@@ -299,6 +310,17 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
             )}
           </div>
         </div>
+      )}
+
+      {/* City Details Modal */}
+      {showCityModal && (
+        <CityDetailsModal
+          cityName={masterCity.city || masterCity.display_name}
+          country={masterCity.country}
+          lat={masterCity.lat}
+          lon={masterCity.lon}
+          onClose={() => setShowCityModal(false)}
+        />
       )}
     </motion.div>
   );
