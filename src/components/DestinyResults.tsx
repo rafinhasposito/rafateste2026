@@ -1,9 +1,11 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { Lock, MapPin, Star, Heart, Briefcase, User, Sparkles, Globe, Crown, Gem, Eye, Search } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Lock, MapPin, Star, Heart, Briefcase, User, Sparkles,
+  Globe, Crown, Gem, Eye, Search, BookOpen, Loader2, ExternalLink
+} from "lucide-react";
 import { getCountryFlag } from "@/lib/countryFlags";
 import type { HouseData } from "@/data/houses";
-import CityDetailsModal from "./CityDetailsModal";
 
 interface CityOption {
   display_name: string;
@@ -27,7 +29,16 @@ interface DestinyResultsProps {
   };
 }
 
-// City hero images by name (curated)
+interface WikiData {
+  title: string;
+  extract: string;
+  thumbnail?: { source: string; width: number; height: number };
+  originalimage?: { source: string };
+  description?: string;
+  content_urls?: { desktop?: { page?: string } };
+}
+
+// Curated hero images
 const CITY_IMAGES: Record<string, string> = {
   "nova iorque": "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=1200&q=80",
   "new york": "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=1200&q=80",
@@ -45,27 +56,20 @@ const CITY_IMAGES: Record<string, string> = {
   "bali": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80",
   "singapura": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=80",
   "amsterdam": "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=1200&q=80",
-  "amesterdão": "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=1200&q=80",
   "sydney": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&q=80",
   "berlim": "https://images.unsplash.com/photo-1560969184-10fe8719e047?w=1200&q=80",
   "buenos aires": "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=1200&q=80",
   "istambul": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=1200&q=80",
   "lisboa": "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=1200&q=80",
   "cusco": "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1200&q=80",
-  "marraquexe": "https://images.unsplash.com/photo-1597211833712-5e41faa202ea?w=1200&q=80",
   "santorini": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1200&q=80",
-  "seul": "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=1200&q=80",
-  "hong kong": "https://images.unsplash.com/photo-1536599018102-9f803c029b22?w=1200&q=80",
-  "cancún": "https://images.unsplash.com/photo-1510097467424-192d713fd8b2?w=1200&q=80",
   "florianópolis": "https://images.unsplash.com/photo-1588001832198-c15cff59b078?w=1200&q=80",
   "salvador": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&q=80",
 };
-
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80";
 
 function getCityImage(cityName: string): string {
-  const key = cityName.toLowerCase().trim();
-  return CITY_IMAGES[key] || FALLBACK_IMAGE;
+  return CITY_IMAGES[cityName.toLowerCase().trim()] || FALLBACK_IMAGE;
 }
 
 // Ritual tips per house
@@ -84,7 +88,29 @@ const HOUSE_RITUALS: Record<number, string[]> = {
   12: ["Medite em silêncio absoluto por 12 minutos ao amanhecer.", "Escreva em um diário secreto o projeto que deseja gestar nos bastidores."],
 };
 
-// Group remaining cities by continent
+function maskCityName(name: string): string {
+  if (!name || name.length < 3) return "???";
+  return name[0] + "*".repeat(Math.min(name.length - 1, 5));
+}
+
+async function fetchWikipediaData(cityName: string): Promise<WikiData | null> {
+  try {
+    const ptRes = await fetch(`https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cityName)}`);
+    if (ptRes.ok) {
+      const data = await ptRes.json();
+      if (data.type !== "disambiguation" && data.extract) return data;
+    }
+    const enRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cityName)}`);
+    if (enRes.ok) {
+      const data = await enRes.json();
+      if (data.extract) return data;
+    }
+  } catch (e) {
+    console.error("Wikipedia fetch error:", e);
+  }
+  return null;
+}
+
 function groupByContinentMock(cities: CityOption[]): Record<string, CityOption[]> {
   const groups: Record<string, CityOption[]> = {};
   for (const c of cities) {
@@ -96,10 +122,11 @@ function groupByContinentMock(cities: CityOption[]): Record<string, CityOption[]
 }
 
 const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsProps) => {
-  const [showUnlockOverlay, setShowUnlockOverlay] = React.useState(false);
-  const [showCityModal, setShowCityModal] = React.useState(false);
+  const [unlocked, setUnlocked] = useState(false);
+  const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
+  const [wikiData, setWikiData] = useState<WikiData | null>(null);
+  const [wikiLoading, setWikiLoading] = useState(false);
 
-  // Pick the #1 city (highest tier first)
   const allCities = [...cities.highticket, ...cities.acessivel, ...cities.nacional];
   const masterCity = allCities[0];
   const secondaryCities = allCities.slice(1);
@@ -107,9 +134,21 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
 
   if (!masterCity) return null;
 
-  const cityImage = getCityImage(masterCity.city || masterCity.display_name);
+  const cityName = masterCity.city || masterCity.display_name;
+  const cityImage = getCityImage(cityName);
   const flag = getCountryFlag(masterCity.country || "");
   const rituals = HOUSE_RITUALS[house] || HOUSE_RITUALS[1];
+
+  const heroImage = wikiData?.originalimage?.source || wikiData?.thumbnail?.source || cityImage;
+
+  const handleUnlock = () => {
+    setUnlocked(true);
+    setWikiLoading(true);
+    fetchWikipediaData(cityName).then((data) => {
+      setWikiData(data);
+      setWikiLoading(false);
+    });
+  };
 
   return (
     <motion.div
@@ -118,129 +157,229 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="space-y-8"
     >
-      {/* ===== MASTER DESTINY CARD ===== */}
+      {/* ===== LOCK SCREEN / MASTER DESTINY ===== */}
       <div className="relative rounded-2xl overflow-hidden border border-primary/20 shadow-[0_0_60px_hsl(var(--gold)/0.08)]">
-        {/* Background image */}
+        {/* Background hero image — always rendered */}
         <div className="absolute inset-0">
           <img
-            src={cityImage}
-            alt={masterCity.city}
-            className="w-full h-full object-cover"
+            src={heroImage}
+            alt={cityName}
+            className={`w-full h-full object-cover transition-all duration-1000 ${
+              !unlocked ? "blur-sm grayscale scale-105" : ""
+            }`}
             loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-transparent" />
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 p-6 md:p-10 space-y-6">
-          {/* Top label */}
-          <div className="flex items-center gap-2">
-            <Crown className="w-4 h-4 text-primary" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-              The Master Destiny
-            </span>
-          </div>
-
-          {/* House power tags */}
-          <div className="flex flex-wrap gap-2">
-            {houseData.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-[10px] font-semibold uppercase tracking-wider text-primary backdrop-blur-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* City name */}
-          <div className="space-y-2 pt-4">
-            <h2 className="font-cinzel text-4xl md:text-6xl font-bold text-foreground leading-none tracking-tight">
-              {masterCity.city || masterCity.display_name}
-            </h2>
-            <div className="flex items-center gap-3 text-foreground/60">
-              <span className="text-xl">{flag}</span>
-              <span className="text-sm font-light tracking-wide">
-                {masterCity.country}
-              </span>
-              {masterCity.lat != null && masterCity.lon != null && (
-                <>
-                  <span className="text-foreground/20">|</span>
-                  <MapPin className="w-3.5 h-3.5 text-primary/50" />
-                  <span className="text-xs text-foreground/40 font-mono">
-                    {masterCity.lat.toFixed(2)}°, {masterCity.lon.toFixed(2)}°
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* House identity */}
-          <div className="mt-4 p-5 rounded-xl bg-card/60 backdrop-blur-md border border-primary/15 space-y-3">
-            <div className="flex items-center gap-2">
-              <Gem className="w-4 h-4 text-primary" />
-              <p className="font-cinzel text-sm font-bold text-primary uppercase tracking-wider">
-                Casa {house} — {houseName}
-              </p>
-            </div>
-            <p className="text-foreground/70 text-sm leading-relaxed">
-              {houseData.resumo}: {houseData.porque}
-            </p>
-          </div>
-
-          {/* Ritual section */}
-          <div className="p-5 rounded-xl bg-primary/5 border border-primary/10 space-y-4">
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-primary" />
-              <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.15em]">
-                Ritual de Revolução Solar
-              </h4>
-            </div>
-            <div className="space-y-3">
-              {rituals.map((r, i) => (
-                <div key={i} className="flex gap-3 items-start">
-                  <span className="shrink-0 w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary">
-                    {i + 1}
-                  </span>
-                  <p className="text-foreground/70 text-xs leading-relaxed pt-0.5">{r}</p>
+        {/* ── LOCKED STATE ── */}
+        <AnimatePresence>
+          {!unlocked && (
+            <motion.div
+              key="lock-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.5 } }}
+              className="relative z-20 flex flex-col items-center justify-center text-center py-24 md:py-32 px-6"
+            >
+              <div className="flex flex-col items-center gap-5 p-8 md:p-12 rounded-2xl bg-card/70 backdrop-blur-xl border border-primary/20 shadow-[0_0_60px_hsl(var(--gold)/0.12)] max-w-md">
+                <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center">
+                  <Lock className="w-7 h-7 text-primary" />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Life areas */}
-          <div className="grid gap-3 md:grid-cols-3">
-            {[
-              { icon: User, label: "Vida Pessoal", text: houseData.pessoal },
-              { icon: Heart, label: "Amor", text: houseData.amor },
-              { icon: Briefcase, label: "Profissional", text: houseData.prof },
-            ].map(({ icon: Icon, label, text }) => (
-              <div
-                key={label}
-                className="p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-primary/8 space-y-2"
-              >
-                <div className="flex items-center gap-2">
-                  <Icon className="w-3.5 h-3.5 text-primary/70" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary/80">{label}</span>
+                <div className="space-y-2">
+                  <p className="font-cinzel text-base md:text-lg font-bold text-foreground uppercase tracking-wider">
+                    Casa {house}: {houseName}
+                  </p>
+                  <p className="text-foreground/50 text-sm leading-relaxed max-w-xs">
+                    O seu Destino Destaque e opções secundárias estão prontos.
+                  </p>
                 </div>
-                <p className="text-foreground/60 text-xs leading-relaxed">{text}</p>
+                <button
+                  onClick={handleUnlock}
+                  className="mt-3 px-10 py-4 rounded-xl bg-gradient-to-r from-primary to-[hsl(var(--gold-light))] text-primary-foreground font-bold text-sm uppercase tracking-[0.14em] shadow-[0_0_40px_hsl(var(--gold)/0.3)] hover:shadow-[0_0_60px_hsl(var(--gold)/0.5)] hover:scale-[1.02] transition-all duration-300 flex items-center gap-3"
+                >
+                  <Eye className="w-5 h-5" />
+                  Desbloquear Mapeamento
+                </button>
               </div>
-            ))}
-          </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          {/* Explore button */}
-          <button
-            onClick={() => setShowCityModal(true)}
-            className="mt-2 px-6 py-3 rounded-xl bg-card/60 backdrop-blur-sm border border-primary/20 text-foreground/80 hover:text-foreground hover:border-primary/40 transition-all duration-300 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider"
-          >
-            <Search className="w-4 h-4 text-primary" />
-            Explorar Destino
-          </button>
-        </div>
+        {/* ── UNLOCKED STATE ── */}
+        <AnimatePresence>
+          {unlocked && (
+            <motion.div
+              key="content-revealed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="relative z-10 p-6 md:p-10 space-y-8"
+            >
+              {/* Loading indicator */}
+              {wikiLoading && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                  <span className="ml-3 text-sm text-foreground/50">A compilar dados...</span>
+                </div>
+              )}
+
+              {/* Top label */}
+              <div className="flex items-center gap-2">
+                <Crown className="w-4 h-4 text-primary" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  The Master Destiny
+                </span>
+              </div>
+
+              {/* Banner: City name, coords, tags */}
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {houseData.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-[10px] font-semibold uppercase tracking-wider text-primary backdrop-blur-sm"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <h2 className="font-cinzel text-4xl md:text-6xl font-bold text-foreground leading-none tracking-tight">
+                  {cityName}
+                </h2>
+                <div className="flex items-center gap-3 text-foreground/60">
+                  <span className="text-xl">{flag}</span>
+                  <span className="text-sm font-light tracking-wide">{masterCity.country}</span>
+                  {masterCity.lat != null && masterCity.lon != null && (
+                    <>
+                      <span className="text-foreground/20">|</span>
+                      <MapPin className="w-3.5 h-3.5 text-primary/50" />
+                      <span className="text-xs text-foreground/40 font-mono">
+                        {masterCity.lat.toFixed(2)}°, {masterCity.lon.toFixed(2)}°
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Secção 1: Egrégora + Significado lado a lado */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="p-5 rounded-xl bg-card/60 backdrop-blur-md border border-primary/15 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Gem className="w-4 h-4 text-primary" />
+                    <p className="font-cinzel text-xs font-bold text-primary uppercase tracking-wider">
+                      A Egrégora de Poder
+                    </p>
+                  </div>
+                  <p className="text-foreground/70 text-sm leading-relaxed">
+                    {houseData.resumo}: {houseData.porque}
+                  </p>
+                </div>
+                <div className="p-5 rounded-xl bg-card/60 backdrop-blur-md border border-primary/15 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <p className="font-cinzel text-xs font-bold text-primary uppercase tracking-wider">
+                      O Que Significa Passar o Aniversário Aqui?
+                    </p>
+                  </div>
+                  <p className="text-foreground/70 text-sm leading-relaxed">
+                    {houseData.beneficio}
+                  </p>
+                </div>
+              </div>
+
+              {/* Wikipedia extract */}
+              {wikiData?.extract && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-5 rounded-xl bg-card/40 backdrop-blur-sm border border-primary/10 space-y-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-primary/60" />
+                    <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
+                      Sobre {wikiData.title || cityName}
+                    </h3>
+                  </div>
+                  <p className="text-foreground/60 text-sm leading-relaxed">
+                    {wikiData.extract}
+                  </p>
+                  {wikiData.content_urls?.desktop?.page && (
+                    <a
+                      href={wikiData.content_urls.desktop.page}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-[10px] text-primary/50 hover:text-primary transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Wikipedia
+                    </a>
+                  )}
+                </motion.div>
+              )}
+
+              {/* Secção 2: Rituais com números gigantes watermark */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-primary" />
+                  <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.15em]">
+                    Rituais de Revolução Solar
+                  </h4>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {rituals.map((r, i) => (
+                    <div
+                      key={i}
+                      className="relative overflow-hidden p-5 rounded-xl bg-card/50 backdrop-blur-sm border border-primary/10"
+                    >
+                      {/* Watermark number */}
+                      <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black text-primary/[0.06] leading-none select-none pointer-events-none">
+                        {i + 1}
+                      </span>
+                      <div className="relative z-10 flex gap-3 items-start">
+                        <span className="shrink-0 w-7 h-7 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center text-[11px] font-bold text-primary">
+                          {i + 1}
+                        </span>
+                        <p className="text-foreground/70 text-xs leading-relaxed pt-1">{r}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Secção 3: Previsões — lista vertical com ícones */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-primary" />
+                  <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.15em]">
+                    Previsões do Ciclo
+                  </h4>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { icon: User, label: "Vida Pessoal", text: houseData.pessoal },
+                    { icon: Heart, label: "Amor", text: houseData.amor },
+                    { icon: Briefcase, label: "Profissional", text: houseData.prof },
+                  ].map(({ icon: Icon, label, text }) => (
+                    <div key={label} className="flex gap-4 items-start p-4 rounded-xl bg-card/40 backdrop-blur-sm border border-primary/8">
+                      <div className="shrink-0 w-10 h-10 rounded-full border-2 border-primary/30 bg-primary/5 flex items-center justify-center">
+                        <Icon className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="space-y-1 flex-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-primary/80">{label}</span>
+                        <p className="text-foreground/60 text-xs leading-relaxed">{text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* ===== SECONDARY DESTINATIONS (LOCKED) ===== */}
+      {/* ===== SECONDARY DESTINATIONS (LOCKED with curiosity trigger) ===== */}
       {secondaryCities.length > 0 && (
         <div className="space-y-5">
           <div className="flex items-center gap-3">
@@ -251,76 +390,92 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
           </div>
 
           <div className="relative">
-            {/* Blurred grid — clickable to reveal overlay */}
+            {/* Grid with partial info visible (flag, continent) but city masked */}
             <div
               className="select-none cursor-pointer"
-              onClick={() => setShowUnlockOverlay(true)}
+              onClick={() => setShowSecondaryOverlay(true)}
             >
               {Object.entries(continentGroups).map(([continent, citiesList]) => (
                 <div key={continent} className="mb-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/30 mb-2 pl-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/40 mb-2 pl-1">
                     {continent}
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {citiesList.map((c, i) => (
-                      <div
-                        key={`${c.city}-${i}`}
-                        className="relative rounded-xl border border-primary/8 bg-card/40 p-4 blur-[6px] opacity-60"
-                      >
-                        <p className="text-foreground font-semibold text-sm">{c.city || c.display_name}</p>
-                        <p className="text-foreground/40 text-[10px]">{c.country}</p>
-                        {c.lat != null && (
-                          <p className="text-foreground/30 text-[9px] font-mono mt-1">
-                            {c.lat?.toFixed(2)}°, {c.lon?.toFixed(2)}°
+                    {citiesList.map((c, i) => {
+                      const cFlag = getCountryFlag(c.country || "");
+                      return (
+                        <div
+                          key={`${c.city}-${i}`}
+                          className="relative rounded-xl border border-primary/8 bg-card/40 p-4 overflow-hidden"
+                        >
+                          {/* Visible: flag + continent */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-base">{cFlag}</span>
+                            <span className="text-[10px] text-foreground/40 uppercase tracking-wider">
+                              {c.continent || c.country}
+                            </span>
+                          </div>
+                          {/* Masked city name */}
+                          <p className="text-foreground/60 font-semibold text-sm blur-[4px]">
+                            {c.city || c.display_name}
                           </p>
-                        )}
-                      </div>
-                    ))}
+                          {/* Masked coordinates */}
+                          {c.lat != null && (
+                            <p className="text-foreground/30 text-[9px] font-mono mt-1">
+                              {c.lat?.toFixed(0)}°, ?????
+                            </p>
+                          )}
+                          {/* Lock icon */}
+                          <div className="absolute top-3 right-3">
+                            <Lock className="w-3.5 h-3.5 text-primary/30" />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Lock overlay — only visible after clicking */}
-            {showUnlockOverlay && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-0 flex flex-col items-center justify-center"
-              >
-                <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-card/80 backdrop-blur-xl border border-primary/20 shadow-[0_0_40px_hsl(var(--gold)/0.1)]">
-                  <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center">
-                    <Lock className="w-6 h-6 text-primary" />
+            {/* Overlay blur + CTA — appears on click */}
+            <AnimatePresence>
+              {showSecondaryOverlay && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 z-10 flex flex-col items-center justify-center backdrop-blur-md bg-background/40 rounded-xl"
+                >
+                  <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-card/80 backdrop-blur-xl border border-primary/20 shadow-[0_0_40px_hsl(var(--gold)/0.1)]">
+                    <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center">
+                      <Lock className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="text-center space-y-1">
+                      <p className="font-cinzel text-sm font-bold text-foreground uppercase tracking-wider">
+                        Acesso Restrito
+                      </p>
+                      <p className="text-foreground/40 text-xs max-w-[260px]">
+                        Desbloqueie todas as coordenadas e destinos secundários
+                      </p>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // TODO: Connect to payment/credits system
+                        window.open("https://wa.me/5511999999999?text=Quero%20desbloquear%20o%20mapeamento%20completo", "_blank");
+                      }}
+                      className="mt-2 px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-[hsl(var(--gold-light))] text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] shadow-[0_0_30px_hsl(var(--gold)/0.25)] hover:shadow-[0_0_50px_hsl(var(--gold)/0.4)] hover:scale-[1.02] transition-all duration-300 flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Desbloquear Mapeamento Completo
+                    </button>
                   </div>
-                  <div className="text-center space-y-1">
-                    <p className="font-cinzel text-sm font-bold text-foreground uppercase tracking-wider">
-                      Acesso Restrito
-                    </p>
-                    <p className="text-foreground/40 text-xs max-w-[260px]">
-                      Desbloqueie todas as coordenadas e destinos secundários
-                    </p>
-                  </div>
-                  <button className="mt-2 px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-[hsl(var(--gold-light))] text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] shadow-[0_0_30px_hsl(var(--gold)/0.25)] hover:shadow-[0_0_50px_hsl(var(--gold)/0.4)] transition-all duration-300 flex items-center gap-2">
-                    <Eye className="w-4 h-4" />
-                    Desbloquear Mapeamento Completo
-                  </button>
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-      )}
-
-      {/* City Details Modal */}
-      {showCityModal && (
-        <CityDetailsModal
-          cityName={masterCity.city || masterCity.display_name}
-          country={masterCity.country}
-          lat={masterCity.lat}
-          lon={masterCity.lon}
-          onClose={() => setShowCityModal(false)}
-        />
       )}
     </motion.div>
   );
