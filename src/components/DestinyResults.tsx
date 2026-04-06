@@ -311,6 +311,17 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
           </div>
         </div>
       )}
+
+      {/* City Details Modal */}
+      {showCityModal && (
+        <CityDetailsModal
+          cityName={masterCity.city || masterCity.display_name}
+          country={masterCity.country}
+          lat={masterCity.lat}
+          lon={masterCity.lon}
+          onClose={() => setShowCityModal(false)}
+        />
+      )}
     </motion.div>
   );
 };
