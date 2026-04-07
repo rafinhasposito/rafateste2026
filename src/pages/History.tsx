@@ -6,7 +6,7 @@ import StarryBackground from "@/components/StarryBackground";
 import UserMenu from "@/components/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { cityDatabase } from "@/data/houses";
+import { cityDatabase, houseColors } from "@/data/houses";
 
 interface ConsultationRow {
   id: string;
@@ -18,6 +18,13 @@ interface ConsultationRow {
   birth_place: string;
   houses_unlocked: number;
   created_at: string;
+}
+
+function extractAccentRGB(house: number): string {
+  const gradient = houseColors[house] || "";
+  const match = gradient.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (match) return `${match[1]}, ${match[2]}, ${match[3]}`;
+  return "255, 215, 0";
 }
 
 const History = () => {
@@ -109,6 +116,7 @@ const History = () => {
               const isPast = c.mode === "passado";
               const goalHouse = c.goal;
               const houseData = goalHouse ? cityDatabase[goalHouse] : null;
+              const accent = goalHouse ? extractAccentRGB(goalHouse) : "255, 215, 0";
 
               return (
                 <motion.div
@@ -116,7 +124,11 @@ const History = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-5 md:p-6 hover:border-primary/30 transition-all"
+                  className="rounded-2xl bg-card/40 backdrop-blur-sm p-5 md:p-6 hover:shadow-lg transition-all"
+                  style={{
+                    border: `1px solid rgba(${accent}, 0.2)`,
+                    borderLeft: `4px solid rgba(${accent}, 0.6)`,
+                  }}
                 >
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Left info */}
@@ -137,9 +149,18 @@ const History = () => {
                       <p className="text-foreground/80 text-sm mb-1">{c.name}</p>
 
                       {goalHouse && houseData && (
-                        <p className="text-primary text-xs font-semibold uppercase tracking-wider">
-                          Casa {goalHouse} — {houseData.label}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ background: `rgb(${accent})` }}
+                          />
+                          <p
+                            className="text-xs font-semibold uppercase tracking-wider"
+                            style={{ color: `rgb(${accent})` }}
+                          >
+                            Casa {goalHouse} — {houseData.label}
+                          </p>
+                        </div>
                       )}
 
                       {c.origin && (
@@ -170,7 +191,12 @@ const History = () => {
 
                       <button
                         onClick={() => navigate(`/dashboard?id=${c.id}`)}
-                        className="mt-1 flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest hover:bg-primary/20 transition-all"
+                        className="mt-1 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all"
+                        style={{
+                          background: `rgba(${accent}, 0.1)`,
+                          border: `1px solid rgba(${accent}, 0.2)`,
+                          color: `rgb(${accent})`,
+                        }}
                       >
                         <Eye className="w-3.5 h-3.5" />
                         Ver Oráculo

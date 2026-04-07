@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Compass, Search } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
-import CityDisplay from "@/components/CityDisplay";
 import { API_URL } from "@/lib/astro";
 import { cityDatabase } from "@/data/houses";
 import { useAlert } from "@/hooks/useAlert";
+import DestinyResults from "@/components/DestinyResults";
 
 interface CityLookupProps {
   name: string;
@@ -17,14 +17,26 @@ interface CityLookupProps {
   onLoadingChange?: (loading: boolean) => void;
 }
 
+interface CityOption {
+  display_name: string;
+  city: string;
+  country: string;
+  lat?: number;
+  lon?: number;
+  tags?: string[];
+  score?: number;
+  continent?: string;
+}
+
 interface LookupResult {
   house: number;
   houseName: string;
-  city: string;
-  country: string;
-  lat: number;
-  lon: number;
-  houseData: typeof cityDatabase[1] | null;
+  houseData: typeof cityDatabase[1];
+  cities: {
+    highticket: CityOption[];
+    acessivel: CityOption[];
+    nacional: CityOption[];
+  };
 }
 
 const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: CityLookupProps) => {
@@ -78,18 +90,33 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
       const houseNum = data.house;
       const houseData = cityDatabase[houseNum] || null;
 
-      // Extract country from city string (e.g. "New York, New York, United States")
+      if (!houseData) {
+        showAlert("Casa não encontrada.");
+        return;
+      }
+
+      // Extract country from city string
       const cityParts = city.split(",").map(s => s.trim());
       const countryName = cityParts.length > 1 ? cityParts[cityParts.length - 1] : "";
 
-      setResult({
-        house: houseNum,
-        houseName: houseData?.label || `Casa ${houseNum}`,
+      // Build the city as the highticket destination for DestinyResults
+      const masterCity: CityOption = {
+        display_name: city,
         city: cityParts[0],
         country: countryName,
         lat: cityCoords.lat,
         lon: cityCoords.lon,
+      };
+
+      setResult({
+        house: houseNum,
+        houseName: houseData.label || `Casa ${houseNum}`,
         houseData,
+        cities: {
+          highticket: [masterCity],
+          acessivel: [],
+          nacional: [],
+        },
       });
       onHouseFound?.(houseNum, city);
     } catch (error) {
@@ -140,54 +167,13 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
       </div>
 
       <AnimatePresence>
-        {result && result.houseData && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="rounded-xl border border-primary/25 bg-card/60 backdrop-blur-sm p-5 space-y-5"
-          >
-            {/* City with map + flag */}
-            <CityDisplay
-              city={result.city}
-              country={result.country}
-              lat={result.lat}
-              lon={result.lon}
-            />
-
-            {/* House info */}
-            <div className="bg-primary/10 rounded-lg p-5 space-y-3">
-              <p className="font-cinzel text-primary text-lg font-bold uppercase tracking-wider">
-                Casa {result.house} — {result.houseName}
-              </p>
-              <p className="text-foreground/80 text-sm leading-relaxed">
-                {result.houseData.resumo}
-              </p>
-              <p className="text-foreground/60 text-xs leading-relaxed">
-                {result.houseData.porque}
-              </p>
-            </div>
-
-            {/* Benefits */}
-            <div className="space-y-3">
-              <h4 className="font-cinzel text-xs font-bold text-foreground uppercase tracking-wider">
-                Vantagens desta Casa
-              </h4>
-              <div className="grid gap-2">
-                {[
-                  { label: "Benefício Principal", text: result.houseData.beneficio },
-                  { label: "Vida Pessoal", text: result.houseData.pessoal },
-                  { label: "Amor", text: result.houseData.amor },
-                  { label: "Profissional", text: result.houseData.prof },
-                ].map((item) => (
-                  <div key={item.label} className="rounded-lg bg-primary/5 border border-primary/10 p-3">
-                    <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-1">{item.label}</p>
-                    <p className="text-foreground/80 text-xs leading-relaxed">{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+        {result && (
+          <DestinyResults
+            house={result.house}
+            houseName={result.houseName}
+            houseData={result.houseData}
+            cities={result.cities}
+          />
         )}
       </AnimatePresence>
     </div>
