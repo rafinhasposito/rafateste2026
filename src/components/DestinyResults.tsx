@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock, MapPin, Star, Heart, Briefcase, User, Sparkles,
-  Globe, Crown, Gem, Eye, Search, BookOpen, Loader2, ExternalLink
+  Globe, Crown, Gem, Eye, Search, BookOpen, Loader2, ExternalLink,
+  CreditCard, ShoppingCart
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { getCountryFlag } from "@/lib/countryFlags";
-import type { HouseData } from "@/data/houses";
+import { cityDatabase, houseColors, type HouseData } from "@/data/houses";
 
 interface CityOption {
   display_name: string;
@@ -27,6 +29,9 @@ interface DestinyResultsProps {
     acessivel: CityOption[];
     nacional: CityOption[];
   };
+  onUnlock?: (houses: number) => void;
+  userCredits?: number;
+  isAuthenticated?: boolean;
 }
 
 interface WikiData {
@@ -36,6 +41,14 @@ interface WikiData {
   originalimage?: { source: string };
   description?: string;
   content_urls?: { desktop?: { page?: string } };
+}
+
+// Helper: extract dominant RGB from houseColors gradient string
+function extractAccentColor(house: number): string {
+  const gradient = houseColors[house] || "";
+  const match = gradient.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (match) return `${match[1]}, ${match[2]}, ${match[3]}`;
+  return "255, 215, 0"; // fallback gold
 }
 
 // Curated hero images
@@ -72,7 +85,6 @@ function getCityImage(cityName: string): string {
   return CITY_IMAGES[cityName.toLowerCase().trim()] || FALLBACK_IMAGE;
 }
 
-// Ritual tips per house
 const HOUSE_RITUALS: Record<number, string[]> = {
   1: ["Ao nascer do sol, declare em voz alta suas intenções para o novo ciclo.", "Acenda uma vela vermelha e visualize-se como o protagonista absoluto da sua história."],
   2: ["Carregue uma moeda de ouro ou pirita no bolso durante todo o dia.", "Escreva em papel dourado as 3 metas financeiras que deseja materializar neste ciclo."],
@@ -121,11 +133,22 @@ function groupByContinentMock(cities: CityOption[]): Record<string, CityOption[]
   return groups;
 }
 
-const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsProps) => {
+const UNLOCK_PACKAGES = [
+  { houses: 1, credits: 1, label: "+1 Casa", desc: "Desbloqueia 1 casa adicional" },
+  { houses: 3, credits: 2, label: "+3 Casas", desc: "Desbloqueia 3 casas adicionais" },
+  { houses: 12, credits: 3, label: "Mapa Completo", desc: "Todas as 12 casas reveladas" },
+];
+
+const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCredits, isAuthenticated }: DestinyResultsProps) => {
+  const navigate = useNavigate();
   const [unlocked, setUnlocked] = useState(false);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [wikiData, setWikiData] = useState<WikiData | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
+
+  const accentColor = extractAccentColor(house);
+  const bgGradient = houseColors[house];
 
   const allCities = [...cities.highticket, ...cities.acessivel, ...cities.nacional];
   const masterCity = allCities[0];
@@ -150,16 +173,42 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
     });
   };
 
+  const handleUnlockPackage = (pkg: typeof UNLOCK_PACKAGES[0]) => {
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+    if ((userCredits ?? 0) < pkg.credits) {
+      navigate("/credits");
+      return;
+    }
+    onUnlock?.(pkg.houses);
+    setShowUnlockModal(false);
+  };
+
+  const openUnlockFlow = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+    setShowUnlockModal(true);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="space-y-8"
+      style={{ '--house-accent': accentColor } as React.CSSProperties}
     >
       {/* ===== LOCK SCREEN / MASTER DESTINY ===== */}
-      <div className="relative rounded-2xl overflow-hidden border border-primary/20 shadow-[0_0_60px_hsl(var(--gold)/0.08)]">
-        {/* Background hero image — always rendered */}
+      <div
+        className="relative rounded-2xl overflow-hidden shadow-[0_0_60px_hsl(var(--gold)/0.08)]"
+        style={{ borderColor: `rgba(${accentColor}, 0.3)`, borderWidth: '1px', borderStyle: 'solid' }}
+      >
+        {/* Background hero image */}
         <div className="absolute inset-0">
           <img
             src={heroImage}
@@ -183,16 +232,21 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
               exit={{ opacity: 0, transition: { duration: 0.5 } }}
               className="relative z-20 flex flex-col items-center justify-center text-center py-24 md:py-32 px-6"
             >
-              <div className="flex flex-col items-center gap-5 p-8 md:p-12 rounded-2xl bg-card/70 backdrop-blur-xl border border-primary/20 shadow-[0_0_60px_hsl(var(--gold)/0.12)] max-w-md">
-                <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center">
-                  <Lock className="w-7 h-7 text-primary" />
+              <div className="flex flex-col items-center gap-5 p-8 md:p-12 rounded-2xl bg-card/70 backdrop-blur-xl shadow-[0_0_60px_hsl(var(--gold)/0.12)] max-w-md"
+                style={{ borderColor: `rgba(${accentColor}, 0.3)`, borderWidth: '1px', borderStyle: 'solid' }}
+              >
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center"
+                  style={{ background: `rgba(${accentColor}, 0.15)`, border: `2px solid rgba(${accentColor}, 0.4)` }}
+                >
+                  <Lock className="w-7 h-7" style={{ color: `rgb(${accentColor})` }} />
                 </div>
                 <div className="space-y-2">
                   <p className="font-cinzel text-base md:text-lg font-bold text-foreground uppercase tracking-wider">
                     Casa {house}: {houseName}
                   </p>
                   <p className="text-foreground/50 text-sm leading-relaxed max-w-xs">
-                    O seu Destino Destaque e opções secundárias estão prontos.
+                    O seu Destino Mestre e opções secundárias estão prontos.
                   </p>
                 </div>
                 <button
@@ -217,7 +271,6 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
               transition={{ duration: 0.8, delay: 0.3 }}
               className="relative z-10 p-6 md:p-10 space-y-8"
             >
-              {/* Loading indicator */}
               {wikiLoading && (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 text-primary animate-spin" />
@@ -227,19 +280,26 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
 
               {/* Top label */}
               <div className="flex items-center gap-2">
-                <Crown className="w-4 h-4 text-primary" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-                  The Master Destiny
+                <Crown className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: `rgb(${accentColor})` }}>
+                  O Destino Mestre
                 </span>
               </div>
 
-              {/* Banner: City name, coords, tags */}
+              {/* Tags */}
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {houseData.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-[10px] font-semibold uppercase tracking-wider text-primary backdrop-blur-sm"
+                      className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm"
+                      style={{
+                        borderColor: `rgba(${accentColor}, 0.4)`,
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                        background: `rgba(${accentColor}, 0.12)`,
+                        color: `rgb(${accentColor})`,
+                      }}
                     >
                       {tag}
                     </span>
@@ -263,12 +323,12 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
                 </div>
               </div>
 
-              {/* Secção 1: Egrégora + Significado lado a lado */}
+              {/* Egrégora + Significado */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="p-5 rounded-xl bg-card/60 backdrop-blur-md border border-primary/15 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Gem className="w-4 h-4 text-primary" />
-                    <p className="font-cinzel text-xs font-bold text-primary uppercase tracking-wider">
+                    <Gem className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                    <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
                       A Egrégora de Poder
                     </p>
                   </div>
@@ -278,8 +338,8 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
                 </div>
                 <div className="p-5 rounded-xl bg-card/60 backdrop-blur-md border border-primary/15 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    <p className="font-cinzel text-xs font-bold text-primary uppercase tracking-wider">
+                    <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                    <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
                       O Que Significa Passar o Aniversário Aqui?
                     </p>
                   </div>
@@ -289,7 +349,7 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
                 </div>
               </div>
 
-              {/* Wikipedia extract */}
+              {/* Wikipedia */}
               {wikiData?.extract && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -302,43 +362,34 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
                       Sobre {wikiData.title || cityName}
                     </h3>
                   </div>
-                  <p className="text-foreground/60 text-sm leading-relaxed">
-                    {wikiData.extract}
-                  </p>
+                  <p className="text-foreground/60 text-sm leading-relaxed">{wikiData.extract}</p>
                   {wikiData.content_urls?.desktop?.page && (
-                    <a
-                      href={wikiData.content_urls.desktop.page}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[10px] text-primary/50 hover:text-primary transition-colors"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      Wikipedia
+                    <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] text-primary/50 hover:text-primary transition-colors">
+                      <ExternalLink className="w-3 h-3" /> Wikipedia
                     </a>
                   )}
                 </motion.div>
               )}
 
-              {/* Secção 2: Rituais com números gigantes watermark */}
+              {/* Rituais */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-primary" />
-                  <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.15em]">
+                  <Star className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                  <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
                     Rituais de Revolução Solar
                   </h4>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   {rituals.map((r, i) => (
-                    <div
-                      key={i}
-                      className="relative overflow-hidden p-5 rounded-xl bg-card/50 backdrop-blur-sm border border-primary/10"
-                    >
-                      {/* Watermark number */}
-                      <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black text-primary/[0.06] leading-none select-none pointer-events-none">
+                    <div key={i} className="relative overflow-hidden p-5 rounded-xl bg-card/50 backdrop-blur-sm border border-primary/10">
+                      <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black leading-none select-none pointer-events-none" style={{ color: `rgba(${accentColor}, 0.06)` }}>
                         {i + 1}
                       </span>
                       <div className="relative z-10 flex gap-3 items-start">
-                        <span className="shrink-0 w-7 h-7 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center text-[11px] font-bold text-primary">
+                        <span
+                          className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold"
+                          style={{ background: `rgba(${accentColor}, 0.15)`, border: `1px solid rgba(${accentColor}, 0.3)`, color: `rgb(${accentColor})` }}
+                        >
                           {i + 1}
                         </span>
                         <p className="text-foreground/70 text-xs leading-relaxed pt-1">{r}</p>
@@ -348,11 +399,11 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
                 </div>
               </div>
 
-              {/* Secção 3: Previsões — lista vertical com ícones */}
+              {/* Previsões */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-primary" />
-                  <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.15em]">
+                  <Globe className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                  <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
                     Previsões do Ciclo
                   </h4>
                 </div>
@@ -363,11 +414,14 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
                     { icon: Briefcase, label: "Profissional", text: houseData.prof },
                   ].map(({ icon: Icon, label, text }) => (
                     <div key={label} className="flex gap-4 items-start p-4 rounded-xl bg-card/40 backdrop-blur-sm border border-primary/8">
-                      <div className="shrink-0 w-10 h-10 rounded-full border-2 border-primary/30 bg-primary/5 flex items-center justify-center">
-                        <Icon className="w-4 h-4 text-primary" />
+                      <div
+                        className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ border: `2px solid rgba(${accentColor}, 0.3)`, background: `rgba(${accentColor}, 0.08)` }}
+                      >
+                        <Icon className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
                       </div>
                       <div className="space-y-1 flex-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-primary/80">{label}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: `rgba(${accentColor}, 0.8)` }}>{label}</span>
                         <p className="text-foreground/60 text-xs leading-relaxed">{text}</p>
                       </div>
                     </div>
@@ -379,7 +433,7 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
         </AnimatePresence>
       </div>
 
-      {/* ===== SECONDARY DESTINATIONS (LOCKED with curiosity trigger) ===== */}
+      {/* ===== SECONDARY DESTINATIONS ===== */}
       {secondaryCities.length > 0 && (
         <div className="space-y-5">
           <div className="flex items-center gap-3">
@@ -390,44 +444,29 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
           </div>
 
           <div className="relative">
-            {/* Grid with partial info visible (flag, continent) but city masked */}
-            <div
-              className="select-none cursor-pointer"
-              onClick={() => setShowSecondaryOverlay(true)}
-            >
+            <div className="select-none cursor-pointer" onClick={() => setShowSecondaryOverlay(true)}>
               {Object.entries(continentGroups).map(([continent, citiesList]) => (
                 <div key={continent} className="mb-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/40 mb-2 pl-1">
-                    {continent}
-                  </p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/40 mb-2 pl-1">{continent}</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {citiesList.map((c, i) => {
                       const cFlag = getCountryFlag(c.country || "");
                       return (
                         <div
                           key={`${c.city}-${i}`}
-                          className="relative rounded-xl border border-primary/8 bg-card/40 p-4 overflow-hidden"
+                          className="relative rounded-xl bg-card/40 p-4 overflow-hidden"
+                          style={{ borderLeft: `3px solid rgba(${accentColor}, 0.4)`, borderTop: '1px solid rgba(255,255,255,0.05)', borderRight: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
                         >
-                          {/* Visible: flag + continent */}
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-base">{cFlag}</span>
-                            <span className="text-[10px] text-foreground/40 uppercase tracking-wider">
-                              {c.continent || c.country}
-                            </span>
+                            <span className="text-[10px] text-foreground/40 uppercase tracking-wider">{c.continent || c.country}</span>
                           </div>
-                          {/* Masked city name */}
-                          <p className="text-foreground/60 font-semibold text-sm blur-[4px]">
-                            {c.city || c.display_name}
-                          </p>
-                          {/* Masked coordinates */}
+                          <p className="text-foreground/60 font-semibold text-sm blur-[4px]">{c.city || c.display_name}</p>
                           {c.lat != null && (
-                            <p className="text-foreground/30 text-[9px] font-mono mt-1">
-                              {c.lat?.toFixed(0)}°, ?????
-                            </p>
+                            <p className="text-foreground/30 text-[9px] font-mono mt-1">{c.lat?.toFixed(0)}°, ?????</p>
                           )}
-                          {/* Lock icon */}
                           <div className="absolute top-3 right-3">
-                            <Lock className="w-3.5 h-3.5 text-primary/30" />
+                            <Lock className="w-3.5 h-3.5" style={{ color: `rgba(${accentColor}, 0.4)` }} />
                           </div>
                         </div>
                       );
@@ -437,7 +476,7 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
               ))}
             </div>
 
-            {/* Overlay blur + CTA — appears on click */}
+            {/* Overlay CTA */}
             <AnimatePresence>
               {showSecondaryOverlay && (
                 <motion.div
@@ -448,23 +487,18 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
                   className="absolute inset-0 z-10 flex flex-col items-center justify-center backdrop-blur-md bg-background/40 rounded-xl"
                 >
                   <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-card/80 backdrop-blur-xl border border-primary/20 shadow-[0_0_40px_hsl(var(--gold)/0.1)]">
-                    <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center">
-                      <Lock className="w-6 h-6 text-primary" />
+                    <div
+                      className="w-14 h-14 rounded-full flex items-center justify-center"
+                      style={{ background: `rgba(${accentColor}, 0.12)`, border: `1px solid rgba(${accentColor}, 0.3)` }}
+                    >
+                      <Lock className="w-6 h-6" style={{ color: `rgb(${accentColor})` }} />
                     </div>
                     <div className="text-center space-y-1">
-                      <p className="font-cinzel text-sm font-bold text-foreground uppercase tracking-wider">
-                        Acesso Restrito
-                      </p>
-                      <p className="text-foreground/40 text-xs max-w-[260px]">
-                        Desbloqueie todas as coordenadas e destinos secundários
-                      </p>
+                      <p className="font-cinzel text-sm font-bold text-foreground uppercase tracking-wider">Acesso Restrito</p>
+                      <p className="text-foreground/40 text-xs max-w-[260px]">Desbloqueie todas as coordenadas e destinos secundários</p>
                     </div>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // TODO: Connect to payment/credits system
-                        window.open("https://wa.me/5511999999999?text=Quero%20desbloquear%20o%20mapeamento%20completo", "_blank");
-                      }}
+                      onClick={openUnlockFlow}
                       className="mt-2 px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-[hsl(var(--gold-light))] text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] shadow-[0_0_30px_hsl(var(--gold)/0.25)] hover:shadow-[0_0_50px_hsl(var(--gold)/0.4)] hover:scale-[1.02] transition-all duration-300 flex items-center gap-2"
                     >
                       <Eye className="w-4 h-4" />
@@ -477,6 +511,154 @@ const DestinyResults = ({ house, houseName, houseData, cities }: DestinyResultsP
           </div>
         </div>
       )}
+
+      {/* ===== GRID DAS 12 CASAS ===== */}
+      {unlocked && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="space-y-5"
+        >
+          <div className="flex items-center gap-3">
+            <Crown className="w-5 h-5 text-primary/60" />
+            <h3 className="font-cinzel text-sm font-bold text-foreground uppercase tracking-[0.12em]">
+              Explorar Todas as Casas
+            </h3>
+          </div>
+          <p className="text-muted-foreground text-xs font-light">
+            Cada casa rege uma área da sua vida. Desbloqueie mais casas para descobrir rotas alternativas de prosperidade.
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((houseNum) => {
+              const hData = cityDatabase[houseNum];
+              const isCurrentHouse = houseNum === house;
+              const hAccent = extractAccentColor(houseNum);
+
+              return (
+                <div
+                  key={houseNum}
+                  className={`relative rounded-xl p-4 overflow-hidden transition-all duration-300 ${
+                    isCurrentHouse
+                      ? "ring-2 ring-offset-1 ring-offset-background"
+                      : "hover:scale-[1.02] cursor-pointer"
+                  }`}
+                  style={{
+                    background: houseColors[houseNum],
+                    ...(isCurrentHouse ? { '--tw-ring-color': `rgb(${hAccent})` } as React.CSSProperties : {}),
+                  }}
+                  onClick={() => {
+                    if (!isCurrentHouse) openUnlockFlow();
+                  }}
+                >
+                  {/* Label */}
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/80">
+                        Casa {houseNum}
+                      </span>
+                      {isCurrentHouse ? (
+                        <Eye className="w-3.5 h-3.5 text-foreground/60" />
+                      ) : (
+                        <Lock className="w-3.5 h-3.5 text-foreground/40" />
+                      )}
+                    </div>
+                    <p className="text-foreground font-cinzel text-xs font-bold leading-tight mb-1">
+                      {hData?.label || `Casa ${houseNum}`}
+                    </p>
+                    {isCurrentHouse && (
+                      <span className="text-[8px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full"
+                        style={{ background: `rgba(${hAccent}, 0.3)`, color: `rgb(${hAccent})` }}
+                      >
+                        Ativa
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* ===== UNLOCK MODAL ===== */}
+      <AnimatePresence>
+        {showUnlockModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm px-4"
+            onClick={() => setShowUnlockModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-card border border-primary/20 rounded-2xl p-6 md:p-8 max-w-md w-full shadow-[0_0_80px_hsl(var(--gold)/0.15)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center mb-6">
+                <CreditCard className="w-8 h-8 text-primary mx-auto mb-3" />
+                <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider">
+                  Desbloquear Casas
+                </h3>
+                <p className="text-muted-foreground text-xs mt-2">
+                  Seus créditos: <span className="text-primary font-bold">{userCredits ?? 0}</span>
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {UNLOCK_PACKAGES.map((pkg) => {
+                  const canAfford = (userCredits ?? 0) >= pkg.credits;
+                  return (
+                    <button
+                      key={pkg.houses}
+                      onClick={() => handleUnlockPackage(pkg)}
+                      className={`w-full p-4 rounded-xl border text-left transition-all ${
+                        canAfford
+                          ? "border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50"
+                          : "border-border/30 bg-card/50 opacity-60"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-cinzel text-sm font-bold text-foreground">{pkg.label}</p>
+                          <p className="text-muted-foreground text-[10px] mt-0.5">{pkg.desc}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-primary font-bold text-sm">{pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}</p>
+                          {!canAfford && (
+                            <p className="text-destructive text-[9px] mt-0.5">Saldo insuficiente</p>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => navigate("/credits")}
+                  className="text-primary text-xs font-semibold uppercase tracking-wider hover:underline flex items-center gap-1.5 mx-auto"
+                >
+                  <ShoppingCart className="w-3.5 h-3.5" />
+                  Comprar Mais Créditos
+                </button>
+              </div>
+
+              <button
+                onClick={() => setShowUnlockModal(false)}
+                className="mt-4 w-full py-2 text-muted-foreground text-xs uppercase tracking-widest hover:text-foreground transition-colors"
+              >
+                Cancelar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
