@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, MapPin, Eye, Unlock, CreditCard } from "lucide-react";
+import { Calendar, Clock, MapPin, Eye, Unlock, CreditCard, Compass, Crown, Scroll, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import UserMenu from "@/components/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { cityDatabase } from "@/data/houses";
+import { cityDatabase, houseColors } from "@/data/houses";
 
 interface ConsultationRow {
   id: string;
@@ -14,41 +14,65 @@ interface ConsultationRow {
   year: string;
   mode: string;
   goal: number | null;
+  intent: string | null;
   origin: string | null;
   birth_place: string;
   houses_unlocked: number;
   created_at: string;
 }
 
+interface TransactionRow {
+  id: string;
+  amount: number;
+  type: string;
+  description: string | null;
+  created_at: string;
+}
+
+function extractAccentColor(house: number): string {
+  const gradient = houseColors[house] || "";
+  const match = gradient.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (match) return `${match[1]}, ${match[2]}, ${match[3]}`;
+  return "255, 215, 0";
+}
+
+function inferSearchType(c: ConsultationRow): { label: string; icon: typeof Compass } {
+  if (c.origin) return { label: "Por Cidade", icon: Compass };
+  if (c.intent) return { label: "Por Intenção", icon: Scroll };
+  return { label: "Por Casa", icon: Crown };
+}
+
 const History = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [consultations, setConsultations] = useState<ConsultationRow[]>([]);
+  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-    const fetch = async () => {
-      const { data } = await supabase
-        .from("consultations")
-        .select("id, name, year, mode, goal, origin, birth_place, houses_unlocked, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      if (data) setConsultations(data as ConsultationRow[]);
+    const load = async () => {
+      const [consultsRes, txRes] = await Promise.all([
+        supabase
+          .from("consultations")
+          .select("id, name, year, mode, goal, intent, origin, birth_place, houses_unlocked, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("credit_transactions")
+          .select("id, amount, type, description, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+      ]);
+      if (consultsRes.data) setConsultations(consultsRes.data as ConsultationRow[]);
+      if (txRes.data) setTransactions(txRes.data as TransactionRow[]);
       setLoading(false);
     };
-    fetch();
+    load();
   }, [user]);
 
-  const formatDate = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
-  };
-
-  const formatTime = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  };
+  const formatDate = (iso: string) => new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const formatTime = (iso: string) => new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
   return (
     <>
@@ -82,6 +106,11 @@ const History = () => {
               </div>
             </div>
           )}
+
+          {/* Pricing info */}
+          <div className="mt-4 text-muted-foreground/60 text-[10px] uppercase tracking-widest">
+            1 crédito = +1 casa &nbsp;|&nbsp; 2 créditos = +3 casas &nbsp;|&nbsp; 3 créditos = mapa completo
+          </div>
         </motion.div>
 
         {/* Loading */}
@@ -104,11 +133,17 @@ const History = () => {
 
         {/* Consultation Cards */}
         {!loading && consultations.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-4 mb-16">
+            <h2 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-4">
+              Histórico de Consultas
+            </h2>
             {consultations.map((c, i) => {
               const isPast = c.mode === "passado";
               const goalHouse = c.goal;
               const houseData = goalHouse ? cityDatabase[goalHouse] : null;
+              const accent = goalHouse ? extractAccentColor(goalHouse) : "255, 215, 0";
+              const searchType = inferSearchType(c);
+              const SearchIcon = searchType.icon;
 
               return (
                 <motion.div
@@ -117,6 +152,7 @@ const History = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-5 md:p-6 hover:border-primary/30 transition-all"
+                  style={{ borderLeft: `4px solid rgba(${accent}, 0.6)` }}
                 >
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Left info */}
@@ -129,6 +165,10 @@ const History = () => {
                         }`}>
                           {isPast ? "Passado" : "Futuro"}
                         </span>
+                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/60 flex items-center gap-1">
+                          <SearchIcon className="w-2.5 h-2.5" />
+                          {searchType.label}
+                        </span>
                         <span className="text-foreground font-cinzel font-bold text-sm">
                           Revolução Solar {c.year}
                         </span>
@@ -137,9 +177,15 @@ const History = () => {
                       <p className="text-foreground/80 text-sm mb-1">{c.name}</p>
 
                       {goalHouse && houseData && (
-                        <p className="text-primary text-xs font-semibold uppercase tracking-wider">
-                          Casa {goalHouse} — {houseData.label}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ background: `rgb(${accent})` }}
+                          />
+                          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: `rgb(${accent})` }}>
+                            Casa {goalHouse} — {houseData.label}
+                          </p>
+                        </div>
                       )}
 
                       {c.origin && (
@@ -181,6 +227,54 @@ const History = () => {
               );
             })}
           </div>
+        )}
+
+        {/* Credit Transactions */}
+        {!loading && transactions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="space-y-4"
+          >
+            <h2 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-4">
+              Extrato de Créditos
+            </h2>
+            <div className="space-y-2">
+              {transactions.map((tx) => {
+                const isPositive = tx.amount > 0;
+                return (
+                  <div
+                    key={tx.id}
+                    className="flex items-center justify-between p-4 rounded-xl border border-border/30 bg-card/30 backdrop-blur-sm"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        isPositive ? "bg-emerald-500/10 border border-emerald-500/30" : "bg-red-500/10 border border-red-500/30"
+                      }`}>
+                        {isPositive ? (
+                          <ArrowDownLeft className="w-4 h-4 text-emerald-400" />
+                        ) : (
+                          <ArrowUpRight className="w-4 h-4 text-red-400" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-foreground text-sm font-medium">
+                          {tx.description || tx.type}
+                        </p>
+                        <p className="text-muted-foreground text-[10px]">
+                          {formatDate(tx.created_at)} às {formatTime(tx.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`font-cinzel font-bold text-sm ${isPositive ? "text-emerald-400" : "text-red-400"}`}>
+                      {isPositive ? "+" : ""}{tx.amount}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
         )}
       </div>
     </>

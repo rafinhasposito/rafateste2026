@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Crown, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cityDatabase } from "@/data/houses";
 import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import GoalCards from "@/components/GoalCards";
 import DestinyResults from "@/components/DestinyResults";
 
@@ -41,6 +44,8 @@ interface HouseResult {
 
 const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSelected, onLoadingChange }: HouseLookupProps) => {
   const { showAlert } = useAlert();
+  const { user, profile, refreshProfile } = useAuth();
+  const navigate = useNavigate();
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HouseResult | null>(null);
@@ -56,14 +61,8 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
   };
 
   const handleLookup = async () => {
-    if (!selectedHouse) {
-      showAlert("Selecione uma Casa no grid.");
-      return;
-    }
-    if (!name || !birthdate || !birthtime || !birthPlace) {
-      showAlert("Preencha seus dados natais acima primeiro.");
-      return;
-    }
+    if (!selectedHouse) { showAlert("Selecione uma Casa no grid."); return; }
+    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima primeiro."); return; }
 
     setLoadingState(true);
     setResult(null);
@@ -91,8 +90,7 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
       const houseResult = data.results?.[String(selectedHouse)];
       const houseData = cityDatabase[selectedHouse];
       const rawOptions = houseResult?.options || {};
-      
-      // API returns arrays of up to 3 cities per tier
+
       const toArray = (v: any): CityOption[] => {
         if (!v) return [];
         if (Array.isArray(v)) return v;
@@ -118,6 +116,27 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
     } finally {
       setLoadingState(false);
     }
+  };
+
+  const handleUnlock = async (houses: number) => {
+    if (!user) { navigate("/auth"); return; }
+    const pkg = [
+      { houses: 1, credits: 1 },
+      { houses: 3, credits: 2 },
+      { houses: 12, credits: 3 },
+    ].find(p => p.houses === houses);
+    if (!pkg) return;
+    if ((profile?.credits ?? 0) < pkg.credits) { navigate("/credits"); return; }
+
+    await supabase.from("profiles").update({ credits: (profile?.credits ?? 0) - pkg.credits }).eq("user_id", user.id);
+    await supabase.from("credit_transactions").insert({
+      user_id: user.id,
+      amount: -pkg.credits,
+      type: "desbloqueio",
+      description: `Desbloqueio de ${houses} casa(s) — Consulta por Casa`,
+    });
+    await refreshProfile();
+    showAlert(`${houses} casa(s) desbloqueada(s) com sucesso!`);
   };
 
   return (
@@ -154,6 +173,9 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
             houseName={result.houseName}
             houseData={result.houseData}
             cities={result.cities}
+            onUnlock={handleUnlock}
+            userCredits={profile?.credits ?? 0}
+            isAuthenticated={!!user}
           />
         )}
       </AnimatePresence>

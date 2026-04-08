@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Lock, Unlock, Map } from "lucide-react";
 
 const PACKAGES = [
   {
@@ -33,12 +34,17 @@ const PACKAGES = [
   },
 ];
 
+const UNLOCK_TABLE = [
+  { label: "+1 Casa", credits: 1, desc: "Desbloqueia 1 casa adicional no seu mapa", icon: Lock },
+  { label: "+3 Casas", credits: 2, desc: "Desbloqueia 3 casas adicionais", icon: Unlock },
+  { label: "Mapa Completo", credits: 3, desc: "Todas as 12 casas reveladas de uma vez", icon: Map },
+];
+
 const Credits = () => {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
 
   const handlePurchase = (pkg: typeof PACKAGES[0]) => {
-    // Placeholder — will integrate Stripe later
     alert(`Pagamento de R$${pkg.price} para ${pkg.credits} crédito(s) será integrado com Stripe em breve.`);
   };
 
@@ -125,6 +131,33 @@ const Credits = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Unlock Pricing Table */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-16"
+        >
+          <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-6 text-center">
+            Quanto Custa Cada Desbloqueio
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            {UNLOCK_TABLE.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.label} className="p-5 rounded-xl border border-primary/15 bg-card/40 backdrop-blur-sm text-center">
+                  <div className="w-10 h-10 rounded-full border border-primary/30 bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                    <Icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="font-cinzel text-sm font-bold text-foreground mb-1">{item.label}</p>
+                  <p className="text-primary font-bold text-lg">{item.credits} crédito{item.credits > 1 ? "s" : ""}</p>
+                  <p className="text-muted-foreground text-[10px] mt-1">{item.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* How credits work */}
         <motion.div

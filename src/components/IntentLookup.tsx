@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Scroll, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { matchIntentToHouse } from "@/lib/intentMap";
 import { cityDatabase } from "@/data/houses";
 import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import DestinyResults from "@/components/DestinyResults";
 
 interface IntentLookupProps {
@@ -41,6 +44,8 @@ interface IntentResult {
 
 const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: IntentLookupProps) => {
   const { showAlert } = useAlert();
+  const { user, profile, refreshProfile } = useAuth();
+  const navigate = useNavigate();
   const [intent, setIntent] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<IntentResult | null>(null);
@@ -51,20 +56,11 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
   };
 
   const handleLookup = async () => {
-    if (intent.length < 10) {
-      showAlert("Descreva seu desejo com pelo menos 10 caracteres.");
-      return;
-    }
-    if (!name || !birthdate || !birthtime || !birthPlace) {
-      showAlert("Preencha seus dados natais acima primeiro.");
-      return;
-    }
+    if (intent.length < 10) { showAlert("Descreva seu desejo com pelo menos 10 caracteres."); return; }
+    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima primeiro."); return; }
 
     const match = matchIntentToHouse(intent);
-    if (!match) {
-      showAlert("Não conseguimos identificar a área. Tente palavras como: dinheiro, amor, carreira, saúde, viagem...");
-      return;
-    }
+    if (!match) { showAlert("Não conseguimos identificar a área. Tente palavras como: dinheiro, amor, carreira, saúde, viagem..."); return; }
 
     const houseNum = match.house;
     const houseData = cityDatabase[houseNum];
@@ -96,7 +92,7 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
 
       const houseResult = data.results?.[String(houseNum)];
       const rawOptions = houseResult?.options || {};
-      
+
       const toArray = (v: any): CityOption[] => {
         if (!v) return [];
         if (Array.isArray(v)) return v;
@@ -117,6 +113,27 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
     } finally {
       setLoadingState(false);
     }
+  };
+
+  const handleUnlock = async (houses: number) => {
+    if (!user) { navigate("/auth"); return; }
+    const pkg = [
+      { houses: 1, credits: 1 },
+      { houses: 3, credits: 2 },
+      { houses: 12, credits: 3 },
+    ].find(p => p.houses === houses);
+    if (!pkg) return;
+    if ((profile?.credits ?? 0) < pkg.credits) { navigate("/credits"); return; }
+
+    await supabase.from("profiles").update({ credits: (profile?.credits ?? 0) - pkg.credits }).eq("user_id", user.id);
+    await supabase.from("credit_transactions").insert({
+      user_id: user.id,
+      amount: -pkg.credits,
+      type: "desbloqueio",
+      description: `Desbloqueio de ${houses} casa(s) — Consulta por Intenção`,
+    });
+    await refreshProfile();
+    showAlert(`${houses} casa(s) desbloqueada(s) com sucesso!`);
   };
 
   return (
@@ -169,6 +186,9 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
             houseName={result.houseName}
             houseData={result.houseData}
             cities={result.cities}
+            onUnlock={handleUnlock}
+            userCredits={profile?.credits ?? 0}
+            isAuthenticated={!!user}
           />
         )}
       </AnimatePresence>
