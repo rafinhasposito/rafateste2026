@@ -546,7 +546,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
                   }`}
                   style={{
                     background: houseColors[houseNum],
-                    ringColor: isCurrentHouse ? `rgb(${hAccent})` : undefined,
+                    ...(isCurrentHouse ? { '--tw-ring-color': `rgb(${hAccent})` } as React.CSSProperties : {}),
                   }}
                   onClick={() => {
                     if (!isCurrentHouse) openUnlockFlow();
