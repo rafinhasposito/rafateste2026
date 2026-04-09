@@ -28,9 +28,12 @@ Deno.serve(async (req) => {
     const query = country ? `${city},${country}` : city
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(query)}&units=metric&lang=pt_br&appid=${apiKey}`
     
+    console.log('Fetching weather for:', query, 'URL:', url.replace(apiKey, '***'))
     const res = await fetch(url)
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: 'Weather data not found' }), {
+      const errorBody = await res.text()
+      console.error('OpenWeather error:', res.status, errorBody)
+      return new Response(JSON.stringify({ error: 'Weather data not found', detail: errorBody }), {
         status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
