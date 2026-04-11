@@ -31,6 +31,7 @@ interface DestinyResultsProps {
     acessivel: CityOption[];
     nacional: CityOption[];
   };
+  allResults?: Record<string, any>;
   onUnlock?: (houses: number) => void;
   userCredits?: number;
   isAuthenticated?: boolean;
