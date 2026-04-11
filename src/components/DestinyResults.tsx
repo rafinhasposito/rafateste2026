@@ -31,6 +31,7 @@ interface DestinyResultsProps {
     acessivel: CityOption[];
     nacional: CityOption[];
   };
+  allResults?: Record<string, any>;
   onUnlock?: (houses: number) => void;
   userCredits?: number;
   isAuthenticated?: boolean;
@@ -69,19 +70,25 @@ const CITY_IMAGES: Record<string, string> = {
   "london": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80",
   "dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=80",
   "tóquio": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&q=80",
+  "tokyo": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&q=80",
   "roma": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80",
+  "rome": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80",
   "barcelona": "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=1200&q=80",
   "miami": "https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?w=1200&q=80",
   "são paulo": "https://images.unsplash.com/photo-1543059080-f9b1272213d5?w=1200&q=80",
   "rio de janeiro": "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1200&q=80",
   "bali": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80",
   "singapura": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=80",
+  "singapore": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=80",
   "amsterdam": "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=1200&q=80",
   "sydney": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=1200&q=80",
   "berlim": "https://images.unsplash.com/photo-1560969184-10fe8719e047?w=1200&q=80",
+  "berlin": "https://images.unsplash.com/photo-1560969184-10fe8719e047?w=1200&q=80",
   "buenos aires": "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=1200&q=80",
   "istambul": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=1200&q=80",
+  "istanbul": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=1200&q=80",
   "lisboa": "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=1200&q=80",
+  "lisbon": "https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=1200&q=80",
   "cusco": "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1200&q=80",
   "santorini": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1200&q=80",
   "florianópolis": "https://images.unsplash.com/photo-1588001832198-c15cff59b078?w=1200&q=80",
@@ -91,14 +98,40 @@ const CITY_IMAGES: Record<string, string> = {
   "bangkok": "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=1200&q=80",
   "bora bora": "https://images.unsplash.com/photo-1589197331516-4d84b72ebde3?w=1200&q=80",
   "fernando de noronha": "https://images.unsplash.com/photo-1598443928710-7def5b3b037e?w=1200&q=80",
+  "praga": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1200&q=80",
+  "prague": "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1200&q=80",
+  "viena": "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=1200&q=80",
+  "vienna": "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=1200&q=80",
+  "moscou": "https://images.unsplash.com/photo-1513326738677-b964603b136d?w=1200&q=80",
+  "moscow": "https://images.unsplash.com/photo-1513326738677-b964603b136d?w=1200&q=80",
+  "cairo": "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=1200&q=80",
+  "marrakech": "https://images.unsplash.com/photo-1597211833712-5e41faa202ea?w=1200&q=80",
+  "hong kong": "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=1200&q=80",
+  "seul": "https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=1200&q=80",
+  "seoul": "https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=1200&q=80",
+  "madri": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=80",
+  "madrid": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=80",
+  "atenas": "https://images.unsplash.com/photo-1555993539-1732b0258235?w=1200&q=80",
+  "athens": "https://images.unsplash.com/photo-1555993539-1732b0258235?w=1200&q=80",
+  "zurique": "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=1200&q=80",
+  "zurich": "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=1200&q=80",
+  "vancouver": "https://images.unsplash.com/photo-1559511260-66a68e7e59b0?w=1200&q=80",
+  "toronto": "https://images.unsplash.com/photo-1517090504332-af2865de5e60?w=1200&q=80",
+  "cidade do méxico": "https://images.unsplash.com/photo-1585464231875-d9ef1f5ad396?w=1200&q=80",
+  "mexico city": "https://images.unsplash.com/photo-1585464231875-d9ef1f5ad396?w=1200&q=80",
+  "bogotá": "https://images.unsplash.com/photo-1536989754687-832a88507bd6?w=1200&q=80",
+  "lima": "https://images.unsplash.com/photo-1531968455001-5c5272a67c71?w=1200&q=80",
+  "santiago": "https://images.unsplash.com/photo-1510253687831-0f982bfc4c72?w=1200&q=80",
+  "montevidéu": "https://images.unsplash.com/photo-1597867397684-d94dd8eb0db8?w=1200&q=80",
+  "montevideo": "https://images.unsplash.com/photo-1597867397684-d94dd8eb0db8?w=1200&q=80",
 };
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80";
 
 function getCityImage(cityName: string): string {
   const key = cityName.toLowerCase().trim();
   if (CITY_IMAGES[key]) return CITY_IMAGES[key];
-  // Unsplash Source fallback
-  return `https://source.unsplash.com/800x600/?${encodeURIComponent(cityName)},city,travel`;
+  // Use a deterministic Unsplash photo based on city name hash instead of deprecated source.unsplash.com
+  return FALLBACK_IMAGE;
 }
 
 const HOUSE_RITUALS: Record<number, string[]> = {
@@ -168,7 +201,7 @@ const UNLOCK_PACKAGES = [
   { houses: 12, credits: 3, label: "Mapa Completo", desc: "Todas as 12 casas reveladas" },
 ];
 
-const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCredits, isAuthenticated }: DestinyResultsProps) => {
+const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated }: DestinyResultsProps) => {
   const navigate = useNavigate();
   const [unlocked, setUnlocked] = useState(false);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
@@ -413,7 +446,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
                       A Egrégora de Poder
                     </p>
                   </div>
-                  <p className="text-foreground/70 text-sm leading-relaxed">
+                   <p className="text-white/80 text-sm leading-relaxed">
                     {houseData.resumo}: {houseData.porque}
                   </p>
                 </div>
@@ -424,7 +457,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
                       O Que Significa Passar o Aniversário Aqui?
                     </p>
                   </div>
-                  <p className="text-foreground/70 text-sm leading-relaxed">
+                  <p className="text-white/80 text-sm leading-relaxed">
                     {houseData.beneficio}
                   </p>
                 </div>
@@ -443,7 +476,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
                       Sobre {wikiData.title || cityName}
                     </h3>
                   </div>
-                  <p className="text-foreground/60 text-sm leading-relaxed">{wikiData.extract}</p>
+                  <p className="text-white/70 text-sm leading-relaxed">{wikiData.extract}</p>
                   {wikiData.content_urls?.desktop?.page && (
                     <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] text-primary/50 hover:text-primary transition-colors">
                       <ExternalLink className="w-3 h-3" /> Wikipedia
@@ -473,7 +506,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
                         >
                           {i + 1}
                         </span>
-                        <p className="text-foreground/70 text-xs leading-relaxed pt-1">{r}</p>
+                        <p className="text-white/80 text-xs leading-relaxed pt-1">{r}</p>
                       </div>
                     </div>
                   ))}
@@ -503,7 +536,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
                       </div>
                       <div className="space-y-1 flex-1">
                         <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: `rgba(${accentColor}, 0.8)` }}>{label}</span>
-                        <p className="text-foreground/60 text-xs leading-relaxed">{text}</p>
+                        <p className="text-white/70 text-xs leading-relaxed">{text}</p>
                       </div>
                     </div>
                   ))}
@@ -595,8 +628,23 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
               const archetype = getHouseArchetype(hData?.name || "");
               const sign = houseSigns[houseNum];
 
-              // Get city for this house from allCities or masterCity
-              const houseCity = isCurrentHouse ? masterCity : null;
+              // Get city for this house from allResults or masterCity
+              let houseCity: CityOption | null = null;
+              if (isCurrentHouse) {
+                houseCity = masterCity;
+              } else if (allResults) {
+                const hResult = allResults[String(houseNum)];
+                const opts = hResult?.options || {};
+                const toArr = (v: any): CityOption[] => {
+                  if (!v) return [];
+                  if (Array.isArray(v)) return v;
+                  return [v];
+                };
+                const htCities = toArr(opts.highticket);
+                const acCities = toArr(opts.acessivel);
+                const naCities = toArr(opts.nacional);
+                houseCity = htCities[0] || acCities[0] || naCities[0] || null;
+              }
               const houseCityFlag = houseCity ? getCountryFlag(houseCity.country || "") : null;
 
               return (
@@ -639,46 +687,46 @@ const DestinyResults = ({ house, houseName, houseData, cities, onUnlock, userCre
 
                     <div className="flex items-start gap-3 mb-3">
                       <div className="flex-1 min-w-0">
-                        <p className="text-primary font-cinzel text-[11px] font-bold uppercase tracking-wider">Casa {houseNum}</p>
-                        <p className="text-foreground text-sm font-semibold mt-0.5">{hData?.label}</p>
-                        <p className="text-foreground/50 text-[10px] mt-0.5">{archetype} · {sign}</p>
-                        <p className="text-foreground/50 text-[10px] mt-0.5">{hData?.regente}</p>
+                        <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider" style={{ color: `rgb(${hAccent})` }}>Casa {houseNum}</p>
+                        <p className="text-white font-semibold text-sm mt-0.5">{hData?.label}</p>
+                        <p className="text-white/60 text-[10px] mt-0.5">{archetype} · {sign}</p>
+                        <p className="text-white/60 text-[10px] mt-0.5">{hData?.regente}</p>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {hData?.tags.map((tag) => (
-                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full bg-foreground/5 border border-foreground/10 text-foreground/60 uppercase tracking-wider">
+                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/80 uppercase tracking-wider">
                           {tag}
                         </span>
                       ))}
                     </div>
 
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-foreground/50 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
-                      <span className="text-foreground/70 text-[10px]">{hData?.cristal}</span>
+                      <span className="text-white/60 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
+                      <span className="text-white/90 text-[10px]">{hData?.cristal}</span>
                     </div>
 
-                    {/* City with flag — only for unlocked houses */}
-                    {isUnlocked && isCurrentHouse && houseCity && (
-                      <div className="mt-2 pt-3 border-t border-foreground/10">
+                    {/* City with flag — for all unlocked houses with city data */}
+                    {isUnlocked && houseCity && (
+                      <div className="mt-2 pt-3 border-t border-white/10">
                         <div className="flex items-center gap-2.5">
                           {houseCityFlag && <span className="text-lg leading-none">{houseCityFlag}</span>}
                           <div className="flex-1 min-w-0">
-                            <p className="text-foreground font-semibold text-sm truncate">{houseCity.city || houseCity.display_name}</p>
-                            <p className="text-foreground/40 text-[10px]">{houseCity.country}</p>
+                            <p className="text-white font-semibold text-sm truncate">{houseCity.city || houseCity.display_name}</p>
+                            <p className="text-white/50 text-[10px]">{houseCity.country}</p>
                           </div>
-                          <MapPin className="w-3.5 h-3.5 text-primary/40 shrink-0" />
+                          <MapPin className="w-3.5 h-3.5 text-white/40 shrink-0" />
                         </div>
                       </div>
                     )}
 
-                    {/* For non-current unlocked houses, show "Desbloqueada" badge */}
-                    {isUnlocked && !isCurrentHouse && (
-                      <div className="mt-2 pt-3 border-t border-foreground/10">
+                    {/* For unlocked houses without city data, show "Desbloqueada" badge */}
+                    {isUnlocked && !houseCity && !isCurrentHouse && (
+                      <div className="mt-2 pt-3 border-t border-white/10">
                         <div className="flex items-center gap-2">
-                          <Eye className="w-3.5 h-3.5 text-primary/50" />
-                          <span className="text-primary/60 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
+                          <Eye className="w-3.5 h-3.5 text-white/50" />
+                          <span className="text-white/60 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
                         </div>
                       </div>
                     )}

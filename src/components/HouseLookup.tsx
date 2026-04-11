@@ -40,6 +40,7 @@ interface HouseResult {
     acessivel: CityOption[];
     nacional: CityOption[];
   };
+  allResults?: Record<string, any>;
 }
 
 const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSelected, onLoadingChange }: HouseLookupProps) => {
@@ -103,11 +104,20 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
         nacional: toArray(rawOptions.nacional),
       };
 
+      // Build allResults from the full API response
+      const allResults: Record<string, any> = {};
+      if (data.results) {
+        for (const [key, val] of Object.entries(data.results)) {
+          allResults[key] = val;
+        }
+      }
+
       setResult({
         house: selectedHouse,
         houseName: houseData?.label || `Casa ${selectedHouse}`,
         houseData,
         cities,
+        allResults,
       });
       onHouseSelected?.(selectedHouse);
     } catch (error) {
@@ -173,6 +183,7 @@ const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSele
             houseName={result.houseName}
             houseData={result.houseData}
             cities={result.cities}
+            allResults={result.allResults}
             onUnlock={handleUnlock}
             userCredits={profile?.credits ?? 0}
             isAuthenticated={!!user}
