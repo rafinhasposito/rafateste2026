@@ -628,8 +628,23 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
               const archetype = getHouseArchetype(hData?.name || "");
               const sign = houseSigns[houseNum];
 
-              // Get city for this house from allCities or masterCity
-              const houseCity = isCurrentHouse ? masterCity : null;
+              // Get city for this house from allResults or masterCity
+              let houseCity: CityOption | null = null;
+              if (isCurrentHouse) {
+                houseCity = masterCity;
+              } else if (allResults) {
+                const hResult = allResults[String(houseNum)];
+                const opts = hResult?.options || {};
+                const toArr = (v: any): CityOption[] => {
+                  if (!v) return [];
+                  if (Array.isArray(v)) return v;
+                  return [v];
+                };
+                const htCities = toArr(opts.highticket);
+                const acCities = toArr(opts.acessivel);
+                const naCities = toArr(opts.nacional);
+                houseCity = htCities[0] || acCities[0] || naCities[0] || null;
+              }
               const houseCityFlag = houseCity ? getCountryFlag(houseCity.country || "") : null;
 
               return (
@@ -672,46 +687,46 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
                     <div className="flex items-start gap-3 mb-3">
                       <div className="flex-1 min-w-0">
-                        <p className="text-primary font-cinzel text-[11px] font-bold uppercase tracking-wider">Casa {houseNum}</p>
-                        <p className="text-foreground text-sm font-semibold mt-0.5">{hData?.label}</p>
-                        <p className="text-foreground/50 text-[10px] mt-0.5">{archetype} · {sign}</p>
-                        <p className="text-foreground/50 text-[10px] mt-0.5">{hData?.regente}</p>
+                        <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider" style={{ color: `rgb(${hAccent})` }}>Casa {houseNum}</p>
+                        <p className="text-white font-semibold text-sm mt-0.5">{hData?.label}</p>
+                        <p className="text-white/60 text-[10px] mt-0.5">{archetype} · {sign}</p>
+                        <p className="text-white/60 text-[10px] mt-0.5">{hData?.regente}</p>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {hData?.tags.map((tag) => (
-                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full bg-foreground/5 border border-foreground/10 text-foreground/60 uppercase tracking-wider">
+                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-white/80 uppercase tracking-wider">
                           {tag}
                         </span>
                       ))}
                     </div>
 
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-foreground/50 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
-                      <span className="text-foreground/70 text-[10px]">{hData?.cristal}</span>
+                      <span className="text-white/60 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
+                      <span className="text-white/90 text-[10px]">{hData?.cristal}</span>
                     </div>
 
-                    {/* City with flag — only for unlocked houses */}
-                    {isUnlocked && isCurrentHouse && houseCity && (
-                      <div className="mt-2 pt-3 border-t border-foreground/10">
+                    {/* City with flag — for all unlocked houses with city data */}
+                    {isUnlocked && houseCity && (
+                      <div className="mt-2 pt-3 border-t border-white/10">
                         <div className="flex items-center gap-2.5">
                           {houseCityFlag && <span className="text-lg leading-none">{houseCityFlag}</span>}
                           <div className="flex-1 min-w-0">
-                            <p className="text-foreground font-semibold text-sm truncate">{houseCity.city || houseCity.display_name}</p>
-                            <p className="text-foreground/40 text-[10px]">{houseCity.country}</p>
+                            <p className="text-white font-semibold text-sm truncate">{houseCity.city || houseCity.display_name}</p>
+                            <p className="text-white/50 text-[10px]">{houseCity.country}</p>
                           </div>
-                          <MapPin className="w-3.5 h-3.5 text-primary/40 shrink-0" />
+                          <MapPin className="w-3.5 h-3.5 text-white/40 shrink-0" />
                         </div>
                       </div>
                     )}
 
-                    {/* For non-current unlocked houses, show "Desbloqueada" badge */}
-                    {isUnlocked && !isCurrentHouse && (
-                      <div className="mt-2 pt-3 border-t border-foreground/10">
+                    {/* For unlocked houses without city data, show "Desbloqueada" badge */}
+                    {isUnlocked && !houseCity && !isCurrentHouse && (
+                      <div className="mt-2 pt-3 border-t border-white/10">
                         <div className="flex items-center gap-2">
-                          <Eye className="w-3.5 h-3.5 text-primary/50" />
-                          <span className="text-primary/60 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
+                          <Eye className="w-3.5 h-3.5 text-white/50" />
+                          <span className="text-white/60 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
                         </div>
                       </div>
                     )}
