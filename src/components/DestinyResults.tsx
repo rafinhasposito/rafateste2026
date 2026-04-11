@@ -446,7 +446,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       A Egrégora de Poder
                     </p>
                   </div>
-                  <p className="text-foreground/70 text-sm leading-relaxed">
+                   <p className="text-white/80 text-sm leading-relaxed">
                     {houseData.resumo}: {houseData.porque}
                   </p>
                 </div>
@@ -457,7 +457,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       O Que Significa Passar o Aniversário Aqui?
                     </p>
                   </div>
-                  <p className="text-foreground/70 text-sm leading-relaxed">
+                  <p className="text-white/80 text-sm leading-relaxed">
                     {houseData.beneficio}
                   </p>
                 </div>
@@ -506,7 +506,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         >
                           {i + 1}
                         </span>
-                        <p className="text-foreground/70 text-xs leading-relaxed pt-1">{r}</p>
+                        <p className="text-white/80 text-xs leading-relaxed pt-1">{r}</p>
                       </div>
                     </div>
                   ))}
@@ -536,7 +536,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       </div>
                       <div className="space-y-1 flex-1">
                         <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: `rgba(${accentColor}, 0.8)` }}>{label}</span>
-                        <p className="text-foreground/60 text-xs leading-relaxed">{text}</p>
+                        <p className="text-white/70 text-xs leading-relaxed">{text}</p>
                       </div>
                     </div>
                   ))}
