@@ -331,10 +331,10 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   <Lock className="w-7 h-7" style={{ color: `rgb(${accentColor})` }} />
                 </div>
                 <div className="space-y-2">
-                  <p className="font-cinzel text-base md:text-lg font-bold text-foreground uppercase tracking-wider">
+                  <p className="font-cinzel text-base md:text-lg font-bold text-white uppercase tracking-wider">
                     Casa {house}: {houseName}
                   </p>
-                  <p className="text-foreground/50 text-sm leading-relaxed max-w-xs">
+                  <p className="text-white/60 text-sm leading-relaxed max-w-xs">
                     O seu Destino Mestre e opções secundárias estão prontos.
                   </p>
                 </div>
@@ -363,7 +363,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
               {wikiLoading && (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                  <span className="ml-3 text-sm text-foreground/50">A compilar dados...</span>
+                  <span className="ml-3 text-sm text-white/60">A compilar dados...</span>
                 </div>
               )}
 
@@ -394,17 +394,17 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     </span>
                   ))}
                 </div>
-                <h2 className="font-cinzel text-4xl md:text-6xl font-bold text-foreground leading-none tracking-tight">
+                <h2 className="font-cinzel text-4xl md:text-6xl font-bold text-white leading-none tracking-tight">
                   {cityName}
                 </h2>
-                <div className="flex items-center gap-3 text-foreground/60 flex-wrap">
+                <div className="flex items-center gap-3 text-white/70 flex-wrap">
                   <span className="text-xl">{flag}</span>
                   <span className="text-sm font-light tracking-wide">{masterCity.country}</span>
                   {masterCity.lat != null && masterCity.lon != null && (
                     <>
-                      <span className="text-foreground/20">|</span>
+                      <span className="text-white/30">|</span>
                       <MapPin className="w-3.5 h-3.5 text-primary/50" />
-                      <span className="text-xs text-foreground/40 font-mono">
+                      <span className="text-xs text-white/50 font-mono">
                         {masterCity.lat.toFixed(2)}°, {masterCity.lon.toFixed(2)}°
                       </span>
                     </>
@@ -412,15 +412,15 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   {/* Weather badge */}
                   {weatherData && (
                     <>
-                      <span className="text-foreground/20">|</span>
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card/60 backdrop-blur-sm border border-primary/10">
+                      <span className="text-white/30">|</span>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/15">
                         <img
                           src={`https://openweathermap.org/img/wn/${weatherData.icon}.png`}
                           alt={weatherData.description}
                           className="w-5 h-5"
                         />
-                        <span className="text-xs font-semibold text-foreground">{weatherData.temp}°C</span>
-                        <span className="text-[9px] text-foreground/40 capitalize">{weatherData.description}</span>
+                        <span className="text-xs font-semibold text-white">{weatherData.temp}°C</span>
+                        <span className="text-[9px] text-white/50 capitalize">{weatherData.description}</span>
                       </div>
                     </>
                   )}
@@ -552,7 +552,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
         <div className="space-y-5">
           <div className="flex items-center gap-3">
             <Globe className="w-5 h-5 text-primary/60" />
-            <h3 className="font-cinzel text-sm font-bold text-foreground uppercase tracking-[0.12em]">
+            <h3 className="font-cinzel text-sm font-bold text-white uppercase tracking-[0.12em]">
               Mapeamento Global Completo
             </h3>
           </div>
@@ -561,7 +561,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
             <div className={`select-none ${!secondaryUnlocked ? 'cursor-pointer' : ''}`} onClick={() => !secondaryUnlocked && openUnlockFlow()}>
               {Object.entries(continentGroups).map(([continent, citiesList]) => (
                 <div key={continent} className="mb-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/40 mb-2 pl-1">{continent}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mb-2 pl-1">{continent}</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {citiesList.map((c, i) => {
                       const cFlag = getCountryFlag(c.country || "");
@@ -573,13 +573,13 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-base">{cFlag}</span>
-                            <span className="text-[10px] text-foreground/40 uppercase tracking-wider">{c.continent || c.country}</span>
+                            <span className="text-[10px] text-white/50 uppercase tracking-wider">{c.continent || c.country}</span>
                           </div>
-                          <p className={`text-foreground font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
+                          <p className={`text-white font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
                             {c.city || c.display_name}
                           </p>
                           {c.lat != null && (
-                            <p className={`text-foreground/30 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
+                            <p className={`text-white/40 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
                               {secondaryUnlocked ? `${c.lat?.toFixed(2)}°, ${c.lon?.toFixed(2)}°` : `${c.lat?.toFixed(0)}°, ?????`}
                             </p>
                           )}
@@ -611,7 +611,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
         >
           <div className="flex items-center gap-3">
             <Crown className="w-5 h-5 text-primary/60" />
-            <h3 className="font-cinzel text-sm font-bold text-foreground uppercase tracking-[0.12em]">
+            <h3 className="font-cinzel text-sm font-bold text-white uppercase tracking-[0.12em]">
               Explorar Todas as Casas
             </h3>
           </div>
@@ -757,7 +757,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
             >
               <div className="text-center mb-6">
                 <CreditCard className="w-8 h-8 text-primary mx-auto mb-3" />
-                <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider">
+                <h3 className="font-cinzel text-lg font-bold text-white uppercase tracking-wider">
                   Desbloquear Casas
                 </h3>
                 <p className="text-muted-foreground text-xs mt-2">
@@ -780,7 +780,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-cinzel text-sm font-bold text-foreground">{pkg.label}</p>
+                          <p className="font-cinzel text-sm font-bold text-white">{pkg.label}</p>
                           <p className="text-muted-foreground text-[10px] mt-0.5">{pkg.desc}</p>
                         </div>
                         <div className="text-right">
