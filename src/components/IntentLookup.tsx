@@ -40,6 +40,7 @@ interface IntentResult {
     acessivel: CityOption[];
     nacional: CityOption[];
   };
+  allResults?: Record<string, any>;
 }
 
 const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: IntentLookupProps) => {
@@ -105,7 +106,15 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
         nacional: toArray(rawOptions.nacional),
       };
 
-      setResult({ house: houseNum, houseName: houseData.label, houseData, cities });
+      // Build allResults from the full API response
+      const allResults: Record<string, any> = {};
+      if (data.results) {
+        for (const [key, val] of Object.entries(data.results)) {
+          allResults[key] = val;
+        }
+      }
+
+      setResult({ house: houseNum, houseName: houseData.label, houseData, cities, allResults });
       onHouseFound?.(houseNum);
     } catch (error) {
       const err = error as Error;
@@ -186,6 +195,7 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
             houseName={result.houseName}
             houseData={result.houseData}
             cities={result.cities}
+            allResults={result.allResults}
             onUnlock={handleUnlock}
             userCredits={profile?.credits ?? 0}
             isAuthenticated={!!user}
