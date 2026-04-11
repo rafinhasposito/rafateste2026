@@ -476,7 +476,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       Sobre {wikiData.title || cityName}
                     </h3>
                   </div>
-                  <p className="text-foreground/60 text-sm leading-relaxed">{wikiData.extract}</p>
+                  <p className="text-white/70 text-sm leading-relaxed">{wikiData.extract}</p>
                   {wikiData.content_urls?.desktop?.page && (
                     <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] text-primary/50 hover:text-primary transition-colors">
                       <ExternalLink className="w-3 h-3" /> Wikipedia
