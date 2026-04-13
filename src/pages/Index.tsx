@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Crown, Scroll } from "lucide-react";
+import { MapPin, Crown, Scroll, Clock, CalendarDays, Rocket, ChevronLeft } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -13,7 +13,7 @@ import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { detectUserLocation } from "@/lib/astro";
 
-type Mode = "futuro" | "passado";
+type Mode = "futuro" | "passado" | "presente";
 type SearchPath = "cidade" | "casa" | "intencao" | null;
 
 const mantras = [
@@ -28,6 +28,30 @@ const stats = [
   { value: "12", label: "Casas Astrológicas" },
   { value: "365", label: "Dias Calculados" },
   { value: "±0.01°", label: "Precisão GPS" },
+];
+
+const modeOptions = [
+  {
+    id: "passado" as Mode,
+    icon: Clock,
+    title: "Passado",
+    desc: "Onde você passou seu aniversário?",
+    tagline: "Auditar um ciclo anterior",
+  },
+  {
+    id: "presente" as Mode,
+    icon: CalendarDays,
+    title: "Presente",
+    desc: "Onde você está passando seu aniversário este ano?",
+    tagline: "Analisar o ciclo atual",
+  },
+  {
+    id: "futuro" as Mode,
+    icon: Rocket,
+    title: "Futuro",
+    desc: "Onde você ancora o seu Sol, define os próximos 12 meses.",
+    tagline: "Projetar o próximo ciclo",
+  },
 ];
 
 const pathOptions = [
@@ -51,11 +75,15 @@ const pathOptions = [
   },
 ];
 
+const currentYear = new Date().getFullYear().toString();
+
 const Index = () => {
   const { showAlert } = useAlert();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>("futuro");
+
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [mode, setMode] = useState<Mode | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [searchPath, setSearchPath] = useState<SearchPath>(null);
 
@@ -76,12 +104,51 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleSelectMode = (m: Mode) => {
+    setMode(m);
+    setSearchPath(null);
+    if (m === "presente") setYear(currentYear);
+    setStep(2);
+  };
+
+  const handleSelectPath = (p: SearchPath) => {
+    setSearchPath(p);
+    setStep(3);
+  };
+
+  const handleBack = () => {
+    if (step === 3) {
+      setSearchPath(null);
+      setStep(2);
+    } else if (step === 2) {
+      setMode(null);
+      setStep(1);
+    }
+  };
+
   const natalDataReady = !!(name.trim() && birthdate && birthtime && birthPlaceValid);
+
+  const yearLabel =
+    mode === "passado" ? "Ano a Auditar" :
+    mode === "presente" ? "Ano Atual" :
+    "Ano do Próximo Aniversário";
+
+  const formTitle =
+    mode === "passado" ? "Resgate da Linha do Tempo" :
+    mode === "presente" ? "Análise do Ciclo Atual" :
+    "Calibração Estelar";
+
+  const formSubtitle =
+    mode === "passado"
+      ? "Insira os dados do ano que deseja auditar e descubra o que o Universo havia preparado para você."
+      : mode === "presente"
+      ? "Insira suas coordenadas natais para analisar a configuração energética deste ciclo."
+      : "Insira suas coordenadas natais para que o algoritmo astrofísico calcule a rota exata da sua prosperidade.";
 
   return (
     <>
       <StarryBackground />
-      <ScanningOverlay visible={isScanning} mode={mode} year={year} />
+      <ScanningOverlay visible={isScanning} mode={mode || "futuro"} year={year} />
       {user && <UserMenu />}
 
       {/* ===== HERO SECTION ===== */}
@@ -158,169 +225,260 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* ===== FORM SECTION ===== */}
+      {/* ===== STEPPER SECTION ===== */}
       <section id="form-section" className="relative px-4 pb-20 max-w-5xl mx-auto">
-        {/* Mode Selector */}
+
+        {/* Step Indicator */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="flex justify-center gap-2 mb-8 w-full max-w-lg mx-auto">
-          {(["futuro", "passado"] as Mode[]).map((m) => (
-            <button key={m} onClick={() => { setMode(m); setSearchPath(null); }}
-              className={`flex-1 py-3.5 px-4 rounded-xl text-[10px] md:text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-300 flex items-center justify-center gap-2.5 ${
-                mode === m
-                  ? "bg-gold text-background shadow-[0_4px_20px_hsl(var(--gold)/0.3)]"
-                  : "bg-secondary/50 text-muted-foreground hover:text-foreground hover:bg-secondary"
+          className="flex justify-center items-center gap-3 mb-10">
+          {[1, 2, 3].map((s) => (
+            <div key={s} className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                step >= s
+                  ? "bg-gold text-background shadow-[0_0_15px_hsl(var(--gold)/0.3)]"
+                  : "bg-secondary/50 text-muted-foreground border border-primary/10"
               }`}>
-              {m === "futuro" ? (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-                  <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                  <path d="M3 3v5h5" /><path d="M12 7v5l4 2" />
-                </svg>
+                {s}
+              </div>
+              {s < 3 && (
+                <div className={`w-12 md:w-20 h-px transition-all duration-300 ${
+                  step > s ? "bg-gold/50" : "bg-primary/10"
+                }`} />
               )}
-              {m === "futuro" ? "Projetar Futuro" : "Auditar Passado"}
-            </button>
+            </div>
           ))}
         </motion.div>
 
-        {/* Main Form Card */}
+        {/* Back Button */}
+        {step > 1 && (
+          <motion.button
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={handleBack}
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-gold transition-colors mb-6 text-xs uppercase tracking-[0.15em] font-medium"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Voltar
+          </motion.button>
+        )}
+
+        {/* Main Card */}
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="glass-panel glass-panel-glow p-6 md:p-12 lg:p-16 relative">
           <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
 
-          <div className="text-center mb-10 md:mb-14">
-            <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
-              {mode === "futuro" ? "Calibração Estelar" : "Resgate da Linha do Tempo"}
-            </h2>
-            <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
-              {mode === "futuro"
-                ? "Insira suas coordenadas natais para que o algoritmo astrofísico calcule a rota exata da sua prosperidade."
-                : "Insira os dados do ano que deseja auditar e descubra o que o Universo havia preparado para você."}
-            </p>
-          </div>
-
-          {/* Natal Data Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-10">
-            <div className="space-y-7">
-              <div>
-                <div className="field-label"><span className="label-dot" /> Nome Completo</div>
-                <input type="text" className="quantum-input" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
-                  <input type="date" className="quantum-input" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+          <AnimatePresence mode="wait">
+            {/* ===== STEP 1: Temporal Selection ===== */}
+            {step === 1 && (
+              <motion.div key="step1" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
+                <div className="text-center mb-10">
+                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
+                    Seleção Temporal
+                  </h2>
+                  <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
+                    Escolha o período que deseja explorar. Cada linha do tempo revela uma configuração energética única.
+                  </p>
                 </div>
-                <div>
-                  <div className="field-label"><span className="label-dot" /> Hora Exata</div>
-                  <input type="time" className="quantum-input" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {modeOptions.map((opt) => {
+                    const Icon = opt.icon;
+                    const isSelected = mode === opt.id;
+                    return (
+                      <motion.button
+                        key={opt.id}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleSelectMode(opt.id)}
+                        className={`p-6 md:p-8 rounded-xl border text-left transition-all duration-300 group ${
+                          isSelected
+                            ? "border-gold bg-gold/10 shadow-[0_0_30px_hsl(var(--gold)/0.15)]"
+                            : "border-primary/15 bg-card/30 hover:border-gold/30 hover:bg-card/50"
+                        }`}
+                      >
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all ${
+                          isSelected ? "bg-gold/20" : "bg-secondary/50 group-hover:bg-gold/10"
+                        }`}>
+                          <Icon className={`w-5 h-5 ${isSelected ? "text-gold" : "text-muted-foreground group-hover:text-gold/70"}`} />
+                        </div>
+                        <h3 className={`font-cinzel text-sm md:text-base font-bold uppercase tracking-[0.1em] mb-2 ${
+                          isSelected ? "text-gold" : "text-foreground"
+                        }`}>
+                          {opt.title}
+                        </h3>
+                        <p className="text-muted-foreground text-[11px] md:text-xs leading-relaxed mb-3">{opt.tagline}</p>
+                        <p className={`text-[10px] md:text-[11px] italic leading-relaxed ${
+                          isSelected ? "text-gold/70" : "text-muted-foreground/60"
+                        }`}>
+                          "{opt.desc}"
+                        </p>
+                      </motion.button>
+                    );
+                  })}
                 </div>
-              </div>
-            </div>
-            <div className="space-y-7">
-              <div>
-                <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
-                <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
-              </div>
-              <div>
-                <div className="field-label"><span className="label-dot" /> {mode === "futuro" ? "Ano do Próximo Aniversário" : "Ano a Auditar"}</div>
-                <input type="number" className="quantum-input text-center text-2xl font-bold text-gold h-14 font-cinzel" value={year} onChange={(e) => setYear(e.target.value)} />
-              </div>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center gap-4 mb-10">
-            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
-            <div className="w-2 h-2 rounded-full bg-gold/20 border border-gold/30" />
-            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
-          </div>
-
-          {/* Mantra */}
-          <div className="text-center mb-10">
-            <AnimatePresence mode="wait">
-              <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
-                "{mantras[mantraIndex]}"
-              </motion.p>
-            </AnimatePresence>
-          </div>
-
-          {/* ===== 3-PATH DECISION ===== */}
-          <div className="mb-10">
-            <div className="text-center mb-8">
-              <h3 className="font-cinzel text-lg md:text-xl font-bold text-foreground uppercase tracking-[0.1em] mb-2">
-                Como Deseja Consultar?
-              </h3>
-              <p className="text-muted-foreground text-xs font-light">
-                Escolha um dos três caminhos abaixo. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
-              </p>
-            </div>
-
-            {/* Path Selector Buttons */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-              {pathOptions.map((opt) => {
-                const Icon = opt.icon;
-                const isSelected = searchPath === opt.id;
-                return (
-                  <motion.button
-                    key={opt.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSearchPath(isSelected ? null : opt.id)}
-                    className={`p-5 rounded-xl border text-left transition-all duration-300 ${
-                      isSelected
-                        ? "border-primary bg-primary/10 shadow-[0_0_25px_hsl(var(--gold)/0.15)]"
-                        : "border-primary/15 bg-card/30 hover:border-primary/30 hover:bg-card/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <Icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                      <span className={`font-cinzel text-xs font-bold uppercase tracking-[0.1em] ${isSelected ? "text-primary" : "text-foreground"}`}>
-                        {opt.title}
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground text-[11px] leading-relaxed">{opt.desc}</p>
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            {/* Natal data warning */}
-            {searchPath && !natalDataReady && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 mb-6 text-center">
-                <p className="text-destructive text-xs font-semibold">
-                  Preencha todos os dados natais acima (nome, data, hora e cidade de nascimento) antes de continuar.
-                </p>
               </motion.div>
             )}
 
-            {/* Path Content */}
-            <AnimatePresence mode="wait">
-              {searchPath === "cidade" && (
-                <motion.div key="cidade" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
-                  className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
-                  <CityLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                </motion.div>
-              )}
-              {searchPath === "casa" && (
-                <motion.div key="casa" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
-                  className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
-                  <HouseLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                </motion.div>
-              )}
-              {searchPath === "intencao" && (
-                <motion.div key="intencao" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
-                  className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
-                  <IntentLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+            {/* ===== STEP 2: Method Selection ===== */}
+            {step === 2 && (
+              <motion.div key="step2" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
+                <div className="text-center mb-8">
+                  {/* Selected mode badge */}
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/20 bg-gold/5 mb-6">
+                    {mode && (() => {
+                      const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
+                      return <ModeIcon className="w-3.5 h-3.5 text-gold" />;
+                    })()}
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
+                      {modeOptions.find(m => m.id === mode)?.title}
+                    </span>
+                  </div>
+
+                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
+                    Como Deseja Consultar?
+                  </h2>
+                  <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
+                    Escolha um dos três caminhos abaixo. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {pathOptions.map((opt) => {
+                    const Icon = opt.icon;
+                    return (
+                      <motion.button
+                        key={opt.id}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleSelectPath(opt.id)}
+                        className="p-5 md:p-6 rounded-xl border border-primary/15 bg-card/30 hover:border-gold/30 hover:bg-card/50 text-left transition-all duration-300 group"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <Icon className="w-5 h-5 text-muted-foreground group-hover:text-gold transition-colors" />
+                          <span className="font-cinzel text-xs font-bold uppercase tracking-[0.1em] text-foreground group-hover:text-gold transition-colors">
+                            {opt.title}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground text-[11px] leading-relaxed">{opt.desc}</p>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ===== STEP 3: Data Collection + Lookup ===== */}
+            {step === 3 && (
+              <motion.div key="step3" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
+                {/* Breadcrumb badges */}
+                <div className="flex justify-center gap-2 mb-6">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/20 bg-gold/5">
+                    {mode && (() => {
+                      const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
+                      return <ModeIcon className="w-3 h-3 text-gold" />;
+                    })()}
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-gold">
+                      {modeOptions.find(m => m.id === mode)?.title}
+                    </span>
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/20 bg-gold/5">
+                    {searchPath && (() => {
+                      const PathIcon = pathOptions.find(p => p.id === searchPath)?.icon || MapPin;
+                      return <PathIcon className="w-3 h-3 text-gold" />;
+                    })()}
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-gold">
+                      {pathOptions.find(p => p.id === searchPath)?.title}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-center mb-10 md:mb-14">
+                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
+                    {formTitle}
+                  </h2>
+                  <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
+                    {formSubtitle}
+                  </p>
+                </div>
+
+                {/* Natal Data Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-10">
+                  <div className="space-y-7">
+                    <div>
+                      <div className="field-label"><span className="label-dot" /> Nome Completo</div>
+                      <input type="text" className="quantum-input" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
+                        <input type="date" className="quantum-input" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+                      </div>
+                      <div>
+                        <div className="field-label"><span className="label-dot" /> Hora Exata</div>
+                        <input type="time" className="quantum-input" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-7">
+                    <div>
+                      <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
+                      <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
+                    </div>
+                    <div>
+                      <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
+                      <input
+                        type="number"
+                        className="quantum-input text-center text-2xl font-bold text-gold h-14 font-cinzel"
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                        disabled={mode === "presente"}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
+                  <div className="w-2 h-2 rounded-full bg-gold/20 border border-gold/30" />
+                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
+                </div>
+
+                {/* Mantra */}
+                <div className="text-center mb-10">
+                  <AnimatePresence mode="wait">
+                    <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                      className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
+                      "{mantras[mantraIndex]}"
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+
+                {/* Natal data warning */}
+                {!natalDataReady && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 mb-6 text-center">
+                    <p className="text-destructive text-xs font-semibold">
+                      Preencha todos os dados natais acima (nome, data, hora e cidade de nascimento) antes de continuar.
+                    </p>
+                  </motion.div>
+                )}
+
+                {/* Lookup Component */}
+                <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
+                  {searchPath === "cidade" && (
+                    <CityLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                  )}
+                  {searchPath === "casa" && (
+                    <HouseLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                  )}
+                  {searchPath === "intencao" && (
+                    <IntentLookup name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
         </motion.div>

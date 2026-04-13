@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface ScanningOverlayProps {
   visible: boolean;
-  mode: "futuro" | "passado";
+  mode: "futuro" | "passado" | "presente";
   year?: string;
 }
 
