@@ -1,66 +1,46 @@
 
 
-## Plano: Reestruturar Formulário em Stepper de 3 Etapas
+## Plano: Exibir Número e Cores da Casa no Resultado por Cidade (Passado)
 
-### Resumo
+### Problema
 
-Transformar o fluxo atual (mode selector binário + formulário + path selector lado a lado) em um stepper progressivo de 3 etapas com revelação sequencial.
+Quando o usuário consulta por cidade (modo Passado), o resultado mostra a cidade mas não destaca visualmente o **número da casa** nem aplica as **cores específicas da casa** de forma proeminente. O número da casa aparece pequeno no lock screen, e após desbloqueio o foco visual é na cidade sem identidade cromática da casa.
 
-### Estado Atual
-- `Mode` é binário: "futuro" | "passado" (sem "presente")
-- O formulário de dados natais e o seletor de método aparecem simultaneamente dentro do mesmo card
-- Não há conceito de etapas/stepper
+### Solução
 
-### Mudanças em `src/pages/Index.tsx`
+Reforçar a identidade visual da casa em todo o card de resultado:
 
-#### 1. Novo type e estado
+#### 1. Número da Casa Grande e Proeminente
 
-- Alterar `type Mode = "futuro" | "passado" | "presente"`
-- Novo estado: `step` (1, 2 ou 3) — controlado automaticamente pelas seleções
-- Quando `mode` é selecionado → `step = 2`
-- Quando `searchPath` é selecionado → `step = 3`
-- Reset: mudar `mode` reseta `searchPath` e volta ao step 2; clicar "voltar" regride
+- Adicionar um **badge/número gigante** da casa (ex: "7") como elemento decorativo de fundo (estilo watermark) no card principal, usando `rgba(${accentColor}, 0.06)` em tamanho ~120px
+- Acima do nome da cidade, exibir um badge colorido: **"Casa 7 · Libra"** com fundo `rgba(${accentColor}, 0.15)` e borda `rgba(${accentColor}, 0.4)`
 
-#### 2. Etapa 1 — Seleção Temporal (substitui o mode selector atual)
+#### 2. Cores da Casa Aplicadas ao Card Principal
 
-- 3 cards grandes (Passado, Presente, Futuro) com ícones distintos
-- Ao selecionar, exibir texto contextual:
-  - Passado: "Onde você passou seu aniversário?"
-  - Presente: "Onde você está passando seu aniversário este ano?"
-  - Futuro: "Onde você ancora o seu Sol, define os próximos 12 meses."
-- Animação de entrada com framer-motion
+- Aplicar o `houseColors[house]` (gradiente radial) como **background do card inteiro** do Destino Mestre (atualmente só usa imagem de fundo)
+- Adicionar uma camada de gradiente com a cor accent da casa sobre o overlay existente
+- Bordas do card: usar `rgba(${accentColor}, 0.5)` mais forte
+- Tags de poder: já usam accent — manter
 
-#### 3. Etapa 2 — Como Deseja Consultar? (aparece após Etapa 1)
+#### 3. Textos com Cor da Casa
 
-- Reutilizar os 3 `pathOptions` existentes (Cidade, Casa, Intenção)
-- Título e subtítulo conforme especificado
-- Transição suave com AnimatePresence
+- Título "O Destino Mestre" → cor accent da casa (já está)
+- Nome da cidade: manter branco mas adicionar **text-shadow** com cor accent: `0 0 30px rgba(${accentColor}, 0.3)`
+- Label "Casa N" acima da cidade: fonte Cinzel, cor accent, tracking largo
 
-#### 4. Etapa 3 — Coleta de Dados (aparece após Etapa 2)
+#### 4. Foto da Cidade com Overlay Colorido
 
-- Formulário de dados natais (nome, data, hora, cidade, ano) — mesmo que o atual
-- O campo "ano" ajusta label conforme mode (passado/presente/futuro)
-- Abaixo do formulário: o componente de lookup correspondente (CityLookup, HouseLookup ou IntentLookup)
+- Sobre a foto da cidade, aplicar um gradient overlay usando a cor accent da casa: `linear-gradient(to bottom, rgba(${accentColor}, 0.2), transparent)`
+- Borda da foto: `rgba(${accentColor}, 0.3)` em vez de `border-primary/10`
 
-#### 5. Navegação entre etapas
-
-- Breadcrumb/indicador visual de progresso no topo (3 dots ou steps)
-- Botão "Voltar" em cada etapa para regredir
-- Seleção em Etapa 1 e 2 auto-avança (sem botão "Próximo")
-
-#### 6. Ajuste do campo "Presente"
-
-- Quando `mode === "presente"`: o campo de ano é preenchido automaticamente com o ano atual e desabilitado
-- Texto e tom verbal neutro (nem passado nem futuro)
-
-### Arquivos Modificados
+### Arquivo Modificado
 
 | Arquivo | Mudança |
 |---|---|
-| `src/pages/Index.tsx` | Stepper 3 etapas, novo mode "presente", navegação progressiva |
+| `src/components/DestinyResults.tsx` | Badge casa grande, gradiente accent no card, text-shadow, overlay colorido na foto |
 
 ### O que NÃO muda
-- Componentes de lookup (CityLookup, HouseLookup, IntentLookup)
-- DestinyResults, houses.ts, Dashboard
-- Sem migrações de banco
+- Lógica de dados, desbloqueio, créditos
+- Grid das 12 casas (já tem cores por casa)
+- Componentes de lookup, houses.ts
 
