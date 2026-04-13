@@ -1,68 +1,66 @@
 
 
-## Plano: Corrigir Fotos, Cidades nas 12 Casas Desbloqueadas e Contraste Visual
+## Plano: Reestruturar Formulário em Stepper de 3 Etapas
 
-### Problemas Identificados
+### Resumo
 
-1. **Fotos do Destino Mestre** — `source.unsplash.com` retorna redirects/erros frequentemente (serviço descontinuado). Precisa usar URLs fixas ou Unsplash Images diretamente.
+Transformar o fluxo atual (mode selector binário + formulário + path selector lado a lado) em um stepper progressivo de 3 etapas com revelação sequencial.
 
-2. **Casas desbloqueadas não mostram cidades** — Na linha 599, `houseCity` é `null` para todas as casas exceto a consultada (`isCurrentHouse`). Quando o usuário paga para desbloquear +1, +3 ou 12 casas, o componente não tem dados de cidades para as outras 11 casas.
+### Estado Atual
+- `Mode` é binário: "futuro" | "passado" (sem "presente")
+- O formulário de dados natais e o seletor de método aparecem simultaneamente dentro do mesmo card
+- Não há conceito de etapas/stepper
 
-3. **Busca por cidade e intenção** — Mesma situação: o `DestinyResults` recebe apenas a cidade da casa consultada. Ao desbloquear as 12 casas, não há dados para popular.
+### Mudanças em `src/pages/Index.tsx`
 
-4. **Contraste ruim** — Texto `text-foreground/50` e `text-foreground/70` sobre fundo `rgba(2,4,8,1)` fica praticamente invisível. As tags com `bg-foreground/5` são ilegíveis.
+#### 1. Novo type e estado
 
-### Solução
+- Alterar `type Mode = "futuro" | "passado" | "presente"`
+- Novo estado: `step` (1, 2 ou 3) — controlado automaticamente pelas seleções
+- Quando `mode` é selecionado → `step = 2`
+- Quando `searchPath` é selecionado → `step = 3`
+- Reset: mudar `mode` reseta `searchPath` e volta ao step 2; clicar "voltar" regride
 
-#### 1. Fotos — Expandir CITY_IMAGES e corrigir fallback
+#### 2. Etapa 1 — Seleção Temporal (substitui o mode selector atual)
 
-- Substituir `source.unsplash.com` (descontinuado) por URLs diretas do Unsplash via `images.unsplash.com/photo-ID`
-- Adicionar mais cidades ao dicionário curado (Tokyo, Moscou, Praga, Viena, etc.)
-- Fallback: usar a imagem da `cityDatabase[house].img` como última opção
+- 3 cards grandes (Passado, Presente, Futuro) com ícones distintos
+- Ao selecionar, exibir texto contextual:
+  - Passado: "Onde você passou seu aniversário?"
+  - Presente: "Onde você está passando seu aniversário este ano?"
+  - Futuro: "Onde você ancora o seu Sol, define os próximos 12 meses."
+- Animação de entrada com framer-motion
 
-#### 2. Cidades nas 12 casas — Usar dados da API completos
+#### 3. Etapa 2 — Como Deseja Consultar? (aparece após Etapa 1)
 
-O problema central: a API `/find_all_cities` retorna `data.results` com dados para TODAS as 12 casas (keyed por número). Mas `HouseLookup` e `IntentLookup` extraem apenas `data.results[selectedHouse]`.
+- Reutilizar os 3 `pathOptions` existentes (Cidade, Casa, Intenção)
+- Título e subtítulo conforme especificado
+- Transição suave com AnimatePresence
 
-**Mudanças em `HouseLookup.tsx` e `IntentLookup.tsx`:**
-- Extrair `data.results` completo e passar como nova prop `allResults` ao `DestinyResults`
+#### 4. Etapa 3 — Coleta de Dados (aparece após Etapa 2)
 
-**Mudanças em `CityLookup.tsx`:**
-- A API `/audit_past` retorna apenas 1 casa. Usar `cityDatabase` para dados estáticos das outras casas, sem cidades (mostrar apenas "Desbloqueada" sem cidade específica).
+- Formulário de dados natais (nome, data, hora, cidade, ano) — mesmo que o atual
+- O campo "ano" ajusta label conforme mode (passado/presente/futuro)
+- Abaixo do formulário: o componente de lookup correspondente (CityLookup, HouseLookup ou IntentLookup)
 
-**Mudanças em `DestinyResults.tsx`:**
-- Nova prop: `allResults?: Record<string, { options: { highticket, acessivel, nacional } }>`
-- No grid das 12 casas, quando uma casa está desbloqueada e `allResults[houseNum]` existe, mostrar a cidade `highticket[0]` dessa casa com bandeira e nome
-- Se não tem dados de API para aquela casa, mostrar badge "Desbloqueada" sem cidade
+#### 5. Navegação entre etapas
 
-#### 3. Contraste — Reforçar legibilidade em fundo escuro
+- Breadcrumb/indicador visual de progresso no topo (3 dots ou steps)
+- Botão "Voltar" em cada etapa para regredir
+- Seleção em Etapa 1 e 2 auto-avança (sem botão "Próximo")
 
-**Cards do grid das 12 casas:**
-- Tags: `bg-white/10 border-white/20 text-white/80` (em vez de `bg-foreground/5`)
-- Cristal label: `text-white/60` e valor: `text-white/90`
-- Arquétipo/signo/regente: `text-white/60`
-- Casa N: usar cor accent da casa (`rgb(${hAccent})`) em vez de `text-primary`
-- Label: `text-white font-semibold`
-- Overlay bloqueado: manter `bg-background/80`
+#### 6. Ajuste do campo "Presente"
 
-**Master Destiny (seção principal):**
-- Tags de poder: já usam accent color — OK
-- Texto de rituais/previsões: `text-white/80` em vez de `text-foreground/70`
-
-**Cards secundários:**
-- Nomes de cidades: `text-white font-semibold` em vez de `text-foreground`
+- Quando `mode === "presente"`: o campo de ano é preenchido automaticamente com o ano atual e desabilitado
+- Texto e tom verbal neutro (nem passado nem futuro)
 
 ### Arquivos Modificados
 
 | Arquivo | Mudança |
 |---|---|
-| `src/components/DestinyResults.tsx` | Nova prop `allResults`, cidades nas 12 casas, contraste, fallback de fotos |
-| `src/components/HouseLookup.tsx` | Passar `allResults` completo da API |
-| `src/components/IntentLookup.tsx` | Passar `allResults` completo da API |
-| `src/components/CityLookup.tsx` | Ajuste menor (sem dados multi-casa da API audit_past) |
+| `src/pages/Index.tsx` | Stepper 3 etapas, novo mode "presente", navegação progressiva |
 
 ### O que NÃO muda
-- `houses.ts`, `HouseCard.tsx`, `Dashboard.tsx` — intactos
+- Componentes de lookup (CityLookup, HouseLookup, IntentLookup)
+- DestinyResults, houses.ts, Dashboard
 - Sem migrações de banco
-- Edge function `get-weather` — intacta
 
