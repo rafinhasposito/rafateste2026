@@ -366,15 +366,25 @@ const Index = () => {
               <motion.div key="step2" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
                 <div className="text-center mb-8">
                   {/* Selected mode badge */}
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/20 bg-gold/5 mb-6">
-                    {mode && (() => {
-                      const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
-                      return <ModeIcon className="w-3.5 h-3.5 text-gold" />;
-                    })()}
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
-                      {modeOptions.find(m => m.id === mode)?.title}
-                    </span>
-                  </div>
+                  {(() => {
+                    const theme = mode ? modeThemes[mode] : null;
+                    return (
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6"
+                        style={{
+                          borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
+                          background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
+                        }}
+                      >
+                        {mode && (() => {
+                          const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
+                          return <ModeIcon className="w-3.5 h-3.5" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
+                        })()}
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
+                          {modeOptions.find(m => m.id === mode)?.title}
+                        </span>
+                      </div>
+                    );
+                  })()}
 
                   <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
                     Como Deseja Consultar?
@@ -385,26 +395,30 @@ const Index = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {pathOptions.map((opt) => {
-                    const Icon = opt.icon;
-                    return (
-                      <motion.button
-                        key={opt.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleSelectPath(opt.id)}
-                        className="p-5 md:p-6 rounded-xl border border-primary/15 bg-card/30 hover:border-gold/30 hover:bg-card/50 text-left transition-all duration-300 group"
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <Icon className="w-5 h-5 text-muted-foreground group-hover:text-gold transition-colors" />
-                          <span className="font-cinzel text-xs font-bold uppercase tracking-[0.1em] text-foreground group-hover:text-gold transition-colors">
-                            {opt.title}
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground text-[11px] leading-relaxed">{opt.desc}</p>
-                      </motion.button>
-                    );
-                  })}
+                  {(() => {
+                    const theme = mode ? modeThemes[mode] : null;
+                    return pathOptions.map((opt) => {
+                      const Icon = opt.icon;
+                      return (
+                        <motion.button
+                          key={opt.id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleSelectPath(opt.id)}
+                          className="p-5 md:p-6 rounded-xl border bg-card/30 text-left transition-all duration-300 group"
+                          style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.15)` : undefined }}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <Icon className="w-5 h-5 text-muted-foreground transition-colors" style={{ '--hover-color': theme ? `rgb(${theme.rgb})` : undefined } as React.CSSProperties} />
+                            <span className="font-cinzel text-xs font-bold uppercase tracking-[0.1em] text-foreground transition-colors">
+                              {opt.title}
+                            </span>
+                          </div>
+                          <p className="text-muted-foreground text-[11px] leading-relaxed">{opt.desc}</p>
+                        </motion.button>
+                      );
+                    });
+                  })()}
                 </div>
               </motion.div>
             )}
@@ -413,26 +427,41 @@ const Index = () => {
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
                 {/* Breadcrumb badges */}
-                <div className="flex justify-center gap-2 mb-6">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/20 bg-gold/5">
-                    {mode && (() => {
-                      const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
-                      return <ModeIcon className="w-3 h-3 text-gold" />;
-                    })()}
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-gold">
-                      {modeOptions.find(m => m.id === mode)?.title}
-                    </span>
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gold/20 bg-gold/5">
-                    {searchPath && (() => {
-                      const PathIcon = pathOptions.find(p => p.id === searchPath)?.icon || MapPin;
-                      return <PathIcon className="w-3 h-3 text-gold" />;
-                    })()}
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-gold">
-                      {pathOptions.find(p => p.id === searchPath)?.title}
-                    </span>
-                  </div>
-                </div>
+                {(() => {
+                  const theme = mode ? modeThemes[mode] : null;
+                  return (
+                    <div className="flex justify-center gap-2 mb-6">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
+                        style={{
+                          borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
+                          background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
+                        }}
+                      >
+                        {mode && (() => {
+                          const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
+                          return <ModeIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
+                        })()}
+                        <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
+                          {modeOptions.find(m => m.id === mode)?.title}
+                        </span>
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
+                        style={{
+                          borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
+                          background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
+                        }}
+                      >
+                        {searchPath && (() => {
+                          const PathIcon = pathOptions.find(p => p.id === searchPath)?.icon || MapPin;
+                          return <PathIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
+                        })()}
+                        <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
+                          {pathOptions.find(p => p.id === searchPath)?.title}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="text-center mb-10 md:mb-14">
                   <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
