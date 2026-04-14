@@ -309,7 +309,22 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-transparent" />
+          {/* House accent color overlay */}
+          <div
+            className="absolute inset-0"
+            style={{ background: `radial-gradient(ellipse at 30% 80%, rgba(${accentColor}, 0.15) 0%, transparent 70%)` }}
+          />
         </div>
+        {/* House number watermark */}
+        <span
+          className="absolute top-4 right-6 z-[5] font-cinzel font-black select-none pointer-events-none leading-none"
+          style={{
+            fontSize: '140px',
+            color: `rgba(${accentColor}, 0.06)`,
+          }}
+        >
+          {house}
+        </span>
 
         {/* LOCKED STATE */}
         <AnimatePresence>
