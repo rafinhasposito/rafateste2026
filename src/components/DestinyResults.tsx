@@ -296,7 +296,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
       {/* ===== LOCK SCREEN / MASTER DESTINY ===== */}
       <div
         className="relative rounded-2xl overflow-hidden shadow-[0_0_60px_hsl(var(--gold)/0.08)]"
-        style={{ borderColor: `rgba(${accentColor}, 0.3)`, borderWidth: '1px', borderStyle: 'solid' }}
+        style={{ borderColor: `rgba(${accentColor}, 0.5)`, borderWidth: '1px', borderStyle: 'solid' }}
       >
         <div className="absolute inset-0">
           <img
