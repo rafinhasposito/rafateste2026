@@ -390,8 +390,31 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 </span>
               </div>
 
-              {/* Tags */}
+              {/* House badge + Tags */}
               <div className="space-y-4">
+                {/* House identity badge */}
+                <div
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm"
+                  style={{
+                    background: `rgba(${accentColor}, 0.15)`,
+                    border: `1px solid rgba(${accentColor}, 0.4)`,
+                  }}
+                >
+                  <span
+                    className="font-cinzel text-sm font-black"
+                    style={{ color: `rgb(${accentColor})` }}
+                  >
+                    Casa {house}
+                  </span>
+                  <span style={{ color: `rgba(${accentColor}, 0.5)` }}>·</span>
+                  <span
+                    className="font-cinzel text-sm font-semibold"
+                    style={{ color: `rgb(${accentColor})` }}
+                  >
+                    {houseSigns[house] || ""}
+                  </span>
+                </div>
+
                 <div className="flex flex-wrap gap-2">
                   {houseData.tags.map((tag) => (
                     <span
@@ -409,7 +432,10 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     </span>
                   ))}
                 </div>
-                <h2 className="font-cinzel text-4xl md:text-6xl font-bold text-white leading-none tracking-tight">
+                <h2
+                  className="font-cinzel text-4xl md:text-6xl font-bold text-white leading-none tracking-tight"
+                  style={{ textShadow: `0 0 30px rgba(${accentColor}, 0.3), 0 0 60px rgba(${accentColor}, 0.15)` }}
+                >
                   {cityName}
                 </h2>
                 <div className="flex items-center gap-3 text-white/70 flex-wrap">
@@ -442,13 +468,20 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 </div>
               </div>
 
-              {/* City photo */}
-              <div className="rounded-xl overflow-hidden border border-primary/10 shadow-lg">
+              {/* City photo with house-colored overlay */}
+              <div
+                className="rounded-xl overflow-hidden shadow-lg relative"
+                style={{ border: `1px solid rgba(${accentColor}, 0.3)` }}
+              >
                 <img
                   src={getCityImage(cityName)}
                   alt={`Foto de ${cityName}`}
                   className="w-full h-48 md:h-64 object-cover"
                   loading="lazy"
+                />
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: `linear-gradient(to bottom, rgba(${accentColor}, 0.15), transparent 60%)` }}
                 />
               </div>
 
