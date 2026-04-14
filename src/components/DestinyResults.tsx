@@ -735,8 +735,20 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
                     <div className="flex items-start gap-3 mb-3">
                       <div className="flex-1 min-w-0">
-                        <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider" style={{ color: `rgb(${hAccent})` }}>Casa {houseNum}</p>
-                        <p className="text-white font-semibold text-sm mt-0.5">{hData?.label}</p>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className="w-7 h-7 rounded-full flex items-center justify-center font-cinzel text-xs font-black"
+                            style={{
+                              background: `rgba(${hAccent}, 0.15)`,
+                              border: `1px solid rgba(${hAccent}, 0.3)`,
+                              color: `rgb(${hAccent})`,
+                            }}
+                          >
+                            {houseNum}
+                          </span>
+                          <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider" style={{ color: `rgb(${hAccent})` }}>Casa {houseNum}</p>
+                        </div>
+                        <p className="text-white font-bold text-base mt-1" style={{ color: `rgb(${hAccent})` }}>{hData?.label}</p>
                         <p className="text-white/60 text-[10px] mt-0.5">{archetype} · {sign}</p>
                         <p className="text-white/60 text-[10px] mt-0.5">{hData?.regente}</p>
                       </div>
