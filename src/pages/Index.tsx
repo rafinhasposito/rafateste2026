@@ -16,6 +16,18 @@ import { detectUserLocation } from "@/lib/astro";
 type Mode = "futuro" | "passado" | "presente";
 type SearchPath = "cidade" | "casa" | "intencao" | null;
 
+const modeThemes: Record<Mode, { accent: string; rgb: string; glow: string; border: string; bg: string }> = {
+  passado: { accent: "hsl(30, 76%, 50%)", rgb: "205, 127, 50", glow: "rgba(205,127,50,0.3)", border: "rgba(205,127,50,0.4)", bg: "rgba(205,127,50,0.08)" },
+  presente: { accent: "hsl(160, 100%, 35%)", rgb: "0, 180, 120", glow: "rgba(0,180,120,0.3)", border: "rgba(0,180,120,0.4)", bg: "rgba(0,180,120,0.08)" },
+  futuro: { accent: "hsl(260, 58%, 59%)", rgb: "120, 80, 220", glow: "rgba(120,80,220,0.3)", border: "rgba(120,80,220,0.4)", bg: "rgba(120,80,220,0.08)" },
+};
+
+const modeCardColors: Record<Mode, { rgb: string }> = {
+  passado: { rgb: "205, 127, 50" },
+  presente: { rgb: "0, 180, 120" },
+  futuro: { rgb: "120, 80, 220" },
+};
+
 const mantras = [
   "Você desperta como Cocriador da sua realidade.",
   "O destino não é fixo — é uma coordenada a ser escolhida.",
@@ -229,25 +241,37 @@ const Index = () => {
       <section id="form-section" className="relative px-4 pb-20 max-w-5xl mx-auto">
 
         {/* Step Indicator */}
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="flex justify-center items-center gap-3 mb-10">
-          {[1, 2, 3].map((s) => (
-            <div key={s} className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                step >= s
-                  ? "bg-gold text-background shadow-[0_0_15px_hsl(var(--gold)/0.3)]"
-                  : "bg-secondary/50 text-muted-foreground border border-primary/10"
-              }`}>
-                {s}
-              </div>
-              {s < 3 && (
-                <div className={`w-12 md:w-20 h-px transition-all duration-300 ${
-                  step > s ? "bg-gold/50" : "bg-primary/10"
-                }`} />
-              )}
-            </div>
-          ))}
-        </motion.div>
+        {(() => {
+          const activeTheme = mode ? modeThemes[mode] : null;
+          const stepActiveBg = activeTheme ? `rgb(${activeTheme.rgb})` : undefined;
+          const stepActiveShadow = activeTheme ? `0 0 15px rgba(${activeTheme.rgb}, 0.3)` : undefined;
+          const stepLineColor = activeTheme ? `rgba(${activeTheme.rgb}, 0.5)` : undefined;
+          return (
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              className="flex justify-center items-center gap-3 mb-10">
+              {[1, 2, 3].map((s) => (
+                <div key={s} className="flex items-center gap-3">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                      step >= s
+                        ? "text-background"
+                        : "bg-secondary/50 text-muted-foreground border border-primary/10"
+                    }`}
+                    style={step >= s ? { backgroundColor: stepActiveBg || 'hsl(var(--gold))', boxShadow: stepActiveShadow || '0 0 15px hsl(var(--gold)/0.3)' } : undefined}
+                  >
+                    {s}
+                  </div>
+                  {s < 3 && (
+                    <div
+                      className={`w-12 md:w-20 h-px transition-all duration-300 ${step > s ? '' : 'bg-primary/10'}`}
+                      style={step > s ? { backgroundColor: stepLineColor || 'hsl(var(--gold)/0.5)' } : undefined}
+                    />
+                  )}
+                </div>
+              ))}
+            </motion.div>
+          );
+        })()}
 
         {/* Back Button */}
         {step > 1 && (
@@ -263,9 +287,20 @@ const Index = () => {
         )}
 
         {/* Main Card */}
+        {(() => {
+          const activeTheme = mode ? modeThemes[mode] : null;
+          return (
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="glass-panel glass-panel-glow p-6 md:p-12 lg:p-16 relative">
-          <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+          className="glass-panel glass-panel-glow p-6 md:p-12 lg:p-16 relative"
+          style={activeTheme ? { borderColor: `rgba(${activeTheme.rgb}, 0.15)` } : undefined}
+        >
+          <div
+            className="absolute top-0 left-[10%] right-[10%] h-px"
+            style={{ background: activeTheme
+              ? `linear-gradient(90deg, transparent, rgba(${activeTheme.rgb}, 0.4), transparent)`
+              : 'linear-gradient(90deg, transparent, hsl(var(--gold)/0.3), transparent)'
+            }}
+          />
 
           <AnimatePresence mode="wait">
             {/* ===== STEP 1: Temporal Selection ===== */}
@@ -284,32 +319,39 @@ const Index = () => {
                   {modeOptions.map((opt) => {
                     const Icon = opt.icon;
                     const isSelected = mode === opt.id;
+                    const cardColor = modeCardColors[opt.id];
                     return (
                       <motion.button
                         key={opt.id}
                         whileHover={{ scale: 1.02, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleSelectMode(opt.id)}
-                        className={`p-6 md:p-8 rounded-xl border text-left transition-all duration-300 group ${
-                          isSelected
-                            ? "border-gold bg-gold/10 shadow-[0_0_30px_hsl(var(--gold)/0.15)]"
-                            : "border-primary/15 bg-card/30 hover:border-gold/30 hover:bg-card/50"
-                        }`}
+                        className="p-6 md:p-8 rounded-xl border text-left transition-all duration-300 group"
+                        style={{
+                          borderColor: isSelected ? `rgba(${cardColor.rgb}, 0.6)` : `rgba(${cardColor.rgb}, 0.15)`,
+                          background: isSelected ? `rgba(${cardColor.rgb}, 0.1)` : undefined,
+                          boxShadow: isSelected ? `0 0 30px rgba(${cardColor.rgb}, 0.15)` : undefined,
+                        }}
                       >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all ${
-                          isSelected ? "bg-gold/20" : "bg-secondary/50 group-hover:bg-gold/10"
-                        }`}>
-                          <Icon className={`w-5 h-5 ${isSelected ? "text-gold" : "text-muted-foreground group-hover:text-gold/70"}`} />
+                        <div
+                          className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all"
+                          style={{
+                            background: isSelected ? `rgba(${cardColor.rgb}, 0.2)` : `rgba(${cardColor.rgb}, 0.08)`,
+                          }}
+                        >
+                          <Icon className="w-5 h-5 transition-colors" style={{ color: isSelected ? `rgb(${cardColor.rgb})` : `rgba(${cardColor.rgb}, 0.6)` }} />
                         </div>
-                        <h3 className={`font-cinzel text-sm md:text-base font-bold uppercase tracking-[0.1em] mb-2 ${
-                          isSelected ? "text-gold" : "text-foreground"
-                        }`}>
+                        <h3
+                          className="font-cinzel text-sm md:text-base font-bold uppercase tracking-[0.1em] mb-2"
+                          style={{ color: isSelected ? `rgb(${cardColor.rgb})` : undefined }}
+                        >
                           {opt.title}
                         </h3>
                         <p className="text-muted-foreground text-[11px] md:text-xs leading-relaxed mb-3">{opt.tagline}</p>
-                        <p className={`text-[10px] md:text-[11px] italic leading-relaxed ${
-                          isSelected ? "text-gold/70" : "text-muted-foreground/60"
-                        }`}>
+                        <p
+                          className="text-[10px] md:text-[11px] italic leading-relaxed"
+                          style={{ color: isSelected ? `rgba(${cardColor.rgb}, 0.7)` : undefined }}
+                        >
                           "{opt.desc}"
                         </p>
                       </motion.button>
