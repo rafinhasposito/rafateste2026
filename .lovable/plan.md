@@ -1,46 +1,71 @@
 
 
-## Plano: Exibir Número e Cores da Casa no Resultado por Cidade (Passado)
+## Plano: Sistema de Cores por Seção + Destaque nos Nomes das Casas
 
 ### Problema
 
-Quando o usuário consulta por cidade (modo Passado), o resultado mostra a cidade mas não destaca visualmente o **número da casa** nem aplica as **cores específicas da casa** de forma proeminente. O número da casa aparece pequeno no lock screen, e após desbloqueio o foco visual é na cidade sem identidade cromática da casa.
+Tudo usa o mesmo esquema escuro dourado — Home, Passado, Presente e Futuro são visualmente idênticos. Os nomes das 12 casas no grid ficam pequenos e sem destaque. O site inteiro parece "uma cor só".
 
-### Solução
+### Solução: Paleta Cromática por Seção
 
-Reforçar a identidade visual da casa em todo o card de resultado:
+Cada contexto temporal terá sua própria identidade cromática, aplicada nos cards do stepper, no glass-panel do Step 3, nos badges e nos acentos:
 
-#### 1. Número da Casa Grande e Proeminente
+| Seção | Cor Principal | Aplicação |
+|---|---|---|
+| **Home (Hero)** | Dourado (atual) | Mantém o gold premium como identidade geral |
+| **Passado** | Âmbar/Cobre `rgb(205, 127, 50)` | Tons quentes envelhecidos, sensação de memória |
+| **Presente** | Esmeralda `rgb(0, 180, 120)` | Verde vibrante, energia do agora |
+| **Futuro** | Índigo/Violeta `rgb(120, 80, 220)` | Tons cósmicos, projeção e visão |
 
-- Adicionar um **badge/número gigante** da casa (ex: "7") como elemento decorativo de fundo (estilo watermark) no card principal, usando `rgba(${accentColor}, 0.06)` em tamanho ~120px
-- Acima do nome da cidade, exibir um badge colorido: **"Casa 7 · Libra"** com fundo `rgba(${accentColor}, 0.15)` e borda `rgba(${accentColor}, 0.4)`
+### Mudanças em `src/pages/Index.tsx`
 
-#### 2. Cores da Casa Aplicadas ao Card Principal
+#### 1. Mapa de cores por modo
 
-- Aplicar o `houseColors[house]` (gradiente radial) como **background do card inteiro** do Destino Mestre (atualmente só usa imagem de fundo)
-- Adicionar uma camada de gradiente com a cor accent da casa sobre o overlay existente
-- Bordas do card: usar `rgba(${accentColor}, 0.5)` mais forte
-- Tags de poder: já usam accent — manter
+```ts
+const modeTheme = {
+  passado: { accent: "205, 127, 50", glow: "rgba(205,127,50,0.3)", border: "rgba(205,127,50,0.4)", bg: "rgba(205,127,50,0.08)" },
+  presente: { accent: "0, 180, 120", glow: "rgba(0,180,120,0.3)", border: "rgba(0,180,120,0.4)", bg: "rgba(0,180,120,0.08)" },
+  futuro: { accent: "120, 80, 220", glow: "rgba(120,80,220,0.3)", border: "rgba(120,80,220,0.4)", bg: "rgba(120,80,220,0.08)" },
+};
+```
 
-#### 3. Textos com Cor da Casa
+#### 2. Step 1 — Cards temporais com cor própria
 
-- Título "O Destino Mestre" → cor accent da casa (já está)
-- Nome da cidade: manter branco mas adicionar **text-shadow** com cor accent: `0 0 30px rgba(${accentColor}, 0.3)`
-- Label "Casa N" acima da cidade: fonte Cinzel, cor accent, tracking largo
+Cada card (Passado/Presente/Futuro) terá borda e ícone na sua cor específica em vez de tudo dourado. Ao selecionar, o glow e o fundo usam a cor do modo.
 
-#### 4. Foto da Cidade com Overlay Colorido
+#### 3. Step 2 e Step 3 — Cor do modo selecionado
 
-- Sobre a foto da cidade, aplicar um gradient overlay usando a cor accent da casa: `linear-gradient(to bottom, rgba(${accentColor}, 0.2), transparent)`
-- Borda da foto: `rgba(${accentColor}, 0.3)` em vez de `border-primary/10`
+- O glass-panel do formulário herda a cor accent do modo (borda, linha superior, badges)
+- Os step indicators (1-2-3) usam a cor do modo ativo em vez de gold fixo
+- Os breadcrumb badges mudam de gold para a cor do modo
 
-### Arquivo Modificado
+#### 4. Nomes das Casas com mais destaque
+
+No grid das 12 casas (`DestinyResults.tsx`) e nos `GoalCards.tsx`:
+- Nome da casa: fonte maior (`text-sm` → `text-base`), `font-bold`, cor accent da casa (`rgb(${hAccent})`) em vez de branco genérico
+- Label (ex: "Ação & Magnetismo"): fonte `text-white font-semibold` com letter-spacing
+- Número da casa: badge colorido maior com fundo accent
+
+### Mudanças em `src/index.css`
+
+- Adicionar variáveis CSS para as 3 cores temporais (para uso global se necessário):
+  ```css
+  --mode-passado: 30 76% 50%;
+  --mode-presente: 160 100% 35%;
+  --mode-futuro: 260 58% 59%;
+  ```
+
+### Arquivos Modificados
 
 | Arquivo | Mudança |
 |---|---|
-| `src/components/DestinyResults.tsx` | Badge casa grande, gradiente accent no card, text-shadow, overlay colorido na foto |
+| `src/pages/Index.tsx` | `modeTheme` map, cores dinâmicas nos steps/badges/borders |
+| `src/index.css` | Variáveis CSS para as cores temporais |
+| `src/components/DestinyResults.tsx` | Nomes das casas maiores e com cor accent |
+| `src/components/GoalCards.tsx` | Nome da casa com mais destaque e cor |
 
 ### O que NÃO muda
-- Lógica de dados, desbloqueio, créditos
-- Grid das 12 casas (já tem cores por casa)
-- Componentes de lookup, houses.ts
+- `houses.ts`, `HouseCard.tsx`, Dashboard
+- Lógica de API, desbloqueio, créditos
+- Sem migrações de banco
 
