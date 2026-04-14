@@ -524,6 +524,8 @@ const Index = () => {
 
           <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
         </motion.div>
+          );
+        })()}
 
         {/* Trust badges */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
