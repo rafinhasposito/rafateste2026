@@ -1,71 +1,89 @@
 
 
-## Plano: Sistema de Cores por Seção + Destaque nos Nomes das Casas
+## Plano: Refatoração Visual Completa — Glassmorphism, Contraste e Grid das 12 Casas
 
-### Problema
+### Resumo
 
-Tudo usa o mesmo esquema escuro dourado — Home, Passado, Presente e Futuro são visualmente idênticos. Os nomes das 12 casas no grid ficam pequenos e sem destaque. O site inteiro parece "uma cor só".
+Redesign completo do `DestinyResults.tsx` focando em 4 áreas: (1) glassmorphism no card principal, (2) contraste global texto/fundo, (3) grid das 12 casas com bordas coloridas por elemento, (4) cards de localização limpos no Mapeamento Global.
 
-### Solução: Paleta Cromática por Seção
+---
 
-Cada contexto temporal terá sua própria identidade cromática, aplicada nos cards do stepper, no glass-panel do Step 3, nos badges e nos acentos:
+### 1. Card "O Destino Mestre" — Novo Design Glassmorphism
 
-| Seção | Cor Principal | Aplicação |
-|---|---|---|
-| **Home (Hero)** | Dourado (atual) | Mantém o gold premium como identidade geral |
-| **Passado** | Âmbar/Cobre `rgb(205, 127, 50)` | Tons quentes envelhecidos, sensação de memória |
-| **Presente** | Esmeralda `rgb(0, 180, 120)` | Verde vibrante, energia do agora |
-| **Futuro** | Índigo/Violeta `rgb(120, 80, 220)` | Tons cósmicos, projeção e visão |
+**Estrutura atual:** Hero image com overlays sobrepostos, textos diretamente sobre a foto, resultando em "foto sobre foto" e baixa legibilidade.
 
-### Mudanças em `src/pages/Index.tsx`
+**Nova estrutura:**
 
-#### 1. Mapa de cores por modo
-
-```ts
-const modeTheme = {
-  passado: { accent: "205, 127, 50", glow: "rgba(205,127,50,0.3)", border: "rgba(205,127,50,0.4)", bg: "rgba(205,127,50,0.08)" },
-  presente: { accent: "0, 180, 120", glow: "rgba(0,180,120,0.3)", border: "rgba(0,180,120,0.4)", bg: "rgba(0,180,120,0.08)" },
-  futuro: { accent: "120, 80, 220", glow: "rgba(120,80,220,0.3)", border: "rgba(120,80,220,0.4)", bg: "rgba(120,80,220,0.08)" },
-};
+```text
+┌──────────────────────────────────────────────────┐
+│  FUNDO SÓLIDO da casa (ex: azul royal Casa 9)   │
+│  + Imagem da cidade com opacity 0.25 + blend     │
+│  ┌──────────────────────────────────────────┐    │
+│  │  CARD DE VIDRO (glassmorphism)            │    │
+│  │  ┌─────────────────────────────────┐      │    │
+│  │  │  "Casa 9" (grande, font-cinzel)  │      │    │
+│  │  │  "Viagens & Estudos" (subtítulo) │      │    │
+│  │  │  ─────────────────────────────── │      │    │
+│  │  │  Bandeira + Québec + coords     │      │    │
+│  │  │  Clima badge                     │      │    │
+│  │  │  ─────────────────────────────── │      │    │
+│  │  │  Egrégora | Significado          │      │    │
+│  │  │  Sobre Québec (wiki)             │      │    │
+│  │  │  Rituais (com ícones)            │      │    │
+│  │  │  Previsões (com ícones)          │      │    │
+│  │  └─────────────────────────────────┘      │    │
+│  └──────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────┘
 ```
 
-#### 2. Step 1 — Cards temporais com cor própria
+**Implementação técnica:**
+- **Fundo externo:** cor sólida por casa usando uma nova paleta `HOUSE_SOLID_COLORS` (ex: Casa 9 = `#1e3a6e` azul royal, Casa 1 = `#6e1e1e` vermelho escuro, etc.)
+- **Imagem:** `opacity: 0.2`, `mix-blend-mode: luminosity`, posicionada como background absoluto
+- **Card de vidro:** `bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl`
+- **Eliminar** os overlays sobrepostos atuais (linhas 310-316) que criam o efeito "foto sobre foto"
+- **Eliminar** a foto duplicada (linhas 472-486) — a imagem já está no fundo
 
-Cada card (Passado/Presente/Futuro) terá borda e ícone na sua cor específica em vez de tudo dourado. Ao selecionar, o glow e o fundo usam a cor do modo.
+### 2. Correção Global de Contraste
 
-#### 3. Step 2 e Step 3 — Cor do modo selecionado
+- **Dentro do glass card:** todo texto será `text-white` ou `text-white/90` (corpo) e `rgb(${accentColor})` (títulos/labels)
+- **Tags:** fundo `bg-white/15` com texto `text-white/90` (atualmente algumas ficam escuras)
+- **Seções internas (Egrégora, Rituais, Previsões):** substituir `bg-card/60` e `bg-card/40` por `bg-white/5 border border-white/10` — evita o card escuro dentro de card escuro
+- **Wikipedia section:** mesma regra — `bg-white/5`
 
-- O glass-panel do formulário herda a cor accent do modo (borda, linha superior, badges)
-- Os step indicators (1-2-3) usam a cor do modo ativo em vez de gold fixo
-- Os breadcrumb badges mudam de gold para a cor do modo
+### 3. Grid "Explorar Todas as Casas" — Bordas por Elemento
 
-#### 4. Nomes das Casas com mais destaque
+Nova paleta de bordas por elemento/signo:
 
-No grid das 12 casas (`DestinyResults.tsx`) e nos `GoalCards.tsx`:
-- Nome da casa: fonte maior (`text-sm` → `text-base`), `font-bold`, cor accent da casa (`rgb(${hAccent})`) em vez de branco genérico
-- Label (ex: "Ação & Magnetismo"): fonte `text-white font-semibold` com letter-spacing
-- Número da casa: badge colorido maior com fundo accent
+| Casa | Signo | Elemento | Cor da Borda |
+|------|-------|----------|-------------|
+| 1, 5, 9 | Áries, Leão, Sagitário | Fogo | `#e74c3c` vermelho |
+| 2, 6, 10 | Touro, Virgem, Capricórnio | Terra | `#27ae60` verde |
+| 3, 7, 11 | Gêmeos, Libra, Aquário | Ar | `#3498db` azul |
+| 4, 8, 12 | Câncer, Escorpião, Peixes | Água | `#9b59b6` violeta |
 
-### Mudanças em `src/index.css`
+**Card da casa selecionada (casa-alvo):** borda 2px sólida na cor do elemento + `ring-2` + badge "Casa-alvo" + `bg-white/8` em vez de transparente
 
-- Adicionar variáveis CSS para as 3 cores temporais (para uso global se necessário):
-  ```css
-  --mode-passado: 30 76% 50%;
-  --mode-presente: 160 100% 35%;
-  --mode-futuro: 260 58% 59%;
-  ```
+**Cards normais:** borda esquerda 3px na cor do elemento, resto `border-white/10`
+
+### 4. Mapeamento Global — Cards de Localização Limpos
+
+Refatorar os cards de cidades secundárias:
+- Layout simples: `bg-white/5 border border-white/10 rounded-xl p-4`
+- Bandeira à esquerda, nome da cidade e país à direita
+- Coordenadas em `font-mono text-white/40`
+- Sem bordas coloridas por casa (neutro) — borda esquerda `border-l-2 border-white/20`
+- Quando bloqueado: blur no nome + ícone de cadeado discreto
+
+---
 
 ### Arquivos Modificados
 
 | Arquivo | Mudança |
 |---|---|
-| `src/pages/Index.tsx` | `modeTheme` map, cores dinâmicas nos steps/badges/borders |
-| `src/index.css` | Variáveis CSS para as cores temporais |
-| `src/components/DestinyResults.tsx` | Nomes das casas maiores e com cor accent |
-| `src/components/GoalCards.tsx` | Nome da casa com mais destaque e cor |
+| `src/components/DestinyResults.tsx` | Glassmorphism no hero, contraste global, grid com bordas por elemento, cards de mapeamento limpos |
 
 ### O que NÃO muda
-- `houses.ts`, `HouseCard.tsx`, Dashboard
-- Lógica de API, desbloqueio, créditos
+- `houses.ts`, `HouseCard.tsx`, `GoalCards.tsx`, `Index.tsx`
+- Lógica de desbloqueio, créditos, API
 - Sem migrações de banco
 
