@@ -742,7 +742,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     !isUnlocked
                       ? "opacity-40 cursor-pointer"
                       : isCurrentHouse
-                        ? "ring-2 shadow-lg"
+                        ? "shadow-lg"
                         : ""
                   }`}
                   style={{
