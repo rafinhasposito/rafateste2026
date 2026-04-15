@@ -757,8 +757,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         ? `1px solid rgba(255,255,255,0.1)`
                         : `1px solid rgba(255,255,255,0.05)`,
                     borderLeft: !isCurrentHouse ? `3px solid ${elementColor}` : undefined,
-                    ringColor: isCurrentHouse ? elementColor : undefined,
-                    boxShadow: isCurrentHouse ? `0 0 30px ${elementColor}33` : undefined,
+                    boxShadow: isCurrentHouse ? `0 0 30px ${elementColor}33, 0 0 0 2px ${elementColor}` : undefined,
                   }}
                 >
                   {/* Locked overlay */}
