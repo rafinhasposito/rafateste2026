@@ -1,89 +1,76 @@
 
 
-## Plano: Refatoração Visual Completa — Glassmorphism, Contraste e Grid das 12 Casas
+## Plano: Hero Deslumbrante com Foto da Cidade em Destaque + Contraste Corrigido
 
-### Resumo
+### Problema
 
-Redesign completo do `DestinyResults.tsx` focando em 4 áreas: (1) glassmorphism no card principal, (2) contraste global texto/fundo, (3) grid das 12 casas com bordas coloridas por elemento, (4) cards de localização limpos no Mapeamento Global.
+O hero atual usa a foto da cidade com `opacity: 0.2` e `mix-blend-mode: luminosity` sobre um fundo sólido escuro — resultado: tudo cinza/escuro, a foto é invisível, e o glass card (`rgba(255,255,255,0.07)`) mal se distingue do fundo. Zero impacto visual.
 
----
-
-### 1. Card "O Destino Mestre" — Novo Design Glassmorphism
-
-**Estrutura atual:** Hero image com overlays sobrepostos, textos diretamente sobre a foto, resultando em "foto sobre foto" e baixa legibilidade.
-
-**Nova estrutura:**
+### Nova Abordagem: Foto Full-Bleed com Overlay Gradiente da Casa
 
 ```text
-┌──────────────────────────────────────────────────┐
-│  FUNDO SÓLIDO da casa (ex: azul royal Casa 9)   │
-│  + Imagem da cidade com opacity 0.25 + blend     │
-│  ┌──────────────────────────────────────────┐    │
-│  │  CARD DE VIDRO (glassmorphism)            │    │
-│  │  ┌─────────────────────────────────┐      │    │
-│  │  │  "Casa 9" (grande, font-cinzel)  │      │    │
-│  │  │  "Viagens & Estudos" (subtítulo) │      │    │
-│  │  │  ─────────────────────────────── │      │    │
-│  │  │  Bandeira + Québec + coords     │      │    │
-│  │  │  Clima badge                     │      │    │
-│  │  │  ─────────────────────────────── │      │    │
-│  │  │  Egrégora | Significado          │      │    │
-│  │  │  Sobre Québec (wiki)             │      │    │
-│  │  │  Rituais (com ícones)            │      │    │
-│  │  │  Previsões (com ícones)          │      │    │
-│  │  └─────────────────────────────────┘      │    │
+┌─────────────────────────────────────────────────┐
+│  FOTO DA CIDADE (100% opacity, object-cover)    │
+│  ┌─ GRADIENT OVERLAY ──────────────────────┐    │
+│  │  De: rgba(houseSolidColor, 0.85) topo   │    │
+│  │  Para: rgba(0,0,0,0.7) base             │    │
+│  │                                          │    │
+│  │  ┌── GLASS CARD (forte) ─────────────┐  │    │
+│  │  │  bg-black/40 backdrop-blur-xl      │  │    │
+│  │  │  border: 1px solid white/25        │  │    │
+│  │  │                                    │  │    │
+│  │  │  CASA 9  (3xl, white, cinzel)      │  │    │
+│  │  │  Viagens & Estudos (accent color)  │  │    │
+│  │  │  ─────────────────────────────     │  │    │
+│  │  │  Québec  🇨🇦  coords  clima       │  │    │
+│  │  │  Egrégora | Significado            │  │    │
+│  │  │  Rituais | Previsões               │  │    │
+│  │  └───────────────────────────────────┘  │    │
 │  └──────────────────────────────────────────┘    │
-└──────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────┘
 ```
 
-**Implementação técnica:**
-- **Fundo externo:** cor sólida por casa usando uma nova paleta `HOUSE_SOLID_COLORS` (ex: Casa 9 = `#1e3a6e` azul royal, Casa 1 = `#6e1e1e` vermelho escuro, etc.)
-- **Imagem:** `opacity: 0.2`, `mix-blend-mode: luminosity`, posicionada como background absoluto
-- **Card de vidro:** `bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl`
-- **Eliminar** os overlays sobrepostos atuais (linhas 310-316) que criam o efeito "foto sobre foto"
-- **Eliminar** a foto duplicada (linhas 472-486) — a imagem já está no fundo
+### Mudanças Específicas
 
-### 2. Correção Global de Contraste
+#### 1. Foto da Cidade — VISÍVEL e Deslumbrante
+- Remover `opacity-20` e `mix-blend-mode: luminosity`
+- Imagem em **opacity total** (`opacity-100`) quando desbloqueado, `opacity-60 blur-sm` quando bloqueado
+- Adicionar **gradient overlay forte** por cima da foto usando a cor sólida da casa:
+  ```
+  linear-gradient(to bottom, 
+    rgba(houseSolidColor, 0.8) 0%,
+    rgba(houseSolidColor, 0.4) 40%,
+    rgba(0,0,0,0.85) 100%)
+  ```
+- Isso cria o efeito "imagem deslumbrante tingida com a cor da casa"
 
-- **Dentro do glass card:** todo texto será `text-white` ou `text-white/90` (corpo) e `rgb(${accentColor})` (títulos/labels)
-- **Tags:** fundo `bg-white/15` com texto `text-white/90` (atualmente algumas ficam escuras)
-- **Seções internas (Egrégora, Rituais, Previsões):** substituir `bg-card/60` e `bg-card/40` por `bg-white/5 border border-white/10` — evita o card escuro dentro de card escuro
-- **Wikipedia section:** mesma regra — `bg-white/5`
+#### 2. Glass Card — Mais Opaco e Legível
+- Trocar `bg-white/7` por `bg-black/40 backdrop-blur-xl`
+- Border mais visível: `border-white/25` (era `/15`)
+- Adicionar `shadow-[0_8px_32px_rgba(0,0,0,0.5)]`
 
-### 3. Grid "Explorar Todas as Casas" — Bordas por Elemento
+#### 3. Seções Internas — Fundo Distinto
+- Egrégora, Rituais, Previsões, Wikipedia: trocar `bg-white/5 border-white/10` por `bg-black/30 border-white/15`
+- Texto corpo: `text-white/90` (era `/80` e `/85`)
+- Labels: `rgb(accentColor)` com `font-bold` (já está, manter)
 
-Nova paleta de bordas por elemento/signo:
+#### 4. Cards das 12 Casas — Fundo Mais Escuro
+- Cards desbloqueados: `bg-black/30` com `border-white/15`
+- Nomes das casas: `text-white font-bold text-base` (garantir)
+- Labels/archetype: `text-white/70` (era `/60`)
 
-| Casa | Signo | Elemento | Cor da Borda |
-|------|-------|----------|-------------|
-| 1, 5, 9 | Áries, Leão, Sagitário | Fogo | `#e74c3c` vermelho |
-| 2, 6, 10 | Touro, Virgem, Capricórnio | Terra | `#27ae60` verde |
-| 3, 7, 11 | Gêmeos, Libra, Aquário | Ar | `#3498db` azul |
-| 4, 8, 12 | Câncer, Escorpião, Peixes | Água | `#9b59b6` violeta |
+#### 5. Mapeamento Global — Idem
+- Cards: `bg-black/25 border-white/12`
+- Nomes: `text-white font-semibold`
 
-**Card da casa selecionada (casa-alvo):** borda 2px sólida na cor do elemento + `ring-2` + badge "Casa-alvo" + `bg-white/8` em vez de transparente
-
-**Cards normais:** borda esquerda 3px na cor do elemento, resto `border-white/10`
-
-### 4. Mapeamento Global — Cards de Localização Limpos
-
-Refatorar os cards de cidades secundárias:
-- Layout simples: `bg-white/5 border border-white/10 rounded-xl p-4`
-- Bandeira à esquerda, nome da cidade e país à direita
-- Coordenadas em `font-mono text-white/40`
-- Sem bordas coloridas por casa (neutro) — borda esquerda `border-l-2 border-white/20`
-- Quando bloqueado: blur no nome + ícone de cadeado discreto
-
----
-
-### Arquivos Modificados
+### Arquivo Modificado
 
 | Arquivo | Mudança |
 |---|---|
-| `src/components/DestinyResults.tsx` | Glassmorphism no hero, contraste global, grid com bordas por elemento, cards de mapeamento limpos |
+| `src/components/DestinyResults.tsx` | Foto full-opacity, gradient overlay da casa, glass card mais opaco, contraste global corrigido |
 
 ### O que NÃO muda
-- `houses.ts`, `HouseCard.tsx`, `GoalCards.tsx`, `Index.tsx`
 - Lógica de desbloqueio, créditos, API
-- Sem migrações de banco
+- `houses.ts`, `Index.tsx`, `GoalCards.tsx`
+- Sem migrações
 
