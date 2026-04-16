@@ -318,15 +318,22 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
         className="relative rounded-2xl overflow-hidden min-h-[420px]"
         style={{ backgroundColor: houseSolidBg }}
       >
-        {/* City image as low-opacity background */}
+        {/* City image — FULL OPACITY, deslumbrante */}
         <img
           src={heroImage}
           alt={cityName}
           className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-            !unlocked ? "blur-sm grayscale scale-105 opacity-10" : "opacity-20"
+            !unlocked ? "blur-sm grayscale scale-105 opacity-60" : "opacity-100"
           }`}
-          style={{ mixBlendMode: "luminosity" }}
           loading="eager"
+        />
+
+        {/* Gradient overlay — house color tint */}
+        <div
+          className="absolute inset-0 z-[1]"
+          style={{
+            background: `linear-gradient(to bottom, ${houseSolidBg}cc 0%, ${houseSolidBg}66 40%, rgba(0,0,0,0.85) 100%)`,
+          }}
         />
 
         {/* House number watermark */}
