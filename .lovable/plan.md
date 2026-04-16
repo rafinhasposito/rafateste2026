@@ -1,76 +1,69 @@
 
 
-## Plano: Hero Deslumbrante com Foto da Cidade em Destaque + Contraste Corrigido
+## Plano: Fundo Sólido no Hero + Foto da Cidade na Seção "Sobre"
 
 ### Problema
+A foto da cidade no hero compete com o glass card e os textos. O resultado fica confuso visualmente.
 
-O hero atual usa a foto da cidade com `opacity: 0.2` e `mix-blend-mode: luminosity` sobre um fundo sólido escuro — resultado: tudo cinza/escuro, a foto é invisível, e o glass card (`rgba(255,255,255,0.07)`) mal se distingue do fundo. Zero impacto visual.
+### Nova Abordagem
 
-### Nova Abordagem: Foto Full-Bleed com Overlay Gradiente da Casa
+**Hero:** Fundo sólido da casa (já temos `HOUSE_SOLID_COLORS`) com um gradiente sutil, SEM foto. Limpo, elegante, foco total no texto.
+
+**Seção "Sobre [Cidade]":** A foto da cidade aparece aqui, grande e deslumbrante, ANTES do texto da Wikipedia. Funciona como uma "janela" visual para a cidade.
 
 ```text
 ┌─────────────────────────────────────────────────┐
-│  FOTO DA CIDADE (100% opacity, object-cover)    │
-│  ┌─ GRADIENT OVERLAY ──────────────────────┐    │
-│  │  De: rgba(houseSolidColor, 0.85) topo   │    │
-│  │  Para: rgba(0,0,0,0.7) base             │    │
-│  │                                          │    │
-│  │  ┌── GLASS CARD (forte) ─────────────┐  │    │
-│  │  │  bg-black/40 backdrop-blur-xl      │  │    │
-│  │  │  border: 1px solid white/25        │  │    │
-│  │  │                                    │  │    │
-│  │  │  CASA 9  (3xl, white, cinzel)      │  │    │
-│  │  │  Viagens & Estudos (accent color)  │  │    │
-│  │  │  ─────────────────────────────     │  │    │
-│  │  │  Québec  🇨🇦  coords  clima       │  │    │
-│  │  │  Egrégora | Significado            │  │    │
-│  │  │  Rituais | Previsões               │  │    │
-│  │  └───────────────────────────────────┘  │    │
-│  └──────────────────────────────────────────┘    │
+│  FUNDO SÓLIDO da casa (gradiente sutil)         │
+│  ┌── GLASS CARD ─────────────────────────────┐  │
+│  │  CASA 9 · Viagens & Estudos               │  │
+│  │  Québec 🇨🇦 · coords · clima              │  │
+│  │  ─────────────────────────────────         │  │
+│  │  Egrégora | Significado                    │  │
+│  │  ─────────────────────────────────         │  │
+│  │  ┌─ SOBRE QUÉBEC ──────────────────────┐  │  │
+│  │  │  ┌──────────────────────────────┐    │  │  │
+│  │  │  │  FOTO DA CIDADE (rounded,    │    │  │  │
+│  │  │  │  max-h-64, object-cover,     │    │  │  │
+│  │  │  │  borda accent suave)         │    │  │  │
+│  │  │  └──────────────────────────────┘    │  │  │
+│  │  │  Texto da Wikipedia...               │  │  │
+│  │  └─────────────────────────────────────┘  │  │
+│  │  Rituais | Previsões                      │  │
+│  └───────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────┘
 ```
 
 ### Mudanças Específicas
 
-#### 1. Foto da Cidade — VISÍVEL e Deslumbrante
-- Remover `opacity-20` e `mix-blend-mode: luminosity`
-- Imagem em **opacity total** (`opacity-100`) quando desbloqueado, `opacity-60 blur-sm` quando bloqueado
-- Adicionar **gradient overlay forte** por cima da foto usando a cor sólida da casa:
+#### 1. Hero — Fundo Sólido com Gradiente
+- Remover a `<img>` do hero (linhas 322-329)
+- Trocar o gradient overlay por um gradiente sólido elegante:
   ```
-  linear-gradient(to bottom, 
-    rgba(houseSolidColor, 0.8) 0%,
-    rgba(houseSolidColor, 0.4) 40%,
-    rgba(0,0,0,0.85) 100%)
+  linear-gradient(135deg, houseSolidColor 0%, darken 60%, rgba(0,0,0,0.9) 100%)
   ```
-- Isso cria o efeito "imagem deslumbrante tingida com a cor da casa"
+- Manter o watermark do número da casa (sutil)
 
-#### 2. Glass Card — Mais Opaco e Legível
-- Trocar `bg-white/7` por `bg-black/40 backdrop-blur-xl`
-- Border mais visível: `border-white/25` (era `/15`)
-- Adicionar `shadow-[0_8px_32px_rgba(0,0,0,0.5)]`
+#### 2. Seção "Sobre" — Foto da Cidade em Destaque
+- Dentro da seção Wikipedia (linhas 551-571), adicionar a foto ANTES do texto
+- Foto com `rounded-xl`, `max-h-64`, `object-cover`, `w-full`
+- Borda suave na cor accent: `border-2 border-[rgba(accent,0.3)]`
+- Se `wikiData.thumbnail` existir, usar a imagem da Wikipedia; senão, usar `heroImage` (do dicionário de fotos)
+- Fallback: se não houver foto, seção aparece só com texto (como hoje)
 
-#### 3. Seções Internas — Fundo Distinto
-- Egrégora, Rituais, Previsões, Wikipedia: trocar `bg-white/5 border-white/10` por `bg-black/30 border-white/15`
-- Texto corpo: `text-white/90` (era `/80` e `/85`)
-- Labels: `rgb(accentColor)` com `font-bold` (já está, manter)
-
-#### 4. Cards das 12 Casas — Fundo Mais Escuro
-- Cards desbloqueados: `bg-black/30` com `border-white/15`
-- Nomes das casas: `text-white font-bold text-base` (garantir)
-- Labels/archetype: `text-white/70` (era `/60`)
-
-#### 5. Mapeamento Global — Idem
-- Cards: `bg-black/25 border-white/12`
-- Nomes: `text-white font-semibold`
+#### 3. Contraste Mantido
+- Glass card continua `bg-black/40 backdrop-blur-xl`
+- Textos brancos, labels na cor accent
+- Sem mudanças nas seções de Rituais, Previsões, Grid ou Mapeamento
 
 ### Arquivo Modificado
 
 | Arquivo | Mudança |
 |---|---|
-| `src/components/DestinyResults.tsx` | Foto full-opacity, gradient overlay da casa, glass card mais opaco, contraste global corrigido |
+| `src/components/DestinyResults.tsx` | Remover foto do hero, fundo sólido gradiente, foto da cidade na seção "Sobre" |
 
 ### O que NÃO muda
-- Lógica de desbloqueio, créditos, API
+- Lógica de desbloqueio, créditos, API, Wikipedia fetch
+- Grid das 12 casas, Mapeamento Global
 - `houses.ts`, `Index.tsx`, `GoalCards.tsx`
 - Sem migrações
 
