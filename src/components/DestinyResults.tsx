@@ -318,21 +318,11 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
         className="relative rounded-2xl overflow-hidden min-h-[420px]"
         style={{ backgroundColor: houseSolidBg }}
       >
-        {/* City image — FULL OPACITY, deslumbrante */}
-        <img
-          src={heroImage}
-          alt={cityName}
-          className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-            !unlocked ? "blur-sm grayscale scale-105 opacity-60" : "opacity-100"
-          }`}
-          loading="eager"
-        />
-
-        {/* Gradient overlay — house color tint */}
+        {/* Solid gradient background — no photo */}
         <div
           className="absolute inset-0 z-[1]"
           style={{
-            background: `linear-gradient(to bottom, ${houseSolidBg}cc 0%, ${houseSolidBg}66 40%, rgba(0,0,0,0.85) 100%)`,
+            background: `linear-gradient(135deg, ${houseSolidBg} 0%, ${houseSolidBg}99 60%, rgba(0,0,0,0.9) 100%)`,
           }}
         />
 
@@ -548,24 +538,56 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 </div>
 
                 {/* Wikipedia */}
-                {wikiData?.extract && (
+                {/* Sobre — City photo + Wikipedia */}
+                {(wikiData?.extract || heroImage) && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-5 rounded-xl space-y-3"
+                    className="rounded-xl overflow-hidden space-y-0"
                     style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}
                   >
-                    <div className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                      <h3 className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
-                        Sobre {wikiData.title || cityName}
-                      </h3>
-                    </div>
-                    <p className="text-white/90 text-sm leading-relaxed">{wikiData.extract}</p>
-                    {wikiData.content_urls?.desktop?.page && (
-                      <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline" style={{ color: `rgba(${accentColor}, 0.7)` }}>
-                        <ExternalLink className="w-3 h-3" /> Wikipedia
-                      </a>
+                    {/* City photo — deslumbrante */}
+                    {heroImage && (
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={heroImage}
+                          alt={cityName}
+                          className="w-full h-64 md:h-72 object-cover"
+                          loading="eager"
+                        />
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            background: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)`,
+                          }}
+                        />
+                        <div className="absolute bottom-3 left-4 right-4 flex items-center gap-2">
+                          <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                          <h3 className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                            Sobre {wikiData?.title || cityName}
+                          </h3>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Wikipedia text */}
+                    {wikiData?.extract && (
+                      <div className="p-5 space-y-3">
+                        {!heroImage && (
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                              Sobre {wikiData.title || cityName}
+                            </h3>
+                          </div>
+                        )}
+                        <p className="text-white/90 text-sm leading-relaxed">{wikiData.extract}</p>
+                        {wikiData.content_urls?.desktop?.page && (
+                          <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline" style={{ color: `rgba(${accentColor}, 0.7)` }}>
+                            <ExternalLink className="w-3 h-3" /> Wikipedia
+                          </a>
+                        )}
+                      </div>
                     )}
                   </motion.div>
                 )}
