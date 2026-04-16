@@ -318,21 +318,28 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
         className="relative rounded-2xl overflow-hidden min-h-[420px]"
         style={{ backgroundColor: houseSolidBg }}
       >
-        {/* City image as low-opacity background */}
+        {/* City image — FULL OPACITY, deslumbrante */}
         <img
           src={heroImage}
           alt={cityName}
           className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ${
-            !unlocked ? "blur-sm grayscale scale-105 opacity-10" : "opacity-20"
+            !unlocked ? "blur-sm grayscale scale-105 opacity-60" : "opacity-100"
           }`}
-          style={{ mixBlendMode: "luminosity" }}
           loading="eager"
+        />
+
+        {/* Gradient overlay — house color tint */}
+        <div
+          className="absolute inset-0 z-[1]"
+          style={{
+            background: `linear-gradient(to bottom, ${houseSolidBg}cc 0%, ${houseSolidBg}66 40%, rgba(0,0,0,0.85) 100%)`,
+          }}
         />
 
         {/* House number watermark */}
         <span
           className="absolute top-4 right-6 z-[2] font-cinzel font-black select-none pointer-events-none leading-none"
-          style={{ fontSize: '140px', color: `rgba(255,255,255,0.04)` }}
+          style={{ fontSize: '140px', color: `rgba(255,255,255,0.06)` }}
         >
           {house}
         </span>
@@ -403,13 +410,14 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
               )}
 
               {/* Glass card container */}
-              <div
-                className="rounded-2xl shadow-2xl p-6 md:p-8 space-y-6"
+               <div
+                className="rounded-2xl p-6 md:p-8 space-y-6"
                 style={{
-                  background: "rgba(255,255,255,0.07)",
+                  background: "rgba(0,0,0,0.40)",
                   backdropFilter: "blur(24px)",
                   WebkitBackdropFilter: "blur(24px)",
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
                 }}
               >
                 {/* Top label */}
@@ -515,25 +523,25 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
                 {/* Egrégora + Significado */}
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
                     <div className="flex items-center gap-2">
                       <Gem className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
                       <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
                         A Egrégora de Poder
                       </p>
                     </div>
-                    <p className="text-white/85 text-sm leading-relaxed">
+                    <p className="text-white/90 text-sm leading-relaxed">
                       {houseData.resumo}: {houseData.porque}
                     </p>
                   </div>
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
                       <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
                         O Que Significa Passar o Aniversário Aqui?
                       </p>
                     </div>
-                    <p className="text-white/85 text-sm leading-relaxed">
+                    <p className="text-white/90 text-sm leading-relaxed">
                       {houseData.beneficio}
                     </p>
                   </div>
@@ -545,7 +553,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="p-5 rounded-xl space-y-3"
-                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                    style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}
                   >
                     <div className="flex items-center gap-2">
                       <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
@@ -553,7 +561,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         Sobre {wikiData.title || cityName}
                       </h3>
                     </div>
-                    <p className="text-white/80 text-sm leading-relaxed">{wikiData.extract}</p>
+                    <p className="text-white/90 text-sm leading-relaxed">{wikiData.extract}</p>
                     {wikiData.content_urls?.desktop?.page && (
                       <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline" style={{ color: `rgba(${accentColor}, 0.7)` }}>
                         <ExternalLink className="w-3 h-3" /> Wikipedia
@@ -572,7 +580,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     {rituals.map((r, i) => (
-                      <div key={i} className="relative overflow-hidden p-5 rounded-xl" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                      <div key={i} className="relative overflow-hidden p-5 rounded-xl" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
                         <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black leading-none select-none pointer-events-none" style={{ color: "rgba(255,255,255,0.03)" }}>
                           {i + 1}
                         </span>
@@ -583,7 +591,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           >
                             {i + 1}
                           </span>
-                          <p className="text-white/85 text-xs leading-relaxed pt-1">{r}</p>
+                          <p className="text-white/90 text-xs leading-relaxed pt-1">{r}</p>
                         </div>
                       </div>
                     ))}
@@ -604,7 +612,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       { icon: Heart, label: "Amor", text: houseData.amor },
                       { icon: Briefcase, label: "Profissional", text: houseData.prof },
                     ].map(({ icon: Icon, label, text }) => (
-                      <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                      <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
                         <div
                           className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
                           style={{ border: `2px solid rgba(${accentColor}, 0.4)`, background: `rgba(${accentColor}, 0.1)` }}
@@ -613,7 +621,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         </div>
                         <div className="space-y-1 flex-1">
                           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>{label}</span>
-                          <p className="text-white/80 text-xs leading-relaxed">{text}</p>
+                          <p className="text-white/90 text-xs leading-relaxed">{text}</p>
                         </div>
                       </div>
                     ))}
@@ -648,9 +656,9 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           key={`${c.city}-${i}`}
                           className="relative rounded-xl p-4 overflow-hidden"
                           style={{
-                            background: "rgba(255,255,255,0.04)",
-                            border: "1px solid rgba(255,255,255,0.08)",
-                            borderLeft: "3px solid rgba(255,255,255,0.15)",
+                            background: "rgba(0,0,0,0.25)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            borderLeft: "3px solid rgba(255,255,255,0.2)",
                           }}
                         >
                           <div className="flex items-center gap-2 mb-2">
@@ -748,13 +756,13 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   style={{
                     background: isUnlocked
                       ? isCurrentHouse
-                        ? "rgba(255,255,255,0.08)"
-                        : houseColors[houseNum]
+                        ? "rgba(0,0,0,0.30)"
+                        : "rgba(0,0,0,0.25)"
                       : undefined,
                     border: isCurrentHouse
                       ? `2px solid ${elementColor}`
                       : isUnlocked
-                        ? `1px solid rgba(255,255,255,0.1)`
+                        ? `1px solid rgba(255,255,255,0.15)`
                         : `1px solid rgba(255,255,255,0.05)`,
                     borderLeft: !isCurrentHouse ? `3px solid ${elementColor}` : undefined,
                     boxShadow: isCurrentHouse ? `0 0 30px ${elementColor}33, 0 0 0 2px ${elementColor}` : undefined,
@@ -799,8 +807,8 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider" style={{ color: `rgb(${hAccent})` }}>Casa {houseNum}</p>
                         </div>
                         <p className="font-bold text-base mt-1" style={{ color: `rgb(${hAccent})` }}>{hData?.label}</p>
-                        <p className="text-white/60 text-[10px] mt-0.5">{archetype} · {sign}</p>
-                        <p className="text-white/60 text-[10px] mt-0.5">{hData?.regente}</p>
+                        <p className="text-white/70 text-[10px] mt-0.5">{archetype} · {sign}</p>
+                        <p className="text-white/70 text-[10px] mt-0.5">{hData?.regente}</p>
                       </div>
                     </div>
 
