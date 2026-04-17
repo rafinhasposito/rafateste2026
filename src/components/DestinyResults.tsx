@@ -491,29 +491,29 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   >
                     {cityName}
                   </h3>
-                  <div className="flex items-center gap-3 text-white/80 flex-wrap">
+                  <div className="flex items-center gap-3 text-white/90 flex-wrap">
                     <span className="text-xl">{flag}</span>
-                    <span className="text-sm font-light tracking-wide">{masterCity.country}</span>
+                    <span className="text-sm font-medium tracking-wide text-white">{masterCity.country}</span>
                     {masterCity.lat != null && masterCity.lon != null && (
                       <>
-                        <span className="text-white/30">|</span>
-                        <MapPin className="w-3.5 h-3.5 text-white/40" />
-                        <span className="text-xs text-white/50 font-mono">
+                        <span className="text-white/40">|</span>
+                        <MapPin className="w-3.5 h-3.5 text-white/70" />
+                        <span className="text-xs text-white/85 font-mono">
                           {masterCity.lat.toFixed(2)}°, {masterCity.lon.toFixed(2)}°
                         </span>
                       </>
                     )}
                     {weatherData && (
                       <>
-                        <span className="text-white/30">|</span>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                        <span className="text-white/40">|</span>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}>
                           <img
                             src={`https://openweathermap.org/img/wn/${weatherData.icon}.png`}
                             alt={weatherData.description}
                             className="w-5 h-5"
                           />
                           <span className="text-xs font-semibold text-white">{weatherData.temp}°C</span>
-                          <span className="text-[9px] text-white/60 capitalize">{weatherData.description}</span>
+                          <span className="text-[9px] text-white/85 capitalize">{weatherData.description}</span>
                         </div>
                       </>
                     )}
