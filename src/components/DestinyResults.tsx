@@ -614,24 +614,24 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">
                       Rituais de Revolução Solar
                     </h4>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     {rituals.map((r, i) => (
-                      <div key={i} className="relative overflow-hidden p-5 rounded-xl" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
-                        <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black leading-none select-none pointer-events-none" style={{ color: "rgba(255,255,255,0.03)" }}>
+                      <div key={i} className="relative overflow-hidden p-5 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                        <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black leading-none select-none pointer-events-none" style={{ color: "rgba(255,255,255,0.04)" }}>
                           {i + 1}
                         </span>
                         <div className="relative z-10 flex gap-3 items-start">
                           <span
-                            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold"
-                            style={{ background: `rgba(${accentColor}, 0.2)`, border: `1px solid rgba(${accentColor}, 0.4)`, color: `rgb(${accentColor})` }}
+                            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
+                            style={{ background: `rgba(${accentColor}, 0.25)`, border: `1px solid rgba(${accentColor}, 0.6)` }}
                           >
                             {i + 1}
                           </span>
-                          <p className="text-white/90 text-xs leading-relaxed pt-1">{r}</p>
+                          <p className="text-white/95 text-xs leading-relaxed pt-1">{r}</p>
                         </div>
                       </div>
                     ))}
@@ -642,7 +642,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Globe className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">
                       Previsões do Ciclo
                     </h4>
                   </div>
@@ -652,16 +652,16 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       { icon: Heart, label: "Amor", text: houseData.amor },
                       { icon: Briefcase, label: "Profissional", text: houseData.prof },
                     ].map(({ icon: Icon, label, text }) => (
-                      <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                      <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                         <div
                           className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ border: `2px solid rgba(${accentColor}, 0.4)`, background: `rgba(${accentColor}, 0.1)` }}
+                          style={{ border: `2px solid rgba(${accentColor}, 0.5)`, background: `rgba(${accentColor}, 0.15)` }}
                         >
                           <Icon className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
                         </div>
                         <div className="space-y-1 flex-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>{label}</span>
-                          <p className="text-white/90 text-xs leading-relaxed">{text}</p>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-white">{label}</span>
+                          <p className="text-white/95 text-xs leading-relaxed">{text}</p>
                         </div>
                       </div>
                     ))}
