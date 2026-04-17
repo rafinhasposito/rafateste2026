@@ -1,67 +1,59 @@
 
-Objetivo
 
-Sim — concordo. O problema não é só “escuro demais”: hoje a página mistura cor escura de identidade com cor de leitura. Vou corrigir isso na raiz para que nenhum texto importante fique escuro sobre fundo escuro ou claro demais sobre imagem clara.
+## Plano: Trazer o Visual Premium para a Página de Histórico
 
-Diagnóstico encontrado
+### Diagnóstico
 
-- Em `src/components/DestinyResults.tsx`, vários títulos/labels usam `rgb(${accentColor})`.
-- Esse `accentColor` vem de `extractAccentColor()` lendo `houseColors` em `src/data/houses.ts`.
-- Algumas casas geram acentos naturalmente escuros (azul profundo, roxo escuro, verde fechado), mas essas cores estão sendo usadas em texto.
-- Além disso, há muitos textos em `text-white/40`, `text-white/50` e `text-white/60`, que ficam fracos demais sobre cards escuros/translúcidos.
-- Na foto da seção “Sobre”, o título ainda compete com a imagem porque a cor de destaque está sendo aplicada direto sobre a foto.
+A página `/dashboard?id=...` (histórico de "Meus Mapas") usa componentes diferentes da home:
+- **Home (busca nova)**: usa `DestinyResults.tsx` — já refatorado, com foto da cidade, glass card, cores vibrantes, alto contraste.
+- **Histórico (Dashboard)**: usa `HouseDetail.tsx` + `HouseCard.tsx` — **ainda no design antigo**, com texto cinza apagado (`text-foreground/30-60`), sem foto da cidade, sem cores por casa, sem clima/Wikipedia.
 
-Plano
+Por isso o usuário sente que "tinha tudo isso antes e agora ficou ruim" — na verdade, o histórico nunca recebeu o visual premium.
 
-1. Separar cor decorativa de cor legível
-- Criar uma paleta semântica por casa dentro de `DestinyResults.tsx`:
-  - fundo sólido da casa
-  - cor vibrante/clara para bordas, ícones e badges
-  - branco/off-white para todo texto principal
-- Parar de usar a cor extraída do gradiente como cor de leitura.
+### Solução
 
-2. Aplicar regra dura de contraste
-- `Casa N`, nome da cidade, país, descrições, rituais, previsões e textos da Wikipedia ficarão sempre em branco/off-white.
-- A cor da casa ficará reservada para:
-  - ícones
-  - selos
-  - bordas
-  - número da casa
-  - badge “Casa-alvo”
+Aplicar o mesmo sistema visual do `DestinyResults.tsx` aos dois componentes do dashboard, mantendo a lógica intacta (créditos, desbloqueio, dados).
 
-3. Corrigir a seção “Sobre”
-- Manter a foto da cidade nessa seção, antes do texto.
-- Reforçar o overlay escuro da imagem para criar contraste real.
-- Colocar “Sobre [Cidade]” em branco.
-- Usar a cor da casa só como chip/linha de destaque, nunca como texto principal em cima da foto.
+### Mudanças
 
-4. Dar mais destaque aos nomes das casas
-- No grid 1–12:
-  - nome da casa em branco, maior e mais forte
-  - número/selo/barra lateral com a cor da casa
-  - signo, arquétipo e metadados em off-white legível
-- A casa selecionada continua destacada, mas sem depender de texto colorido escuro.
+#### 1. `HouseDetail.tsx` — Refatoração visual completa
+- **Hero**: fundo sólido da casa (`HOUSE_SOLID_COLORS`) com gradiente + watermark do número da casa, ao invés do `houseColors` gradient antigo.
+- **Glass card**: envolver conteúdo em `bg-black/40 backdrop-blur-xl border-white/15`.
+- **Foto da cidade**: adicionar imagem grande (`h-64 object-cover`) na seção do destino principal, com overlay escuro no rodapé para legibilidade.
+- **Contraste**: substituir todos os `text-foreground/30-60` por `text-white/90` (corpo) e `text-white` (títulos). Eliminar texto colorido sobre fundo escuro.
+- **Cores decorativas**: usar `HOUSE_ACCENT_RGB` (cores vibrantes) só para ícones, bordas, badges e o nome do arquétipo — nunca para texto longo.
+- **Seções (Leitura, Sombra, Promessa, Áreas, Benefício/Ideal, Radar)**: padronizar com `bg-black/30 border-white/15`, labels coloridos com accent vibrante, corpo em branco/off-white.
+- **Bandeira do país** ao lado do nome da cidade no destino principal.
 
-5. Ajustar todos os textos secundários apagados
-- Subir contraste de coordenadas, país, continente, cristal, descrições do modal e textos auxiliares.
-- Remover usos excessivos de `text-white/40-60` nessa página.
+#### 2. `HouseCard.tsx` — Cards do grid das 12 casas
+- Borda esquerda colorida pelo elemento da casa (Fogo/Terra/Ar/Água via `ELEMENT_COLORS`).
+- Fundo `bg-black/40` ao invés do gradient leve atual; melhor contraste do texto.
+- Nome da casa em `text-white font-bold`, label em `text-white/90`, metadados em `text-white/70` (não mais `/50`).
+- Badge "Casa-alvo" com cor vibrante da casa.
+- Estado bloqueado: blur + cadeado discreto (manter atual mas refinar).
+- Estado selecionado: ring na cor accent da casa (não mais dourado genérico).
 
-Detalhes técnicos
+#### 3. Reutilizar tokens do `DestinyResults.tsx`
+- Extrair `HOUSE_SOLID_COLORS`, `HOUSE_ACCENT_RGB`, `ELEMENT_COLORS`, `CITY_IMAGES`, `getCityImage` para um novo arquivo compartilhado: **`src/lib/houseTheme.ts`**.
+- Importar em `DestinyResults.tsx`, `HouseDetail.tsx` e `HouseCard.tsx` para garantir consistência visual em todo o app.
 
-- Arquivo principal: `src/components/DestinyResults.tsx`
-- Mudanças-chave:
-  - substituir texto crítico hoje colorido por `text-white`/`text-white/90`
-  - criar tokens visuais por casa para separar identidade visual de legibilidade
-  - reforçar o overlay da foto na seção “Sobre”
-  - revisar labels do hero, cards internos, grid das casas, mapeamento global e modal
-- Não muda:
-  - lógica de unlock
-  - créditos
-  - integração com clima/Wikipedia
-  - estrutura do fluxo
+### Arquivos modificados
 
-Resultado esperado
+| Arquivo | Mudança |
+|---|---|
+| `src/lib/houseTheme.ts` | **NOVO** — tokens compartilhados (cores sólidas, accents vibrantes, cores por elemento, fotos das cidades) |
+| `src/components/HouseDetail.tsx` | Hero com fundo sólido, foto da cidade, glass card, contraste branco, cores accent decorativas |
+| `src/components/HouseCard.tsx` | Borda colorida por elemento, fundo escuro, texto branco legível, badge alvo na cor da casa |
+| `src/components/DestinyResults.tsx` | Trocar tokens locais pelos imports do `houseTheme.ts` (sem mudança visual) |
 
-- zero texto escuro sobre fundo escuro
-- foto da cidade continua bonita, mas sem brigar com o conteúdo
-- a Casa Escolhida continua com personalidade própria, só que muito mais legível e elegante
+### O que NÃO muda
+
+- `Dashboard.tsx` (estrutura, lógica, fluxo)
+- Sistema de créditos e desbloqueio
+- `houses.ts`, `houseMeta.ts`, dados
+- Banco / API / Supabase
+
+### Resultado esperado
+
+O histórico em `/dashboard?id=...` ficará visualmente idêntico ao `DestinyResults.tsx` da home — foto deslumbrante da cidade, fundo sólido com a cor da casa, texto branco perfeitamente legível, cores vibrantes apenas em elementos decorativos, grid das 12 casas com bordas por elemento. Zero texto cinza sobre fundo escuro.
+
