@@ -1,69 +1,67 @@
 
+Objetivo
 
-## Plano: Fundo Sólido no Hero + Foto da Cidade na Seção "Sobre"
+Sim — concordo. O problema não é só “escuro demais”: hoje a página mistura cor escura de identidade com cor de leitura. Vou corrigir isso na raiz para que nenhum texto importante fique escuro sobre fundo escuro ou claro demais sobre imagem clara.
 
-### Problema
-A foto da cidade no hero compete com o glass card e os textos. O resultado fica confuso visualmente.
+Diagnóstico encontrado
 
-### Nova Abordagem
+- Em `src/components/DestinyResults.tsx`, vários títulos/labels usam `rgb(${accentColor})`.
+- Esse `accentColor` vem de `extractAccentColor()` lendo `houseColors` em `src/data/houses.ts`.
+- Algumas casas geram acentos naturalmente escuros (azul profundo, roxo escuro, verde fechado), mas essas cores estão sendo usadas em texto.
+- Além disso, há muitos textos em `text-white/40`, `text-white/50` e `text-white/60`, que ficam fracos demais sobre cards escuros/translúcidos.
+- Na foto da seção “Sobre”, o título ainda compete com a imagem porque a cor de destaque está sendo aplicada direto sobre a foto.
 
-**Hero:** Fundo sólido da casa (já temos `HOUSE_SOLID_COLORS`) com um gradiente sutil, SEM foto. Limpo, elegante, foco total no texto.
+Plano
 
-**Seção "Sobre [Cidade]":** A foto da cidade aparece aqui, grande e deslumbrante, ANTES do texto da Wikipedia. Funciona como uma "janela" visual para a cidade.
+1. Separar cor decorativa de cor legível
+- Criar uma paleta semântica por casa dentro de `DestinyResults.tsx`:
+  - fundo sólido da casa
+  - cor vibrante/clara para bordas, ícones e badges
+  - branco/off-white para todo texto principal
+- Parar de usar a cor extraída do gradiente como cor de leitura.
 
-```text
-┌─────────────────────────────────────────────────┐
-│  FUNDO SÓLIDO da casa (gradiente sutil)         │
-│  ┌── GLASS CARD ─────────────────────────────┐  │
-│  │  CASA 9 · Viagens & Estudos               │  │
-│  │  Québec 🇨🇦 · coords · clima              │  │
-│  │  ─────────────────────────────────         │  │
-│  │  Egrégora | Significado                    │  │
-│  │  ─────────────────────────────────         │  │
-│  │  ┌─ SOBRE QUÉBEC ──────────────────────┐  │  │
-│  │  │  ┌──────────────────────────────┐    │  │  │
-│  │  │  │  FOTO DA CIDADE (rounded,    │    │  │  │
-│  │  │  │  max-h-64, object-cover,     │    │  │  │
-│  │  │  │  borda accent suave)         │    │  │  │
-│  │  │  └──────────────────────────────┘    │  │  │
-│  │  │  Texto da Wikipedia...               │  │  │
-│  │  └─────────────────────────────────────┘  │  │
-│  │  Rituais | Previsões                      │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
-```
+2. Aplicar regra dura de contraste
+- `Casa N`, nome da cidade, país, descrições, rituais, previsões e textos da Wikipedia ficarão sempre em branco/off-white.
+- A cor da casa ficará reservada para:
+  - ícones
+  - selos
+  - bordas
+  - número da casa
+  - badge “Casa-alvo”
 
-### Mudanças Específicas
+3. Corrigir a seção “Sobre”
+- Manter a foto da cidade nessa seção, antes do texto.
+- Reforçar o overlay escuro da imagem para criar contraste real.
+- Colocar “Sobre [Cidade]” em branco.
+- Usar a cor da casa só como chip/linha de destaque, nunca como texto principal em cima da foto.
 
-#### 1. Hero — Fundo Sólido com Gradiente
-- Remover a `<img>` do hero (linhas 322-329)
-- Trocar o gradient overlay por um gradiente sólido elegante:
-  ```
-  linear-gradient(135deg, houseSolidColor 0%, darken 60%, rgba(0,0,0,0.9) 100%)
-  ```
-- Manter o watermark do número da casa (sutil)
+4. Dar mais destaque aos nomes das casas
+- No grid 1–12:
+  - nome da casa em branco, maior e mais forte
+  - número/selo/barra lateral com a cor da casa
+  - signo, arquétipo e metadados em off-white legível
+- A casa selecionada continua destacada, mas sem depender de texto colorido escuro.
 
-#### 2. Seção "Sobre" — Foto da Cidade em Destaque
-- Dentro da seção Wikipedia (linhas 551-571), adicionar a foto ANTES do texto
-- Foto com `rounded-xl`, `max-h-64`, `object-cover`, `w-full`
-- Borda suave na cor accent: `border-2 border-[rgba(accent,0.3)]`
-- Se `wikiData.thumbnail` existir, usar a imagem da Wikipedia; senão, usar `heroImage` (do dicionário de fotos)
-- Fallback: se não houver foto, seção aparece só com texto (como hoje)
+5. Ajustar todos os textos secundários apagados
+- Subir contraste de coordenadas, país, continente, cristal, descrições do modal e textos auxiliares.
+- Remover usos excessivos de `text-white/40-60` nessa página.
 
-#### 3. Contraste Mantido
-- Glass card continua `bg-black/40 backdrop-blur-xl`
-- Textos brancos, labels na cor accent
-- Sem mudanças nas seções de Rituais, Previsões, Grid ou Mapeamento
+Detalhes técnicos
 
-### Arquivo Modificado
+- Arquivo principal: `src/components/DestinyResults.tsx`
+- Mudanças-chave:
+  - substituir texto crítico hoje colorido por `text-white`/`text-white/90`
+  - criar tokens visuais por casa para separar identidade visual de legibilidade
+  - reforçar o overlay da foto na seção “Sobre”
+  - revisar labels do hero, cards internos, grid das casas, mapeamento global e modal
+- Não muda:
+  - lógica de unlock
+  - créditos
+  - integração com clima/Wikipedia
+  - estrutura do fluxo
 
-| Arquivo | Mudança |
-|---|---|
-| `src/components/DestinyResults.tsx` | Remover foto do hero, fundo sólido gradiente, foto da cidade na seção "Sobre" |
+Resultado esperado
 
-### O que NÃO muda
-- Lógica de desbloqueio, créditos, API, Wikipedia fetch
-- Grid das 12 casas, Mapeamento Global
-- `houses.ts`, `Index.tsx`, `GoalCards.tsx`
-- Sem migrações
-
+- zero texto escuro sobre fundo escuro
+- foto da cidade continua bonita, mas sem brigar com o conteúdo
+- a Casa Escolhida continua com personalidade própria, só que muito mais legível e elegante
