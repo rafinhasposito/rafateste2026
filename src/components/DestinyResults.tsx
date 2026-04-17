@@ -55,11 +55,26 @@ interface WeatherData {
 }
 
 function extractAccentColor(house: number): string {
-  const gradient = houseColors[house] || "";
-  const match = gradient.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (match) return `${match[1]}, ${match[2]}, ${match[3]}`;
-  return "255, 215, 0";
+  // Returns a HIGH-CONTRAST decorative color per house (for icons, borders, badges).
+  // NEVER use this for body text — text must always be white/off-white.
+  return HOUSE_ACCENT_RGB[house] || "255, 215, 0";
 }
+
+/** Bright, legible accent colors per house — for icons, borders, badges ONLY (never body text) */
+const HOUSE_ACCENT_RGB: Record<number, string> = {
+  1: "255, 99, 99",     // Áries — vibrant red
+  2: "120, 220, 140",   // Touro — fresh green
+  3: "120, 200, 255",   // Gêmeos — sky blue
+  4: "200, 160, 255",   // Câncer — soft violet
+  5: "255, 200, 80",    // Leão — bright gold
+  6: "120, 230, 200",   // Virgem — mint teal
+  7: "230, 170, 230",   // Libra — pink plum
+  8: "180, 140, 255",   // Escorpião — bright indigo
+  9: "120, 180, 255",   // Sagitário — royal sky
+  10: "200, 200, 200",  // Capricórnio — light silver
+  11: "120, 220, 230",  // Aquário — bright cyan
+  12: "200, 180, 255",  // Peixes — lavender
+};
 
 /** Solid background colors per house */
 const HOUSE_SOLID_COLORS: Record<number, string> = {
