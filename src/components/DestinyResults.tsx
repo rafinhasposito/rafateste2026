@@ -687,7 +687,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
             <div className={`select-none ${!secondaryUnlocked ? 'cursor-pointer' : ''}`} onClick={() => !secondaryUnlocked && openUnlockFlow()}>
               {Object.entries(continentGroups).map(([continent, citiesList]) => (
                 <div key={continent} className="mb-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mb-2 pl-1">{continent}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/85 mb-2 pl-1">{continent}</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {citiesList.map((c, i) => {
                       const cFlag = getCountryFlag(c.country || "");
@@ -696,28 +696,28 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           key={`${c.city}-${i}`}
                           className="relative rounded-xl p-4 overflow-hidden"
                           style={{
-                            background: "rgba(0,0,0,0.25)",
-                            border: "1px solid rgba(255,255,255,0.12)",
-                            borderLeft: "3px solid rgba(255,255,255,0.2)",
+                            background: "rgba(0,0,0,0.35)",
+                            border: "1px solid rgba(255,255,255,0.18)",
+                            borderLeft: "3px solid rgba(255,255,255,0.3)",
                           }}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-base">{cFlag}</span>
-                            <span className="text-[10px] text-white/50 uppercase tracking-wider">{c.continent || c.country}</span>
+                            <span className="text-[10px] text-white/80 uppercase tracking-wider">{c.continent || c.country}</span>
                           </div>
-                          <p className={`text-white/90 font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
+                          <p className={`text-white font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
                             {c.city || c.display_name}
                           </p>
                           {c.lat != null && (
-                            <p className={`text-white/35 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
+                            <p className={`text-white/70 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
                               {secondaryUnlocked ? `${c.lat?.toFixed(2)}°, ${c.lon?.toFixed(2)}°` : `${c.lat?.toFixed(0)}°, ?????`}
                             </p>
                           )}
                           <div className="absolute top-3 right-3">
                             {secondaryUnlocked ? (
-                              <MapPin className="w-3.5 h-3.5 text-white/30" />
+                              <MapPin className="w-3.5 h-3.5 text-white/60" />
                             ) : (
-                              <Lock className="w-3.5 h-3.5 text-white/25" />
+                              <Lock className="w-3.5 h-3.5 text-white/50" />
                             )}
                           </div>
                         </div>
