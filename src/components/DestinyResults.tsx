@@ -428,7 +428,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 {/* Top label */}
                 <div className="flex items-center gap-2">
                   <Crown className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: `rgb(${accentColor})` }}>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
                     O Destino Mestre
                   </span>
                 </div>
@@ -441,10 +441,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   >
                     Casa {house}
                   </h2>
-                  <p
-                    className="font-cinzel text-lg md:text-xl font-semibold tracking-wide"
-                    style={{ color: `rgb(${accentColor})` }}
-                  >
+                  <p className="font-cinzel text-lg md:text-xl font-semibold tracking-wide text-white/95">
                     {houseData.label}
                   </p>
                 </div>
@@ -454,15 +451,15 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   <div
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
                     style={{
-                      background: `rgba(${accentColor}, 0.15)`,
-                      border: `1px solid rgba(${accentColor}, 0.4)`,
+                      background: `rgba(${accentColor}, 0.18)`,
+                      border: `1px solid rgba(${accentColor}, 0.5)`,
                     }}
                   >
-                    <span className="font-cinzel text-sm font-black" style={{ color: `rgb(${accentColor})` }}>
+                    <span className="font-cinzel text-sm font-black text-white">
                       Casa {house}
                     </span>
-                    <span style={{ color: `rgba(${accentColor}, 0.5)` }}>·</span>
-                    <span className="font-cinzel text-sm font-semibold" style={{ color: `rgb(${accentColor})` }}>
+                    <span className="text-white/40">·</span>
+                    <span className="font-cinzel text-sm font-semibold text-white/95">
                       {houseSigns[house] || ""}
                     </span>
                   </div>
