@@ -844,25 +844,25 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           >
                             {houseNum}
                           </span>
-                          <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider" style={{ color: `rgb(${hAccent})` }}>Casa {houseNum}</p>
+                          <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider text-white/80">Casa {houseNum}</p>
                         </div>
-                        <p className="font-bold text-base mt-1" style={{ color: `rgb(${hAccent})` }}>{hData?.label}</p>
-                        <p className="text-white/70 text-[10px] mt-0.5">{archetype} · {sign}</p>
-                        <p className="text-white/70 text-[10px] mt-0.5">{hData?.regente}</p>
+                        <p className="font-bold text-base mt-1 text-white">{hData?.label}</p>
+                        <p className="text-white/80 text-[10px] mt-0.5">{archetype} · {sign}</p>
+                        <p className="text-white/80 text-[10px] mt-0.5">{hData?.regente}</p>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {hData?.tags.map((tag) => (
-                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.8)" }}>
+                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.95)" }}>
                           {tag}
                         </span>
                       ))}
                     </div>
 
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-white/50 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
-                      <span className="text-white/85 text-[10px]">{hData?.cristal}</span>
+                      <span className="text-white/75 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
+                      <span className="text-white text-[10px] font-medium">{hData?.cristal}</span>
                     </div>
 
                     {/* City with flag */}
