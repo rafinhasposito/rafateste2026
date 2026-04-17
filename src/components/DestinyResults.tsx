@@ -556,7 +556,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="rounded-xl overflow-hidden space-y-0"
-                    style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}
+                    style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}
                   >
                     {/* City photo — deslumbrante */}
                     {heroImage && (
@@ -567,15 +567,21 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           className="w-full h-64 md:h-72 object-cover"
                           loading="eager"
                         />
+                        {/* Strong dark gradient for legibility */}
                         <div
                           className="absolute inset-0"
                           style={{
-                            background: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)`,
+                            background: `linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)`,
                           }}
                         />
-                        <div className="absolute bottom-3 left-4 right-4 flex items-center gap-2">
-                          <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                          <h3 className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                        <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
+                          {/* Color bar as accent */}
+                          <span
+                            className="block w-1 h-5 rounded-full"
+                            style={{ background: `rgb(${accentColor})` }}
+                          />
+                          <BookOpen className="w-4 h-4 text-white" />
+                          <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-white" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
                             Sobre {wikiData?.title || cityName}
                           </h3>
                         </div>
@@ -588,14 +594,14 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         {!heroImage && (
                           <div className="flex items-center gap-2">
                             <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-white">
                               Sobre {wikiData.title || cityName}
                             </h3>
                           </div>
                         )}
-                        <p className="text-white/90 text-sm leading-relaxed">{wikiData.extract}</p>
+                        <p className="text-white/95 text-sm leading-relaxed">{wikiData.extract}</p>
                         {wikiData.content_urls?.desktop?.page && (
-                          <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline" style={{ color: `rgba(${accentColor}, 0.7)` }}>
+                          <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline text-white/80 hover:text-white">
                             <ExternalLink className="w-3 h-3" /> Wikipedia
                           </a>
                         )}
