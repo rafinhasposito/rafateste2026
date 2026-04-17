@@ -867,23 +867,23 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
                     {/* City with flag */}
                     {isUnlocked && houseCity && (
-                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                         <div className="flex items-center gap-2.5">
                           {houseCityFlag && <span className="text-lg leading-none">{houseCityFlag}</span>}
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-semibold text-sm truncate">{houseCity.city || houseCity.display_name}</p>
-                            <p className="text-white/50 text-[10px]">{houseCity.country}</p>
+                            <p className="text-white/80 text-[10px]">{houseCity.country}</p>
                           </div>
-                          <MapPin className="w-3.5 h-3.5 text-white/30 shrink-0" />
+                          <MapPin className="w-3.5 h-3.5 text-white/60 shrink-0" />
                         </div>
                       </div>
                     )}
 
                     {isUnlocked && !houseCity && !isCurrentHouse && (
-                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                         <div className="flex items-center gap-2">
-                          <Eye className="w-3.5 h-3.5 text-white/40" />
-                          <span className="text-white/50 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
+                          <Eye className="w-3.5 h-3.5 text-white/70" />
+                          <span className="text-white/80 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
                         </div>
                       </div>
                     )}
