@@ -525,25 +525,25 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
                 {/* Egrégora + Significado */}
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                     <div className="flex items-center gap-2">
                       <Gem className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
+                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">
                         A Egrégora de Poder
                       </p>
                     </div>
-                    <p className="text-white/90 text-sm leading-relaxed">
+                    <p className="text-white/95 text-sm leading-relaxed">
                       {houseData.resumo}: {houseData.porque}
                     </p>
                   </div>
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
+                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">
                         O Que Significa Passar o Aniversário Aqui?
                       </p>
                     </div>
-                    <p className="text-white/90 text-sm leading-relaxed">
+                    <p className="text-white/95 text-sm leading-relaxed">
                       {houseData.beneficio}
                     </p>
                   </div>
