@@ -55,11 +55,26 @@ interface WeatherData {
 }
 
 function extractAccentColor(house: number): string {
-  const gradient = houseColors[house] || "";
-  const match = gradient.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (match) return `${match[1]}, ${match[2]}, ${match[3]}`;
-  return "255, 215, 0";
+  // Returns a HIGH-CONTRAST decorative color per house (for icons, borders, badges).
+  // NEVER use this for body text — text must always be white/off-white.
+  return HOUSE_ACCENT_RGB[house] || "255, 215, 0";
 }
+
+/** Bright, legible accent colors per house — for icons, borders, badges ONLY (never body text) */
+const HOUSE_ACCENT_RGB: Record<number, string> = {
+  1: "255, 99, 99",     // Áries — vibrant red
+  2: "120, 220, 140",   // Touro — fresh green
+  3: "120, 200, 255",   // Gêmeos — sky blue
+  4: "200, 160, 255",   // Câncer — soft violet
+  5: "255, 200, 80",    // Leão — bright gold
+  6: "120, 230, 200",   // Virgem — mint teal
+  7: "230, 170, 230",   // Libra — pink plum
+  8: "180, 140, 255",   // Escorpião — bright indigo
+  9: "120, 180, 255",   // Sagitário — royal sky
+  10: "200, 200, 200",  // Capricórnio — light silver
+  11: "120, 220, 230",  // Aquário — bright cyan
+  12: "200, 180, 255",  // Peixes — lavender
+};
 
 /** Solid background colors per house */
 const HOUSE_SOLID_COLORS: Record<number, string> = {
@@ -413,7 +428,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 {/* Top label */}
                 <div className="flex items-center gap-2">
                   <Crown className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: `rgb(${accentColor})` }}>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
                     O Destino Mestre
                   </span>
                 </div>
@@ -426,10 +441,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   >
                     Casa {house}
                   </h2>
-                  <p
-                    className="font-cinzel text-lg md:text-xl font-semibold tracking-wide"
-                    style={{ color: `rgb(${accentColor})` }}
-                  >
+                  <p className="font-cinzel text-lg md:text-xl font-semibold tracking-wide text-white/95">
                     {houseData.label}
                   </p>
                 </div>
@@ -439,15 +451,15 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   <div
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
                     style={{
-                      background: `rgba(${accentColor}, 0.15)`,
-                      border: `1px solid rgba(${accentColor}, 0.4)`,
+                      background: `rgba(${accentColor}, 0.18)`,
+                      border: `1px solid rgba(${accentColor}, 0.5)`,
                     }}
                   >
-                    <span className="font-cinzel text-sm font-black" style={{ color: `rgb(${accentColor})` }}>
+                    <span className="font-cinzel text-sm font-black text-white">
                       Casa {house}
                     </span>
-                    <span style={{ color: `rgba(${accentColor}, 0.5)` }}>·</span>
-                    <span className="font-cinzel text-sm font-semibold" style={{ color: `rgb(${accentColor})` }}>
+                    <span className="text-white/40">·</span>
+                    <span className="font-cinzel text-sm font-semibold text-white/95">
                       {houseSigns[house] || ""}
                     </span>
                   </div>
@@ -479,29 +491,29 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   >
                     {cityName}
                   </h3>
-                  <div className="flex items-center gap-3 text-white/80 flex-wrap">
+                  <div className="flex items-center gap-3 text-white/90 flex-wrap">
                     <span className="text-xl">{flag}</span>
-                    <span className="text-sm font-light tracking-wide">{masterCity.country}</span>
+                    <span className="text-sm font-medium tracking-wide text-white">{masterCity.country}</span>
                     {masterCity.lat != null && masterCity.lon != null && (
                       <>
-                        <span className="text-white/30">|</span>
-                        <MapPin className="w-3.5 h-3.5 text-white/40" />
-                        <span className="text-xs text-white/50 font-mono">
+                        <span className="text-white/40">|</span>
+                        <MapPin className="w-3.5 h-3.5 text-white/70" />
+                        <span className="text-xs text-white/85 font-mono">
                           {masterCity.lat.toFixed(2)}°, {masterCity.lon.toFixed(2)}°
                         </span>
                       </>
                     )}
                     {weatherData && (
                       <>
-                        <span className="text-white/30">|</span>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                        <span className="text-white/40">|</span>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}>
                           <img
                             src={`https://openweathermap.org/img/wn/${weatherData.icon}.png`}
                             alt={weatherData.description}
                             className="w-5 h-5"
                           />
                           <span className="text-xs font-semibold text-white">{weatherData.temp}°C</span>
-                          <span className="text-[9px] text-white/60 capitalize">{weatherData.description}</span>
+                          <span className="text-[9px] text-white/85 capitalize">{weatherData.description}</span>
                         </div>
                       </>
                     )}
@@ -513,25 +525,25 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
                 {/* Egrégora + Significado */}
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                     <div className="flex items-center gap-2">
                       <Gem className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
+                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">
                         A Egrégora de Poder
                       </p>
                     </div>
-                    <p className="text-white/90 text-sm leading-relaxed">
+                    <p className="text-white/95 text-sm leading-relaxed">
                       {houseData.resumo}: {houseData.porque}
                     </p>
                   </div>
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>
+                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">
                         O Que Significa Passar o Aniversário Aqui?
                       </p>
                     </div>
-                    <p className="text-white/90 text-sm leading-relaxed">
+                    <p className="text-white/95 text-sm leading-relaxed">
                       {houseData.beneficio}
                     </p>
                   </div>
@@ -544,7 +556,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="rounded-xl overflow-hidden space-y-0"
-                    style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}
+                    style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}
                   >
                     {/* City photo — deslumbrante */}
                     {heroImage && (
@@ -555,15 +567,21 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           className="w-full h-64 md:h-72 object-cover"
                           loading="eager"
                         />
+                        {/* Strong dark gradient for legibility */}
                         <div
                           className="absolute inset-0"
                           style={{
-                            background: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%)`,
+                            background: `linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)`,
                           }}
                         />
-                        <div className="absolute bottom-3 left-4 right-4 flex items-center gap-2">
-                          <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                          <h3 className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                        <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
+                          {/* Color bar as accent */}
+                          <span
+                            className="block w-1 h-5 rounded-full"
+                            style={{ background: `rgb(${accentColor})` }}
+                          />
+                          <BookOpen className="w-4 h-4 text-white" />
+                          <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-white" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
                             Sobre {wikiData?.title || cityName}
                           </h3>
                         </div>
@@ -576,14 +594,14 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         {!heroImage && (
                           <div className="flex items-center gap-2">
                             <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-white">
                               Sobre {wikiData.title || cityName}
                             </h3>
                           </div>
                         )}
-                        <p className="text-white/90 text-sm leading-relaxed">{wikiData.extract}</p>
+                        <p className="text-white/95 text-sm leading-relaxed">{wikiData.extract}</p>
                         {wikiData.content_urls?.desktop?.page && (
-                          <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline" style={{ color: `rgba(${accentColor}, 0.7)` }}>
+                          <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline text-white/80 hover:text-white">
                             <ExternalLink className="w-3 h-3" /> Wikipedia
                           </a>
                         )}
@@ -596,24 +614,24 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">
                       Rituais de Revolução Solar
                     </h4>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     {rituals.map((r, i) => (
-                      <div key={i} className="relative overflow-hidden p-5 rounded-xl" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
-                        <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black leading-none select-none pointer-events-none" style={{ color: "rgba(255,255,255,0.03)" }}>
+                      <div key={i} className="relative overflow-hidden p-5 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                        <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black leading-none select-none pointer-events-none" style={{ color: "rgba(255,255,255,0.04)" }}>
                           {i + 1}
                         </span>
                         <div className="relative z-10 flex gap-3 items-start">
                           <span
-                            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold"
-                            style={{ background: `rgba(${accentColor}, 0.2)`, border: `1px solid rgba(${accentColor}, 0.4)`, color: `rgb(${accentColor})` }}
+                            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
+                            style={{ background: `rgba(${accentColor}, 0.25)`, border: `1px solid rgba(${accentColor}, 0.6)` }}
                           >
                             {i + 1}
                           </span>
-                          <p className="text-white/90 text-xs leading-relaxed pt-1">{r}</p>
+                          <p className="text-white/95 text-xs leading-relaxed pt-1">{r}</p>
                         </div>
                       </div>
                     ))}
@@ -624,7 +642,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Globe className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em]" style={{ color: `rgb(${accentColor})` }}>
+                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">
                       Previsões do Ciclo
                     </h4>
                   </div>
@@ -634,16 +652,16 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       { icon: Heart, label: "Amor", text: houseData.amor },
                       { icon: Briefcase, label: "Profissional", text: houseData.prof },
                     ].map(({ icon: Icon, label, text }) => (
-                      <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.30)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                      <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                         <div
                           className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ border: `2px solid rgba(${accentColor}, 0.4)`, background: `rgba(${accentColor}, 0.1)` }}
+                          style={{ border: `2px solid rgba(${accentColor}, 0.5)`, background: `rgba(${accentColor}, 0.15)` }}
                         >
                           <Icon className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
                         </div>
                         <div className="space-y-1 flex-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>{label}</span>
-                          <p className="text-white/90 text-xs leading-relaxed">{text}</p>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-white">{label}</span>
+                          <p className="text-white/95 text-xs leading-relaxed">{text}</p>
                         </div>
                       </div>
                     ))}
@@ -669,7 +687,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
             <div className={`select-none ${!secondaryUnlocked ? 'cursor-pointer' : ''}`} onClick={() => !secondaryUnlocked && openUnlockFlow()}>
               {Object.entries(continentGroups).map(([continent, citiesList]) => (
                 <div key={continent} className="mb-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mb-2 pl-1">{continent}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/85 mb-2 pl-1">{continent}</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {citiesList.map((c, i) => {
                       const cFlag = getCountryFlag(c.country || "");
@@ -678,28 +696,28 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           key={`${c.city}-${i}`}
                           className="relative rounded-xl p-4 overflow-hidden"
                           style={{
-                            background: "rgba(0,0,0,0.25)",
-                            border: "1px solid rgba(255,255,255,0.12)",
-                            borderLeft: "3px solid rgba(255,255,255,0.2)",
+                            background: "rgba(0,0,0,0.35)",
+                            border: "1px solid rgba(255,255,255,0.18)",
+                            borderLeft: "3px solid rgba(255,255,255,0.3)",
                           }}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-base">{cFlag}</span>
-                            <span className="text-[10px] text-white/50 uppercase tracking-wider">{c.continent || c.country}</span>
+                            <span className="text-[10px] text-white/80 uppercase tracking-wider">{c.continent || c.country}</span>
                           </div>
-                          <p className={`text-white/90 font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
+                          <p className={`text-white font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
                             {c.city || c.display_name}
                           </p>
                           {c.lat != null && (
-                            <p className={`text-white/35 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
+                            <p className={`text-white/70 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
                               {secondaryUnlocked ? `${c.lat?.toFixed(2)}°, ${c.lon?.toFixed(2)}°` : `${c.lat?.toFixed(0)}°, ?????`}
                             </p>
                           )}
                           <div className="absolute top-3 right-3">
                             {secondaryUnlocked ? (
-                              <MapPin className="w-3.5 h-3.5 text-white/30" />
+                              <MapPin className="w-3.5 h-3.5 text-white/60" />
                             ) : (
-                              <Lock className="w-3.5 h-3.5 text-white/25" />
+                              <Lock className="w-3.5 h-3.5 text-white/50" />
                             )}
                           </div>
                         </div>
@@ -826,46 +844,46 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           >
                             {houseNum}
                           </span>
-                          <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider" style={{ color: `rgb(${hAccent})` }}>Casa {houseNum}</p>
+                          <p className="font-cinzel text-[11px] font-bold uppercase tracking-wider text-white/80">Casa {houseNum}</p>
                         </div>
-                        <p className="font-bold text-base mt-1" style={{ color: `rgb(${hAccent})` }}>{hData?.label}</p>
-                        <p className="text-white/70 text-[10px] mt-0.5">{archetype} · {sign}</p>
-                        <p className="text-white/70 text-[10px] mt-0.5">{hData?.regente}</p>
+                        <p className="font-bold text-base mt-1 text-white">{hData?.label}</p>
+                        <p className="text-white/80 text-[10px] mt-0.5">{archetype} · {sign}</p>
+                        <p className="text-white/80 text-[10px] mt-0.5">{hData?.regente}</p>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {hData?.tags.map((tag) => (
-                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.8)" }}>
+                        <span key={tag} className="text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.95)" }}>
                           {tag}
                         </span>
                       ))}
                     </div>
 
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-white/50 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
-                      <span className="text-white/85 text-[10px]">{hData?.cristal}</span>
+                      <span className="text-white/75 text-[10px] uppercase tracking-[0.18em]">Cristal:</span>
+                      <span className="text-white text-[10px] font-medium">{hData?.cristal}</span>
                     </div>
 
                     {/* City with flag */}
                     {isUnlocked && houseCity && (
-                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                         <div className="flex items-center gap-2.5">
                           {houseCityFlag && <span className="text-lg leading-none">{houseCityFlag}</span>}
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-semibold text-sm truncate">{houseCity.city || houseCity.display_name}</p>
-                            <p className="text-white/50 text-[10px]">{houseCity.country}</p>
+                            <p className="text-white/80 text-[10px]">{houseCity.country}</p>
                           </div>
-                          <MapPin className="w-3.5 h-3.5 text-white/30 shrink-0" />
+                          <MapPin className="w-3.5 h-3.5 text-white/60 shrink-0" />
                         </div>
                       </div>
                     )}
 
                     {isUnlocked && !houseCity && !isCurrentHouse && (
-                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                      <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                         <div className="flex items-center gap-2">
-                          <Eye className="w-3.5 h-3.5 text-white/40" />
-                          <span className="text-white/50 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
+                          <Eye className="w-3.5 h-3.5 text-white/70" />
+                          <span className="text-white/80 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
                         </div>
                       </div>
                     )}
