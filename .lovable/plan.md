@@ -1,59 +1,59 @@
+## Objetivo
 
+Duas mudanças visuais pontuais e cirúrgicas — sem mexer em lógica, créditos, API ou no visual da Casa Escolhida.
 
-## Plano: Trazer o Visual Premium para a Página de Histórico
+---
 
-### Diagnóstico
+### 1. Grid "Explorar todas as casas" passa de 4 → 3 colunas
 
-A página `/dashboard?id=...` (histórico de "Meus Mapas") usa componentes diferentes da home:
-- **Home (busca nova)**: usa `DestinyResults.tsx` — já refatorado, com foto da cidade, glass card, cores vibrantes, alto contraste.
-- **Histórico (Dashboard)**: usa `HouseDetail.tsx` + `HouseCard.tsx` — **ainda no design antigo**, com texto cinza apagado (`text-foreground/30-60`), sem foto da cidade, sem cores por casa, sem clima/Wikipedia.
+Hoje o grid das 12 casas no desktop fica em 4 colunas, deixando os cards apertados e a tipografia espremida (especialmente o nome da casa + arquétipo + signo + cristal). Com 3 colunas, cada card ganha cerca de 33% mais largura e a leitura fica muito mais elegante.
 
-Por isso o usuário sente que "tinha tudo isso antes e agora ficou ruim" — na verdade, o histórico nunca recebeu o visual premium.
+**Breakpoints novos:**
+- Mobile: **2 colunas** (igual hoje)
+- Tablet (sm): **3 colunas**
+- Desktop (lg): **3 colunas** (era 4)
 
-### Solução
+**Locais que mudam (3 ocorrências):**
+- `src/components/DestinyResults.tsx` linha 752 — grid principal das 12 casas
+- `src/components/DestinyResults.tsx` linha 691 — grid de mapeamento global
+- `src/pages/Dashboard.tsx` linha 364 — grid das 12 casas no histórico
 
-Aplicar o mesmo sistema visual do `DestinyResults.tsx` aos dois componentes do dashboard, mantendo a lógica intacta (créditos, desbloqueio, dados).
+Tudo trocando `lg:grid-cols-4` por `lg:grid-cols-3` (e ajustando `sm:grid-cols-3` onde faltar).
 
-### Mudanças
+---
 
-#### 1. `HouseDetail.tsx` — Refatoração visual completa
-- **Hero**: fundo sólido da casa (`HOUSE_SOLID_COLORS`) com gradiente + watermark do número da casa, ao invés do `houseColors` gradient antigo.
-- **Glass card**: envolver conteúdo em `bg-black/40 backdrop-blur-xl border-white/15`.
-- **Foto da cidade**: adicionar imagem grande (`h-64 object-cover`) na seção do destino principal, com overlay escuro no rodapé para legibilidade.
-- **Contraste**: substituir todos os `text-foreground/30-60` por `text-white/90` (corpo) e `text-white` (títulos). Eliminar texto colorido sobre fundo escuro.
-- **Cores decorativas**: usar `HOUSE_ACCENT_RGB` (cores vibrantes) só para ícones, bordas, badges e o nome do arquétipo — nunca para texto longo.
-- **Seções (Leitura, Sombra, Promessa, Áreas, Benefício/Ideal, Radar)**: padronizar com `bg-black/30 border-white/15`, labels coloridos com accent vibrante, corpo em branco/off-white.
-- **Bandeira do país** ao lado do nome da cidade no destino principal.
+### 2. Nova curadoria de fotos das cidades
 
-#### 2. `HouseCard.tsx` — Cards do grid das 12 casas
-- Borda esquerda colorida pelo elemento da casa (Fogo/Terra/Ar/Água via `ELEMENT_COLORS`).
-- Fundo `bg-black/40` ao invés do gradient leve atual; melhor contraste do texto.
-- Nome da casa em `text-white font-bold`, label em `text-white/90`, metadados em `text-white/70` (não mais `/50`).
-- Badge "Casa-alvo" com cor vibrante da casa.
-- Estado bloqueado: blur + cadeado discreto (manter atual mas refinar).
-- Estado selecionado: ring na cor accent da casa (não mais dourado genérico).
+Substituir as URLs do Unsplash atuais por fotos mais icônicas, identificáveis e de melhor enquadramento horizontal (ideais para o card 16:9 da seção "Sobre"). Foco em imagens que mostrem o **skyline reconhecível** da cidade (não fotos genéricas de rua ou close-up de monumentos).
 
-#### 3. Reutilizar tokens do `DestinyResults.tsx`
-- Extrair `HOUSE_SOLID_COLORS`, `HOUSE_ACCENT_RGB`, `ELEMENT_COLORS`, `CITY_IMAGES`, `getCityImage` para um novo arquivo compartilhado: **`src/lib/houseTheme.ts`**.
-- Importar em `DestinyResults.tsx`, `HouseDetail.tsx` e `HouseCard.tsx` para garantir consistência visual em todo o app.
+**Critérios da nova curadoria:**
+- Skyline / vista aérea / cartão-postal universalmente reconhecível
+- Boa iluminação (golden hour ou luz natural intensa)
+- Composição horizontal limpa, sem texto sobreposto
+- Cores vibrantes que combinem com o tom premium do app
 
-### Arquivos modificados
+**Cidades que serão revisadas (~60 entradas):**
+São Paulo, Rio de Janeiro, Nova Iorque, Paris, Londres, Tóquio, Dubai, Roma, Barcelona, Miami, Bali, Singapura, Amsterdam, Sydney, Berlim, Buenos Aires, Istambul, Lisboa, Cusco, Santorini, Florianópolis, Salvador, Auckland, Bangkok, Bora Bora, Fernando de Noronha, Praga, Viena, Moscou, Cairo, Marrakech, Hong Kong, Seul, Madri, Atenas, Zurique, Vancouver, Toronto, Cidade do México, Bogotá, Lima, Santiago, Montevidéu, Los Angeles + variações em inglês/português.
 
-| Arquivo | Mudança |
-|---|---|
-| `src/lib/houseTheme.ts` | **NOVO** — tokens compartilhados (cores sólidas, accents vibrantes, cores por elemento, fotos das cidades) |
-| `src/components/HouseDetail.tsx` | Hero com fundo sólido, foto da cidade, glass card, contraste branco, cores accent decorativas |
-| `src/components/HouseCard.tsx` | Borda colorida por elemento, fundo escuro, texto branco legível, badge alvo na cor da casa |
-| `src/components/DestinyResults.tsx` | Trocar tokens locais pelos imports do `houseTheme.ts` (sem mudança visual) |
+**Local:** `src/components/DestinyResults.tsx`, constante `CITY_IMAGES` (linhas 103–166) e `FALLBACK_IMAGE` (linha 167).
+
+A função `getCityImage()` continua igual — só os valores mudam.
+
+---
 
 ### O que NÃO muda
 
-- `Dashboard.tsx` (estrutura, lógica, fluxo)
-- Sistema de créditos e desbloqueio
-- `houses.ts`, `houseMeta.ts`, dados
-- Banco / API / Supabase
+- Lógica de créditos e desbloqueio
+- Integração com Wikipedia, clima, API Flask
+- Componente `HouseCard.tsx` (estrutura interna)
+- Cores das casas, cristais, arquétipos
+- Visual da Casa Escolhida (hero, glass card, foto da cidade na seção "Sobre")
+- Banco / Supabase / edge functions
+
+---
 
 ### Resultado esperado
 
-O histórico em `/dashboard?id=...` ficará visualmente idêntico ao `DestinyResults.tsx` da home — foto deslumbrante da cidade, fundo sólido com a cor da casa, texto branco perfeitamente legível, cores vibrantes apenas em elementos decorativos, grid das 12 casas com bordas por elemento. Zero texto cinza sobre fundo escuro.
-
+- Cards das 12 casas com respiro adequado, tipografia legível e proporção mais nobre
+- Fotos das cidades reconhecíveis à primeira vista — São Paulo como São Paulo, Paris como Paris
+- Zero mudança em comportamento, créditos ou fluxo

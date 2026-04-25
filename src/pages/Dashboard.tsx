@@ -361,7 +361,7 @@ const Dashboard = () => {
         </AnimatePresence>
 
         {/* Houses Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4 mb-12">
           {Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).map((houseNum) => {
             const house = cityDatabase[houseNum];
             const result = getHouseResult(houseNum);
