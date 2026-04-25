@@ -1,67 +1,59 @@
+## Objetivo
 
-Objetivo
+Duas mudanças visuais pontuais e cirúrgicas — sem mexer em lógica, créditos, API ou no visual da Casa Escolhida.
 
-Sim — concordo. O problema não é só “escuro demais”: hoje a página mistura cor escura de identidade com cor de leitura. Vou corrigir isso na raiz para que nenhum texto importante fique escuro sobre fundo escuro ou claro demais sobre imagem clara.
+---
 
-Diagnóstico encontrado
+### 1. Grid "Explorar todas as casas" passa de 4 → 3 colunas
 
-- Em `src/components/DestinyResults.tsx`, vários títulos/labels usam `rgb(${accentColor})`.
-- Esse `accentColor` vem de `extractAccentColor()` lendo `houseColors` em `src/data/houses.ts`.
-- Algumas casas geram acentos naturalmente escuros (azul profundo, roxo escuro, verde fechado), mas essas cores estão sendo usadas em texto.
-- Além disso, há muitos textos em `text-white/40`, `text-white/50` e `text-white/60`, que ficam fracos demais sobre cards escuros/translúcidos.
-- Na foto da seção “Sobre”, o título ainda compete com a imagem porque a cor de destaque está sendo aplicada direto sobre a foto.
+Hoje o grid das 12 casas no desktop fica em 4 colunas, deixando os cards apertados e a tipografia espremida (especialmente o nome da casa + arquétipo + signo + cristal). Com 3 colunas, cada card ganha cerca de 33% mais largura e a leitura fica muito mais elegante.
 
-Plano
+**Breakpoints novos:**
+- Mobile: **2 colunas** (igual hoje)
+- Tablet (sm): **3 colunas**
+- Desktop (lg): **3 colunas** (era 4)
 
-1. Separar cor decorativa de cor legível
-- Criar uma paleta semântica por casa dentro de `DestinyResults.tsx`:
-  - fundo sólido da casa
-  - cor vibrante/clara para bordas, ícones e badges
-  - branco/off-white para todo texto principal
-- Parar de usar a cor extraída do gradiente como cor de leitura.
+**Locais que mudam (3 ocorrências):**
+- `src/components/DestinyResults.tsx` linha 752 — grid principal das 12 casas
+- `src/components/DestinyResults.tsx` linha 691 — grid de mapeamento global
+- `src/pages/Dashboard.tsx` linha 364 — grid das 12 casas no histórico
 
-2. Aplicar regra dura de contraste
-- `Casa N`, nome da cidade, país, descrições, rituais, previsões e textos da Wikipedia ficarão sempre em branco/off-white.
-- A cor da casa ficará reservada para:
-  - ícones
-  - selos
-  - bordas
-  - número da casa
-  - badge “Casa-alvo”
+Tudo trocando `lg:grid-cols-4` por `lg:grid-cols-3` (e ajustando `sm:grid-cols-3` onde faltar).
 
-3. Corrigir a seção “Sobre”
-- Manter a foto da cidade nessa seção, antes do texto.
-- Reforçar o overlay escuro da imagem para criar contraste real.
-- Colocar “Sobre [Cidade]” em branco.
-- Usar a cor da casa só como chip/linha de destaque, nunca como texto principal em cima da foto.
+---
 
-4. Dar mais destaque aos nomes das casas
-- No grid 1–12:
-  - nome da casa em branco, maior e mais forte
-  - número/selo/barra lateral com a cor da casa
-  - signo, arquétipo e metadados em off-white legível
-- A casa selecionada continua destacada, mas sem depender de texto colorido escuro.
+### 2. Nova curadoria de fotos das cidades
 
-5. Ajustar todos os textos secundários apagados
-- Subir contraste de coordenadas, país, continente, cristal, descrições do modal e textos auxiliares.
-- Remover usos excessivos de `text-white/40-60` nessa página.
+Substituir as URLs do Unsplash atuais por fotos mais icônicas, identificáveis e de melhor enquadramento horizontal (ideais para o card 16:9 da seção "Sobre"). Foco em imagens que mostrem o **skyline reconhecível** da cidade (não fotos genéricas de rua ou close-up de monumentos).
 
-Detalhes técnicos
+**Critérios da nova curadoria:**
+- Skyline / vista aérea / cartão-postal universalmente reconhecível
+- Boa iluminação (golden hour ou luz natural intensa)
+- Composição horizontal limpa, sem texto sobreposto
+- Cores vibrantes que combinem com o tom premium do app
 
-- Arquivo principal: `src/components/DestinyResults.tsx`
-- Mudanças-chave:
-  - substituir texto crítico hoje colorido por `text-white`/`text-white/90`
-  - criar tokens visuais por casa para separar identidade visual de legibilidade
-  - reforçar o overlay da foto na seção “Sobre”
-  - revisar labels do hero, cards internos, grid das casas, mapeamento global e modal
-- Não muda:
-  - lógica de unlock
-  - créditos
-  - integração com clima/Wikipedia
-  - estrutura do fluxo
+**Cidades que serão revisadas (~60 entradas):**
+São Paulo, Rio de Janeiro, Nova Iorque, Paris, Londres, Tóquio, Dubai, Roma, Barcelona, Miami, Bali, Singapura, Amsterdam, Sydney, Berlim, Buenos Aires, Istambul, Lisboa, Cusco, Santorini, Florianópolis, Salvador, Auckland, Bangkok, Bora Bora, Fernando de Noronha, Praga, Viena, Moscou, Cairo, Marrakech, Hong Kong, Seul, Madri, Atenas, Zurique, Vancouver, Toronto, Cidade do México, Bogotá, Lima, Santiago, Montevidéu, Los Angeles + variações em inglês/português.
 
-Resultado esperado
+**Local:** `src/components/DestinyResults.tsx`, constante `CITY_IMAGES` (linhas 103–166) e `FALLBACK_IMAGE` (linha 167).
 
-- zero texto escuro sobre fundo escuro
-- foto da cidade continua bonita, mas sem brigar com o conteúdo
-- a Casa Escolhida continua com personalidade própria, só que muito mais legível e elegante
+A função `getCityImage()` continua igual — só os valores mudam.
+
+---
+
+### O que NÃO muda
+
+- Lógica de créditos e desbloqueio
+- Integração com Wikipedia, clima, API Flask
+- Componente `HouseCard.tsx` (estrutura interna)
+- Cores das casas, cristais, arquétipos
+- Visual da Casa Escolhida (hero, glass card, foto da cidade na seção "Sobre")
+- Banco / Supabase / edge functions
+
+---
+
+### Resultado esperado
+
+- Cards das 12 casas com respiro adequado, tipografia legível e proporção mais nobre
+- Fotos das cidades reconhecíveis à primeira vista — São Paulo como São Paulo, Paris como Paris
+- Zero mudança em comportamento, créditos ou fluxo
