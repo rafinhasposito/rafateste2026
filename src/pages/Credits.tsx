@@ -3,50 +3,21 @@ import StarryBackground from "@/components/StarryBackground";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Lock, Unlock, Map } from "lucide-react";
+import { usePricing, type PricingItem } from "@/hooks/usePricing";
+import { toast } from "sonner";
 
-const PACKAGES = [
-  {
-    id: "basic",
-    name: "Descoberta",
-    credits: 1,
-    price: "29,90",
-    houses: "1 Casa",
-    description: "Veja a casa mais importante para o seu objetivo",
-    highlight: false,
-  },
-  {
-    id: "plus",
-    name: "Expansão",
-    credits: 2,
-    price: "49,90",
-    houses: "3 Casas",
-    description: "Desbloqueie 3 casas e descubra rotas alternativas",
-    highlight: true,
-  },
-  {
-    id: "premium",
-    name: "Mapa Completo",
-    credits: 3,
-    price: "79,90",
-    houses: "12 Casas",
-    description: "Acesso total a todas as 12 casas do seu mapa estelar",
-    highlight: false,
-  },
-];
-
-const UNLOCK_TABLE = [
-  { label: "+1 Casa", credits: 1, desc: "Desbloqueia 1 casa adicional no seu mapa", icon: Lock },
-  { label: "+3 Casas", credits: 2, desc: "Desbloqueia 3 casas adicionais", icon: Unlock },
-  { label: "Mapa Completo", credits: 3, desc: "Todas as 12 casas reveladas de uma vez", icon: Map },
-];
+const ICONS: Record<string, any> = { cost_house_1: Lock, cost_house_3: Unlock, cost_full_map: Map, cost_city: Map };
 
 const Credits = () => {
-  const { profile, user } = useAuth();
+  const { profile } = useAuth();
   const navigate = useNavigate();
+  const { packages, costs, loading } = usePricing();
 
-  const handlePurchase = (pkg: typeof PACKAGES[0]) => {
-    alert(`Pagamento de R$${pkg.price} para ${pkg.credits} crédito(s) será integrado com Stripe em breve.`);
+  const handlePurchase = (pkg: PricingItem) => {
+    toast.info(`Pagamento de R$ ${pkg.price_brl?.toFixed(2)} para ${pkg.credits} crédito(s) será integrado em breve.`);
   };
+  const fmt = (n: number | null) => n == null ? ["0", "00"] : n.toFixed(2).split(".");
+  const housesLabel = (c: number) => c === 1 ? "1 Casa" : c === 2 ? "3 Casas" : "12 Casas";
 
   return (
     <>
@@ -79,58 +50,45 @@ const Credits = () => {
         </motion.div>
 
         {/* Packages Grid */}
+        {loading ? (
+          <p className="text-muted-foreground text-center text-sm">Carregando pacotes…</p>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {PACKAGES.map((pkg, i) => (
+          {packages.map((pkg, i) => {
+            const highlight = i === 1;
+            const [int, dec] = fmt(pkg.price_brl);
+            return (
             <motion.div
-              key={pkg.id}
+              key={pkg.key}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`glass-panel p-8 text-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${
-                pkg.highlight
-                  ? "border-primary/40 shadow-[0_0_40px_hsl(var(--gold)/0.15)]"
-                  : ""
-              }`}
+              className={`glass-panel p-8 text-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${highlight ? "border-primary/40 shadow-[0_0_40px_hsl(var(--gold)/0.15)]" : ""}`}
             >
-              {pkg.highlight && (
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-dark via-primary to-gold-light" />
-              )}
-
+              {highlight && (<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-dark via-primary to-gold-light" />)}
               <div className="mb-4">
-                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-space">{pkg.houses}</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-space">{housesLabel(pkg.credits)}</span>
               </div>
-
-              <h3 className="font-cinzel text-xl font-bold text-foreground mb-2 uppercase tracking-wider">
-                {pkg.name}
-              </h3>
-
-              <p className="text-muted-foreground text-xs font-light mb-6 min-h-[2.5rem]">
-                {pkg.description}
-              </p>
-
+              <h3 className="font-cinzel text-xl font-bold text-foreground mb-2 uppercase tracking-wider">{pkg.label}</h3>
+              <p className="text-muted-foreground text-xs font-light mb-6 min-h-[2.5rem]">{pkg.description}</p>
               <div className="mb-6">
                 <span className="text-muted-foreground text-xs">R$</span>
-                <span className="text-foreground font-cinzel text-4xl font-bold mx-1">{pkg.price.split(",")[0]}</span>
-                <span className="text-muted-foreground text-sm">,{pkg.price.split(",")[1]}</span>
+                <span className="text-foreground font-cinzel text-4xl font-bold mx-1">{int}</span>
+                <span className="text-muted-foreground text-sm">,{dec}</span>
               </div>
-
               <div className="mb-6 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
                 {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}
               </div>
-
               <button
                 onClick={() => handlePurchase(pkg)}
-                className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${
-                  pkg.highlight
-                    ? "bg-primary text-background hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)]"
-                    : "bg-secondary text-foreground hover:bg-secondary/80"
-                }`}
+                className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${highlight ? "bg-primary text-background hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)]" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
               >
                 Comprar
               </button>
             </motion.div>
-          ))}
+          );})}
         </div>
+        )}
 
         {/* Unlock Pricing Table */}
         <motion.div
@@ -142,17 +100,17 @@ const Credits = () => {
           <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-6 text-center">
             Quanto Custa Cada Desbloqueio
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            {UNLOCK_TABLE.map((item) => {
-              const Icon = item.icon;
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            {costs.map((item) => {
+              const Icon = ICONS[item.key] || Map;
               return (
-                <div key={item.label} className="p-5 rounded-xl border border-primary/15 bg-card/40 backdrop-blur-sm text-center">
+                <div key={item.key} className="p-5 rounded-xl border border-primary/15 bg-card/40 backdrop-blur-sm text-center">
                   <div className="w-10 h-10 rounded-full border border-primary/30 bg-primary/10 flex items-center justify-center mx-auto mb-3">
                     <Icon className="w-4 h-4 text-primary" />
                   </div>
                   <p className="font-cinzel text-sm font-bold text-foreground mb-1">{item.label}</p>
                   <p className="text-primary font-bold text-lg">{item.credits} crédito{item.credits > 1 ? "s" : ""}</p>
-                  <p className="text-muted-foreground text-[10px] mt-1">{item.desc}</p>
+                  <p className="text-muted-foreground text-[10px] mt-1">{item.description}</p>
                 </div>
               );
             })}
