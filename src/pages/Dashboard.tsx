@@ -288,57 +288,78 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-primary/15 bg-primary/5 mb-4">
-            <div className={`w-1.5 h-1.5 rounded-full ${modeDot} animate-pulse`} />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-primary">{modeLabel}</span>
-          </div>
-          <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-2 uppercase tracking-wider">
-            Revolução Solar {consultation.year}
-          </h1>
-          <p className="text-muted-foreground text-sm font-light">{consultation.name}</p>
+        {/* Header — Consultation Summary Card (mirrors History) */}
+        {(() => {
+          const isPast = currentMode === "passado";
+          const accent = extractAccentColor(goalHouse);
+          const searchType = inferSearchType(consultation);
+          const SearchIcon = searchType.Icon;
+          const houseLabel = goalHouse ? cityDatabase[goalHouse]?.label : null;
+          const dt = new Date(consultation.created_at);
+          const formattedDate = dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+          const formattedTime = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
-          {/* Origin city + house highlight */}
-          {goalHouse && (
-            <div className="mt-4 inline-flex flex-col items-center gap-2 px-6 py-4 rounded-2xl border border-primary/20 bg-primary/5 backdrop-blur-sm">
-              {consultation.origin && (
-                <p className="text-foreground/80 text-sm font-light">
-                  {currentMode === "passado"
-                    ? `Você passou o aniversário em ${consultation.origin}`
-                    : currentMode === "presente"
-                      ? `Seu aniversário será em ${consultation.origin}`
-                      : `Cidade atual: ${consultation.origin}`}
-                </p>
-              )}
-              {/* Show destination city for goal house */}
-              {(() => {
-                const goalResult = goalHouse ? getHouseResult(goalHouse) : null;
-                const destCity = goalResult?.city?.city;
-                const destCountry = goalResult?.city?.country;
-                if (destCity && currentMode !== "passado") {
-                  return (
-                    <p className="text-primary/80 text-xs font-medium mt-1">
-                      Destino Principal: {destCity}, {destCountry}
-                    </p>
-                  );
-                }
-                return null;
-              })()}
-              <p className="text-primary font-cinzel text-base font-bold uppercase tracking-wider">
-                {currentMode === "passado"
-                  ? `A energia caiu na Casa ${goalHouse}`
-                  : `Casa-alvo: ${goalHouse}`}
-                {" — "}{cityDatabase[goalHouse]?.label}
-              </p>
-              <p className="text-foreground/50 text-[11px] leading-relaxed max-w-md text-center">
-                {currentMode === "passado"
-                  ? `Naquele ciclo, a cidade ${consultation.origin || "escolhida"} posicionou o Sol na Casa ${goalHouse}, ativando a área de ${cityDatabase[goalHouse]?.label?.toLowerCase()}.`
-                  : `Quem ativa a Casa ${goalHouse} foca em ${cityDatabase[goalHouse]?.label?.toLowerCase()}. Escolha uma das cidades e passe 24h no local.`}
-              </p>
-            </div>
-          )}
-        </motion.div>
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-5 md:p-6 mb-8 max-w-3xl mx-auto"
+              style={{ borderLeft: `4px solid rgba(${accent}, 0.6)` }}
+            >
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                    <span className={`text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border ${
+                      isPast
+                        ? "text-amber-400 border-amber-400/30 bg-amber-400/10"
+                        : currentMode === "presente"
+                          ? "text-blue-400 border-blue-400/30 bg-blue-400/10"
+                          : "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
+                    }`}>
+                      {isPast ? "Passado" : currentMode === "presente" ? "Presente" : "Futuro"}
+                    </span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/60 flex items-center gap-1">
+                      <SearchIcon className="w-2.5 h-2.5" />
+                      {searchType.label}
+                    </span>
+                    <span className="text-foreground font-cinzel font-bold text-sm">
+                      Revolução Solar {consultation.year}
+                    </span>
+                  </div>
+
+                  <p className="text-foreground/80 text-sm mb-1">{consultation.name}</p>
+
+                  {goalHouse && houseLabel && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full" style={{ background: `rgb(${accent})` }} />
+                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: `rgb(${accent})` }}>
+                        Casa {goalHouse} — {houseLabel}
+                      </p>
+                    </div>
+                  )}
+
+                  {consultation.origin && (
+                    <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
+                      <MapPin className="w-3 h-3" />
+                      <span className="text-[11px]">{consultation.origin}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 text-muted-foreground text-[11px] shrink-0">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3" />
+                    {formattedDate}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3 h-3" />
+                    {formattedTime}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })()}
 
         {/* Oracle Text */}
         {oracleText && (
