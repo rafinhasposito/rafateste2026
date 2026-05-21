@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Calendar, Clock, MapPin, Compass, Crown, Scroll } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import UserMenu from "@/components/UserMenu";
 import HouseCard from "@/components/HouseCard";
@@ -8,7 +9,7 @@ import HouseDetail from "@/components/HouseDetail";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
-import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast } from "@/data/houses";
+import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast, houseColors } from "@/data/houses";
 
 interface CityOption {
   city: string;
