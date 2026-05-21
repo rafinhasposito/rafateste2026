@@ -1,59 +1,44 @@
-## Objetivo
+## Causa raiz encontrada
 
-Duas mudanças visuais pontuais e cirúrgicas — sem mexer em lógica, créditos, API ou no visual da Casa Escolhida.
+As fotos novas que coloquei no `CITY_IMAGES` **estão lá**, mas nunca aparecem porque o código busca a foto da Wikipedia primeiro. Como Wikipedia quase sempre responde para cidades grandes (Nova York, Paris, São Paulo…), a minha curadoria do Unsplash nunca é usada — só serviria se a Wikipedia falhasse.
 
----
+**Linha problemática (`src/components/DestinyResults.tsx:278`):**
 
-### 1. Grid "Explorar todas as casas" passa de 4 → 3 colunas
+```ts
+const heroImage = wikiData?.originalimage?.source 
+              || wikiData?.thumbnail?.source 
+              || cityImage;  // ← minha curadoria, último na fila
+```
 
-Hoje o grid das 12 casas no desktop fica em 4 colunas, deixando os cards apertados e a tipografia espremida (especialmente o nome da casa + arquétipo + signo + cristal). Com 3 colunas, cada card ganha cerca de 33% mais largura e a leitura fica muito mais elegante.
-
-**Breakpoints novos:**
-- Mobile: **2 colunas** (igual hoje)
-- Tablet (sm): **3 colunas**
-- Desktop (lg): **3 colunas** (era 4)
-
-**Locais que mudam (3 ocorrências):**
-- `src/components/DestinyResults.tsx` linha 752 — grid principal das 12 casas
-- `src/components/DestinyResults.tsx` linha 691 — grid de mapeamento global
-- `src/pages/Dashboard.tsx` linha 364 — grid das 12 casas no histórico
-
-Tudo trocando `lg:grid-cols-4` por `lg:grid-cols-3` (e ajustando `sm:grid-cols-3` onde faltar).
+Resultado: você vê sempre a foto que a Wikipedia escolheu (geralmente o brasão da cidade, um mapa, ou uma foto vertical mal enquadrada), nunca os skylines bonitos que selecionei.
 
 ---
 
-### 2. Nova curadoria de fotos das cidades
+## Correção
 
-Substituir as URLs do Unsplash atuais por fotos mais icônicas, identificáveis e de melhor enquadramento horizontal (ideais para o card 16:9 da seção "Sobre"). Foco em imagens que mostrem o **skyline reconhecível** da cidade (não fotos genéricas de rua ou close-up de monumentos).
+Inverter a prioridade: **minha curadoria primeiro**, Wikipedia só como fallback para cidades fora da lista.
 
-**Critérios da nova curadoria:**
-- Skyline / vista aérea / cartão-postal universalmente reconhecível
-- Boa iluminação (golden hour ou luz natural intensa)
-- Composição horizontal limpa, sem texto sobreposto
-- Cores vibrantes que combinem com o tom premium do app
+**Nova ordem:**
+1. Foto curada do Unsplash (skyline icônico, horizontal, alta qualidade) — para as ~50 cidades principais
+2. Wikipedia (`originalimage` ou `thumbnail`) — para cidades fora da curadoria
+3. Imagem genérica de fallback — caso ambos falhem
 
-**Cidades que serão revisadas (~60 entradas):**
-São Paulo, Rio de Janeiro, Nova Iorque, Paris, Londres, Tóquio, Dubai, Roma, Barcelona, Miami, Bali, Singapura, Amsterdam, Sydney, Berlim, Buenos Aires, Istambul, Lisboa, Cusco, Santorini, Florianópolis, Salvador, Auckland, Bangkok, Bora Bora, Fernando de Noronha, Praga, Viena, Moscou, Cairo, Marrakech, Hong Kong, Seul, Madri, Atenas, Zurique, Vancouver, Toronto, Cidade do México, Bogotá, Lima, Santiago, Montevidéu, Los Angeles + variações em inglês/português.
+**Mudança (1 arquivo, 2 trechos pequenos):**
 
-**Local:** `src/components/DestinyResults.tsx`, constante `CITY_IMAGES` (linhas 103–166) e `FALLBACK_IMAGE` (linha 167).
+`src/components/DestinyResults.tsx`:
+- Adicionar helper `getCuratedCityImage()` que retorna a URL curada **ou null** (em vez de cair no fallback genérico)
+- Linha 278: mudar a ordem para `curated || wikiData?.originalimage || wikiData?.thumbnail || cityImage`
 
-A função `getCityImage()` continua igual — só os valores mudam.
-
----
-
-### O que NÃO muda
-
-- Lógica de créditos e desbloqueio
-- Integração com Wikipedia, clima, API Flask
-- Componente `HouseCard.tsx` (estrutura interna)
-- Cores das casas, cristais, arquétipos
-- Visual da Casa Escolhida (hero, glass card, foto da cidade na seção "Sobre")
-- Banco / Supabase / edge functions
+O texto da seção "Sobre [Cidade]" continua vindo da Wikipedia normalmente — só a **foto** muda de fonte.
 
 ---
 
-### Resultado esperado
+## Resultado esperado
 
-- Cards das 12 casas com respiro adequado, tipografia legível e proporção mais nobre
-- Fotos das cidades reconhecíveis à primeira vista — São Paulo como São Paulo, Paris como Paris
-- Zero mudança em comportamento, créditos ou fluxo
+Cidades como Nova York, Paris, Lisboa, São Paulo, Rio, Tóquio etc. passarão a mostrar os skylines icônicos do Unsplash que selecionei. Cidades pequenas (fora da lista de 50) continuam usando a foto da Wikipedia como antes.
+
+## O que NÃO muda
+
+- Texto/resumo da Wikipedia continua aparecendo
+- Lógica de créditos, desbloqueio, clima
+- Grid das casas, histórico, tudo o resto
