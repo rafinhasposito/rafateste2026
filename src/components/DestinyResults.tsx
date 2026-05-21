@@ -281,7 +281,8 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
   const flag = getCountryFlag(masterCity.country || "");
   const rituals = HOUSE_RITUALS[house] || HOUSE_RITUALS[1];
 
-  const heroImage = wikiData?.originalimage?.source || wikiData?.thumbnail?.source || cityImage;
+  const curated = getCuratedCityImage(cityName);
+  const heroImage = curated || wikiData?.originalimage?.source || wikiData?.thumbnail?.source || cityImage;
 
   const handleUnlock = () => {
     setUnlocked(true);
