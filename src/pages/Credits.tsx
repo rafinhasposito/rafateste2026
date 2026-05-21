@@ -3,50 +3,21 @@ import StarryBackground from "@/components/StarryBackground";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Lock, Unlock, Map } from "lucide-react";
+import { usePricing, type PricingItem } from "@/hooks/usePricing";
+import { toast } from "sonner";
 
-const PACKAGES = [
-  {
-    id: "basic",
-    name: "Descoberta",
-    credits: 1,
-    price: "29,90",
-    houses: "1 Casa",
-    description: "Veja a casa mais importante para o seu objetivo",
-    highlight: false,
-  },
-  {
-    id: "plus",
-    name: "Expansão",
-    credits: 2,
-    price: "49,90",
-    houses: "3 Casas",
-    description: "Desbloqueie 3 casas e descubra rotas alternativas",
-    highlight: true,
-  },
-  {
-    id: "premium",
-    name: "Mapa Completo",
-    credits: 3,
-    price: "79,90",
-    houses: "12 Casas",
-    description: "Acesso total a todas as 12 casas do seu mapa estelar",
-    highlight: false,
-  },
-];
-
-const UNLOCK_TABLE = [
-  { label: "+1 Casa", credits: 1, desc: "Desbloqueia 1 casa adicional no seu mapa", icon: Lock },
-  { label: "+3 Casas", credits: 2, desc: "Desbloqueia 3 casas adicionais", icon: Unlock },
-  { label: "Mapa Completo", credits: 3, desc: "Todas as 12 casas reveladas de uma vez", icon: Map },
-];
+const ICONS: Record<string, any> = { cost_house_1: Lock, cost_house_3: Unlock, cost_full_map: Map, cost_city: Map };
 
 const Credits = () => {
-  const { profile, user } = useAuth();
+  const { profile } = useAuth();
   const navigate = useNavigate();
+  const { packages, costs, loading } = usePricing();
 
-  const handlePurchase = (pkg: typeof PACKAGES[0]) => {
-    alert(`Pagamento de R$${pkg.price} para ${pkg.credits} crédito(s) será integrado com Stripe em breve.`);
+  const handlePurchase = (pkg: PricingItem) => {
+    toast.info(`Pagamento de R$ ${pkg.price_brl?.toFixed(2)} para ${pkg.credits} crédito(s) será integrado em breve.`);
   };
+  const fmt = (n: number | null) => n == null ? ["0", "00"] : n.toFixed(2).split(".");
+  const housesLabel = (c: number) => c === 1 ? "1 Casa" : c === 2 ? "3 Casas" : "12 Casas";
 
   return (
     <>
