@@ -181,6 +181,12 @@ function getCityImage(cityName: string): string {
   return FALLBACK_IMAGE;
 }
 
+/** Returns curated Unsplash image only if we have one for this city, else null. */
+function getCuratedCityImage(cityName: string): string | null {
+  const key = cityName.toLowerCase().trim();
+  return CITY_IMAGES[key] ?? null;
+}
+
 const HOUSE_RITUALS: Record<number, string[]> = {
   1: ["Ao nascer do sol, declare em voz alta suas intenções para o novo ciclo.", "Acenda uma vela vermelha e visualize-se como o protagonista absoluto da sua história."],
   2: ["Carregue uma moeda de ouro ou pirita no bolso durante todo o dia.", "Escreva em papel dourado as 3 metas financeiras que deseja materializar neste ciclo."],
