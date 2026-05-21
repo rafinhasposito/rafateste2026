@@ -50,58 +50,45 @@ const Credits = () => {
         </motion.div>
 
         {/* Packages Grid */}
+        {loading ? (
+          <p className="text-muted-foreground text-center text-sm">Carregando pacotes…</p>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {PACKAGES.map((pkg, i) => (
+          {packages.map((pkg, i) => {
+            const highlight = i === 1;
+            const [int, dec] = fmt(pkg.price_brl);
+            return (
             <motion.div
-              key={pkg.id}
+              key={pkg.key}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`glass-panel p-8 text-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${
-                pkg.highlight
-                  ? "border-primary/40 shadow-[0_0_40px_hsl(var(--gold)/0.15)]"
-                  : ""
-              }`}
+              className={`glass-panel p-8 text-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${highlight ? "border-primary/40 shadow-[0_0_40px_hsl(var(--gold)/0.15)]" : ""}`}
             >
-              {pkg.highlight && (
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-dark via-primary to-gold-light" />
-              )}
-
+              {highlight && (<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-dark via-primary to-gold-light" />)}
               <div className="mb-4">
-                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-space">{pkg.houses}</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-space">{housesLabel(pkg.credits)}</span>
               </div>
-
-              <h3 className="font-cinzel text-xl font-bold text-foreground mb-2 uppercase tracking-wider">
-                {pkg.name}
-              </h3>
-
-              <p className="text-muted-foreground text-xs font-light mb-6 min-h-[2.5rem]">
-                {pkg.description}
-              </p>
-
+              <h3 className="font-cinzel text-xl font-bold text-foreground mb-2 uppercase tracking-wider">{pkg.label}</h3>
+              <p className="text-muted-foreground text-xs font-light mb-6 min-h-[2.5rem]">{pkg.description}</p>
               <div className="mb-6">
                 <span className="text-muted-foreground text-xs">R$</span>
-                <span className="text-foreground font-cinzel text-4xl font-bold mx-1">{pkg.price.split(",")[0]}</span>
-                <span className="text-muted-foreground text-sm">,{pkg.price.split(",")[1]}</span>
+                <span className="text-foreground font-cinzel text-4xl font-bold mx-1">{int}</span>
+                <span className="text-muted-foreground text-sm">,{dec}</span>
               </div>
-
               <div className="mb-6 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
                 {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}
               </div>
-
               <button
                 onClick={() => handlePurchase(pkg)}
-                className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${
-                  pkg.highlight
-                    ? "bg-primary text-background hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)]"
-                    : "bg-secondary text-foreground hover:bg-secondary/80"
-                }`}
+                className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${highlight ? "bg-primary text-background hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)]" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
               >
                 Comprar
               </button>
             </motion.div>
-          ))}
+          );})}
         </div>
+        )}
 
         {/* Unlock Pricing Table */}
         <motion.div
@@ -113,17 +100,17 @@ const Credits = () => {
           <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-6 text-center">
             Quanto Custa Cada Desbloqueio
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            {UNLOCK_TABLE.map((item) => {
-              const Icon = item.icon;
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            {costs.map((item) => {
+              const Icon = ICONS[item.key] || Map;
               return (
-                <div key={item.label} className="p-5 rounded-xl border border-primary/15 bg-card/40 backdrop-blur-sm text-center">
+                <div key={item.key} className="p-5 rounded-xl border border-primary/15 bg-card/40 backdrop-blur-sm text-center">
                   <div className="w-10 h-10 rounded-full border border-primary/30 bg-primary/10 flex items-center justify-center mx-auto mb-3">
                     <Icon className="w-4 h-4 text-primary" />
                   </div>
                   <p className="font-cinzel text-sm font-bold text-foreground mb-1">{item.label}</p>
                   <p className="text-primary font-bold text-lg">{item.credits} crédito{item.credits > 1 ? "s" : ""}</p>
-                  <p className="text-muted-foreground text-[10px] mt-1">{item.desc}</p>
+                  <p className="text-muted-foreground text-[10px] mt-1">{item.description}</p>
                 </div>
               );
             })}
