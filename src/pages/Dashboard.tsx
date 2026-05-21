@@ -252,8 +252,6 @@ const Dashboard = () => {
   const lockedCount = Math.max(0, TOTAL_HOUSES - consultation.houses_unlocked);
   const credits = profile?.credits ?? 0;
 
-  const modeLabel = currentMode === "passado" ? "Análise do Passado" : currentMode === "presente" ? "Momento Presente" : "Previsão Futura";
-  const modeDot = currentMode === "passado" ? "bg-amber-400" : currentMode === "presente" ? "bg-blue-400" : "bg-emerald-400";
 
   const oracleText = consultation.result?.oraculo
     || (goalHouse
