@@ -1,44 +1,67 @@
-## Causa raiz encontrada
+## Diagnóstico
 
-As fotos novas que coloquei no `CITY_IMAGES` **estão lá**, mas nunca aparecem porque o código busca a foto da Wikipedia primeiro. Como Wikipedia quase sempre responde para cidades grandes (Nova York, Paris, São Paulo…), a minha curadoria do Unsplash nunca é usada — só serviria se a Wikipedia falhasse.
+O banco de dados está **vazio**. O código já chama `profiles`, `consultations` e `credit_transactions` em vários lugares, mas essas tabelas nunca foram criadas — por isso créditos, histórico e compras estão quebrados hoje. Preços e custos por ação estão **hardcoded** em `src/pages/Credits.tsx` e nos componentes Lookup.
 
-**Linha problemática (`src/components/DestinyResults.tsx:278`):**
+## O que vou construir
 
-```ts
-const heroImage = wikiData?.originalimage?.source 
-              || wikiData?.thumbnail?.source 
-              || cityImage;  // ← minha curadoria, último na fila
-```
+### 1. Banco de dados (1 migration)
 
-Resultado: você vê sempre a foto que a Wikipedia escolheu (geralmente o brasão da cidade, um mapa, ou uma foto vertical mal enquadrada), nunca os skylines bonitos que selecionei.
+**Tabelas novas:**
+- `profiles` — `user_id`, `display_name`, `avatar_url`, `credits` (default 1 crédito de boas-vindas), timestamps
+- `user_roles` — `user_id`, `role` (enum: `admin` | `user`). Tabela separada por segurança (impede escalada de privilégio)
+- `consultations` — histórico de buscas: `user_id`, `query_type` (city/house/intent), `query_data` jsonb, `results` jsonb, `credits_spent`
+- `credit_transactions` — extrato: `user_id`, `amount` (+/-), `type` (purchase/spend/admin_grant), `description`
+- `pricing_config` — configuração editável de pacotes e custos por ação. Linhas: `package_1cr`, `package_2cr`, `package_3cr`, `cost_city`, `cost_house_1`, `cost_house_3`, `cost_full_map`. Cada uma com `label`, `credits`, `price_brl`, `description`, `active`
 
----
+**Função de segurança:** `has_role(user_id, role)` SECURITY DEFINER para usar em RLS sem recursão
 
-## Correção
+**Trigger:** ao criar usuário em `auth.users`, cria automaticamente `profiles` com 1 crédito grátis e papel `user`
 
-Inverter a prioridade: **minha curadoria primeiro**, Wikipedia só como fallback para cidades fora da lista.
+**RLS:**
+- `profiles` / `consultations` / `credit_transactions`: usuário vê só os próprios; admin vê todos
+- `user_roles`: usuário vê o próprio papel; só admin altera
+- `pricing_config`: leitura pública (frontend precisa pra exibir preços); escrita só admin
 
-**Nova ordem:**
-1. Foto curada do Unsplash (skyline icônico, horizontal, alta qualidade) — para as ~50 cidades principais
-2. Wikipedia (`originalimage` ou `thumbnail`) — para cidades fora da curadoria
-3. Imagem genérica de fallback — caso ambos falhem
+### 2. Login (Google + Email/Senha)
 
-**Mudança (1 arquivo, 2 trechos pequenos):**
+- Mantém Google (já funciona)
+- Adiciona formulário Email/Senha em `/auth` com abas "Entrar" e "Criar conta"
+- Página nova `/reset-password` para recuperação de senha
+- Auto-confirm desligado (usuário precisa verificar email — padrão seguro)
+- Loga ouvinte `onAuthStateChange` antes de `getSession()` no `useAuth`
 
-`src/components/DestinyResults.tsx`:
-- Adicionar helper `getCuratedCityImage()` que retorna a URL curada **ou null** (em vez de cair no fallback genérico)
-- Linha 278: mudar a ordem para `curated || wikiData?.originalimage || wikiData?.thumbnail || cityImage`
+### 3. Painel Admin `/admin`
 
-O texto da seção "Sobre [Cidade]" continua vindo da Wikipedia normalmente — só a **foto** muda de fonte.
+Rota protegida (só usuários com role `admin` entram). Três abas:
 
----
+- **Preços & Custos**: edita os 7 itens de `pricing_config` (pacotes de compra + custos por ação). Salvar atualiza o banco; o frontend público lê de lá em vez do hardcode.
+- **Usuários**: lista todos com `email`, `display_name`, `credits`, total gasto, data de cadastro. Botões: "+ Crédito", "− Crédito" (registra em `credit_transactions` como `admin_grant`), "Tornar admin" / "Remover admin".
+- **Transações**: tabela com todas as movimentações de crédito (compras, gastos, grants), filtro por usuário e tipo.
 
-## Resultado esperado
+### 4. Frontend lê preços do banco
 
-Cidades como Nova York, Paris, Lisboa, São Paulo, Rio, Tóquio etc. passarão a mostrar os skylines icônicos do Unsplash que selecionei. Cidades pequenas (fora da lista de 50) continuam usando a foto da Wikipedia como antes.
+- `Credits.tsx` busca `pricing_config` em vez do array hardcoded
+- `CityLookup` / `HouseLookup` / `IntentLookup` buscam os custos de `pricing_config` em vez de constantes locais
+- Botão de comprar continua "em breve" (estrutura pronta, Stripe fica para depois conforme você pediu)
+
+### 5. Bootstrap do seu acesso admin
+
+Depois que a migration rodar e você fizer login uma vez (Google ou email), eu te peço o email da conta e rodo um INSERT em `user_roles` te marcando como admin. A partir daí, `/admin` libera pra você.
 
 ## O que NÃO muda
 
-- Texto/resumo da Wikipedia continua aparecendo
-- Lógica de créditos, desbloqueio, clima
-- Grid das casas, histórico, tudo o resto
+- Lógica de cálculo astrológico, integração Flask/Wikipedia/OpenWeather
+- Layout dos resultados, grid das casas, fotos das cidades
+- Fluxo de stepper, ritual de constelação
+
+## Arquivos afetados
+
+- **Novos**: `src/pages/Admin.tsx`, `src/pages/ResetPassword.tsx`, `src/hooks/usePricing.tsx`, `src/hooks/useIsAdmin.tsx`, `src/components/admin/PricingEditor.tsx`, `src/components/admin/UsersTable.tsx`, `src/components/admin/TransactionsTable.tsx`
+- **Editados**: `src/pages/Auth.tsx` (adiciona email/senha), `src/pages/Credits.tsx` (lê do banco), `src/components/CityLookup.tsx` + `HouseLookup.tsx` + `IntentLookup.tsx` (lê custos do banco), `src/App.tsx` (rotas `/admin` e `/reset-password`), `src/components/UserMenu.tsx` (link "Admin" se for admin)
+
+## Resultado esperado
+
+- Login funciona com Google **e** Email/Senha + recuperação de senha
+- Você acessa `/admin`, edita preço de qualquer pacote ou custo de ação e o site inteiro atualiza imediatamente sem mexer em código
+- Você vê todos os usuários, dá ou tira créditos manualmente
+- Estrutura de pagamento pronta — quando quiser ligar Stripe, é só plugar
