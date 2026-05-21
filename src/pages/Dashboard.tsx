@@ -44,11 +44,26 @@ interface ConsultationRow {
   year: string;
   mode: string;
   goal: number | null;
+  intent: string | null;
   origin: string | null;
   birth_place: string;
   houses_unlocked: number;
   result: ApiResult | null;
   created_at: string;
+}
+
+function extractAccentColor(house: number | null): string {
+  if (!house) return "255, 215, 0";
+  const gradient = houseColors[house] || "";
+  const match = gradient.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (match) return `${match[1]}, ${match[2]}, ${match[3]}`;
+  return "255, 215, 0";
+}
+
+function inferSearchType(c: { origin: string | null; intent: string | null }): { label: string; Icon: typeof Compass } {
+  if (c.origin) return { label: "Por Cidade", Icon: Compass };
+  if (c.intent) return { label: "Por Intenção", Icon: Scroll };
+  return { label: "Por Casa", Icon: Crown };
 }
 
 const TOTAL_HOUSES = 12;
