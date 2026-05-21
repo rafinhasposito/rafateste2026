@@ -1,9 +1,11 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const UserMenu = () => {
   const { user, profile, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
 
   if (!user) return null;
@@ -54,6 +56,11 @@ const UserMenu = () => {
         <div className="absolute right-0 top-full mt-2 w-40 bg-card border border-border rounded-xl p-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all shadow-xl">
           <p className="text-foreground text-xs font-medium px-3 py-2 truncate">{profile?.display_name || profile?.email}</p>
           <div className="h-px bg-border my-1" />
+          {isAdmin && (
+            <button onClick={() => navigate("/admin")} className="w-full text-left px-3 py-2 text-primary text-xs hover:bg-primary/10 rounded-lg transition-colors">
+              Painel Admin
+            </button>
+          )}
           <button
             onClick={signOut}
             className="w-full text-left px-3 py-2 text-destructive text-xs hover:bg-destructive/10 rounded-lg transition-colors"
