@@ -56,6 +56,9 @@ const UserMenu = () => {
         <div className="absolute right-0 top-full mt-2 w-40 bg-card border border-border rounded-xl p-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all shadow-xl">
           <p className="text-foreground text-xs font-medium px-3 py-2 truncate">{profile?.display_name || profile?.email}</p>
           <div className="h-px bg-border my-1" />
+          <button onClick={() => navigate("/perfil")} className="w-full text-left px-3 py-2 text-foreground text-xs hover:bg-primary/10 rounded-lg transition-colors">
+            Meu Perfil
+          </button>
           {isAdmin && (
             <button onClick={() => navigate("/admin")} className="w-full text-left px-3 py-2 text-primary text-xs hover:bg-primary/10 rounded-lg transition-colors">
               Painel Admin

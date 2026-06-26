@@ -7,14 +7,15 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import PricingEditor from "@/components/admin/PricingEditor";
 import UsersTable from "@/components/admin/UsersTable";
 import TransactionsTable from "@/components/admin/TransactionsTable";
+import MetricsDashboard from "@/components/admin/MetricsDashboard";
 
-type Tab = "pricing" | "users" | "transactions";
+type Tab = "metrics" | "pricing" | "users" | "transactions";
 
 const Admin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const [tab, setTab] = useState<Tab>("pricing");
+  const [tab, setTab] = useState<Tab>("metrics");
 
   if (authLoading || adminLoading) {
     return (
@@ -41,6 +42,7 @@ const Admin = () => {
   }
 
   const tabs: { id: Tab; label: string }[] = [
+    { id: "metrics", label: "Métricas" },
     { id: "pricing", label: "Preços & Custos" },
     { id: "users", label: "Usuários" },
     { id: "transactions", label: "Transações" },
@@ -64,6 +66,7 @@ const Admin = () => {
             ))}
           </div>
 
+          {tab === "metrics" && <MetricsDashboard />}
           {tab === "pricing" && <PricingEditor />}
           {tab === "users" && <UsersTable />}
           {tab === "transactions" && <TransactionsTable />}
