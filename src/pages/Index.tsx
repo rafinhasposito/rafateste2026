@@ -116,6 +116,30 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-fill com dados natais salvos no perfil
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, birth_date, birth_time, birth_city")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      if (data.full_name && !name) setName(data.full_name);
+      if (data.birth_date && !birthdate) setBirthdate(data.birth_date);
+      if (data.birth_time && !birthtime) setBirthtime(String(data.birth_time).slice(0, 5));
+      if (data.birth_city && !birthPlace) {
+        setBirthPlace(data.birth_city);
+        setBirthPlaceValid(true);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   const handleSelectMode = (m: Mode) => {
     setMode(m);
     setSearchPath(null);
