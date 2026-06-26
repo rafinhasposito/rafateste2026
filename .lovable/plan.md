@@ -1,67 +1,82 @@
-## Diagnóstico
-
-O banco de dados está **vazio**. O código já chama `profiles`, `consultations` e `credit_transactions` em vários lugares, mas essas tabelas nunca foram criadas — por isso créditos, histórico e compras estão quebrados hoje. Preços e custos por ação estão **hardcoded** em `src/pages/Credits.tsx` e nos componentes Lookup.
-
 ## O que vou construir
 
-### 1. Banco de dados (1 migration)
+### 1. Página `/perfil` — perfil pessoal
 
-**Tabelas novas:**
-- `profiles` — `user_id`, `display_name`, `avatar_url`, `credits` (default 1 crédito de boas-vindas), timestamps
-- `user_roles` — `user_id`, `role` (enum: `admin` | `user`). Tabela separada por segurança (impede escalada de privilégio)
-- `consultations` — histórico de buscas: `user_id`, `query_type` (city/house/intent), `query_data` jsonb, `results` jsonb, `credits_spent`
-- `credit_transactions` — extrato: `user_id`, `amount` (+/-), `type` (purchase/spend/admin_grant), `description`
-- `pricing_config` — configuração editável de pacotes e custos por ação. Linhas: `package_1cr`, `package_2cr`, `package_3cr`, `cost_city`, `cost_house_1`, `cost_house_3`, `cost_full_map`. Cada uma com `label`, `credits`, `price_brl`, `description`, `active`
+Rota protegida. Mostra:
 
-**Função de segurança:** `has_role(user_id, role)` SECURITY DEFINER para usar em RLS sem recursão
+**Bloco "Minha Conta"**
+- Avatar + nome + email
+- Saldo de créditos em destaque (dourado)
+- Botão "Comprar mais créditos" → `/credits`
+- Data de cadastro
 
-**Trigger:** ao criar usuário em `auth.users`, cria automaticamente `profiles` com 1 crédito grátis e papel `user`
+**Bloco "Meus Dados Natais" (opcionais, editáveis)**
+- Nome completo
+- Data de nascimento
+- Hora de nascimento
+- Cidade de nascimento (autocomplete igual ao da home, grava `lat`/`lon`/`country`)
+- Botão "Salvar"
 
-**RLS:**
-- `profiles` / `consultations` / `credit_transactions`: usuário vê só os próprios; admin vê todos
-- `user_roles`: usuário vê o próprio papel; só admin altera
-- `pricing_config`: leitura pública (frontend precisa pra exibir preços); escrita só admin
+Salva em `profiles` (colunas novas — ver Banco).
 
-### 2. Login (Google + Email/Senha)
+**Bloco "Minhas Últimas Consultas"**
+Últimas 5 buscas de `consultations`, com link "Ver todas" → `/history`.
 
-- Mantém Google (já funciona)
-- Adiciona formulário Email/Senha em `/auth` com abas "Entrar" e "Criar conta"
-- Página nova `/reset-password` para recuperação de senha
-- Auto-confirm desligado (usuário precisa verificar email — padrão seguro)
-- Loga ouvinte `onAuthStateChange` antes de `getSession()` no `useAuth`
+### 2. Auto-preenchimento na home
 
-### 3. Painel Admin `/admin`
+`CityLookup` / `HouseLookup` / `IntentLookup` passam a ler os dados natais do `profiles` ao abrir e pré-preencher o formulário. Campos seguem editáveis (só preenche se a pessoa salvou no perfil). Quem nunca preencheu segue digitando normal — nada bloqueia.
 
-Rota protegida (só usuários com role `admin` entram). Três abas:
+### 3. Nova aba `/admin` → "Métricas" (vira a aba padrão)
 
-- **Preços & Custos**: edita os 7 itens de `pricing_config` (pacotes de compra + custos por ação). Salvar atualiza o banco; o frontend público lê de lá em vez do hardcode.
-- **Usuários**: lista todos com `email`, `display_name`, `credits`, total gasto, data de cadastro. Botões: "+ Crédito", "− Crédito" (registra em `credit_transactions` como `admin_grant`), "Tornar admin" / "Remover admin".
-- **Transações**: tabela com todas as movimentações de crédito (compras, gastos, grants), filtro por usuário e tipo.
+**Cards no topo:**
+- Total de cadastros (count `profiles`)
+- Cadastros últimos 7 / 30 dias
+- Usuários ativos (≥ 1 consulta)
+- Compradores (≥ 1 transação `type='purchase'`)
+- Receita total em BRL (cruza `credit_transactions.purchase` × `pricing_config.price_brl`) — aparece zerado com label "aguardando pagamentos" até Stripe ligar
+- Créditos vendidos (soma de amounts `purchase`)
+- Créditos gastos (soma de amounts negativos)
+- Consultas totais + breakdown por tipo (cidade / casa / intenção)
 
-### 4. Frontend lê preços do banco
+**Gráfico:** linha de cadastros por dia, últimos 30 dias (`recharts`, já no projeto).
 
-- `Credits.tsx` busca `pricing_config` em vez do array hardcoded
-- `CityLookup` / `HouseLookup` / `IntentLookup` buscam os custos de `pricing_config` em vez de constantes locais
-- Botão de comprar continua "em breve" (estrutura pronta, Stripe fica para depois conforme você pediu)
+**Tabela:** Top 10 usuários por créditos comprados e por créditos gastos.
 
-### 5. Bootstrap do seu acesso admin
+Abas existentes (Preços, Usuários, Transações) ficam como estão.
 
-Depois que a migration rodar e você fizer login uma vez (Google ou email), eu te peço o email da conta e rodo um INSERT em `user_roles` te marcando como admin. A partir daí, `/admin` libera pra você.
+### 4. Link no menu do usuário
 
-## O que NÃO muda
+`UserMenu.tsx` ganha item "Meu Perfil" → `/perfil`.
 
-- Lógica de cálculo astrológico, integração Flask/Wikipedia/OpenWeather
-- Layout dos resultados, grid das casas, fotos das cidades
-- Fluxo de stepper, ritual de constelação
+## Banco de dados
+
+Uma migration:
+- `ALTER TABLE profiles` adiciona `full_name text`, `birth_date date`, `birth_time time`, `birth_city text`, `birth_country text`, `birth_lat numeric`, `birth_lon numeric`. Tudo opcional (nullable).
+- Nenhuma tabela nova. RLS atual cobre.
 
 ## Arquivos afetados
 
-- **Novos**: `src/pages/Admin.tsx`, `src/pages/ResetPassword.tsx`, `src/hooks/usePricing.tsx`, `src/hooks/useIsAdmin.tsx`, `src/components/admin/PricingEditor.tsx`, `src/components/admin/UsersTable.tsx`, `src/components/admin/TransactionsTable.tsx`
-- **Editados**: `src/pages/Auth.tsx` (adiciona email/senha), `src/pages/Credits.tsx` (lê do banco), `src/components/CityLookup.tsx` + `HouseLookup.tsx` + `IntentLookup.tsx` (lê custos do banco), `src/App.tsx` (rotas `/admin` e `/reset-password`), `src/components/UserMenu.tsx` (link "Admin" se for admin)
+**Novos:**
+- `src/pages/Profile.tsx`
+- `src/components/admin/MetricsDashboard.tsx`
+- `src/hooks/useNatalData.tsx` (lê/salva dados natais, expõe pré-preenchimento)
 
-## Resultado esperado
+**Editados:**
+- `src/App.tsx` (rota `/perfil`)
+- `src/components/UserMenu.tsx` (item "Meu Perfil")
+- `src/pages/Admin.tsx` (adiciona aba "Métricas" como primeira/padrão)
+- `src/components/CityLookup.tsx`, `HouseLookup.tsx`, `IntentLookup.tsx` (auto-fill via `useNatalData`)
+- `src/integrations/supabase/types.ts` (regenera após a migration)
 
-- Login funciona com Google **e** Email/Senha + recuperação de senha
-- Você acessa `/admin`, edita preço de qualquer pacote ou custo de ação e o site inteiro atualiza imediatamente sem mexer em código
-- Você vê todos os usuários, dá ou tira créditos manualmente
-- Estrutura de pagamento pronta — quando quiser ligar Stripe, é só plugar
+## O que NÃO muda
+
+- Lógica astrológica, integrações Flask/Wikipedia/OpenWeather
+- Layout dos resultados, grid das 12 casas, fotos das cidades
+- Stepper, ritual de constelação
+- Fluxo de compra (Stripe segue "em breve")
+
+## Resultado
+
+- `/perfil`: vê créditos, salva dados natais uma vez
+- Próximas consultas vêm pré-preenchidas — só escolhe modo + destino
+- `/admin` abre direto em "Métricas" com cadastros, compradores, receita, consultas e gráfico de crescimento
