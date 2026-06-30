@@ -47,6 +47,7 @@ interface LookupResult {
 const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: CityLookupProps) => {
   const { showAlert } = useAlert();
   const { user, profile, refreshProfile } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [city, setCity] = useState("");
   const [cityValid, setCityValid] = useState(false);
