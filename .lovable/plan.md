@@ -1,82 +1,65 @@
-## O que vou construir
+# Plano: Admin + Cobrança unificada + Pagamentos Stripe
 
-### 1. Página `/perfil` — perfil pessoal
+## 1. Promover `divulgacaoareavip@gmail.com` a admin
 
-Rota protegida. Mostra:
+- Migration que, ao identificar o `user_id` desse email em `auth.users`, insere `('admin')` em `public.user_roles` (idempotente, `ON CONFLICT DO NOTHING`).
+- Trigger `on_auth_user_created` adicional: se `NEW.email = 'divulgacaoareavip@gmail.com'`, promove automaticamente em qualquer (re)cadastro futuro.
+- Resultado: ao logar com esse email, o menu mostra "Painel Admin" e `/admin` libera as abas Métricas, Preços, Usuários, Transações.
 
-**Bloco "Minha Conta"**
-- Avatar + nome + email
-- Saldo de créditos em destaque (dourado)
-- Botão "Comprar mais créditos" → `/credits`
-- Data de cadastro
+> Você já pode liberar créditos manualmente em **Admin → Usuários** (botões +/−1 por usuário, com log em `credit_transactions`). Vou adicionar também um campo "definir saldo exato" e "+10 / +50" para acelerar lançamentos.
 
-**Bloco "Meus Dados Natais" (opcionais, editáveis)**
-- Nome completo
-- Data de nascimento
-- Hora de nascimento
-- Cidade de nascimento (autocomplete igual ao da home, grava `lat`/`lon`/`country`)
-- Botão "Salvar"
+## 2. Cobrança unificada: 1 crédito por consulta
 
-Salva em `profiles` (colunas novas — ver Banco).
+Hoje a cobrança só acontece quando o usuário clica "desbloquear cidades extras". Vou padronizar:
 
-**Bloco "Minhas Últimas Consultas"**
-Últimas 5 buscas de `consultations`, com link "Ver todas" → `/history`.
+- **Toda consulta custa 1 crédito**, debitado antes da chamada da API, nas três entradas: `CityLookup`, `HouseLookup`, `IntentLookup`.
+- Atualizar `pricing_config`: chave `consulta_base = 1`. Os pacotes de desbloqueio extra (3 casas / 12 casas) continuam, mas a primeira casa-alvo já vem incluída na consulta base.
+- Se o usuário tiver 0 créditos → redireciona para `/credits` antes de chamar a API (evita gastar request).
+- Reabrir uma consulta antiga em **Histórico** continua **gratuito** (já está pago).
+- Admins não são cobrados (bypass via `useIsAdmin`).
+- Cada débito gera linha em `credit_transactions` com `type='consulta'` e descrição contendo casa/cidade/ano.
 
-### 2. Auto-preenchimento na home
+## 3. Pagamentos — Stripe (recomendado)
 
-`CityLookup` / `HouseLookup` / `IntentLookup` passam a ler os dados natais do `profiles` ao abrir e pré-preencher o formulário. Campos seguem editáveis (só preenche se a pessoa salvou no perfil). Quem nunca preencheu segue digitando normal — nada bloqueia.
+Para o público (Brasil, cartão local + internacional, Pix via Stripe, assinaturas futuras) e como a recomendação automática descartou Paddle por país do vendedor (BR), o melhor caminho é **Stripe gerenciado pela Lovable** com **cálculo e coleta de imposto (+0,5%)** — Stripe calcula/coleta o imposto no checkout e você cuida de registro/declaração/recolhimento.
 
-### 3. Nova aba `/admin` → "Métricas" (vira a aba padrão)
+Fluxo proposto:
+1. Habilitar Stripe gerenciado (sem precisar de chave manual; ambiente de teste imediato).
+2. Criar produtos espelhando o `pricing_config` atual:
+   - 1 crédito — R$ 29,90
+   - 3 créditos — R$ 79,90
+   - 10 créditos — R$ 199,90 (novo, melhor margem)
+   - Mapa completo (12 casas, sem custo adicional de créditos) — R$ 249,90
+3. Página `/credits` reformulada: cards de pacote → botão "Comprar" → Stripe Checkout (modo `payment`, não assinatura) → webhook credita `profiles.credits` e registra `credit_transactions` (`type='compra'`).
+4. Edge function `stripe-webhook` (verify signature) + edge function `create-checkout` (cria session com `client_reference_id = user.id`).
+5. Admin → aba **Métricas** já mostra receita; ela passa a refletir compras reais.
 
-**Cards no topo:**
-- Total de cadastros (count `profiles`)
-- Cadastros últimos 7 / 30 dias
-- Usuários ativos (≥ 1 consulta)
-- Compradores (≥ 1 transação `type='purchase'`)
-- Receita total em BRL (cruza `credit_transactions.purchase` × `pricing_config.price_brl`) — aparece zerado com label "aguardando pagamentos" até Stripe ligar
-- Créditos vendidos (soma de amounts `purchase`)
-- Créditos gastos (soma de amounts negativos)
-- Consultas totais + breakdown por tipo (cidade / casa / intenção)
+> Alternativa se preferir agora: manter os preços só como referência e ativar Stripe depois. Mas sem gateway a aba "Comprar créditos" continua decorativa.
 
-**Gráfico:** linha de cadastros por dia, últimos 30 dias (`recharts`, já no projeto).
+## 4. Revisão geral do site (itens que vou ajustar de quebra)
 
-**Tabela:** Top 10 usuários por créditos comprados e por créditos gastos.
+- `UserMenu`: garantir link "Painel Admin" só aparece se `isAdmin`.
+- `Credits.tsx`: refatorar para consumir `pricing_config` + botão real de Stripe.
+- `Dashboard / History`: reabrir consulta antiga **não** cobra (já paga).
+- Mensagem clara no formulário da home: "Esta consulta usa 1 crédito".
+- Bloqueio amigável quando saldo = 0 com CTA para `/credits`.
 
-Abas existentes (Preços, Usuários, Transações) ficam como estão.
+## Detalhes técnicos
 
-### 4. Link no menu do usuário
+- Migration:
+  ```sql
+  INSERT INTO public.user_roles (user_id, role)
+  SELECT id, 'admin' FROM auth.users
+  WHERE email='divulgacaoareavip@gmail.com'
+  ON CONFLICT DO NOTHING;
+  ```
+  + ajuste em `handle_new_user` para auto-promover esse email.
+- Débito 1cr: helper `chargeConsultation(userId, meta)` em `src/lib/credits.ts` chamado nos 3 lookups.
+- Stripe: `payments--enable_stripe_payments` → `batch_create_product` → edge functions `create-checkout` e `stripe-webhook` → atualizar `/credits`.
+- Webhook usa `service_role` para escrever em `profiles` e `credit_transactions`.
 
-`UserMenu.tsx` ganha item "Meu Perfil" → `/perfil`.
+## Confirmações que preciso
 
-## Banco de dados
-
-Uma migration:
-- `ALTER TABLE profiles` adiciona `full_name text`, `birth_date date`, `birth_time time`, `birth_city text`, `birth_country text`, `birth_lat numeric`, `birth_lon numeric`. Tudo opcional (nullable).
-- Nenhuma tabela nova. RLS atual cobre.
-
-## Arquivos afetados
-
-**Novos:**
-- `src/pages/Profile.tsx`
-- `src/components/admin/MetricsDashboard.tsx`
-- `src/hooks/useNatalData.tsx` (lê/salva dados natais, expõe pré-preenchimento)
-
-**Editados:**
-- `src/App.tsx` (rota `/perfil`)
-- `src/components/UserMenu.tsx` (item "Meu Perfil")
-- `src/pages/Admin.tsx` (adiciona aba "Métricas" como primeira/padrão)
-- `src/components/CityLookup.tsx`, `HouseLookup.tsx`, `IntentLookup.tsx` (auto-fill via `useNatalData`)
-- `src/integrations/supabase/types.ts` (regenera após a migration)
-
-## O que NÃO muda
-
-- Lógica astrológica, integrações Flask/Wikipedia/OpenWeather
-- Layout dos resultados, grid das 12 casas, fotos das cidades
-- Stepper, ritual de constelação
-- Fluxo de compra (Stripe segue "em breve")
-
-## Resultado
-
-- `/perfil`: vê créditos, salva dados natais uma vez
-- Próximas consultas vêm pré-preenchidas — só escolhe modo + destino
-- `/admin` abre direto em "Métricas" com cadastros, compradores, receita, consultas e gráfico de crescimento
+1. Confirma habilitar **Stripe** agora (test mode imediato, live após verificar conta)?
+2. Mantém os preços R$ 29,90 / 79,90 / 199,90 / 249,90 ou quer outros?
+3. Reabrir consulta antiga deve mesmo continuar **grátis**?
