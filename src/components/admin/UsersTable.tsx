@@ -49,6 +49,16 @@ const UsersTable = () => {
     setBusy(null);
   };
 
+  const setExact = async (row: Row) => {
+    const raw = window.prompt(`Definir saldo exato para ${row.email ?? row.display_name ?? row.user_id}\nSaldo atual: ${row.credits}`, String(row.credits));
+    if (raw === null) return;
+    const n = Math.max(0, Math.floor(Number(raw)));
+    if (!Number.isFinite(n)) { toast.error("Valor inválido"); return; }
+    const delta = n - row.credits;
+    if (delta === 0) return;
+    await adjustCredits(row, delta);
+  };
+
   const toggleAdmin = async (row: Row) => {
     setBusy(row.user_id);
     if (row.is_admin) {
