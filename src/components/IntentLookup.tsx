@@ -48,6 +48,7 @@ interface IntentResult {
 const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: IntentLookupProps) => {
   const { showAlert } = useAlert();
   const { user, profile, refreshProfile } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [intent, setIntent] = useState("");
   const [loading, setLoading] = useState(false);
