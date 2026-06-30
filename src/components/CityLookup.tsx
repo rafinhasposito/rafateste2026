@@ -69,6 +69,19 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
       showAlert("Preencha seus dados natais acima primeiro.");
       return;
     }
+    if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
+    const charge = await chargeConsultation({
+      userId: user.id,
+      currentCredits: profile?.credits ?? 0,
+      isAdmin,
+      description: `Consulta por Cidade — ${city} em ${year}`,
+    });
+    if (!charge.ok) {
+      showAlert("Você não tem créditos suficientes. Cada consulta custa 1 crédito.");
+      navigate("/credits");
+      return;
+    }
+    await refreshProfile();
 
     setLoadingState(true);
     setResult(null);
