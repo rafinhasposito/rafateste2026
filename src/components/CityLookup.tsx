@@ -8,6 +8,8 @@ import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { chargeConsultation } from "@/lib/credits";
 import DestinyResults from "@/components/DestinyResults";
 
 interface CityLookupProps {
