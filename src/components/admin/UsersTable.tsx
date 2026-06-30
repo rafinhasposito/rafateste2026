@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Minus, Shield, ShieldOff } from "lucide-react";
+import { Minus, Shield, ShieldOff } from "lucide-react";
 
 interface Row {
   id: string;
@@ -49,6 +49,16 @@ const UsersTable = () => {
     setBusy(null);
   };
 
+  const setExact = async (row: Row) => {
+    const raw = window.prompt(`Definir saldo exato para ${row.email ?? row.display_name ?? row.user_id}\nSaldo atual: ${row.credits}`, String(row.credits));
+    if (raw === null) return;
+    const n = Math.max(0, Math.floor(Number(raw)));
+    if (!Number.isFinite(n)) { toast.error("Valor inválido"); return; }
+    const delta = n - row.credits;
+    if (delta === 0) return;
+    await adjustCredits(row, delta);
+  };
+
   const toggleAdmin = async (row: Row) => {
     setBusy(row.user_id);
     if (row.is_admin) {
@@ -92,12 +102,18 @@ const UsersTable = () => {
               <span className="text-muted-foreground text-[10px] uppercase">cr</span>
             </div>
             <button onClick={() => adjustCredits(row, 1)} disabled={busy === row.user_id}
-              className="p-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30" title="+1 crédito">
-              <Plus className="w-4 h-4 text-emerald-400" />
-            </button>
+              className="px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 text-[11px] font-bold text-emerald-400" title="+1 crédito">+1</button>
+            <button onClick={() => adjustCredits(row, 10)} disabled={busy === row.user_id}
+              className="px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 text-[11px] font-bold text-emerald-400" title="+10 créditos">+10</button>
+            <button onClick={() => adjustCredits(row, 50)} disabled={busy === row.user_id}
+              className="px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 text-[11px] font-bold text-emerald-400" title="+50 créditos">+50</button>
             <button onClick={() => adjustCredits(row, -1)} disabled={busy === row.user_id || row.credits <= 0}
               className="p-2 rounded-lg border border-destructive/30 bg-destructive/10 hover:bg-destructive/20 disabled:opacity-30" title="-1 crédito">
               <Minus className="w-4 h-4 text-destructive" />
+            </button>
+            <button onClick={() => setExact(row)} disabled={busy === row.user_id}
+              className="px-2 py-1.5 rounded-lg border border-border hover:border-primary/40 disabled:opacity-30 text-[10px] uppercase tracking-wider text-muted-foreground" title="Definir saldo exato">
+              Saldo
             </button>
             <button onClick={() => toggleAdmin(row)} disabled={busy === row.user_id}
               className="p-2 rounded-lg border border-border hover:border-primary/40 disabled:opacity-30"

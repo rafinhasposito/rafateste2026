@@ -8,6 +8,8 @@ import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { chargeConsultation } from "@/lib/credits";
 import DestinyResults from "@/components/DestinyResults";
 
 interface CityLookupProps {
@@ -45,6 +47,7 @@ interface LookupResult {
 const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: CityLookupProps) => {
   const { showAlert } = useAlert();
   const { user, profile, refreshProfile } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [city, setCity] = useState("");
   const [cityValid, setCityValid] = useState(false);
@@ -66,6 +69,19 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
       showAlert("Preencha seus dados natais acima primeiro.");
       return;
     }
+    if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
+    const charge = await chargeConsultation({
+      userId: user.id,
+      currentCredits: profile?.credits ?? 0,
+      isAdmin,
+      description: `Consulta por Cidade — ${city} em ${year}`,
+    });
+    if (!charge.ok) {
+      showAlert("Você não tem créditos suficientes. Cada consulta custa 1 crédito.");
+      navigate("/credits");
+      return;
+    }
+    await refreshProfile();
 
     setLoadingState(true);
     setResult(null);
