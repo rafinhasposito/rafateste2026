@@ -7,6 +7,8 @@ import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { chargeConsultation } from "@/lib/credits";
 import GoalCards from "@/components/GoalCards";
 import DestinyResults from "@/components/DestinyResults";
 
