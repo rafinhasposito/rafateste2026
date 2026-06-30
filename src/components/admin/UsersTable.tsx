@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Minus, Shield, ShieldOff } from "lucide-react";
+import { Minus, Shield, ShieldOff } from "lucide-react";
 
 interface Row {
   id: string;
