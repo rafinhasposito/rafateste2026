@@ -312,6 +312,15 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
       navigate("/credits");
       return;
     }
+    // Unified flow: if we have a saved consultation, delegate the debit + unlock
+    // to Dashboard so houses_unlocked stays consistent and credits don't leak.
+    if (consultationId) {
+      setShowUnlockModal(false);
+      setShowSecondaryOverlay(false);
+      navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
+      return;
+    }
+    // Fallback (no persisted consultation — shouldn't happen in normal flow)
     if (pkg.houses === 12) {
       setUnlockedHouses(new Set(Array.from({ length: 12 }, (_, i) => i + 1)));
       setSecondaryUnlocked(true);
