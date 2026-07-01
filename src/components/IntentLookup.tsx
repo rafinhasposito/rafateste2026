@@ -44,9 +44,10 @@ interface IntentResult {
     nacional: CityOption[];
   };
   allResults?: Record<string, any>;
+  consultationId?: string;
 }
 
-const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: IntentLookupProps) => {
+const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: IntentLookupProps) => {
   const { showAlert } = useAlert();
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
