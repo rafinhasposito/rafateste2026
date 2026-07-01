@@ -44,9 +44,10 @@ interface HouseResult {
     nacional: CityOption[];
   };
   allResults?: Record<string, any>;
+  consultationId?: string;
 }
 
-const HouseLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseSelected, onLoadingChange }: HouseLookupProps) => {
+const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHouseSelected, onLoadingChange }: HouseLookupProps) => {
   const { showAlert } = useAlert();
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
