@@ -102,13 +102,15 @@ const Dashboard = () => {
   const { user, profile, refreshProfile } = useAuth();
   const { showAlert } = useAlert();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const consultationId = searchParams.get("id");
+  const unlockParam = searchParams.get("unlock");
 
   const [consultation, setConsultation] = useState<ConsultationRow | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [unlocking, setUnlocking] = useState(false);
+  const [autoUnlockDone, setAutoUnlockDone] = useState(false);
 
   useEffect(() => {
     if (!user) return;
