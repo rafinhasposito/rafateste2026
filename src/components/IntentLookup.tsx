@@ -7,12 +7,13 @@ import { cityDatabase } from "@/data/houses";
 import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { chargeConsultation } from "@/lib/credits";
+import { saveConsultation } from "@/lib/consultations";
 import DestinyResults from "@/components/DestinyResults";
 
 interface IntentLookupProps {
+  mode: string;
   name: string;
   birthdate: string;
   birthtime: string;
@@ -43,9 +44,10 @@ interface IntentResult {
     nacional: CityOption[];
   };
   allResults?: Record<string, any>;
+  consultationId?: string;
 }
 
-const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: IntentLookupProps) => {
+const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: IntentLookupProps) => {
   const { showAlert } = useAlert();
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
@@ -131,7 +133,20 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
         }
       }
 
-      setResult({ house: houseNum, houseName: houseData.label, houseData, cities, allResults });
+      const consultationId = await saveConsultation({
+        userId: user.id,
+        name: name.trim(),
+        birthdate,
+        birthtime,
+        birth_place: birthPlace.trim(),
+        year,
+        mode,
+        goal: houseNum,
+        intent: intent.trim(),
+        result: { results: allResults, house: houseNum },
+      }) ?? undefined;
+
+      setResult({ house: houseNum, houseName: houseData.label, houseData, cities, allResults, consultationId });
       onHouseFound?.(houseNum);
     } catch (error) {
       const err = error as Error;
@@ -141,26 +156,6 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
     }
   };
 
-  const handleUnlock = async (houses: number) => {
-    if (!user) { navigate("/auth"); return; }
-    const pkg = [
-      { houses: 1, credits: 1 },
-      { houses: 3, credits: 2 },
-      { houses: 12, credits: 3 },
-    ].find(p => p.houses === houses);
-    if (!pkg) return;
-    if ((profile?.credits ?? 0) < pkg.credits) { navigate("/credits"); return; }
-
-    await supabase.from("profiles").update({ credits: (profile?.credits ?? 0) - pkg.credits }).eq("user_id", user.id);
-    await supabase.from("credit_transactions").insert({
-      user_id: user.id,
-      amount: -pkg.credits,
-      type: "desbloqueio",
-      description: `Desbloqueio de ${houses} casa(s) — Consulta por Intenção`,
-    });
-    await refreshProfile();
-    showAlert(`${houses} casa(s) desbloqueada(s) com sucesso!`);
-  };
 
   return (
     <div className="space-y-6">
@@ -213,7 +208,7 @@ const IntentLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFou
             houseData={result.houseData}
             cities={result.cities}
             allResults={result.allResults}
-            onUnlock={handleUnlock}
+            consultationId={result.consultationId}
             userCredits={profile?.credits ?? 0}
             isAuthenticated={!!user}
           />

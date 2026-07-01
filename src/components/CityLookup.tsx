@@ -7,12 +7,13 @@ import { cityDatabase } from "@/data/houses";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { chargeConsultation } from "@/lib/credits";
+import { saveConsultation } from "@/lib/consultations";
 import DestinyResults from "@/components/DestinyResults";
 
 interface CityLookupProps {
+  mode: string;
   name: string;
   birthdate: string;
   birthtime: string;
@@ -42,9 +43,11 @@ interface LookupResult {
     acessivel: CityOption[];
     nacional: CityOption[];
   };
+  allResults?: Record<string, any>;
+  consultationId?: string;
 }
 
-const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: CityLookupProps) => {
+const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHouseFound, onLoadingChange }: CityLookupProps) => {
   const { showAlert } = useAlert();
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
@@ -90,25 +93,29 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
       const [ano, mes, dia] = birthdate.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
 
-      const response = await fetch(`${API_URL}/audit_past`, {
+      const basePayload = {
+        name: name.trim(),
+        place_of_birth: birthPlace.trim(),
+        dob: dataFormatada,
+        time: birthtime,
+        target_year: year,
+      };
+
+      const auditResp = await fetch(`${API_URL}/audit_past`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          place_of_birth: birthPlace.trim(),
-          dob: dataFormatada,
-          time: birthtime,
-          target_year: year,
+          ...basePayload,
           past_city: city.trim(),
           past_lat: cityCoords.lat,
           past_lon: cityCoords.lon,
         }),
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Erro na consulta.");
+      const auditData = await auditResp.json();
+      if (!auditResp.ok) throw new Error(auditData.error || "Erro na consulta.");
 
-      const houseNum = data.house;
+      const houseNum = auditData.house;
       const houseData = cityDatabase[houseNum] || null;
       if (!houseData) throw new Error("Casa não encontrada.");
 
@@ -123,6 +130,49 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
         lon: cityCoords.lon,
       };
 
+      // Enrich in parallel with full 12-house city map so unlocks work later
+      // just like in the "futuro" flow (HouseLookup / IntentLookup).
+      let allResults: Record<string, any> = {};
+      try {
+        const enrichResp = await fetch(`${API_URL}/find_all_cities`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...basePayload, alvoId: houseNum }),
+        });
+        if (enrichResp.ok) {
+          const enrichData = await enrichResp.json();
+          if (enrichData?.results) {
+            for (const [k, v] of Object.entries(enrichData.results)) allResults[k] = v;
+          }
+        }
+      } catch (e) {
+        console.warn("[CityLookup] enrich failed (non-fatal)", e);
+      }
+
+      // Ensure the target-house entry reflects the user-chosen city
+      allResults[String(houseNum)] = {
+        city: masterCity,
+        options: {
+          highticket: masterCity,
+          acessivel: allResults[String(houseNum)]?.options?.acessivel ?? null,
+          nacional: allResults[String(houseNum)]?.options?.nacional ?? null,
+        },
+      };
+
+      // Persist consultation (non-blocking on error)
+      const consultationId = await saveConsultation({
+        userId: user.id,
+        name: name.trim(),
+        birthdate,
+        birthtime,
+        birth_place: birthPlace.trim(),
+        year,
+        mode,
+        goal: houseNum,
+        origin: city.trim(),
+        result: { results: allResults, house: houseNum },
+      }) ?? undefined;
+
       setResult({
         house: houseNum,
         houseName: houseData.label,
@@ -132,6 +182,8 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
           acessivel: [],
           nacional: [],
         },
+        allResults,
+        consultationId,
       });
       onHouseFound?.(houseNum, city);
     } catch (error) {
@@ -140,27 +192,6 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
     } finally {
       setLoadingState(false);
     }
-  };
-
-  const handleUnlock = async (houses: number) => {
-    if (!user) { navigate("/auth"); return; }
-    const pkg = [
-      { houses: 1, credits: 1 },
-      { houses: 3, credits: 2 },
-      { houses: 12, credits: 3 },
-    ].find(p => p.houses === houses);
-    if (!pkg) return;
-    if ((profile?.credits ?? 0) < pkg.credits) { navigate("/credits"); return; }
-
-    await supabase.from("profiles").update({ credits: (profile?.credits ?? 0) - pkg.credits }).eq("user_id", user.id);
-    await supabase.from("credit_transactions").insert({
-      user_id: user.id,
-      amount: -pkg.credits,
-      type: "desbloqueio",
-      description: `Desbloqueio de ${houses} casa(s) — Consulta por Cidade`,
-    });
-    await refreshProfile();
-    showAlert(`${houses} casa(s) desbloqueada(s) com sucesso!`);
   };
 
   return (
@@ -209,7 +240,8 @@ const CityLookup = ({ name, birthdate, birthtime, birthPlace, year, onHouseFound
             houseName={result.houseName}
             houseData={result.houseData}
             cities={result.cities}
-            onUnlock={handleUnlock}
+            allResults={result.allResults}
+            consultationId={result.consultationId}
             userCredits={profile?.credits ?? 0}
             isAuthenticated={!!user}
           />

@@ -102,13 +102,15 @@ const Dashboard = () => {
   const { user, profile, refreshProfile } = useAuth();
   const { showAlert } = useAlert();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const consultationId = searchParams.get("id");
+  const unlockParam = searchParams.get("unlock");
 
   const [consultation, setConsultation] = useState<ConsultationRow | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [unlocking, setUnlocking] = useState(false);
+  const [autoUnlockDone, setAutoUnlockDone] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -220,6 +222,22 @@ const Dashboard = () => {
       setUnlocking(false);
     }
   };
+
+  // Auto-trigger unlock when arriving via /dashboard?id=…&unlock=N
+  useEffect(() => {
+    if (autoUnlockDone) return;
+    if (!consultation || !profile || unlocking) return;
+    if (!unlockParam) return;
+    const n = parseInt(unlockParam, 10);
+    if (!Number.isFinite(n) || n <= 0) return;
+    setAutoUnlockDone(true);
+    handleUnlock(n).finally(() => {
+      const next = new URLSearchParams(searchParams);
+      next.delete("unlock");
+      setSearchParams(next, { replace: true });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [consultation?.id, profile?.credits, unlockParam, autoUnlockDone]);
 
   if (loading) {
     return (

@@ -35,6 +35,7 @@ interface DestinyResultsProps {
   onUnlock?: (houses: number) => void;
   userCredits?: number;
   isAuthenticated?: boolean;
+  consultationId?: string;
 }
 
 interface WikiData {
@@ -254,7 +255,7 @@ const UNLOCK_PACKAGES = [
   { houses: 12, credits: 3, label: "Mapa Completo", desc: "Todas as 12 casas reveladas" },
 ];
 
-const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated }: DestinyResultsProps) => {
+const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId }: DestinyResultsProps) => {
   const navigate = useNavigate();
   const [unlocked, setUnlocked] = useState(false);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
@@ -311,6 +312,15 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
       navigate("/credits");
       return;
     }
+    // Unified flow: if we have a saved consultation, delegate the debit + unlock
+    // to Dashboard so houses_unlocked stays consistent and credits don't leak.
+    if (consultationId) {
+      setShowUnlockModal(false);
+      setShowSecondaryOverlay(false);
+      navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
+      return;
+    }
+    // Fallback (no persisted consultation — shouldn't happen in normal flow)
     if (pkg.houses === 12) {
       setUnlockedHouses(new Set(Array.from({ length: 12 }, (_, i) => i + 1)));
       setSecondaryUnlocked(true);
@@ -815,12 +825,15 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         ? "rgba(0,0,0,0.30)"
                         : "rgba(0,0,0,0.25)"
                       : undefined,
-                    border: isCurrentHouse
-                      ? `2px solid ${elementColor}`
-                      : isUnlocked
-                        ? `1px solid rgba(255,255,255,0.15)`
-                        : `1px solid rgba(255,255,255,0.05)`,
-                    borderLeft: !isCurrentHouse ? `3px solid ${elementColor}` : undefined,
+                    borderStyle: "solid",
+                    borderTopWidth: isCurrentHouse ? 2 : 1,
+                    borderRightWidth: isCurrentHouse ? 2 : 1,
+                    borderBottomWidth: isCurrentHouse ? 2 : 1,
+                    borderLeftWidth: isCurrentHouse ? 2 : 3,
+                    borderTopColor: isCurrentHouse ? elementColor : isUnlocked ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)",
+                    borderRightColor: isCurrentHouse ? elementColor : isUnlocked ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)",
+                    borderBottomColor: isCurrentHouse ? elementColor : isUnlocked ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)",
+                    borderLeftColor: elementColor,
                     boxShadow: isCurrentHouse ? `0 0 30px ${elementColor}33, 0 0 0 2px ${elementColor}` : undefined,
                   }}
                 >
@@ -898,8 +911,8 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     {isUnlocked && !houseCity && !isCurrentHouse && (
                       <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                         <div className="flex items-center gap-2">
-                          <Eye className="w-3.5 h-3.5 text-white/70" />
-                          <span className="text-white/80 text-[10px] font-semibold uppercase tracking-wider">Desbloqueada</span>
+                          <Loader2 className="w-3.5 h-3.5 text-white/60 animate-spin" />
+                          <span className="text-white/70 text-[10px] font-medium uppercase tracking-wider">Calculando cidade…</span>
                         </div>
                       </div>
                     )}
