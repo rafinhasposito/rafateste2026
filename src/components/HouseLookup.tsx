@@ -197,7 +197,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
             houseData={result.houseData}
             cities={result.cities}
             allResults={result.allResults}
-            onUnlock={handleUnlock}
+            consultationId={result.consultationId}
             userCredits={profile?.credits ?? 0}
             isAuthenticated={!!user}
           />
