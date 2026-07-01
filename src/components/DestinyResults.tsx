@@ -825,12 +825,15 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         ? "rgba(0,0,0,0.30)"
                         : "rgba(0,0,0,0.25)"
                       : undefined,
-                    border: isCurrentHouse
-                      ? `2px solid ${elementColor}`
-                      : isUnlocked
-                        ? `1px solid rgba(255,255,255,0.15)`
-                        : `1px solid rgba(255,255,255,0.05)`,
-                    borderLeft: !isCurrentHouse ? `3px solid ${elementColor}` : undefined,
+                    borderStyle: "solid",
+                    borderTopWidth: isCurrentHouse ? 2 : 1,
+                    borderRightWidth: isCurrentHouse ? 2 : 1,
+                    borderBottomWidth: isCurrentHouse ? 2 : 1,
+                    borderLeftWidth: isCurrentHouse ? 2 : 3,
+                    borderTopColor: isCurrentHouse ? elementColor : isUnlocked ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)",
+                    borderRightColor: isCurrentHouse ? elementColor : isUnlocked ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)",
+                    borderBottomColor: isCurrentHouse ? elementColor : isUnlocked ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.05)",
+                    borderLeftColor: elementColor,
                     boxShadow: isCurrentHouse ? `0 0 30px ${elementColor}33, 0 0 0 2px ${elementColor}` : undefined,
                   }}
                 >
