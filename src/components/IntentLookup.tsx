@@ -133,7 +133,20 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         }
       }
 
-      setResult({ house: houseNum, houseName: houseData.label, houseData, cities, allResults });
+      const consultationId = await saveConsultation({
+        userId: user.id,
+        name: name.trim(),
+        birthdate,
+        birthtime,
+        birth_place: birthPlace.trim(),
+        year,
+        mode,
+        goal: houseNum,
+        intent: intent.trim(),
+        result: { results: allResults, house: houseNum },
+      }) ?? undefined;
+
+      setResult({ house: houseNum, houseName: houseData.label, houseData, cities, allResults, consultationId });
       onHouseFound?.(houseNum);
     } catch (error) {
       const err = error as Error;
@@ -143,26 +156,6 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
     }
   };
 
-  const handleUnlock = async (houses: number) => {
-    if (!user) { navigate("/auth"); return; }
-    const pkg = [
-      { houses: 1, credits: 1 },
-      { houses: 3, credits: 2 },
-      { houses: 12, credits: 3 },
-    ].find(p => p.houses === houses);
-    if (!pkg) return;
-    if ((profile?.credits ?? 0) < pkg.credits) { navigate("/credits"); return; }
-
-    await supabase.from("profiles").update({ credits: (profile?.credits ?? 0) - pkg.credits }).eq("user_id", user.id);
-    await supabase.from("credit_transactions").insert({
-      user_id: user.id,
-      amount: -pkg.credits,
-      type: "desbloqueio",
-      description: `Desbloqueio de ${houses} casa(s) — Consulta por Intenção`,
-    });
-    await refreshProfile();
-    showAlert(`${houses} casa(s) desbloqueada(s) com sucesso!`);
-  };
 
   return (
     <div className="space-y-6">
