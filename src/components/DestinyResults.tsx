@@ -35,6 +35,7 @@ interface DestinyResultsProps {
   onUnlock?: (houses: number) => void;
   userCredits?: number;
   isAuthenticated?: boolean;
+  consultationId?: string;
 }
 
 interface WikiData {
