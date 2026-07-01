@@ -255,7 +255,7 @@ const UNLOCK_PACKAGES = [
   { houses: 12, credits: 3, label: "Mapa Completo", desc: "Todas as 12 casas reveladas" },
 ];
 
-const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated }: DestinyResultsProps) => {
+const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId }: DestinyResultsProps) => {
   const navigate = useNavigate();
   const [unlocked, setUnlocked] = useState(false);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
