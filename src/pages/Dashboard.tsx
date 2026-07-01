@@ -223,6 +223,22 @@ const Dashboard = () => {
     }
   };
 
+  // Auto-trigger unlock when arriving via /dashboard?id=…&unlock=N
+  useEffect(() => {
+    if (autoUnlockDone) return;
+    if (!consultation || !profile || unlocking) return;
+    if (!unlockParam) return;
+    const n = parseInt(unlockParam, 10);
+    if (!Number.isFinite(n) || n <= 0) return;
+    setAutoUnlockDone(true);
+    handleUnlock(n).finally(() => {
+      const next = new URLSearchParams(searchParams);
+      next.delete("unlock");
+      setSearchParams(next, { replace: true });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [consultation?.id, profile?.credits, unlockParam, autoUnlockDone]);
+
   if (loading) {
     return (
       <>
