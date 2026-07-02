@@ -454,14 +454,19 @@ const Dashboard = () => {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 {unlockOptions.map((opt) => {
                   const canAfford = credits >= opt.cost;
+                  const requiresConfirm = opt.cost >= 2;
                   return (
                     <button
                       key={opt.amount}
-                      onClick={() => handleUnlock(opt.amount)}
+                      onClick={() => {
+                        if (!canAfford) return;
+                        if (requiresConfirm) setPendingUnlock(opt.amount);
+                        else handleUnlock(opt.amount);
+                      }}
                       disabled={unlocking || !canAfford}
                       className="px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {unlocking ? "..." : `${opt.label} (${opt.cost} cr)`}
+                      {unlocking ? "Processando..." : `${opt.label} (${opt.cost} crédito${opt.cost > 1 ? "s" : ""})`}
                     </button>
                   );
                 })}
@@ -476,8 +481,29 @@ const Dashboard = () => {
           </motion.div>
         )}
       </div>
+
+      <ConfirmCreditAction
+        open={pendingUnlock !== null}
+        onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}
+        onConfirm={() => {
+          const n = pendingUnlock;
+          setPendingUnlock(null);
+          if (n) handleUnlock(n);
+        }}
+        title="Desbloquear casas"
+        description={
+          pendingUnlock
+            ? `Você está prestes a desbloquear ${pendingUnlock} casa${pendingUnlock > 1 ? "s" : ""} desta consulta.`
+            : undefined
+        }
+        credits={pendingUnlock ?? 0}
+        currentBalance={credits}
+        confirmLabel="Desbloquear agora"
+        loading={unlocking}
+      />
     </>
   );
 };
 
 export default Dashboard;
+
