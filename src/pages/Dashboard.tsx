@@ -113,6 +113,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [unlocking, setUnlocking] = useState(false);
   const [autoUnlockDone, setAutoUnlockDone] = useState(false);
+  const [pendingUnlock, setPendingUnlock] = useState<number | null>(null);
+
 
   useEffect(() => {
     if (!user) return;
