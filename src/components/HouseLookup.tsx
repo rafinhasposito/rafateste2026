@@ -84,6 +84,8 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       return;
     }
     await refreshProfile();
+    if (!isAdmin) showAlert("Consulta iniciada. 1 crédito debitado.");
+
 
     setLoadingState(true);
     setResult(null);
