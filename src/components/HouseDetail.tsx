@@ -59,35 +59,41 @@ const DestinationCard = ({
   city: CityOption;
   label: string;
   toneClass: string;
-}) => (
-  <div className="bg-card/40 border border-border/50 rounded-xl p-4 hover:border-primary/30 transition-all group/dest">
-    <p className={`text-[9px] uppercase tracking-[0.2em] font-semibold mb-3 ${toneClass}`}>
-      {label}
-    </p>
-    <div className="flex items-center gap-3">
-      <MapPin className="w-5 h-5 text-primary/60 shrink-0" />
-      <div className="flex-1 min-w-0">
-        <p className="text-foreground font-bold text-base">{city.city}</p>
-        <p className="text-muted-foreground text-[11px]">{city.country} · {city.continent}</p>
-      </div>
-    </div>
-    {typeof city.lat === "number" && typeof city.lon === "number" && (
-      <>
-        <div className="mt-3 rounded-lg overflow-hidden border border-border/30 h-24 bg-background/50">
-          <iframe
-            src={getMapUrl(city.lat, city.lon)}
-            className="w-full h-full border-0 opacity-70 group-hover/dest:opacity-100 transition-opacity pointer-events-none"
-            loading="lazy"
-            title={`Mapa de ${city.city}`}
-          />
+}) => {
+  if (!city) return null;
+  const lat = typeof city.lat === "number" ? city.lat : Number(city.lat);
+  const lon = typeof city.lon === "number" ? city.lon : Number(city.lon);
+  const hasCoords = Number.isFinite(lat) && Number.isFinite(lon);
+  return (
+    <div className="bg-card/40 border border-border/50 rounded-xl p-4 hover:border-primary/30 transition-all group/dest">
+      <p className={`text-[9px] uppercase tracking-[0.2em] font-semibold mb-3 ${toneClass}`}>
+        {label}
+      </p>
+      <div className="flex items-center gap-3">
+        <MapPin className="w-5 h-5 text-primary/60 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-foreground font-bold text-base">{city.city}</p>
+          <p className="text-muted-foreground text-[11px]">{city.country} · {city.continent}</p>
         </div>
-        <p className="text-foreground/30 text-[9px] mt-2 text-center">
-          {city.lat.toFixed(2)}° {city.lat > 0 ? "N" : "S"}, {city.lon.toFixed(2)}° {city.lon > 0 ? "L" : "O"}
-        </p>
-      </>
-    )}
-  </div>
-);
+      </div>
+      {hasCoords && (
+        <>
+          <div className="mt-3 rounded-lg overflow-hidden border border-border/30 h-24 bg-background/50">
+            <iframe
+              src={getMapUrl(lat, lon)}
+              className="w-full h-full border-0 opacity-70 group-hover/dest:opacity-100 transition-opacity pointer-events-none"
+              loading="lazy"
+              title={`Mapa de ${city.city}`}
+            />
+          </div>
+          <p className="text-foreground/30 text-[9px] mt-2 text-center">
+            {lat.toFixed(2)}° {lat > 0 ? "N" : "S"}, {lon.toFixed(2)}° {lon > 0 ? "L" : "O"}
+          </p>
+        </>
+      )}
+    </div>
+  );
+};
 
 const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: HouseDetailProps) => {
   const bgGradient = houseColors[house.id];
