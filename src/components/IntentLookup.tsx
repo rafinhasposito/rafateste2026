@@ -199,7 +199,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         ) : (
           <Sparkles className="w-4 h-4" />
         )}
-        {loading ? "Consultando o Cosmos..." : "Revelar Meu Destino"}
+        {loading ? "Consultando o Cosmos..." : "Revelar Meu Destino (1 crédito)"}
       </button>
 
       <AnimatePresence>
