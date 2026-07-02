@@ -6,10 +6,12 @@ import StarryBackground from "@/components/StarryBackground";
 import UserMenu from "@/components/UserMenu";
 import HouseCard from "@/components/HouseCard";
 import HouseDetail from "@/components/HouseDetail";
+import ConfirmCreditAction from "@/components/ConfirmCreditAction";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast, houseColors } from "@/data/houses";
+
 
 interface CityOption {
   city: string;
