@@ -71,17 +71,21 @@ const DestinationCard = ({
         <p className="text-muted-foreground text-[11px]">{city.country} · {city.continent}</p>
       </div>
     </div>
-    <div className="mt-3 rounded-lg overflow-hidden border border-border/30 h-24 bg-background/50">
-      <iframe
-        src={getMapUrl(city.lat, city.lon)}
-        className="w-full h-full border-0 opacity-70 group-hover/dest:opacity-100 transition-opacity pointer-events-none"
-        loading="lazy"
-        title={`Mapa de ${city.city}`}
-      />
-    </div>
-    <p className="text-foreground/30 text-[9px] mt-2 text-center">
-      {city.lat.toFixed(2)}° {city.lat > 0 ? "N" : "S"}, {city.lon.toFixed(2)}° {city.lon > 0 ? "L" : "O"}
-    </p>
+    {typeof city.lat === "number" && typeof city.lon === "number" && (
+      <>
+        <div className="mt-3 rounded-lg overflow-hidden border border-border/30 h-24 bg-background/50">
+          <iframe
+            src={getMapUrl(city.lat, city.lon)}
+            className="w-full h-full border-0 opacity-70 group-hover/dest:opacity-100 transition-opacity pointer-events-none"
+            loading="lazy"
+            title={`Mapa de ${city.city}`}
+          />
+        </div>
+        <p className="text-foreground/30 text-[9px] mt-2 text-center">
+          {city.lat.toFixed(2)}° {city.lat > 0 ? "N" : "S"}, {city.lon.toFixed(2)}° {city.lon > 0 ? "L" : "O"}
+        </p>
+      </>
+    )}
   </div>
 );
 
