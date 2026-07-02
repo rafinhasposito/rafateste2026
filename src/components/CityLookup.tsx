@@ -85,6 +85,8 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       return;
     }
     await refreshProfile();
+    if (!isAdmin) showAlert("Consulta iniciada. 1 crédito debitado.");
+
 
     setLoadingState(true);
     setResult(null);
