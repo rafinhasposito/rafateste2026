@@ -1,43 +1,133 @@
-# Plano: Corrigir Histórico, Desbloqueio Passado/Presente e Sweep de Bugs
 
-## Problemas confirmados
+# Revisão Geral — Plano em 4 Fases
 
-1. **Histórico vazio**: os fluxos da home (`CityLookup`, `HouseLookup`, `IntentLookup`) cobram 1 crédito e chamam a API, mas **não inserem em `consultations`**. Só o Dashboard lê essa tabela → toda consulta nova desaparece do histórico. Só existem 24 linhas antigas.
-2. **"Olhinho + DESBLOQUEADA" no passado/presente**: `CityLookup` usa o endpoint `/audit_past`, que só devolve a casa-alvo (sem `results` das outras 11). Quando o usuário paga para desbloquear as 12 casas, o `DestinyResults` não tem cidades para exibir e cai no fallback genérico "Desbloqueada". No futuro funciona porque `HouseLookup`/`IntentLookup` chamam `/find_all_cities` e passam `allResults`.
-3. **Warning React**: `DestinyResults` mistura shorthand `border` com longhand `borderLeft` no mesmo `style` (log do console).
-4. **`handleUnlock` duplicado**: cada lookup tem sua própria função de desbloqueio de "pacotes", mas o Dashboard já tem a versão canônica; a versão da home debita créditos mas não atualiza `houses_unlocked` em lugar nenhum (não tem registro pra atualizar) — é um vazamento de créditos.
+Escopo dividido para reduzir risco de regressão e consumo de créditos. Cada fase é entregue e validada antes da próxima. Padrão visual de referência: **Dashboard**. Aviso de créditos: **inline nos botões + modal para ações caras (≥ 2 créditos ou irreversíveis)**.
 
-## Correções
+---
 
-### 1. Persistir toda consulta em `consultations`
-Nos três lookups, logo após sucesso da API, inserir:
-- `user_id, name, birthdate, birthtime, birth_place, year, mode` (passado/presente/futuro), `goal` (nº casa quando aplicável), `intent` (quando aplicável), `origin` (cidade quando Cidade), `result` = payload completo da API (inclui `results` para desbloqueios futuros no Dashboard), `houses_unlocked: 1` (só a casa-alvo liberada).
-- Guardar o `id` retornado no state para o botão "Desbloquear +N" navegar para `/dashboard?id=<id>` **em vez de** debitar créditos localmente sem atualizar nada.
+## Fase 1 — Bugs críticos + Transparência de créditos
 
-### 2. Passado/Presente com paridade de desbloqueio
-Em `CityLookup`, após `/audit_past` retornar `houseNum`, disparar **em paralelo** `/find_all_cities` com `alvoId: houseNum` e mesclar o `results` no `allResults` passado ao `DestinyResults`. Assim, quando o usuário paga para desbloquear as outras casas, elas mostram cidade+bandeira+país igual ao futuro.
+**Objetivo:** eliminar crashes, estados inconsistentes e garantir que nenhum crédito seja consumido sem aviso.
 
-### 3. Remover fallback "Desbloqueada" enganoso
-Em `DestinyResults` (linhas ~898-905), se `isUnlocked && !houseCity && !isCurrentHouse`, mostrar um estado real: "Calculando cidade…" com spinner OU esconder a linha (nunca mais o olhinho + palavra "Desbloqueada" solta).
+### Transparência de créditos
+- Criar componente `ConfirmCreditAction` (AlertDialog reutilizável) com: quantidade de créditos, saldo atual, saldo após, aviso de irreversibilidade.
+- Criar helper `CreditBadge` para exibir "(1 crédito)" ao lado do label de botões.
+- Aplicar em:
+  - `CityLookup`, `HouseLookup`, `IntentLookup` — botão principal mostra "Consultar (1 crédito)"; **sem modal** (custo baixo, ação recorrente), mas com toast de confirmação após débito.
+  - `DestinyResults` — pacotes de desbloqueio (+1 casa = 1cr, +3 casas = 2cr, revelar tudo = 3cr) passam por **modal de confirmação obrigatório**.
+  - Dashboard `?unlock=N` — se chegou via URL sem confirmação prévia, exibir modal antes de debitar.
+- Mensagens padronizadas: "Esta ação consumirá X crédito(s). Saldo atual: Y. Após: Z."
 
-### 4. Unificar botão de desbloqueio
-Trocar `handleUnlock` local dos 3 lookups por: navegar para `/dashboard?id=<consultation.id>&unlock=<n>`, e o Dashboard já cuida do débito + `houses_unlocked` corretamente (única fonte de verdade). Elimina o vazamento de créditos.
+### Bugs conhecidos (varredura)
+- `HouseDetail.tsx` — revisar todos os `.toFixed`, `.map`, `.length` em campos possivelmente undefined (city.lat/lon já corrigido; auditar tags, options, cities).
+- `DestinyResults.tsx` — validar `allResults[n]?.city` antes de renderizar; estados vazios com componente único `EmptyState`.
+- `Dashboard.tsx` — garantir idempotência do `useEffect` de `?unlock=N` (evitar débito duplo em StrictMode / refresh).
+- `History.tsx` — verificar por que "últimas consultas" não aparecem; provável mismatch de RLS ou filtro de user_id.
+- Console: remover warnings de key, CSS shorthand, controlled/uncontrolled inputs.
+- Remover imports não usados nos arquivos tocados.
 
-### 5. Fix warning React
-Em `DestinyResults`, substituir o objeto `style` que tem `border` + `borderLeft` por longhands (`borderTop/Right/Bottom/Left` ou `borderColor`+`borderLeftColor`) para eliminar o warning do console.
+### Entregáveis Fase 1
+- 1 novo componente `ConfirmCreditAction`, 1 helper `CreditBadge`.
+- Edits em: 3 lookups, `DestinyResults`, `Dashboard`, `History`, `HouseDetail`.
+- Zero erros de console nas rotas principais (validado com Playwright headless).
 
-### 6. Sweep adicional
-- Verificar se `IntentLookup` e `HouseLookup` também têm `handleUnlock` vazio (têm) e aplicar o mesmo redirecionamento.
-- Confirmar que o Dashboard carregado via `?id=` continua abrindo a casa-alvo por padrão e permitindo clicar nas outras (grid de 3 colunas mantido).
-- Garantir que `mode` gravado em `consultations` bate com os filtros usados no `History` (`passado` vs `futuro`).
+---
 
-## Arquivos afetados
-- `src/components/CityLookup.tsx` — insert em consultations, chamada extra `/find_all_cities`, remover `handleUnlock` local.
-- `src/components/HouseLookup.tsx` — insert em consultations, remover `handleUnlock` local.
-- `src/components/IntentLookup.tsx` — insert em consultations, remover `handleUnlock` local.
-- `src/components/DestinyResults.tsx` — fix warning border, remover fallback "Desbloqueada", roteamento para `/dashboard?id=…` no clique de desbloqueio.
-- `src/pages/Dashboard.tsx` — ler `?unlock=N` opcional para auto-abrir modal (opcional, só se for trivial).
-- `src/pages/Index.tsx` — passar `mode` para os componentes de lookup (se ainda não passa).
+## Fase 2 — Textos, gramática e tempos verbais
 
-## Fora do escopo
-Sem mudanças no schema do banco, no Admin, nas cores/estilos ou nos textos.
+**Objetivo:** unificar copy em toda a aplicação. Zero mistura de tempos verbais.
+
+### Ações
+- Varredura de todos os textos hard-coded em `src/**/*.tsx` e `src/**/*.ts`.
+- Corrigir ortografia, gramática, pontuação, concordância.
+- Regra de tempos verbais:
+  - **Presente contínuo** durante loading: "Consultando o cosmos...", "Calculando rotas...", "Carregando histórico..." (auditar todos os `loading ? "..." : "..."`).
+  - **Passado** só após conclusão: "Consulta realizada", "Crédito debitado", "Casa desbloqueada".
+  - **Futuro** só para ações posteriores: "Você receberá...", "Será descontado...".
+- Padronizar termos duplicados:
+  - "Casa" vs "Casa Astrológica" → sempre "Casa N" nos títulos, "Casa Astrológica" apenas em contexto explicativo.
+  - "Cidade" vs "Destino" vs "Rota" → definir 1 termo por contexto.
+  - "Créditos" vs "Consultas" → sempre "créditos".
+  - "Passado/Presente/Futuro" — verbos consistentes por modo (memória já registrada).
+- Placeholders, tooltips, toasts, mensagens de erro, empty states — todos revisados.
+- Toasts com mesma estrutura via `useAlert` — variantes: success, error, info, loading.
+
+### Entregáveis Fase 2
+- Glossário curto em `src/lib/copy.ts` com strings reutilizadas (títulos de seção, labels de botão de ação, mensagens de estado).
+- Edits de copy em ~15-20 arquivos.
+
+---
+
+## Fase 3 — Padronização visual (referência: Dashboard)
+
+**Objetivo:** uma única linguagem visual em todas as telas.
+
+### Ações
+- **Tokens**: auditar `index.css` — garantir que todos os componentes usem `text-foreground`, `bg-card`, `border-border` etc. Remover qualquer `text-white`, `bg-black`, hex hard-coded.
+- **Botões**: unificar alturas (`h-12` primário, `h-10` secundário), padding, tipografia (Cinzel uppercase tracking).
+- **Cards**: mesma borda, raio (`rounded-xl`), shadow, padding interno.
+- **Inputs**: mesma altura, foco, placeholder, ícones à esquerda.
+- **Grid/spacing**: gap-6 entre seções, gap-4 entre itens, container `max-w-6xl mx-auto px-4`.
+- **Modais**: usar shadcn Dialog com header + description + footer; nunca `alert()` ou `confirm()`.
+- **Loading states**: padronizar spinner (`Loader2 animate-spin`), skeletons via `<Skeleton />`.
+- **Empty states**: componente `<EmptyState icon title description action />` reutilizável.
+- **Header/nav**: mesma altura, mesmo padding, mesmo comportamento mobile.
+
+### Telas alvo
+Index, Dashboard, History, Credits, Profile, Auth, Admin — todas alinhadas ao Dashboard.
+
+### Entregáveis Fase 3
+- Novo `<EmptyState />`, `<PageContainer />`, `<SectionHeader />`.
+- Refatoração visual (sem mudança de lógica) em ~10 páginas/componentes.
+
+---
+
+## Fase 4 — UX, acessibilidade e responsividade
+
+**Objetivo:** polimento final.
+
+### UX
+- Reduzir cliques em fluxos frequentes.
+- Feedback imediato em toda ação (toast + estado visual).
+- Botões desabilitados quando ação inválida, com tooltip explicando por quê.
+
+### Acessibilidade
+- `aria-label` em todos os botões ícone-only.
+- Contraste — nada abaixo de WCAG AA (usar tokens `foreground`/`muted-foreground`).
+- Foco visível em todos os interativos.
+- Hierarquia de headings (1 `<h1>` por página, sem pular níveis).
+- `<main>` único por rota.
+- `h-dvh` no lugar de `h-screen` onde aplicável.
+
+### Responsividade
+- Testar em 375px, 768px, 1024px, 1440px com Playwright.
+- Corrigir quebras: grids que viram coluna única, tabelas com scroll horizontal, modais que ocupam tela cheia no mobile.
+- Menu mobile do Header revisado.
+
+### Validação final
+- Playwright: percorrer fluxo completo (login → consulta passado/presente/futuro → desbloqueio → history → dashboard) em desktop e mobile.
+- Zero warnings no console em todas as rotas.
+- Confirmar que todos os avisos de créditos aparecem antes do débito.
+
+---
+
+## Detalhes técnicos
+
+### Custo estimado
+Fase 1 é a maior (bugs + fluxo de créditos, ~8-12 arquivos modificados). Fases 2-4 são progressivamente menores em risco mas amplas em superfície.
+
+### Ordem de execução dentro de cada fase
+1. Ler todos os arquivos relevantes em paralelo.
+2. Criar componentes/helpers compartilhados primeiro.
+3. Aplicar em todas as chamadas.
+4. Validar com Playwright antes de encerrar a fase.
+
+### O que NÃO vai mudar
+- Schema do banco (a menos que um bug exija).
+- Lógica de negócio de precificação (`usePricing`).
+- Endpoints da API externa.
+- Fluxo de autenticação Google.
+
+---
+
+**Começo pela Fase 1.** Aprove para eu implementar; ao final entrego resumo e peço confirmação antes da Fase 2.

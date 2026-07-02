@@ -84,6 +84,8 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       return;
     }
     await refreshProfile();
+    if (!isAdmin) showAlert("Consulta iniciada. 1 crédito debitado.");
+
 
     setLoadingState(true);
     setResult(null);
@@ -186,7 +188,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         ) : (
           <Search className="w-4 h-4" />
         )}
-        {loading ? "Calculando Rotas..." : "Revelar Cidades Ideais"}
+        {loading ? "Calculando Rotas..." : "Revelar Cidades Ideais (1 crédito)"}
       </button>
 
       <AnimatePresence>
