@@ -24,7 +24,7 @@ const PricingEditor = () => {
     refresh();
   };
 
-  if (loading) return <p className="text-muted-foreground text-sm">Carregando…</p>;
+  if (loading) return <p className="text-muted-foreground text-sm">Carregando...</p>;
 
   const packages = items.filter(i => i.category === "package");
   const costs = items.filter(i => i.category === "cost");
