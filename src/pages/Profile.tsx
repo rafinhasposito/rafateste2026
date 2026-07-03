@@ -85,7 +85,7 @@ const Profile = () => {
     return (
       <>
         <StarryBackground />
-        <div className="min-h-screen flex items-center justify-center text-primary font-cinzel animate-pulse">Carregando…</div>
+        <div className="min-h-screen flex items-center justify-center text-primary font-cinzel animate-pulse">Carregando...</div>
       </>
     );
   }
@@ -177,7 +177,7 @@ const Profile = () => {
               disabled={saving}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-primary/40 bg-primary/10 text-primary font-bold text-xs uppercase tracking-[0.14em] hover:bg-primary/20 transition-all disabled:opacity-40"
             >
-              <Save className="w-4 h-4" /> {saving ? "Salvando…" : "Salvar Perfil"}
+              <Save className="w-4 h-4" /> {saving ? "Salvando..." : "Salvar Perfil"}
             </button>
           </div>
         </motion.div>

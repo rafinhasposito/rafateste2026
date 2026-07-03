@@ -33,7 +33,7 @@ const TransactionsTable = () => {
   const filtered = txs.filter(t => typeFilter === "all" || t.type === typeFilter);
   const types = Array.from(new Set(txs.map(t => t.type)));
 
-  if (loading) return <p className="text-muted-foreground text-sm">Carregando…</p>;
+  if (loading) return <p className="text-muted-foreground text-sm">Carregando...</p>;
 
   return (
     <div>

@@ -227,7 +227,7 @@ const Dashboard = () => {
     }
   };
 
-  // Auto-trigger unlock when arriving via /dashboard?id=…&unlock=N
+  // Auto-trigger unlock when arriving via /dashboard?id=...&unlock=N
   useEffect(() => {
     if (autoUnlockDone) return;
     if (!consultation || !profile || unlocking) return;
