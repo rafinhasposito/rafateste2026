@@ -182,7 +182,7 @@ const Dashboard = () => {
     }
 
     if ((profile.credits ?? 0) < creditsNeeded) {
-      showAlert(`Você precisa de ${creditsNeeded} crédito${creditsNeeded > 1 ? "s" : ""}.`);
+      showAlert(`Créditos insuficientes. Você precisa de ${creditsNeeded} crédito${creditsNeeded > 1 ? "s" : ""} para esta ação.`);
       return;
     }
 

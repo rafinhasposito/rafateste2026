@@ -124,7 +124,7 @@ const History = () => {
         {!loading && consultations.length === 0 && (
           <div className="text-center py-20">
             <MapPin className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground text-sm mb-6">Nenhuma consulta realizada ainda.</p>
+            <p className="text-muted-foreground text-sm mb-6">Você ainda não realizou nenhuma consulta.</p>
             <button onClick={() => navigate("/")} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm uppercase tracking-widest">
               Calcular Primeira Rota
             </button>

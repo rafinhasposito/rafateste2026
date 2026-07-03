@@ -190,7 +190,7 @@ const Profile = () => {
             <button onClick={() => navigate("/history")} className="text-primary text-[10px] uppercase tracking-widest hover:underline">Ver todas →</button>
           </div>
           {recent.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-6">Nenhuma consulta ainda.</p>
+            <p className="text-muted-foreground text-sm text-center py-6">Você ainda não realizou nenhuma consulta.</p>
           ) : (
             <div className="space-y-2">
               {recent.map(c => (
