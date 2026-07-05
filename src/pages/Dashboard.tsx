@@ -7,6 +7,8 @@ import UserMenu from "@/components/UserMenu";
 import HouseCard from "@/components/HouseCard";
 import HouseDetail from "@/components/HouseDetail";
 import ConfirmCreditAction from "@/components/ConfirmCreditAction";
+import PageLoader from "@/components/PageLoader";
+import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
