@@ -188,7 +188,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         ) : (
           <Search className="w-4 h-4" />
         )}
-        {loading ? "Calculando Rotas..." : "Revelar Cidades Ideais (1 crédito)"}
+        {loading ? "Calculando rotas estelares..." : "Revelar cidades ideais (1 crédito)"}
       </button>
 
       <AnimatePresence>
