@@ -78,12 +78,12 @@ const UsersTable = () => {
     r.display_name?.toLowerCase().includes(filter.toLowerCase())
   );
 
-  if (loading) return <p className="text-muted-foreground text-sm">Carregando usuários...</p>;
+  if (loading) return <p className="text-muted-foreground text-sm">Carregando usuários…</p>;
 
   return (
     <div>
       <input
-        placeholder="Buscar por email ou nome..." value={filter} onChange={e => setFilter(e.target.value)}
+        placeholder="Buscar por email ou nome…" value={filter} onChange={e => setFilter(e.target.value)}
         className="w-full px-4 py-2 rounded-xl bg-background/40 border border-border text-foreground text-sm mb-4"
       />
       <div className="space-y-2">

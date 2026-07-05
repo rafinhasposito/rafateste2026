@@ -912,7 +912,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                         <div className="flex items-center gap-2">
                           <Loader2 className="w-3.5 h-3.5 text-white/60 animate-spin" />
-                          <span className="text-white/70 text-[10px] font-medium uppercase tracking-wider">Calculando cidade...</span>
+                          <span className="text-white/70 text-[10px] font-medium uppercase tracking-wider">Calculando cidade…</span>
                         </div>
                       </div>
                     )}
@@ -951,12 +951,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 <p className="text-white/50 text-xs mt-2">
                   Seus créditos: <span className="font-bold" style={{ color: `rgb(${accentColor})` }}>{userCredits ?? 0}</span>
                 </p>
-                <p className="text-amber-300/80 text-[10px] mt-3 leading-relaxed">
-                  Ao selecionar um pacote, os créditos serão debitados imediatamente.
-                  Esta ação não pode ser desfeita.
-                </p>
               </div>
-
 
               <div className="space-y-3">
                 {UNLOCK_PACKAGES.map((pkg) => {
