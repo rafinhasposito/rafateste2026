@@ -63,10 +63,10 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
 
   const handleLookup = async () => {
     if (intent.length < 10) { showAlert("Descreva seu desejo com pelo menos 10 caracteres."); return; }
-    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
+    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima primeiro."); return; }
 
     const match = matchIntentToHouse(intent);
-    if (!match) { showAlert("Não conseguimos identificar a área. Tente palavras como: dinheiro, amor, carreira, saúde ou viagem."); return; }
+    if (!match) { showAlert("Não conseguimos identificar a área. Tente palavras como: dinheiro, amor, carreira, saúde, viagem..."); return; }
 
     const houseNum = match.house;
     const houseData = cityDatabase[houseNum];
@@ -80,7 +80,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       description: `Consulta por Intenção — Casa ${houseNum} (${houseData.label}) em ${year}`,
     });
     if (!charge.ok) {
-      showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
+      showAlert("Você não tem créditos suficientes. Cada consulta custa 1 crédito.");
       navigate("/credits");
       return;
     }
@@ -152,7 +152,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       onHouseFound?.(houseNum);
     } catch (error) {
       const err = error as Error;
-      showAlert("Falha na consulta: " + err.message);
+      showAlert("Erro: " + err.message);
     } finally {
       setLoadingState(false);
     }
@@ -199,7 +199,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         ) : (
           <Sparkles className="w-4 h-4" />
         )}
-        {loading ? "Consultando o cosmos..." : "Revelar meu destino (1 crédito)"}
+        {loading ? "Consultando o Cosmos..." : "Revelar Meu Destino (1 crédito)"}
       </button>
 
       <AnimatePresence>

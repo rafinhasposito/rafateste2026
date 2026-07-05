@@ -114,7 +114,7 @@ const MetricsDashboard = () => {
     })();
   }, []);
 
-  if (!m) return <p className="text-muted-foreground text-sm">Carregando métricas…</p>;
+  if (!m) return <p className="text-muted-foreground text-sm">Carregando métricas...</p>;
 
   const fmtBrl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 

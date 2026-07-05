@@ -1,51 +1,50 @@
 /**
- * Copy centralizada — usada em toda a aplicação para garantir
- * consistência de vocabulário e tempos verbais.
- *
- * Regras:
- *  - Loading → presente contínuo ("Consultando...", "Carregando...").
- *  - Conclusão → passado ("Consulta realizada", "Crédito debitado").
- *  - Ações futuras → futuro ("Você receberá...", "Será debitado...").
- *  - Termo oficial: "crédito(s)" (nunca "consulta" como moeda).
+ * Copy centralizado — strings reutilizadas na UI.
+ * Regras de tempos verbais:
+ * - Presente contínuo (gerúndio) para loading: "Consultando o cosmos...", "Calculando rotas...".
+ * - Passado para conclusão: "Consulta realizada", "Casa desbloqueada".
+ * - Futuro para efeitos posteriores: "Será debitado", "Você receberá".
  */
 
-export const copy = {
-  // Loading
-  loadingCosmos: "Consultando o cosmos...",
-  loadingRoutes: "Calculando rotas estelares...",
-  loadingCity: "Simulando deslocamento...",
-  loadingHistory: "Carregando histórico...",
-  loadingMap: "Carregando mapa estelar...",
-  loadingGeneric: "Carregando...",
+export const LOADING = {
+  cosmos: "Consultando o cosmos...",
+  routes: "Calculando rotas...",
+  history: "Carregando histórico...",
+  map: "Carregando mapa estelar...",
+  packages: "Carregando pacotes...",
+  saving: "Salvando...",
   processing: "Processando...",
-
-  // Botões principais (com custo inline)
-  ctaIntent: "Revelar meu destino (1 crédito)",
-  ctaHouse: "Revelar cidades ideais (1 crédito)",
-  ctaCity: "Simular deslocamento (1 crédito)",
-
-  // Toasts pós-débito
-  chargedOne: "Consulta iniciada. 1 crédito debitado.",
-  chargedMany: (n: number) => `Consulta iniciada. ${n} créditos debitados.`,
-
-  // Erros
-  errNoCredits:
-    "Você não possui créditos suficientes. Cada consulta custa 1 crédito.",
-  errFillNatal: "Preencha seus dados natais acima antes de continuar.",
-  errAuthRequired: "Entre na sua conta para realizar a consulta.",
-  errQueryPrefix: "Falha na consulta:",
-
-  // Validações específicas
-  errIntentShort: "Descreva seu desejo com pelo menos 10 caracteres.",
-  errIntentNoMatch:
-    "Não conseguimos identificar a área. Tente palavras como: dinheiro, amor, carreira, saúde ou viagem.",
-  errHouseNotSelected: "Selecione uma casa astrológica no grid.",
-
-  // Desbloqueios
-  unlockConfirmTitle: "Confirmar desbloqueio",
-  unlockIrreversible:
-    "Esta ação é irreversível. Os créditos serão debitados imediatamente.",
-
-  // Créditos
-  creditLabel: (n: number) => `${n} crédito${n === 1 ? "" : "s"}`,
+  generic: "Carregando...",
 } as const;
+
+export const ACTIONS = {
+  consult: "Consultar",
+  revealDestiny: "Revelar meu destino",
+  revealCities: "Revelar cidades ideais",
+  seeOracle: "Ver Oráculo",
+  newConsultation: "Nova Consulta",
+  buyCredits: "Comprar mais créditos",
+} as const;
+
+export const EMPTY = {
+  noConsultations: "Você ainda não realizou nenhuma consulta.",
+  noTransactions: "Nenhuma movimentação de créditos até o momento.",
+} as const;
+
+export const CREDITS = {
+  insufficient: "Créditos insuficientes. Cada consulta custa 1 crédito.",
+  charged: "Consulta iniciada. 1 crédito debitado.",
+  need: (n: number) =>
+    `Créditos insuficientes. Você precisa de ${n} crédito${n > 1 ? "s" : ""} para esta ação.`,
+  unlocked: (n: number) =>
+    `${n} casa${n > 1 ? "s" : ""} desbloqueada${n > 1 ? "s" : ""} com sucesso.`,
+} as const;
+
+export const ERRORS = {
+  unlockFailed: "Falha ao desbloquear. Tente novamente.",
+  consultationFailed: "Não foi possível concluir a consulta. Tente novamente.",
+  genericSave: "Não foi possível salvar. Tente novamente.",
+} as const;
+
+export const pluralCredits = (n: number) =>
+  `${n} crédito${n === 1 ? "" : "s"}`;

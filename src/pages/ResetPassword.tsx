@@ -41,7 +41,7 @@ const ResetPassword = () => {
           <h1 className="font-cinzel text-xl font-bold text-foreground uppercase tracking-wider mb-2 text-center">Nova Senha</h1>
           <p className="text-muted-foreground text-xs text-center mb-6">Defina uma nova senha para sua conta</p>
           {!ready ? (
-            <p className="text-muted-foreground text-sm text-center">Aguardando link de recuperação…</p>
+            <p className="text-muted-foreground text-sm text-center">Aguardando link de recuperação...</p>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
               <input type="password" required minLength={6} placeholder="Nova senha" value={password} onChange={e => setPassword(e.target.value)}

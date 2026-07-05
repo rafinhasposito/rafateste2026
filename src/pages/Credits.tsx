@@ -51,7 +51,7 @@ const Credits = () => {
 
         {/* Packages Grid */}
         {loading ? (
-          <p className="text-primary font-cinzel text-base md:text-lg uppercase tracking-[0.2em] animate-pulse text-center py-8" role="status" aria-live="polite">Carregando pacotes...</p>
+          <p className="text-muted-foreground text-center text-sm">Carregando pacotes...</p>
         ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {packages.map((pkg, i) => {

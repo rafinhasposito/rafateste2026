@@ -7,8 +7,6 @@ import UserMenu from "@/components/UserMenu";
 import HouseCard from "@/components/HouseCard";
 import HouseDetail from "@/components/HouseDetail";
 import ConfirmCreditAction from "@/components/ConfirmCreditAction";
-import PageLoader from "@/components/PageLoader";
-import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
@@ -184,7 +182,7 @@ const Dashboard = () => {
     }
 
     if ((profile.credits ?? 0) < creditsNeeded) {
-      showAlert(`Você precisa de ${creditsNeeded} crédito${creditsNeeded > 1 ? "s" : ""}.`);
+      showAlert(`Créditos insuficientes. Você precisa de ${creditsNeeded} crédito${creditsNeeded > 1 ? "s" : ""} para esta ação.`);
       return;
     }
 
@@ -229,7 +227,7 @@ const Dashboard = () => {
     }
   };
 
-  // Auto-trigger unlock when arriving via /dashboard?id=…&unlock=N
+  // Auto-trigger unlock when arriving via /dashboard?id=...&unlock=N
   useEffect(() => {
     if (autoUnlockDone) return;
     if (!consultation || !profile || unlocking) return;
@@ -246,20 +244,26 @@ const Dashboard = () => {
   }, [consultation?.id, profile?.credits, unlockParam, autoUnlockDone]);
 
   if (loading) {
-    return <PageLoader label="Carregando mapa estelar..." />;
+    return (
+      <>
+        <StarryBackground />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-primary font-cinzel text-xl animate-pulse">Carregando mapa estelar...</div>
+        </div>
+      </>
+    );
   }
 
   if (!consultation) {
     return (
       <>
         <StarryBackground />
-        <div className="min-h-dvh flex items-center justify-center">
-          <EmptyState
-            icon={Compass}
-            title="Nenhuma consulta encontrada"
-            description="Calcule sua primeira rota estelar para ver o dashboard."
-            action={{ label: "Calcular Rota", onClick: () => navigate("/") }}
-          />
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
+          <h2 className="font-cinzel text-2xl font-bold text-foreground mb-4">Nenhuma Consulta Encontrada</h2>
+          <p className="text-muted-foreground text-sm mb-8">Calcule sua primeira rota estelar para ver o dashboard.</p>
+          <button onClick={() => navigate("/")} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm uppercase tracking-widest">
+            Calcular Rota
+          </button>
         </div>
       </>
     );

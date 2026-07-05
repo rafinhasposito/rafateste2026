@@ -912,7 +912,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                       <div className="mt-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
                         <div className="flex items-center gap-2">
                           <Loader2 className="w-3.5 h-3.5 text-white/60 animate-spin" />
-                          <span className="text-white/70 text-[10px] font-medium uppercase tracking-wider">Calculando cidade…</span>
+                          <span className="text-white/70 text-[10px] font-medium uppercase tracking-wider">Calculando cidade...</span>
                         </div>
                       </div>
                     )}

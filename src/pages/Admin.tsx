@@ -21,7 +21,7 @@ const Admin = () => {
     return (
       <>
         <StarryBackground />
-        <div className="min-h-screen flex items-center justify-center text-primary font-cinzel animate-pulse">Verificando acesso…</div>
+        <div className="min-h-screen flex items-center justify-center text-primary font-cinzel animate-pulse">Verificando acesso...</div>
       </>
     );
   }

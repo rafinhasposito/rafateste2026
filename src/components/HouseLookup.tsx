@@ -67,8 +67,8 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
   };
 
   const handleLookup = async () => {
-    if (!selectedHouse) { showAlert("Selecione uma casa astrológica no grid."); return; }
-    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
+    if (!selectedHouse) { showAlert("Selecione uma Casa no grid."); return; }
+    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima primeiro."); return; }
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
 
     const houseData0 = cityDatabase[selectedHouse];
@@ -79,7 +79,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       description: `Consulta por Casa — Casa ${selectedHouse} (${houseData0?.label ?? ""}) em ${year}`,
     });
     if (!charge.ok) {
-      showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
+      showAlert("Você não tem créditos suficientes. Cada consulta custa 1 crédito.");
       navigate("/credits");
       return;
     }
@@ -157,7 +157,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       onHouseSelected?.(selectedHouse);
     } catch (error) {
       const err = error as Error;
-      showAlert("Falha na consulta: " + err.message);
+      showAlert("Erro: " + err.message);
     } finally {
       setLoadingState(false);
     }
@@ -188,7 +188,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         ) : (
           <Search className="w-4 h-4" />
         )}
-        {loading ? "Calculando rotas estelares..." : "Revelar cidades ideais (1 crédito)"}
+        {loading ? "Calculando Rotas..." : "Revelar Cidades Ideais (1 crédito)"}
       </button>
 
       <AnimatePresence>
