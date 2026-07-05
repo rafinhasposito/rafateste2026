@@ -85,7 +85,7 @@ const Profile = () => {
     return (
       <>
         <StarryBackground />
-        <div className="min-h-screen flex items-center justify-center text-primary font-cinzel animate-pulse">Carregando...</div>
+        <div className="min-h-screen flex items-center justify-center text-primary font-cinzel animate-pulse">Carregando…</div>
       </>
     );
   }
@@ -177,7 +177,7 @@ const Profile = () => {
               disabled={saving}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-primary/40 bg-primary/10 text-primary font-bold text-xs uppercase tracking-[0.14em] hover:bg-primary/20 transition-all disabled:opacity-40"
             >
-              <Save className="w-4 h-4" /> {saving ? "Salvando..." : "Salvar Perfil"}
+              <Save className="w-4 h-4" /> {saving ? "Salvando…" : "Salvar Perfil"}
             </button>
           </div>
         </motion.div>
@@ -190,7 +190,7 @@ const Profile = () => {
             <button onClick={() => navigate("/history")} className="text-primary text-[10px] uppercase tracking-widest hover:underline">Ver todas →</button>
           </div>
           {recent.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-6">Você ainda não realizou nenhuma consulta.</p>
+            <p className="text-muted-foreground text-sm text-center py-6">Nenhuma consulta ainda.</p>
           ) : (
             <div className="space-y-2">
               {recent.map(c => (

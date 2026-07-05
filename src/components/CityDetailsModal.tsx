@@ -157,7 +157,7 @@ const CityDetailsModal: React.FC<CityDetailsModalProps> = ({
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 text-primary animate-spin" />
                 <span className="ml-3 text-sm text-foreground/40">
-                  Consultando dados da cidade...
+                  Consultando dados da cidade…
                 </span>
               </div>
             )}
