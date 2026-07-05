@@ -69,7 +69,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       return;
     }
     if (!name || !birthdate || !birthtime || !birthPlace) {
-      showAlert("Preencha seus dados natais acima primeiro.");
+      showAlert("Preencha seus dados natais acima antes de continuar.");
       return;
     }
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
@@ -80,7 +80,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       description: `Consulta por Cidade — ${city} em ${year}`,
     });
     if (!charge.ok) {
-      showAlert("Você não tem créditos suficientes. Cada consulta custa 1 crédito.");
+      showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
       navigate("/credits");
       return;
     }
@@ -190,7 +190,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       onHouseFound?.(houseNum, city);
     } catch (error) {
       const err = error as Error;
-      showAlert("Erro: " + err.message);
+      showAlert("Falha na consulta: " + err.message);
     } finally {
       setLoadingState(false);
     }
@@ -231,7 +231,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
           ) : (
             <Search className="w-4 h-4" />
           )}
-          {loading ? "Calculando..." : "Consultar (1 crédito)"}
+          {loading ? "Simulando deslocamento..." : "Simular deslocamento (1 crédito)"}
         </button>
       </div>
 
