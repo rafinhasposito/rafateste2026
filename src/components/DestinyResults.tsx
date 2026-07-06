@@ -951,7 +951,12 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 <p className="text-white/50 text-xs mt-2">
                   Seus créditos: <span className="font-bold" style={{ color: `rgb(${accentColor})` }}>{userCredits ?? 0}</span>
                 </p>
+                <p className="text-amber-300/80 text-[10px] mt-3 leading-relaxed">
+                  Ao selecionar um pacote, os créditos serão debitados imediatamente.
+                  Esta ação não pode ser desfeita.
+                </p>
               </div>
+
 
               <div className="space-y-3">
                 {UNLOCK_PACKAGES.map((pkg) => {

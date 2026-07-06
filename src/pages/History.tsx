@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, MapPin, Eye, Unlock, CreditCard, Compass, Crown, Scroll, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import UserMenu from "@/components/UserMenu";
+import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase, houseColors } from "@/data/houses";
@@ -115,20 +116,21 @@ const History = () => {
 
         {/* Loading */}
         {loading && (
-          <div className="text-center">
-            <p className="text-primary font-cinzel text-lg animate-pulse">Carregando histórico...</p>
+          <div className="text-center py-16">
+            <p className="text-primary font-cinzel text-base md:text-lg uppercase tracking-[0.2em] animate-pulse" role="status" aria-live="polite">
+              Carregando histórico...
+            </p>
           </div>
         )}
 
         {/* Empty */}
         {!loading && consultations.length === 0 && (
-          <div className="text-center py-20">
-            <MapPin className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground text-sm mb-6">Nenhuma consulta realizada ainda.</p>
-            <button onClick={() => navigate("/")} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm uppercase tracking-widest">
-              Calcular Primeira Rota
-            </button>
-          </div>
+          <EmptyState
+            icon={MapPin}
+            title="Nenhuma consulta ainda"
+            description="Calcule sua primeira rota estelar para começar sua jornada."
+            action={{ label: "Calcular primeira rota", onClick: () => navigate("/") }}
+          />
         )}
 
         {/* Consultation Cards */}
