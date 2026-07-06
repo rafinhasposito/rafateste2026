@@ -289,111 +289,110 @@ const Dashboard = () => {
     }
   }
 
-  const isPast = currentMode === "passado";
-  const modeToken = isPast
-    ? { label: "Passado", cls: "text-amber-400 border-amber-400/30 bg-amber-400/10", dot: "bg-amber-400" }
-    : currentMode === "presente"
-      ? { label: "Presente", cls: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10", dot: "bg-emerald-400" }
-      : { label: "Futuro", cls: "text-indigo-400 border-indigo-400/30 bg-indigo-400/10", dot: "bg-indigo-400" };
-
-  const accent = extractAccentColor(goalHouse);
-  const searchType = inferSearchType(consultation);
-  const SearchIcon = searchType.Icon;
-  const houseLabel = goalHouse ? cityDatabase[goalHouse]?.label : null;
-  const dt = new Date(consultation.created_at);
-  const formattedDate = dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
-  const formattedTime = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
   return (
     <>
       <StarryBackground />
       {user && <UserMenu />}
-      <div className="min-h-screen px-4 py-8 max-w-6xl mx-auto relative z-10">
-        {/* Editorial Header */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
-          <div>
-            <nav className="flex items-center gap-2 text-primary/80 text-[10px] uppercase tracking-[0.25em] mb-2">
-              <button onClick={() => navigate("/")} className="hover:text-primary transition-colors">Mapa Astral</button>
-              <span className="opacity-30">/</span>
-              <span className="text-muted-foreground">Ver o Mapa Completo</span>
-            </nav>
-            <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground tracking-tight">
-              Dashboard Estelar
-            </h1>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={`px-3 py-1.5 border text-[10px] font-bold rounded-full uppercase tracking-[0.2em] inline-flex items-center gap-2 ${modeToken.cls}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${modeToken.dot} animate-pulse`} />
-              Modo · {modeToken.label}
-            </span>
-            <button
-              onClick={() => navigate("/credits")}
-              className="px-3 py-1.5 border border-primary/30 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-[0.2em] hover:bg-primary/15 transition-colors"
+      <div className="min-h-screen px-4 py-8 max-w-7xl mx-auto relative z-10">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary transition-colors">
+            ← Nova Consulta
+          </button>
+          <button onClick={() => navigate("/credits")} className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors font-semibold">
+            {credits} Créditos
+          </button>
+        </div>
+
+        {/* Header — Consultation Summary Card (mirrors History) */}
+        {(() => {
+          const isPast = currentMode === "passado";
+          const accent = extractAccentColor(goalHouse);
+          const searchType = inferSearchType(consultation);
+          const SearchIcon = searchType.Icon;
+          const houseLabel = goalHouse ? cityDatabase[goalHouse]?.label : null;
+          const dt = new Date(consultation.created_at);
+          const formattedDate = dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+          const formattedTime = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-5 md:p-6 mb-8 max-w-3xl mx-auto"
+              style={{ borderLeft: `4px solid rgba(${accent}, 0.6)` }}
             >
-              {credits} Créditos
-            </button>
-          </div>
-        </header>
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                    <span className={`text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border ${
+                      isPast
+                        ? "text-amber-400 border-amber-400/30 bg-amber-400/10"
+                        : currentMode === "presente"
+                          ? "text-blue-400 border-blue-400/30 bg-blue-400/10"
+                          : "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
+                    }`}>
+                      {isPast ? "Passado" : currentMode === "presente" ? "Presente" : "Futuro"}
+                    </span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/60 flex items-center gap-1">
+                      <SearchIcon className="w-2.5 h-2.5" />
+                      {searchType.label}
+                    </span>
+                    <span className="text-foreground font-cinzel font-bold text-sm">
+                      Revolução Solar {consultation.year}
+                    </span>
+                  </div>
 
-        {/* Fused Oracle + Summary card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl border border-border/50 bg-card/40 backdrop-blur-sm p-6 md:p-10 mb-10"
-          style={{ borderLeft: `4px solid rgba(${accent}, 0.7)` }}
-        >
-          <div className="absolute top-0 right-0 p-8 opacity-[0.06] pointer-events-none">
-            <svg className="w-40 h-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 2v20M2 12h20M12 7l5 5-5 5M12 7l-5 5 5 5" />
-            </svg>
-          </div>
-          <div className="relative z-10 max-w-3xl">
-            {oracleText && (
-              <>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] mb-4" style={{ color: `rgb(${accent})` }}>
-                  {currentMode === "passado" ? "Análise do Mestre Astrólogo" : "Oráculo do Mestre Astrólogo"}
-                </p>
-                <p className="font-cinzel text-xl md:text-2xl text-foreground leading-relaxed mb-6 italic">
-                  "{oracleText}"
-                </p>
-              </>
-            )}
+                  <p className="text-foreground/80 text-sm mb-1">{consultation.name}</p>
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-5 border-t border-border/50">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/60 inline-flex items-center gap-1">
-                    <SearchIcon className="w-2.5 h-2.5" />
-                    {searchType.label}
+                  {goalHouse && houseLabel && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full" style={{ background: `rgb(${accent})` }} />
+                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: `rgb(${accent})` }}>
+                        Casa {goalHouse} — {houseLabel}
+                      </p>
+                    </div>
+                  )}
+
+                  {consultation.origin && (
+                    <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
+                      <MapPin className="w-3 h-3" />
+                      <span className="text-[11px]">{consultation.origin}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 text-muted-foreground text-[11px] shrink-0">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3" />
+                    {formattedDate}
                   </span>
-                  <span className="text-foreground font-cinzel font-bold text-sm">
-                    Revolução Solar {consultation.year}
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3 h-3" />
+                    {formattedTime}
                   </span>
                 </div>
-                <p className="text-foreground/70 text-sm">{consultation.name}</p>
-                {goalHouse && houseLabel && (
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className="w-2 h-2 rounded-full" style={{ background: `rgb(${accent})` }} />
-                    <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: `rgb(${accent})` }}>
-                      Casa {goalHouse} — {houseLabel}
-                    </p>
-                  </div>
-                )}
-                {consultation.origin && (
-                  <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
-                    <MapPin className="w-3 h-3" />
-                    <span className="text-[11px]">{consultation.origin}</span>
-                  </div>
-                )}
               </div>
-              <div className="flex items-center gap-4 text-muted-foreground text-[11px] shrink-0">
-                <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" />{formattedDate}</span>
-                <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" />{formattedTime}</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
+          );
+        })()}
+
+        {/* Oracle Text */}
+        {oracleText && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-3xl mx-auto mb-12 rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8"
+          >
+            <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3 text-center">
+              {currentMode === "passado" ? "Análise do Mestre Astrólogo" : "Oráculo do Mestre Astrólogo"}
+            </p>
+            <p className="text-foreground/80 text-sm italic leading-relaxed text-center font-light">
+              "{oracleText}"
+            </p>
+          </motion.div>
+        )}
 
         {/* Selected House Detail */}
         <AnimatePresence>
@@ -413,16 +412,6 @@ const Dashboard = () => {
             );
           })()}
         </AnimatePresence>
-
-        {/* Houses Grid header */}
-        <div className="flex items-baseline justify-between mb-4 mt-2">
-          <h2 className="font-cinzel text-sm font-bold text-foreground uppercase tracking-[0.3em]">
-            As 12 Casas
-          </h2>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            {consultation.houses_unlocked} de {TOTAL_HOUSES} desbloqueadas
-          </span>
-        </div>
 
         {/* Houses Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4 mb-12">
@@ -451,8 +440,8 @@ const Dashboard = () => {
         {/* Unlock CTA */}
         {lockedCount > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-12">
-            <div className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-8 max-w-xl mx-auto">
-              <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-[0.2em] mb-2">
+            <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-8 max-w-xl mx-auto">
+              <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-2">
                 Desbloqueie Mais Casas
               </h3>
               <p className="text-muted-foreground text-xs font-light mb-6">
@@ -465,26 +454,20 @@ const Dashboard = () => {
                     <button
                       key={opt.amount}
                       onClick={() => handleUnlock(opt.amount)}
-                      disabled={!canAfford || unlocking}
-                      className={`px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-[0.2em] transition-all ${
-                        canAfford
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
-                          : "bg-foreground/5 text-muted-foreground cursor-not-allowed border border-border/50"
-                      }`}
+                      disabled={unlocking || !canAfford}
+                      className="px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {opt.label} · {opt.cost} cr
+                      {unlocking ? "..." : `${opt.label} (${opt.cost} cr)`}
                     </button>
                   );
                 })}
-              </div>
-              {credits < 1 && (
                 <button
                   onClick={() => navigate("/credits")}
-                  className="mt-4 text-primary text-xs uppercase tracking-[0.2em] font-semibold hover:underline"
+                  className="px-5 py-3 rounded-xl border border-primary/25 bg-card/40 text-foreground font-bold text-xs uppercase tracking-[0.14em] hover:border-primary/40 transition-all"
                 >
-                  Comprar créditos →
+                  Comprar Créditos
                 </button>
-              )}
+              </div>
             </div>
           </motion.div>
         )}
