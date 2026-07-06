@@ -1,43 +1,82 @@
-# Plano: Corrigir Histórico, Desbloqueio Passado/Presente e Sweep de Bugs
+## Objetivo
+Reconstruir a tela "Ver o Mapa Completo" (`/dashboard`) seguindo a direção **Editorial Cósmico** escolhida, unificando o vocabulário visual com o Histórico de Consultas: hierarquia editorial, cards `rounded-2xl/3xl` com borda-esquerda colorida por casa, tipografia Cinzel dominante, labels `uppercase tracking-[0.2em]`, superfícies `slate-900/40` com `backdrop-blur`, e acentos por casa/modo (âmbar/esmeralda/índigo + `--house-accent`).
 
-## Problemas confirmados
+Nada de conteúdo removido — apenas reorganização, refinamento visual e coesão.
 
-1. **Histórico vazio**: os fluxos da home (`CityLookup`, `HouseLookup`, `IntentLookup`) cobram 1 crédito e chamam a API, mas **não inserem em `consultations`**. Só o Dashboard lê essa tabela → toda consulta nova desaparece do histórico. Só existem 24 linhas antigas.
-2. **"Olhinho + DESBLOQUEADA" no passado/presente**: `CityLookup` usa o endpoint `/audit_past`, que só devolve a casa-alvo (sem `results` das outras 11). Quando o usuário paga para desbloquear as 12 casas, o `DestinyResults` não tem cidades para exibir e cai no fallback genérico "Desbloqueada". No futuro funciona porque `HouseLookup`/`IntentLookup` chamam `/find_all_cities` e passam `allResults`.
-3. **Warning React**: `DestinyResults` mistura shorthand `border` com longhand `borderLeft` no mesmo `style` (log do console).
-4. **`handleUnlock` duplicado**: cada lookup tem sua própria função de desbloqueio de "pacotes", mas o Dashboard já tem a versão canônica; a versão da home debita créditos mas não atualiza `houses_unlocked` em lugar nenhum (não tem registro pra atualizar) — é um vazamento de créditos.
+## Escopo (arquivos)
+1. `src/pages/Dashboard.tsx`
+2. `src/components/HouseDetail.tsx`
+3. `src/components/HouseCard.tsx` (ajustes leves para casar com nova estética)
 
-## Correções
+## Mudanças por seção
 
-### 1. Persistir toda consulta em `consultations`
-Nos três lookups, logo após sucesso da API, inserir:
-- `user_id, name, birthdate, birthtime, birth_place, year, mode` (passado/presente/futuro), `goal` (nº casa quando aplicável), `intent` (quando aplicável), `origin` (cidade quando Cidade), `result` = payload completo da API (inclui `results` para desbloqueios futuros no Dashboard), `houses_unlocked: 1` (só a casa-alvo liberada).
-- Guardar o `id` retornado no state para o botão "Desbloquear +N" navegar para `/dashboard?id=<id>` **em vez de** debitar créditos localmente sem atualizar nada.
+### 1. Cabeçalho do Dashboard
+- Substituir a "top bar" simples por um **header editorial**:
+  - Migalha `Mapa Astral / Ver o Mapa Completo` em índigo `uppercase tracking-widest`.
+  - Título `Dashboard Estelar` em Cinzel 3xl-4xl.
+  - À direita, pill do modo (Passado/Presente/Futuro na cor certa) + pill "Créditos" e link "Nova Consulta" reorganizados como pílulas coerentes.
 
-### 2. Passado/Presente com paridade de desbloqueio
-Em `CityLookup`, após `/audit_past` retornar `houseNum`, disparar **em paralelo** `/find_all_cities` com `alvoId: houseNum` e mesclar o `results` no `allResults` passado ao `DestinyResults`. Assim, quando o usuário paga para desbloquear as outras casas, elas mostram cidade+bandeira+país igual ao futuro.
+### 2. Card de resumo + Oráculo (fusão)
+- Fundir o card de resumo da consulta e o bloco de Oráculo em **uma única "carta editorial"** `rounded-3xl` com:
+  - Ícone/glifo cósmico grande decorativo em `opacity-10` no canto.
+  - Label `Oráculo do Mestre Astrólogo` em índigo.
+  - Frase em Cinzel 2xl branca (a citação do oráculo).
+  - Rodapé separado por `border-t`: nome + Casa alvo colorida + data/hora + origem (equivalente ao card atual, condensado).
+- Borda-esquerda 4px na cor da casa alvo.
 
-### 3. Remover fallback "Desbloqueada" enganoso
-Em `DestinyResults` (linhas ~898-905), se `isUnlocked && !houseCity && !isCurrentHouse`, mostrar um estado real: "Calculando cidade…" com spinner OU esconder a linha (nunca mais o olhinho + palavra "Desbloqueada" solta).
+### 3. Grid das 12 Casas
+- Manter `HouseCard`, mas ajustar container: grid `grid-cols-6 md:grid-cols-12 gap-3` em variação "constelação" — cards menores tipo aspecto quadrado com `CASA` label + número em Cinzel; a casa selecionada ganha `border-2` na cor da casa + `bg-[accent]/10` + glow. Casa alvo mantém coroa. Casas bloqueadas com `opacity-40 grayscale-[.4]`.
+- Chip "N de 12 desbloqueadas" acima do grid.
 
-### 4. Unificar botão de desbloqueio
-Trocar `handleUnlock` local dos 3 lookups por: navegar para `/dashboard?id=<consultation.id>&unlock=<n>`, e o Dashboard já cuida do débito + `houses_unlocked` corretamente (única fonte de verdade). Elimina o vazamento de créditos.
+### 4. Painel de Detalhe da Casa (HouseDetail) — reconstrução completa
+Aplicar layout de duas colunas:
 
-### 5. Fix warning React
-Em `DestinyResults`, substituir o objeto `style` que tem `border` + `borderLeft` por longhands (`borderTop/Right/Bottom/Left` ou `borderColor`+`borderLeftColor`) para eliminar o warning do console.
+```text
+┌──────────────────────────────────────────────────────────┐
+│ Fechar                                                   │
+├─────────────────────┬────────────────────────────────────┤
+│ SIDEBAR (1/3)       │  MAIN (2/3)                        │
+│ border-l-8 accent   │                                    │
+│ • Casa N (Cinzel 3xl)│ • Leitura de Ativação             │
+│ • Label da casa      │ • Tags                            │
+│ • Arquétipo / Signo  │ • Egrégora / Resumo poético       │
+│   / Regente / Cristal│ • Destinos Calculados (grid 2×2)  │
+│ • Badge modo         │   com mapa + coordenadas          │
+│ • Cidade aniversário │ • Promessa do Universo            │
+│   (past + goal)      │ • Profissional / Amor / Pessoal   │
+│ • Tags (chips)       │ • Benefício / Ideal Para          │
+│ • Radar de Impacto   │                                   │
+│   (barras finas)     │                                   │
+└─────────────────────┴────────────────────────────────────┘
+```
 
-### 6. Sweep adicional
-- Verificar se `IntentLookup` e `HouseLookup` também têm `handleUnlock` vazio (têm) e aplicar o mesmo redirecionamento.
-- Confirmar que o Dashboard carregado via `?id=` continua abrindo a casa-alvo por padrão e permitindo clicar nas outras (grid de 3 colunas mantido).
-- Garantir que `mode` gravado em `consultations` bate com os filtros usados no `History` (`passado` vs `futuro`).
+- Container: `bg-slate-900/60 rounded-[2rem] border border-border/50 overflow-hidden`.
+- Sidebar: `bg-slate-950/40 border-r`, `border-l-8` cor da casa.
+- Radar com barras finas h-1 estilo protótipo (não h-1.5 pesadas).
+- Destinos: cards `rounded-2xl bg-slate-800/40 border border-slate-800`, mapa embutido menor (h-24), coordenadas discretas.
+- Cabeçalhos de seção: `text-[10px] uppercase tracking-[0.25em]` na cor accent da casa.
+- Footer com `Benefício` (verde) e `Ideal Para` (âmbar) lado a lado com labels coloridos, separados por `border-t border-slate-800`.
 
-## Arquivos afetados
-- `src/components/CityLookup.tsx` — insert em consultations, chamada extra `/find_all_cities`, remover `handleUnlock` local.
-- `src/components/HouseLookup.tsx` — insert em consultations, remover `handleUnlock` local.
-- `src/components/IntentLookup.tsx` — insert em consultations, remover `handleUnlock` local.
-- `src/components/DestinyResults.tsx` — fix warning border, remover fallback "Desbloqueada", roteamento para `/dashboard?id=…` no clique de desbloqueio.
-- `src/pages/Dashboard.tsx` — ler `?unlock=N` opcional para auto-abrir modal (opcional, só se for trivial).
-- `src/pages/Index.tsx` — passar `mode` para os componentes de lookup (se ainda não passa).
+### 5. CTA de desbloqueio
+- Manter lógica intacta, mas envelopar no mesmo estilo: card `rounded-2xl bg-slate-900/40 border`, título Cinzel, botões coerentes com pílulas do resto.
 
-## Fora do escopo
-Sem mudanças no schema do banco, no Admin, nas cores/estilos ou nos textos.
+## Tokens & padronização
+- Usar tokens semânticos existentes: `card`, `border`, `foreground`, `muted-foreground`, `primary`. Onde o protótipo usa `slate-900/60` e `slate-800`, mapear para `bg-card/40` / `border-border/50` para respeitar o design system.
+- Cor de acento por casa via `--house-accent` inline (`style={{ borderLeftColor: 'rgb(var(--accent))' }}`), aproveitando `extractAccentColor`.
+- Cores por modo continuam: âmbar (passado), esmeralda (presente/futuro atual — ajustar para índigo no futuro conforme memory), respeitando a memory `Temporal modes`.
+
+## Detalhes técnicos
+- Motion: manter `AnimatePresence` no HouseDetail; entradas com `fade-in + y:20`; barras de radar animam width como já fazem.
+- Sem novas dependências.
+- Preservar todo o conteúdo textual dinâmico (past/present/future adaptations, sombra, cidade do aniversário).
+- Guards `Number.isFinite` no mapa/coords ficam como estão.
+- Sem mudança de rota, API, lógica de créditos, unlock ou queries Supabase.
+
+## Fora de escopo
+- Não mexer em `HouseLookup`, `CityLookup`, `IntentLookup`, `DestinyResults`, histórico, autenticação ou backend.
+- Não introduzir novas fontes nem palette clara.
+- Não remover seções existentes.
+
+## Verificação
+- Abrir `/dashboard?id=…` em Playwright após build, capturar full-page e comparar com o protótipo escolhido: header editorial, card oráculo fundido, grid 12 casas, painel 2-colunas com sidebar accent, radar barras finas, footer Benefício/Ideal.
+- Testar modos Passado e Futuro para garantir troca de labels/cores.

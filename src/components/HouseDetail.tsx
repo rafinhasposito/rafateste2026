@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { HouseData, houseColors } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
+import { MapPin, X } from "lucide-react";
 
 interface CityOption {
   city: string;
@@ -29,23 +30,29 @@ interface HouseDetailProps {
   onClose: () => void;
 }
 
-import { MapPin } from "lucide-react";
-
 const getMapUrl = (lat: number, lon: number) =>
   `https://maps.google.com/maps?q=${lat},${lon}&z=6&output=embed`;
 
-const RadarBar = ({ label, value, toneClass }: { label: string; value: number; toneClass: string }) => (
-  <div className="space-y-1">
+const extractAccentColor = (house: number): string => {
+  const gradient = houseColors[house] || "";
+  const match = gradient.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (match) return `${match[1]}, ${match[2]}, ${match[3]}`;
+  return "255, 215, 0";
+};
+
+const RadarBar = ({ label, value, accent }: { label: string; value: number; accent: string }) => (
+  <div className="space-y-1.5">
     <div className="flex justify-between items-center">
-      <span className="text-foreground/60 text-[10px] uppercase tracking-wider">{label}</span>
-      <span className="text-foreground/40 text-[10px]">{value}%</span>
+      <span className="text-foreground/60 text-[10px] uppercase tracking-[0.2em]">{label}</span>
+      <span className="text-foreground/50 text-[10px] font-semibold">{value}%</span>
     </div>
-    <div className="h-1.5 rounded-full bg-foreground/5 overflow-hidden">
+    <div className="h-1 rounded-full bg-foreground/5 overflow-hidden">
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${value}%` }}
         transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-        className={`h-full rounded-full ${toneClass}`}
+        className="h-full rounded-full"
+        style={{ background: `rgb(${accent})` }}
       />
     </div>
   </div>
@@ -54,23 +61,26 @@ const RadarBar = ({ label, value, toneClass }: { label: string; value: number; t
 const DestinationCard = ({
   city,
   label,
-  toneClass,
+  accent,
 }: {
   city: CityOption;
   label: string;
-  toneClass: string;
+  accent: string;
 }) => {
   if (!city) return null;
   const lat = typeof city.lat === "number" ? city.lat : Number(city.lat);
   const lon = typeof city.lon === "number" ? city.lon : Number(city.lon);
   const hasCoords = Number.isFinite(lat) && Number.isFinite(lon);
   return (
-    <div className="bg-card/40 border border-border/50 rounded-xl p-4 hover:border-primary/30 transition-all group/dest">
-      <p className={`text-[9px] uppercase tracking-[0.2em] font-semibold mb-3 ${toneClass}`}>
+    <div className="bg-card/40 border border-border/50 rounded-2xl p-4 hover:border-foreground/20 transition-all group/dest">
+      <p
+        className="text-[9px] uppercase tracking-[0.25em] font-bold mb-3"
+        style={{ color: `rgb(${accent})` }}
+      >
         {label}
       </p>
       <div className="flex items-center gap-3">
-        <MapPin className="w-5 h-5 text-primary/60 shrink-0" />
+        <MapPin className="w-5 h-5 shrink-0" style={{ color: `rgba(${accent}, 0.7)` }} />
         <div className="flex-1 min-w-0">
           <p className="text-foreground font-bold text-base">{city.city}</p>
           <p className="text-muted-foreground text-[11px]">{city.country} · {city.continent}</p>
@@ -86,7 +96,7 @@ const DestinationCard = ({
               title={`Mapa de ${city.city}`}
             />
           </div>
-          <p className="text-foreground/30 text-[9px] mt-2 text-center">
+          <p className="text-foreground/40 text-[9px] mt-2 text-center tracking-wider">
             {lat.toFixed(2)}° {lat > 0 ? "N" : "S"}, {lon.toFixed(2)}° {lon > 0 ? "L" : "O"}
           </p>
         </>
@@ -95,8 +105,17 @@ const DestinationCard = ({
   );
 };
 
+const SectionLabel = ({ children, accent }: { children: React.ReactNode; accent: string }) => (
+  <h4
+    className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3"
+    style={{ color: `rgb(${accent})` }}
+  >
+    {children}
+  </h4>
+);
+
 const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: HouseDetailProps) => {
-  const bgGradient = houseColors[house.id];
+  const accent = extractAccentColor(house.id);
   const archetype = getHouseArchetype(house.name);
   const sign = houseSigns[house.id];
   const isPast = mode === "passado";
@@ -110,7 +129,12 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
   const prof = isPast ? house.prof_passado : house.prof;
   const mainText = isPast ? house.past_text : house.porque;
 
-  // Time-aware labels
+  const modeToken = isPast
+    ? { label: "Análise do Passado", cls: "text-amber-400 border-amber-400/30 bg-amber-400/10", dot: "bg-amber-400" }
+    : isFuture
+      ? { label: "Previsão Futura", cls: "text-indigo-400 border-indigo-400/30 bg-indigo-400/10", dot: "bg-indigo-400" }
+      : { label: "Momento Presente", cls: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10", dot: "bg-emerald-400" };
+
   const promessaTitulo = isPast
     ? "O Que o Universo Preparou Naquele Ciclo"
     : isFuture
@@ -138,38 +162,14 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
     ? { prof: "Cenário Profissional", amor: "Cenário Afetivo", pessoal: "Cenário Pessoal" }
     : { prof: "Profissional", amor: "Amor", pessoal: "Pessoal" };
 
-  const destinations: { city: CityOption; label: string; toneClass: string }[] = [];
-
+  const destinations: { city: CityOption; label: string }[] = [];
   if (result) {
-    destinations.push({
-      city: result.city,
-      label: isPast ? "Destino Ativado" : "Destino Principal",
-      toneClass: "text-primary",
-    });
-
-    if (result.options.nacional) {
-      destinations.push({
-        city: result.options.nacional,
-        label: "Opção Nacional",
-        toneClass: "text-foreground",
-      });
-    }
-
-    if (result.options.acessivel && result.options.acessivel.city !== result.city.city) {
-      destinations.push({
-        city: result.options.acessivel,
-        label: "Rota Acessível",
-        toneClass: "text-muted-foreground",
-      });
-    }
-
-    if (result.options.highticket && result.options.highticket.city !== result.city.city) {
-      destinations.push({
-        city: result.options.highticket,
-        label: "Rota Premium",
-        toneClass: "text-primary",
-      });
-    }
+    destinations.push({ city: result.city, label: isPast ? "Destino Ativado" : "Destino Principal" });
+    if (result.options.nacional) destinations.push({ city: result.options.nacional, label: "Opção Nacional" });
+    if (result.options.acessivel && result.options.acessivel.city !== result.city.city)
+      destinations.push({ city: result.options.acessivel, label: "Rota Acessível" });
+    if (result.options.highticket && result.options.highticket.city !== result.city.city)
+      destinations.push({ city: result.options.highticket, label: "Rota Premium" });
   }
 
   return (
@@ -178,145 +178,174 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="rounded-3xl border border-primary/20 overflow-hidden mb-12"
-      style={{ background: bgGradient }}
+      className="rounded-[2rem] border border-border/50 bg-card/60 backdrop-blur-md overflow-hidden mb-12"
     >
-      <div className="flex justify-end p-4 pb-0">
-        <button onClick={onClose} className="text-foreground/30 hover:text-foreground/60 transition-colors text-sm">Fechar</button>
-      </div>
+      {/* Top accent bar */}
+      <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, rgba(${accent},0.9), rgba(${accent},0.2))` }} />
 
-      <div className="p-6 md:p-10 pt-2">
-        {/* Header */}
-        <div className="flex items-start gap-4 mb-2">
-          <div className="flex-1">
-            <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wider">
-              Casa {house.id}
-            </h3>
-            <p className="text-primary text-sm uppercase tracking-[0.3em] mt-1 font-semibold">{house.label}</p>
-            <div className="flex items-center gap-3 mt-2 flex-wrap">
-              <span className="text-foreground/40 text-xs">{archetype}</span>
-              <span className="text-foreground/20">·</span>
-              <span className="text-foreground/40 text-xs">{sign}</span>
-              <span className="text-foreground/20">·</span>
-              <span className="text-foreground/40 text-xs">{house.regente}</span>
-              <span className="text-foreground/20">·</span>
-              <span className="text-foreground/40 text-xs">Cristal: {house.cristal}</span>
+      <div className="flex flex-col lg:flex-row">
+        {/* SIDEBAR — Identity */}
+        <aside
+          className="lg:w-[38%] p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-border/50 bg-background/30"
+          style={{ borderLeft: `8px solid rgb(${accent})` }}
+        >
+          <div className="flex justify-between items-start mb-1 lg:hidden">
+            <span />
+            <button onClick={onClose} className="text-foreground/40 hover:text-foreground/80 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <p className="font-cinzel text-[11px] font-bold uppercase tracking-[0.3em] mb-1" style={{ color: `rgb(${accent})` }}>
+            Casa {house.id}
+          </p>
+          <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wider leading-tight mb-3">
+            {house.label}
+          </h3>
+
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-foreground/50 mb-5">
+            <span>{archetype}</span>
+            <span className="text-foreground/20">·</span>
+            <span>{sign}</span>
+            <span className="text-foreground/20">·</span>
+            <span>{house.regente}</span>
+          </div>
+
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-[9px] font-bold uppercase tracking-[0.25em] mb-6 ${modeToken.cls}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${modeToken.dot}`} />
+            {modeToken.label}
+          </div>
+
+          {/* Cristal */}
+          <div className="flex items-center gap-2 mb-6 text-[11px]">
+            <span className="text-foreground/50 uppercase tracking-[0.2em]">Cristal:</span>
+            <span className="text-foreground/80 font-medium">{house.cristal}</span>
+          </div>
+
+          {/* Origin highlight for goal house in past mode */}
+          {isPast && isGoal && originCity && (
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6">
+              <p className="text-[9px] uppercase tracking-[0.25em] text-amber-400 font-bold mb-2">Cidade do Aniversário</p>
+              <p className="text-foreground/80 text-xs leading-relaxed">
+                Você passou o aniversário em <span className="text-foreground font-semibold">{originCity}</span>, e o Sol ativou a Casa {house.id}.
+              </p>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* Mode badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/15 bg-primary/5 mt-3 mb-5">
-          <div className={`w-1.5 h-1.5 rounded-full ${isPast ? 'bg-amber-400' : isFuture ? 'bg-emerald-400' : 'bg-blue-400'}`} />
-          <span className="text-[9px] uppercase tracking-[0.3em] text-primary font-semibold">
-            {isPast ? "Análise do Passado" : isFuture ? "Previsão Futura" : "Momento Presente"}
-          </span>
-        </div>
-
-        {/* Origin highlight for goal house in past mode */}
-        {isPast && isGoal && originCity && (
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-5 mb-6">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-semibold mb-2">Cidade do Aniversário</p>
-            <p className="text-foreground/80 text-sm leading-relaxed">
-              Você passou o aniversário de {house.id === 1 ? "ciclo" : "ano"} em <span className="text-foreground font-semibold">{originCity}</span>, e o Sol se posicionou na Casa {house.id} — ativando a área de <span className="text-primary font-semibold">{house.label}</span>.
-            </p>
-          </div>
-        )}
-
-        {/* Leitura */}
-        <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{leituraTitulo}</p>
-          <p className="text-foreground/80 text-sm leading-relaxed font-light">{leituraTexto}</p>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {house.tags.map((tag) => (
-            <span key={tag} className="text-[10px] px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary uppercase tracking-wider font-medium">
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Main resumo */}
-        <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
-          <p className="text-primary font-cinzel text-sm font-bold uppercase tracking-wider mb-2">{house.resumo}</p>
-          <p className="text-foreground/70 text-sm leading-relaxed">{mainText}</p>
-        </div>
-
-        {/* Sombra (past only) */}
-        {isPast && house.sombra && (
-          <div className="bg-destructive/5 border border-destructive/15 rounded-xl p-5 mb-6">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-destructive font-semibold mb-3">O Lado Sombra Daquele Ciclo</p>
-            <p className="text-foreground/70 text-xs leading-relaxed">{house.sombra}</p>
-          </div>
-        )}
-
-        {/* Destinations */}
-        {destinations.length > 0 && (
-          <div className="mb-8">
-            <h4 className="font-cinzel text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">
-              {destinoLabel}
-            </h4>
-            <p className="text-foreground/60 text-[11px] mb-4 leading-relaxed">{destinoDesc}</p>
-            <div className={`grid grid-cols-1 ${destinations.length >= 3 ? 'md:grid-cols-3' : destinations.length === 2 ? 'md:grid-cols-2' : ''} gap-4`}>
-              {destinations.map((d, i) => (
-                <DestinationCard key={i} {...d} />
+          {/* Tags */}
+          <div className="mb-6">
+            <SectionLabel accent={accent}>Palavras-chave</SectionLabel>
+            <div className="flex flex-wrap gap-1.5">
+              {house.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] px-2.5 py-1 rounded-full border font-medium uppercase tracking-wider"
+                  style={{
+                    background: `rgba(${accent}, 0.1)`,
+                    borderColor: `rgba(${accent}, 0.25)`,
+                    color: `rgb(${accent})`,
+                  }}
+                >
+                  {tag}
+                </span>
               ))}
             </div>
           </div>
-        )}
 
-        {/* Radar */}
-        <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
-          <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.3em] mb-4">
-            Radar de Impacto
-          </h4>
-          <div className="space-y-3">
-            <RadarBar label="Dinheiro" value={house.radar.dinheiro} toneClass="bg-primary" />
-            <RadarBar label="Amor" value={house.radar.amor} toneClass="bg-foreground/70" />
-            <RadarBar label="Saúde" value={house.radar.saude} toneClass="bg-muted-foreground" />
+          {/* Radar */}
+          <div>
+            <SectionLabel accent={accent}>Radar de Impacto</SectionLabel>
+            <div className="space-y-3">
+              <RadarBar label="Dinheiro" value={house.radar.dinheiro} accent={accent} />
+              <RadarBar label="Amor" value={house.radar.amor} accent={accent} />
+              <RadarBar label="Saúde" value={house.radar.saude} accent={accent} />
+            </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Promise */}
-        <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{promessaTitulo}</p>
-          <p className="text-foreground/80 text-sm italic leading-relaxed font-light">
-            "{house.promessa_texto}"
-          </p>
-        </div>
+        {/* MAIN — Content */}
+        <div className="lg:w-[62%] p-6 md:p-10 space-y-8">
+          <div className="hidden lg:flex justify-end -mt-2 -mr-2">
+            <button
+              onClick={onClose}
+              className="text-foreground/40 hover:text-foreground/80 transition-colors text-[11px] uppercase tracking-[0.2em] flex items-center gap-1.5"
+            >
+              Fechar <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
-        {/* Areas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.prof}</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{prof}</p>
-          </div>
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.amor}</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{amor}</p>
-          </div>
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.pessoal}</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{pessoal}</p>
-          </div>
-        </div>
+          {/* Leitura */}
+          <section>
+            <SectionLabel accent={accent}>{leituraTitulo}</SectionLabel>
+            <p className="text-foreground/80 text-sm leading-relaxed font-light">{leituraTexto}</p>
+          </section>
 
-        {/* Benefício & Ideal */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">
-              {isPast ? "O Que Foi Colhido" : "Benefício"}
+          {/* Egrégora / Resumo */}
+          <section className="rounded-2xl bg-background/30 border border-border/50 p-5">
+            <p className="font-cinzel text-sm font-bold uppercase tracking-[0.2em] mb-2" style={{ color: `rgb(${accent})` }}>
+              {house.resumo}
             </p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{beneficio}</p>
+            <p className="text-foreground/70 text-sm leading-relaxed">{mainText}</p>
+          </section>
+
+          {/* Sombra (past only) */}
+          {isPast && house.sombra && (
+            <section className="rounded-2xl bg-destructive/5 border border-destructive/20 p-5">
+              <SectionLabel accent="248, 113, 113">O Lado Sombra Daquele Ciclo</SectionLabel>
+              <p className="text-foreground/70 text-xs leading-relaxed">{house.sombra}</p>
+            </section>
+          )}
+
+          {/* Destinos */}
+          {destinations.length > 0 && (
+            <section>
+              <SectionLabel accent={accent}>{destinoLabel}</SectionLabel>
+              <p className="text-muted-foreground text-[11px] mb-4 leading-relaxed">{destinoDesc}</p>
+              <div className={`grid grid-cols-1 ${destinations.length >= 2 ? 'md:grid-cols-2' : ''} gap-3`}>
+                {destinations.map((d, i) => (
+                  <DestinationCard key={i} city={d.city} label={d.label} accent={accent} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Promessa */}
+          <section className="rounded-2xl p-5 border" style={{ background: `rgba(${accent}, 0.05)`, borderColor: `rgba(${accent}, 0.2)` }}>
+            <SectionLabel accent={accent}>{promessaTitulo}</SectionLabel>
+            <p className="text-foreground/85 text-sm italic leading-relaxed font-light">"{house.promessa_texto}"</p>
+          </section>
+
+          {/* Areas */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { label: areaLabels.prof, text: prof },
+              { label: areaLabels.amor, text: amor },
+              { label: areaLabels.pessoal, text: pessoal },
+            ].map((a) => (
+              <div key={a.label} className="rounded-2xl bg-background/30 border border-border/50 p-4">
+                <p className="text-[10px] uppercase tracking-[0.25em] font-bold mb-2" style={{ color: `rgb(${accent})` }}>
+                  {a.label}
+                </p>
+                <p className="text-foreground/70 text-xs leading-relaxed">{a.text}</p>
+              </div>
+            ))}
           </div>
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">
-              {isPast ? "O Que Era Necessário" : "Ideal Para"}
-            </p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{ideal}</p>
-          </div>
+
+          {/* Benefício + Ideal */}
+          <footer className="flex flex-col md:flex-row gap-6 pt-6 border-t border-border/50">
+            <div className="flex-1">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-400 font-bold mb-1.5">
+                {isPast ? "O Que Foi Colhido" : "Benefício"}
+              </p>
+              <p className="text-foreground/80 text-sm leading-relaxed">{beneficio}</p>
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-bold mb-1.5">
+                {isPast ? "O Que Era Necessário" : "Ideal Para"}
+              </p>
+              <p className="text-foreground/80 text-sm leading-relaxed">{ideal}</p>
+            </div>
+          </footer>
         </div>
       </div>
     </motion.div>
