@@ -893,7 +893,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
       )}
 
       {/* ===== GRID DAS 12 CASAS — ELEMENT BORDERS ===== */}
-      {unlocked && (
+      {!embedded && unlocked && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
