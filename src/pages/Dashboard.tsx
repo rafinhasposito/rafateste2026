@@ -394,21 +394,59 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* Selected House Detail */}
+        {/* Selected House Detail — unified DestinyResults layout */}
         <AnimatePresence>
           {selectedHouse && (() => {
             const house = cityDatabase[selectedHouse];
             const result = getHouseResult(selectedHouse);
             if (!house) return null;
+            if (!result) {
+              return (
+                <HouseDetail
+                  house={house}
+                  result={result}
+                  mode={currentMode}
+                  isGoal={goalHouse === selectedHouse}
+                  originCity={consultation.origin}
+                  onClose={() => setSelectedHouse(null)}
+                />
+              );
+            }
+            // Convert single-option HouseResult → DestinyResults arrays.
+            const master = result.city;
+            const seen = new Set<string>();
+            const push = (arr: CityOption[], c: CityOption | null | undefined) => {
+              if (!c) return;
+              const k = `${c.city}|${c.country}`;
+              if (seen.has(k)) return;
+              seen.add(k);
+              arr.push(c);
+            };
+            const highticket: CityOption[] = [];
+            const acessivel: CityOption[] = [];
+            const nacional: CityOption[] = [];
+            push(highticket, master);
+            push(highticket, result.options.highticket);
+            push(acessivel, result.options.acessivel);
+            push(nacional, result.options.nacional);
             return (
-              <HouseDetail
-                house={house}
-                result={result}
-                mode={currentMode}
-                isGoal={goalHouse === selectedHouse}
-                originCity={consultation.origin}
-                onClose={() => setSelectedHouse(null)}
-              />
+              <div key={selectedHouse} className="mb-12">
+                <DestinyResults
+                  house={selectedHouse}
+                  houseName={house.label}
+                  houseData={house}
+                  cities={{ highticket, acessivel, nacional }}
+                  allResults={consultation.result?.results}
+                  userCredits={credits}
+                  isAuthenticated={!!user}
+                  consultationId={consultation.id}
+                  autoUnlocked
+                  embedded
+                  mode={currentMode}
+                  isGoal={goalHouse === selectedHouse}
+                  originCity={consultation.origin}
+                />
+              </div>
             );
           })()}
         </AnimatePresence>
