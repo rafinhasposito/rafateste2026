@@ -265,9 +265,9 @@ const UNLOCK_PACKAGES = [
   { houses: 12, credits: 3, label: "Mapa Completo", desc: "Todas as 12 casas reveladas" },
 ];
 
-const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId }: DestinyResultsProps) => {
+const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId, autoUnlocked = false, mode = "futuro", embedded = false, originCity, isGoal }: DestinyResultsProps) => {
   const navigate = useNavigate();
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(autoUnlocked);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [wikiData, setWikiData] = useState<WikiData | null>(null);
@@ -285,6 +285,33 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
   const secondaryCities = allCities.slice(1);
   const continentGroups = groupByContinentMock(secondaryCities);
 
+  const isPast = mode === "passado";
+  const isFuture = mode === "futuro";
+
+  // Time-aware text selection (falls back to future/present copy when past-specific missing)
+  const timedMain = isPast ? (houseData.past_text || houseData.porque) : houseData.porque;
+  const timedBeneficio = isPast ? (houseData.beneficio_passado || houseData.beneficio) : houseData.beneficio;
+  const timedIdeal = isPast ? (houseData.ideal_passado || houseData.ideal) : houseData.ideal;
+  const timedPessoal = isPast ? (houseData.pessoal_passado || houseData.pessoal) : houseData.pessoal;
+  const timedAmor = isPast ? (houseData.amor_passado || houseData.amor) : houseData.amor;
+  const timedProf = isPast ? (houseData.prof_passado || houseData.prof) : houseData.prof;
+
+  const promessaTitulo = isPast
+    ? "O Que o Universo Preparou Naquele Ciclo"
+    : isFuture
+      ? "A Promessa do Universo Para Este Ciclo"
+      : "A Energia Ativa Neste Momento";
+  const leituraTitulo = isPast
+    ? "Análise Retroativa da Casa"
+    : isFuture
+      ? "Leitura de Ativação da Casa"
+      : "Energia em Ação";
+  const areaLabels = isPast
+    ? { prof: "Cenário Profissional", amor: "Cenário Afetivo", pessoal: "Cenário Pessoal" }
+    : { prof: "Profissional", amor: "Amor", pessoal: "Pessoal" };
+  const beneficioLabel = isPast ? "O Que Foi Colhido" : "Benefício";
+  const idealLabel = isPast ? "O Que Era Necessário" : "Ideal Para";
+
   if (!masterCity) return null;
 
   const cityName = masterCity.city || masterCity.display_name;
@@ -292,11 +319,16 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
   const flag = getCountryFlag(masterCity.country || "");
   const rituals = HOUSE_RITUALS[house] || HOUSE_RITUALS[1];
 
+  const leituraTexto = isPast
+    ? `Naquele ciclo, quem ativou a Casa ${house} focou em ${houseData.label}, canalizando a energia dessa área. Veja abaixo como essa frequência se manifestou.`
+    : isFuture
+      ? `Quem escolhe a Casa ${house} ativa foco em ${houseData.label}. Escolha uma das cidades calculadas e passe 24h no local para ancorar essa frequência.`
+      : `A Casa ${house} está ativa com foco em ${houseData.label}. As cidades abaixo potencializam essa energia.`;
+
   const curated = getCuratedCityImage(cityName);
   const heroImage = curated || wikiData?.originalimage?.source || wikiData?.thumbnail?.source || cityImage;
 
-  const handleUnlock = () => {
-    setUnlocked(true);
+  const runFetches = React.useCallback(() => {
     setWikiLoading(true);
     fetchWikipediaData(cityName).then((data) => {
       setWikiData(data);
@@ -305,6 +337,17 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
     fetchWeatherData(cityName, masterCity.country).then((data) => {
       setWeatherData(data);
     });
+  }, [cityName, masterCity.country]);
+
+  // Auto-fetch when arriving pre-unlocked (Dashboard embed).
+  useEffect(() => {
+    if (autoUnlocked) runFetches();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoUnlocked, cityName]);
+
+  const handleUnlock = () => {
+    setUnlocked(true);
+    runFetches();
   };
 
   const getNextHousesToUnlock = (count: number): number[] => {
