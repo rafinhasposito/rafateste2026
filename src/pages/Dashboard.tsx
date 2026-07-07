@@ -6,6 +6,7 @@ import StarryBackground from "@/components/StarryBackground";
 import UserMenu from "@/components/UserMenu";
 import HouseCard from "@/components/HouseCard";
 import HouseDetail from "@/components/HouseDetail";
+import DestinyResults from "@/components/DestinyResults";
 import ConfirmCreditAction from "@/components/ConfirmCreditAction";
 import PageLoader from "@/components/PageLoader";
 import EmptyState from "@/components/EmptyState";
