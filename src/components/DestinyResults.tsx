@@ -36,6 +36,16 @@ interface DestinyResultsProps {
   userCredits?: number;
   isAuthenticated?: boolean;
   consultationId?: string;
+  /** When true, skips the "Desbloquear Mapeamento" overlay and auto-fetches wiki + weather. */
+  autoUnlocked?: boolean;
+  /** Time mode — drives verb tense and labels. Defaults to "futuro". */
+  mode?: "passado" | "presente" | "futuro";
+  /** When true, hides secondary destinations block and 12-house grid (Dashboard owns them). */
+  embedded?: boolean;
+  /** Birth/origin city — surfaced only in past mode for the goal house. */
+  originCity?: string | null;
+  /** True when this house is the consultation's goal house. */
+  isGoal?: boolean;
 }
 
 interface WikiData {
