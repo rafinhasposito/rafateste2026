@@ -869,9 +869,9 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           <p className={`text-white font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
                             {c.city || c.display_name}
                           </p>
-                          {c.lat != null && (
+                          {c.lat != null && c.lon != null && (
                             <p className={`text-white/70 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
-                              {secondaryUnlocked ? `${c.lat?.toFixed(2)}°, ${c.lon?.toFixed(2)}°` : `${c.lat?.toFixed(0)}°, ?????`}
+                              {c.lat.toFixed(2)}°, {c.lon.toFixed(2)}°
                             </p>
                           )}
                           <div className="absolute top-3 right-3">
