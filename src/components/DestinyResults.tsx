@@ -835,7 +835,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
       </div>
 
       {/* ===== SECONDARY DESTINATIONS — CLEAN CARDS ===== */}
-      {secondaryCities.length > 0 && (
+      {!embedded && secondaryCities.length > 0 && (
         <div className="space-y-5">
           <div className="flex items-center gap-3">
             <Globe className="w-5 h-5 text-white/50" />
