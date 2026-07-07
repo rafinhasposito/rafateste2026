@@ -36,6 +36,16 @@ interface DestinyResultsProps {
   userCredits?: number;
   isAuthenticated?: boolean;
   consultationId?: string;
+  /** When true, skips the "Desbloquear Mapeamento" overlay and auto-fetches wiki + weather. */
+  autoUnlocked?: boolean;
+  /** Time mode — drives verb tense and labels. Defaults to "futuro". */
+  mode?: "passado" | "presente" | "futuro";
+  /** When true, hides secondary destinations block and 12-house grid (Dashboard owns them). */
+  embedded?: boolean;
+  /** Birth/origin city — surfaced only in past mode for the goal house. */
+  originCity?: string | null;
+  /** True when this house is the consultation's goal house. */
+  isGoal?: boolean;
 }
 
 interface WikiData {
@@ -255,9 +265,9 @@ const UNLOCK_PACKAGES = [
   { houses: 12, credits: 3, label: "Mapa Completo", desc: "Todas as 12 casas reveladas" },
 ];
 
-const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId }: DestinyResultsProps) => {
+const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId, autoUnlocked = false, mode = "futuro", embedded = false, originCity, isGoal }: DestinyResultsProps) => {
   const navigate = useNavigate();
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(autoUnlocked);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [wikiData, setWikiData] = useState<WikiData | null>(null);
@@ -275,6 +285,33 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
   const secondaryCities = allCities.slice(1);
   const continentGroups = groupByContinentMock(secondaryCities);
 
+  const isPast = mode === "passado";
+  const isFuture = mode === "futuro";
+
+  // Time-aware text selection (falls back to future/present copy when past-specific missing)
+  const timedMain = isPast ? (houseData.past_text || houseData.porque) : houseData.porque;
+  const timedBeneficio = isPast ? (houseData.beneficio_passado || houseData.beneficio) : houseData.beneficio;
+  const timedIdeal = isPast ? (houseData.ideal_passado || houseData.ideal) : houseData.ideal;
+  const timedPessoal = isPast ? (houseData.pessoal_passado || houseData.pessoal) : houseData.pessoal;
+  const timedAmor = isPast ? (houseData.amor_passado || houseData.amor) : houseData.amor;
+  const timedProf = isPast ? (houseData.prof_passado || houseData.prof) : houseData.prof;
+
+  const promessaTitulo = isPast
+    ? "O Que o Universo Preparou Naquele Ciclo"
+    : isFuture
+      ? "A Promessa do Universo Para Este Ciclo"
+      : "A Energia Ativa Neste Momento";
+  const leituraTitulo = isPast
+    ? "Análise Retroativa da Casa"
+    : isFuture
+      ? "Leitura de Ativação da Casa"
+      : "Energia em Ação";
+  const areaLabels = isPast
+    ? { prof: "Cenário Profissional", amor: "Cenário Afetivo", pessoal: "Cenário Pessoal" }
+    : { prof: "Profissional", amor: "Amor", pessoal: "Pessoal" };
+  const beneficioLabel = isPast ? "O Que Foi Colhido" : "Benefício";
+  const idealLabel = isPast ? "O Que Era Necessário" : "Ideal Para";
+
   if (!masterCity) return null;
 
   const cityName = masterCity.city || masterCity.display_name;
@@ -282,11 +319,16 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
   const flag = getCountryFlag(masterCity.country || "");
   const rituals = HOUSE_RITUALS[house] || HOUSE_RITUALS[1];
 
+  const leituraTexto = isPast
+    ? `Naquele ciclo, quem ativou a Casa ${house} focou em ${houseData.label}, canalizando a energia dessa área. Veja abaixo como essa frequência se manifestou.`
+    : isFuture
+      ? `Quem escolhe a Casa ${house} ativa foco em ${houseData.label}. Escolha uma das cidades calculadas e passe 24h no local para ancorar essa frequência.`
+      : `A Casa ${house} está ativa com foco em ${houseData.label}. As cidades abaixo potencializam essa energia.`;
+
   const curated = getCuratedCityImage(cityName);
   const heroImage = curated || wikiData?.originalimage?.source || wikiData?.thumbnail?.source || cityImage;
 
-  const handleUnlock = () => {
-    setUnlocked(true);
+  const runFetches = React.useCallback(() => {
     setWikiLoading(true);
     fetchWikipediaData(cityName).then((data) => {
       setWikiData(data);
@@ -295,6 +337,17 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
     fetchWeatherData(cityName, masterCity.country).then((data) => {
       setWeatherData(data);
     });
+  }, [cityName, masterCity.country]);
+
+  // Auto-fetch when arriving pre-unlocked (Dashboard embed).
+  useEffect(() => {
+    if (autoUnlocked) runFetches();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoUnlocked, cityName]);
+
+  const handleUnlock = () => {
+    setUnlocked(true);
+    runFetches();
   };
 
   const getNextHousesToUnlock = (count: number): number[] => {
@@ -664,6 +717,76 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   </div>
                 </div>
 
+                {/* Leitura de Ativação */}
+                <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                    <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">{leituraTitulo}</p>
+                  </div>
+                  <p className="text-white/95 text-sm leading-relaxed">{leituraTexto}</p>
+                </div>
+
+                {/* Origin highlight — past + goal only */}
+                {isPast && isGoal && originCity && (
+                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(251, 191, 36, 0.10)", border: "1px solid rgba(251, 191, 36, 0.25)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-amber-300">Cidade do Aniversário</p>
+                    <p className="text-white/95 text-sm leading-relaxed">
+                      Você passou o aniversário em <span className="text-white font-semibold">{originCity}</span>, e o Sol se posicionou na Casa {house} — ativando a área de <span className="font-semibold" style={{ color: `rgb(${accentColor})` }}>{houseData.label}</span>.
+                    </p>
+                  </div>
+                )}
+
+                {/* Resumo principal */}
+                <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                  <p className="font-cinzel text-sm font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>{houseData.resumo}</p>
+                  <p className="text-white/95 text-sm leading-relaxed">{timedMain}</p>
+                </div>
+
+                {/* Radar de Impacto */}
+                <div className="p-5 rounded-xl space-y-4" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">Radar de Impacto</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { label: "Dinheiro", value: houseData.radar.dinheiro },
+                      { label: "Amor", value: houseData.radar.amor },
+                      { label: "Saúde", value: houseData.radar.saude },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="space-y-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/80 text-[10px] uppercase tracking-wider">{label}</span>
+                          <span className="text-white/70 text-[10px] font-mono">{value}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${value}%` }}
+                            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+                            className="h-full rounded-full"
+                            style={{ background: `rgb(${accentColor})` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Promessa do Universo */}
+                <div className="p-5 rounded-xl space-y-3" style={{ background: `rgba(${accentColor}, 0.08)`, border: `1px solid rgba(${accentColor}, 0.28)` }}>
+                  <p className="text-[10px] uppercase tracking-[0.25em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{promessaTitulo}</p>
+                  <p className="text-white/95 text-sm italic leading-relaxed font-light">"{houseData.promessa_texto}"</p>
+                </div>
+
+                {/* Sombra — past only */}
+                {isPast && houseData.sombra && (
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.25)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-red-300">O Lado Sombra Daquele Ciclo</p>
+                    <p className="text-white/85 text-xs leading-relaxed">{houseData.sombra}</p>
+                  </div>
+                )}
+
                 {/* Previsões */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
@@ -674,9 +797,9 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   </div>
                   <div className="space-y-3">
                     {[
-                      { icon: User, label: "Vida Pessoal", text: houseData.pessoal },
-                      { icon: Heart, label: "Amor", text: houseData.amor },
-                      { icon: Briefcase, label: "Profissional", text: houseData.prof },
+                      { icon: User, label: areaLabels.pessoal, text: timedPessoal },
+                      { icon: Heart, label: areaLabels.amor, text: timedAmor },
+                      { icon: Briefcase, label: areaLabels.prof, text: timedProf },
                     ].map(({ icon: Icon, label, text }) => (
                       <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                         <div
@@ -693,6 +816,18 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                     ))}
                   </div>
                 </div>
+
+                {/* Benefício & Ideal Para */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{beneficioLabel}</p>
+                    <p className="text-white/90 text-xs leading-relaxed">{timedBeneficio}</p>
+                  </div>
+                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{idealLabel}</p>
+                    <p className="text-white/90 text-xs leading-relaxed">{timedIdeal}</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           )}
@@ -700,7 +835,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
       </div>
 
       {/* ===== SECONDARY DESTINATIONS — CLEAN CARDS ===== */}
-      {secondaryCities.length > 0 && (
+      {!embedded && secondaryCities.length > 0 && (
         <div className="space-y-5">
           <div className="flex items-center gap-3">
             <Globe className="w-5 h-5 text-white/50" />
@@ -734,9 +869,9 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                           <p className={`text-white font-semibold text-sm ${!secondaryUnlocked ? 'blur-[4px]' : ''}`}>
                             {c.city || c.display_name}
                           </p>
-                          {c.lat != null && (
+                          {c.lat != null && c.lon != null && (
                             <p className={`text-white/70 text-[9px] font-mono mt-1 ${!secondaryUnlocked ? 'blur-[3px]' : ''}`}>
-                              {secondaryUnlocked ? `${c.lat?.toFixed(2)}°, ${c.lon?.toFixed(2)}°` : `${c.lat?.toFixed(0)}°, ?????`}
+                              {c.lat.toFixed(2)}°, {c.lon.toFixed(2)}°
                             </p>
                           )}
                           <div className="absolute top-3 right-3">
@@ -758,7 +893,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
       )}
 
       {/* ===== GRID DAS 12 CASAS — ELEMENT BORDERS ===== */}
-      {unlocked && (
+      {!embedded && unlocked && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
