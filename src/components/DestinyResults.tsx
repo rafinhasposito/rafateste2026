@@ -717,6 +717,76 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   </div>
                 </div>
 
+                {/* Leitura de Ativação */}
+                <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                    <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">{leituraTitulo}</p>
+                  </div>
+                  <p className="text-white/95 text-sm leading-relaxed">{leituraTexto}</p>
+                </div>
+
+                {/* Origin highlight — past + goal only */}
+                {isPast && isGoal && originCity && (
+                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(251, 191, 36, 0.10)", border: "1px solid rgba(251, 191, 36, 0.25)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-amber-300">Cidade do Aniversário</p>
+                    <p className="text-white/95 text-sm leading-relaxed">
+                      Você passou o aniversário em <span className="text-white font-semibold">{originCity}</span>, e o Sol se posicionou na Casa {house} — ativando a área de <span className="font-semibold" style={{ color: `rgb(${accentColor})` }}>{houseData.label}</span>.
+                    </p>
+                  </div>
+                )}
+
+                {/* Resumo principal */}
+                <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                  <p className="font-cinzel text-sm font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>{houseData.resumo}</p>
+                  <p className="text-white/95 text-sm leading-relaxed">{timedMain}</p>
+                </div>
+
+                {/* Radar de Impacto */}
+                <div className="p-5 rounded-xl space-y-4" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
+                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">Radar de Impacto</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { label: "Dinheiro", value: houseData.radar.dinheiro },
+                      { label: "Amor", value: houseData.radar.amor },
+                      { label: "Saúde", value: houseData.radar.saude },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="space-y-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/80 text-[10px] uppercase tracking-wider">{label}</span>
+                          <span className="text-white/70 text-[10px] font-mono">{value}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${value}%` }}
+                            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+                            className="h-full rounded-full"
+                            style={{ background: `rgb(${accentColor})` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Promessa do Universo */}
+                <div className="p-5 rounded-xl space-y-3" style={{ background: `rgba(${accentColor}, 0.08)`, border: `1px solid rgba(${accentColor}, 0.28)` }}>
+                  <p className="text-[10px] uppercase tracking-[0.25em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{promessaTitulo}</p>
+                  <p className="text-white/95 text-sm italic leading-relaxed font-light">"{houseData.promessa_texto}"</p>
+                </div>
+
+                {/* Sombra — past only */}
+                {isPast && houseData.sombra && (
+                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.25)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-red-300">O Lado Sombra Daquele Ciclo</p>
+                    <p className="text-white/85 text-xs leading-relaxed">{houseData.sombra}</p>
+                  </div>
+                )}
+
                 {/* Previsões */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
@@ -727,9 +797,9 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   </div>
                   <div className="space-y-3">
                     {[
-                      { icon: User, label: "Vida Pessoal", text: houseData.pessoal },
-                      { icon: Heart, label: "Amor", text: houseData.amor },
-                      { icon: Briefcase, label: "Profissional", text: houseData.prof },
+                      { icon: User, label: areaLabels.pessoal, text: timedPessoal },
+                      { icon: Heart, label: areaLabels.amor, text: timedAmor },
+                      { icon: Briefcase, label: areaLabels.prof, text: timedProf },
                     ].map(({ icon: Icon, label, text }) => (
                       <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                         <div
@@ -744,6 +814,18 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* Benefício & Ideal Para */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{beneficioLabel}</p>
+                    <p className="text-white/90 text-xs leading-relaxed">{timedBeneficio}</p>
+                  </div>
+                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{idealLabel}</p>
+                    <p className="text-white/90 text-xs leading-relaxed">{timedIdeal}</p>
                   </div>
                 </div>
               </div>
