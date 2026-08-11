@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast, houseColors } from "@/data/houses";
+import { TEST_MODE, isLocalConsultationId, loadLocalConsultation } from "@/lib/testMode";
 
 
 interface CityOption {
