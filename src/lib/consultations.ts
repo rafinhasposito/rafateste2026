@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { TEST_MODE, newLocalConsultationId, saveLocalConsultation } from "@/lib/testMode";
 
 export interface SaveConsultationArgs {
   userId: string;
