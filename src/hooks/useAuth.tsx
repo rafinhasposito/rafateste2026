@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { TEST_MODE, GUEST_USER_ID, GUEST_PROFILE } from "@/lib/testMode";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface Profile {
@@ -30,10 +31,12 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(
+    TEST_MODE ? ({ id: GUEST_USER_ID, email: GUEST_PROFILE.email } as unknown as User) : null
+  );
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(TEST_MODE ? GUEST_PROFILE : null);
+  const [loading, setLoading] = useState(!TEST_MODE);
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
@@ -45,10 +48,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshProfile = async () => {
+    if (TEST_MODE) return;
     if (user) await fetchProfile(user.id);
   };
 
   useEffect(() => {
+    if (TEST_MODE) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);

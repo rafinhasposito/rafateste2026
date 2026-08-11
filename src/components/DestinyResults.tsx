@@ -10,6 +10,7 @@ import { getCountryFlag } from "@/lib/countryFlags";
 import { cityDatabase, houseColors, type HouseData } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
 import { supabase } from "@/integrations/supabase/client";
+import { TEST_MODE } from "@/lib/testMode";
 
 interface CityOption {
   display_name: string;
@@ -267,14 +268,16 @@ const UNLOCK_PACKAGES = [
 
 const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId, autoUnlocked = false, mode = "futuro", embedded = false, originCity, isGoal }: DestinyResultsProps) => {
   const navigate = useNavigate();
-  const [unlocked, setUnlocked] = useState(autoUnlocked);
+  const [unlocked, setUnlocked] = useState(autoUnlocked || TEST_MODE);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [wikiData, setWikiData] = useState<WikiData | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [unlockedHouses, setUnlockedHouses] = useState<Set<number>>(new Set([house]));
-  const [secondaryUnlocked, setSecondaryUnlocked] = useState(false);
+  const [unlockedHouses, setUnlockedHouses] = useState<Set<number>>(
+    TEST_MODE ? new Set(Array.from({ length: 12 }, (_, i) => i + 1)) : new Set([house])
+  );
+  const [secondaryUnlocked, setSecondaryUnlocked] = useState(TEST_MODE);
 
   const accentColor = extractAccentColor(house);
   const bgGradient = houseColors[house];
@@ -341,7 +344,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
   // Auto-fetch when arriving pre-unlocked (Dashboard embed).
   useEffect(() => {
-    if (autoUnlocked) runFetches();
+    if (autoUnlocked || TEST_MODE) runFetches();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoUnlocked, cityName]);
 
@@ -357,21 +360,23 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
   };
 
   const handleUnlockPackage = (pkg: typeof UNLOCK_PACKAGES[0]) => {
-    if (!isAuthenticated) {
-      navigate("/auth");
-      return;
-    }
-    if ((userCredits ?? 0) < pkg.credits) {
-      navigate("/credits");
-      return;
-    }
-    // Unified flow: if we have a saved consultation, delegate the debit + unlock
-    // to Dashboard so houses_unlocked stays consistent and credits don't leak.
-    if (consultationId) {
-      setShowUnlockModal(false);
-      setShowSecondaryOverlay(false);
-      navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
-      return;
+    if (!TEST_MODE) {
+      if (!isAuthenticated) {
+        navigate("/auth");
+        return;
+      }
+      if ((userCredits ?? 0) < pkg.credits) {
+        navigate("/credits");
+        return;
+      }
+      // Unified flow: if we have a saved consultation, delegate the debit + unlock
+      // to Dashboard so houses_unlocked stays consistent and credits don't leak.
+      if (consultationId) {
+        setShowUnlockModal(false);
+        setShowSecondaryOverlay(false);
+        navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
+        return;
+      }
     }
     // Fallback (no persisted consultation — shouldn't happen in normal flow)
     if (pkg.houses === 12) {
@@ -392,7 +397,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
   const openUnlockFlow = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !TEST_MODE) {
       navigate("/auth");
       return;
     }

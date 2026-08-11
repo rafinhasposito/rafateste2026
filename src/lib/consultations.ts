@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { TEST_MODE, newLocalConsultationId, saveLocalConsultation } from "@/lib/testMode";
 
 export interface SaveConsultationArgs {
   userId: string;
@@ -19,6 +20,27 @@ export interface SaveConsultationArgs {
  * or null on failure (non-blocking — caller may still render results).
  */
 export const saveConsultation = async (args: SaveConsultationArgs): Promise<string | null> => {
+  if (TEST_MODE) {
+    const id = newLocalConsultationId();
+    saveLocalConsultation(id, {
+      id,
+      user_id: args.userId,
+      name: args.name,
+      birthdate: args.birthdate,
+      birthtime: args.birthtime,
+      birth_place: args.birth_place,
+      year: args.year,
+      mode: args.mode,
+      goal: args.goal ?? null,
+      intent: args.intent ?? null,
+      origin: args.origin ?? null,
+      result: args.result,
+      houses_unlocked: 12,
+      created_at: new Date().toISOString(),
+    });
+    return id;
+  }
+
   const { data, error } = await supabase
     .from("consultations")
     .insert({

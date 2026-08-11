@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { TEST_MODE } from "@/lib/testMode";
 
 export interface ChargeArgs {
   userId: string;
@@ -20,6 +21,8 @@ export interface ChargeResult {
  * Retorna ok=false com reason="no_credits" se faltar saldo.
  */
 export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult> => {
+  if (TEST_MODE) return { ok: true, newBalance: args.currentCredits };
+
   const cost = args.amount ?? 1;
 
   if (args.isAdmin) {

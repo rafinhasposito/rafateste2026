@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast, houseColors } from "@/data/houses";
+import { TEST_MODE, isLocalConsultationId, loadLocalConsultation } from "@/lib/testMode";
 
 
 interface CityOption {
@@ -94,6 +95,7 @@ const getConsultationGoalHouse = (consultation: ConsultationRow | null): number 
 };
 
 const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: number) => {
+  if (TEST_MODE) return false;
   const unlockedCount = Math.max(consultation.houses_unlocked, 0);
   const goalHouse = getConsultationGoalHouse(consultation);
 
@@ -121,6 +123,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!user) return;
+    if (TEST_MODE) {
+      const local = isLocalConsultationId(consultationId) ? loadLocalConsultation(consultationId!) : null;
+      if (local) setConsultation(local as ConsultationRow);
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       let query = supabase
         .from("consultations")
