@@ -10,6 +10,7 @@ import { getCountryFlag } from "@/lib/countryFlags";
 import { cityDatabase, houseColors, type HouseData } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
 import { supabase } from "@/integrations/supabase/client";
+import { TEST_MODE } from "@/lib/testMode";
 
 interface CityOption {
   display_name: string;
