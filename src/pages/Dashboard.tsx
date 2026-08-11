@@ -123,6 +123,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!user) return;
+    if (TEST_MODE) {
+      const local = isLocalConsultationId(consultationId) ? loadLocalConsultation(consultationId!) : null;
+      if (local) setConsultation(local as ConsultationRow);
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       let query = supabase
         .from("consultations")
