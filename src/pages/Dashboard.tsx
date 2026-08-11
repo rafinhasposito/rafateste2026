@@ -94,6 +94,7 @@ const getConsultationGoalHouse = (consultation: ConsultationRow | null): number 
 };
 
 const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: number) => {
+  if (TEST_MODE) return false;
   const unlockedCount = Math.max(consultation.houses_unlocked, 0);
   const goalHouse = getConsultationGoalHouse(consultation);
 
