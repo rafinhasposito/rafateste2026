@@ -360,21 +360,23 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
   };
 
   const handleUnlockPackage = (pkg: typeof UNLOCK_PACKAGES[0]) => {
-    if (!isAuthenticated) {
-      navigate("/auth");
-      return;
-    }
-    if ((userCredits ?? 0) < pkg.credits) {
-      navigate("/credits");
-      return;
-    }
-    // Unified flow: if we have a saved consultation, delegate the debit + unlock
-    // to Dashboard so houses_unlocked stays consistent and credits don't leak.
-    if (consultationId) {
-      setShowUnlockModal(false);
-      setShowSecondaryOverlay(false);
-      navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
-      return;
+    if (!TEST_MODE) {
+      if (!isAuthenticated) {
+        navigate("/auth");
+        return;
+      }
+      if ((userCredits ?? 0) < pkg.credits) {
+        navigate("/credits");
+        return;
+      }
+      // Unified flow: if we have a saved consultation, delegate the debit + unlock
+      // to Dashboard so houses_unlocked stays consistent and credits don't leak.
+      if (consultationId) {
+        setShowUnlockModal(false);
+        setShowSecondaryOverlay(false);
+        navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
+        return;
+      }
     }
     // Fallback (no persisted consultation — shouldn't happen in normal flow)
     if (pkg.houses === 12) {
