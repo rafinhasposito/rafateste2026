@@ -71,12 +71,14 @@ const UserMenu = () => {
               Painel Admin
             </button>
           )}
-          <button
-            onClick={signOut}
-            className="w-full text-left px-3 py-2 text-destructive text-xs hover:bg-destructive/10 rounded-lg transition-colors"
-          >
-            Sair
-          </button>
+          {!TEST_MODE && (
+            <button
+              onClick={signOut}
+              className="w-full text-left px-3 py-2 text-destructive text-xs hover:bg-destructive/10 rounded-lg transition-colors"
+            >
+              Sair
+            </button>
+          )}
         </div>
       </div>
     </motion.div>
