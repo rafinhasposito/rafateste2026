@@ -344,7 +344,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
   // Auto-fetch when arriving pre-unlocked (Dashboard embed).
   useEffect(() => {
-    if (autoUnlocked) runFetches();
+    if (autoUnlocked || TEST_MODE) runFetches();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoUnlocked, cityName]);
 
