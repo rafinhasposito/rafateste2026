@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { TEST_MODE } from "@/lib/testMode";
 
 export const useIsAdmin = () => {
   const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(TEST_MODE);
+  const [loading, setLoading] = useState(!TEST_MODE);
 
   useEffect(() => {
+    if (TEST_MODE) return;
     if (!user) {
       setIsAdmin(false);
       setLoading(false);
