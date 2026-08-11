@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { TEST_MODE } from "@/lib/testMode";
 
 export interface ChargeArgs {
   userId: string;
