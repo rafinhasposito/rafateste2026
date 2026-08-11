@@ -397,7 +397,7 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
 
   const openUnlockFlow = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !TEST_MODE) {
       navigate("/auth");
       return;
     }
