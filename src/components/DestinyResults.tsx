@@ -268,14 +268,16 @@ const UNLOCK_PACKAGES = [
 
 const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnlock, userCredits, isAuthenticated, consultationId, autoUnlocked = false, mode = "futuro", embedded = false, originCity, isGoal }: DestinyResultsProps) => {
   const navigate = useNavigate();
-  const [unlocked, setUnlocked] = useState(autoUnlocked);
+  const [unlocked, setUnlocked] = useState(autoUnlocked || TEST_MODE);
   const [showSecondaryOverlay, setShowSecondaryOverlay] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [wikiData, setWikiData] = useState<WikiData | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [unlockedHouses, setUnlockedHouses] = useState<Set<number>>(new Set([house]));
-  const [secondaryUnlocked, setSecondaryUnlocked] = useState(false);
+  const [unlockedHouses, setUnlockedHouses] = useState<Set<number>>(
+    TEST_MODE ? new Set(Array.from({ length: 12 }, (_, i) => i + 1)) : new Set([house])
+  );
+  const [secondaryUnlocked, setSecondaryUnlocked] = useState(TEST_MODE);
 
   const accentColor = extractAccentColor(house);
   const bgGradient = houseColors[house];
