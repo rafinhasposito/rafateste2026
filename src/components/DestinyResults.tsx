@@ -748,6 +748,11 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   <p className="text-white/95 text-sm leading-relaxed">{timedMain}</p>
                 </div>
 
+                {/* Guia completo da casa */}
+                <HouseGuidePanel house={house} accentColor={accentColor} />
+
+
+
                 {/* Radar de Impacto */}
                 <div className="p-5 rounded-xl space-y-4" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
                   <div className="flex items-center gap-2">
