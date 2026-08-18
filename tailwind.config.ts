@@ -14,22 +14,13 @@ export default {
     },
     extend: {
       fontFamily: {
-        cinzel: ["Cinzel", "serif"],
+        inter: ["Inter", "sans-serif"],
+        sfpro: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "sans-serif"],
         outfit: ["Outfit", "sans-serif"],
         space: ["Space Grotesk", "sans-serif"],
-        signature: ["Great Vibes", "cursive"],
+        cinzel: ["Cinzel", "serif"],
       },
       colors: {
-        quantum: {
-          950: "hsl(var(--quantum-950))",
-          900: "hsl(var(--quantum-900))",
-          800: "hsl(var(--quantum-800))",
-        },
-        gold: {
-          DEFAULT: "hsl(var(--gold))",
-          dark: "hsl(var(--gold-dark))",
-          light: "hsl(var(--gold-light))",
-        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -38,6 +29,16 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+        },
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+          dark: "hsl(var(--gold-dark))",
+        },
+        quantum: {
+          950: "hsl(var(--quantum-950))",
+          900: "hsl(var(--quantum-900))",
+          800: "hsl(var(--quantum-800))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

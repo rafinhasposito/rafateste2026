@@ -139,6 +139,14 @@ const Auth = () => {
             </button>
           </form>
 
+          {/* Botão de Bypass para Testes Locais */}
+          <button
+            onClick={() => navigate('/showcase-onboarding')}
+            className="w-full py-3 mt-3 rounded-xl border border-primary/30 text-primary font-bold text-sm uppercase tracking-widest hover:bg-primary/10 transition-all"
+          >
+            Pular Login (Testar Game)
+          </button>
+
           <div className="flex justify-between mt-5 text-xs">
             {mode !== "signin" ? (
               <button onClick={() => setMode("signin")} className="text-muted-foreground hover:text-primary transition-colors">← Voltar ao login</button>

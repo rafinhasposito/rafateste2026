@@ -22,6 +22,10 @@ export interface ChargeResult {
 export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult> => {
   const cost = args.amount ?? 1;
 
+  // TEMPORARY BYPASS: Return success without hitting the database
+  return { ok: true, newBalance: args.currentCredits };
+  
+  /* Original code
   if (args.isAdmin) {
     // Log para auditoria mas sem debitar
     await supabase.from("credit_transactions").insert({
@@ -53,4 +57,5 @@ export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult
   });
 
   return { ok: true, newBalance };
+  */
 };

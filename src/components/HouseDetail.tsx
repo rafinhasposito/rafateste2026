@@ -29,7 +29,7 @@ interface HouseDetailProps {
   onClose: () => void;
 }
 
-import { MapPin } from "lucide-react";
+import { MapPin, CheckCircle2, AlertTriangle, Lightbulb } from "lucide-react";
 
 const getMapUrl = (lat: number, lon: number) =>
   `https://maps.google.com/maps?q=${lat},${lon}&z=6&output=embed`;
@@ -95,6 +95,15 @@ const DestinationCard = ({
   );
 };
 
+const SectionBlock = ({ title, children, highlight = false }: { title: string, children: React.ReactNode, highlight?: boolean }) => (
+  <div className={`${highlight ? 'bg-primary/5 border-primary/15' : 'bg-background/30 border-foreground/5'} backdrop-blur-sm rounded-xl p-5 border mb-4`}>
+    <p className={`text-[10px] uppercase tracking-[0.2em] font-semibold mb-3 ${highlight ? 'text-primary' : 'text-primary/80'}`}>{title}</p>
+    <div className="text-foreground/80 text-sm leading-relaxed font-light">
+      {children}
+    </div>
+  </div>
+);
+
 const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: HouseDetailProps) => {
   const bgGradient = houseColors[house.id];
   const archetype = getHouseArchetype(house.name);
@@ -102,41 +111,10 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
   const isPast = mode === "passado";
   const isFuture = mode === "futuro";
 
-  // Time-aware text selection
-  const beneficio = isPast ? house.beneficio_passado : house.beneficio;
-  const ideal = isPast ? house.ideal_passado : house.ideal;
-  const pessoal = isPast ? house.pessoal_passado : house.pessoal;
-  const amor = isPast ? house.amor_passado : house.amor;
-  const prof = isPast ? house.prof_passado : house.prof;
-  const mainText = isPast ? house.past_text : house.porque;
-
-  // Time-aware labels
-  const promessaTitulo = isPast
-    ? "O Que o Universo Preparou Naquele Ciclo"
-    : isFuture
-      ? "A Promessa do Universo Para Este Ciclo"
-      : "A Energia Ativa Neste Momento";
-
-  const leituraTitulo = isPast
-    ? "Análise Retroativa da Casa"
-    : isFuture
-      ? "Leitura de Ativação da Casa"
-      : "Energia em Ação";
-
-  const leituraTexto = isPast
-    ? `Naquele ciclo, quem ativou a Casa ${house.id} focou em ${house.label}, canalizando a energia de ${archetype}. Veja abaixo como essa frequência se manifestou.`
-    : isFuture
-      ? `Quem escolhe a Casa ${house.id} ativa foco em ${house.label}, com energia de ${archetype}. Escolha uma das cidades calculadas e passe 24h no local para ancorar essa frequência.`
-      : `A Casa ${house.id} está ativa com foco em ${house.label}, canalizando ${archetype}. As cidades abaixo potencializam essa energia.`;
-
   const destinoLabel = isPast ? "Onde a Energia se Ancorou" : "Destinos Calculados";
   const destinoDesc = isPast
     ? "As cidades abaixo representam os pontos de ancoragem energética daquele ciclo."
     : "A matemática pode retornar 1, 2 ou 3 rotas, conforme viabilidade astrológica de cada casa.";
-
-  const areaLabels = isPast
-    ? { prof: "Cenário Profissional", amor: "Cenário Afetivo", pessoal: "Cenário Pessoal" }
-    : { prof: "Profissional", amor: "Amor", pessoal: "Pessoal" };
 
   const destinations: { city: CityOption; label: string; toneClass: string }[] = [];
 
@@ -189,11 +167,10 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         {/* Header */}
         <div className="flex items-start gap-4 mb-2">
           <div className="flex-1">
-            <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wider">
-              Casa {house.id}
+            <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground tracking-wider">
+              {house.name}
             </h3>
-            <p className="text-primary text-sm uppercase tracking-[0.3em] mt-1 font-semibold">{house.label}</p>
-            <div className="flex items-center gap-3 mt-2 flex-wrap">
+            <div className="flex items-center gap-3 mt-4 flex-wrap">
               <span className="text-foreground/40 text-xs">{archetype}</span>
               <span className="text-foreground/20">·</span>
               <span className="text-foreground/40 text-xs">{sign}</span>
@@ -206,7 +183,7 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         </div>
 
         {/* Mode badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/15 bg-primary/5 mt-3 mb-5">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/15 bg-primary/5 mt-3 mb-6">
           <div className={`w-1.5 h-1.5 rounded-full ${isPast ? 'bg-amber-400' : isFuture ? 'bg-emerald-400' : 'bg-blue-400'}`} />
           <span className="text-[9px] uppercase tracking-[0.3em] text-primary font-semibold">
             {isPast ? "Análise do Passado" : isFuture ? "Previsão Futura" : "Momento Presente"}
@@ -223,38 +200,92 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
           </div>
         )}
 
-        {/* Leitura */}
-        <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{leituraTitulo}</p>
-          <p className="text-foreground/80 text-sm leading-relaxed font-light">{leituraTexto}</p>
+        {/* 1. O que você precisa entender em 10 segundos */}
+        <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 mb-6 shadow-sm">
+          <div className="flex gap-3 items-start">
+            <Lightbulb className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-bold mb-2">O que você precisa entender em 10 segundos</p>
+              <p className="text-foreground/90 text-sm leading-relaxed font-medium">{house.entender_10s}</p>
+            </div>
+          </div>
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-6">
           {house.tags.map((tag) => (
-            <span key={tag} className="text-[10px] px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary uppercase tracking-wider font-medium">
+            <span key={tag} className="text-[10px] px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary uppercase tracking-wider font-medium">
               {tag}
             </span>
           ))}
         </div>
 
-        {/* Main resumo */}
+        {/* 2. Pode favorecer */}
         <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
-          <p className="text-primary font-cinzel text-sm font-bold uppercase tracking-wider mb-2">{house.resumo}</p>
-          <p className="text-foreground/70 text-sm leading-relaxed">{mainText}</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-4">Pode Favorecer</p>
+          <ul className="space-y-3">
+            {house.favorece.map((item, idx) => (
+              <li key={idx} className="flex gap-3 items-start text-sm text-foreground/80">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5 opacity-70" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Sombra (past only) */}
-        {isPast && house.sombra && (
-          <div className="bg-destructive/5 border border-destructive/15 rounded-xl p-5 mb-6">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-destructive font-semibold mb-3">O Lado Sombra Daquele Ciclo</p>
-            <p className="text-foreground/70 text-xs leading-relaxed">{house.sombra}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <SectionBlock title="O tema do seu ano">
+            {house.tema_ano}
+          </SectionBlock>
+          <SectionBlock title="O que você pode ganhar com isso">
+            {house.ganhar}
+          </SectionBlock>
+        </div>
+
+        <SectionBlock title="Como isso aparece na vida real">
+          {house.vida_real}
+        </SectionBlock>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <SectionBlock title="Dinheiro">
+            {house.dinheiro}
+          </SectionBlock>
+          <SectionBlock title="Trabalho">
+            {house.trabalho}
+          </SectionBlock>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <SectionBlock title="Amor">
+            {house.amor}
+          </SectionBlock>
+          <SectionBlock title="Vida Pessoal">
+            {house.vida_pessoal}
+          </SectionBlock>
+        </div>
+
+        <div className="bg-primary/5 border border-primary/15 rounded-xl p-5 mb-4">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Como aproveitar esse ano</p>
+          <p className="text-foreground/80 text-sm leading-relaxed">{house.como_aproveitar}</p>
+        </div>
+
+        <div className="bg-destructive/5 border border-destructive/15 rounded-xl p-5 mb-8 flex gap-3 items-start">
+          <AlertTriangle className="w-5 h-5 text-destructive/80 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-destructive font-semibold mb-2">Cuidado com...</p>
+            <p className="text-foreground/80 text-sm leading-relaxed">{house.cuidado}</p>
           </div>
-        )}
+        </div>
+
+        {/* Resumo Final */}
+        <div className="bg-foreground/5 rounded-xl p-5 border border-foreground/10 text-center mb-10">
+          <p className="text-foreground text-sm font-medium italic">"{house.resumo}"</p>
+        </div>
+
 
         {/* Destinations */}
         {destinations.length > 0 && (
-          <div className="mb-8">
+          <div className="mb-8 border-t border-foreground/10 pt-8">
             <h4 className="font-cinzel text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">
               {destinoLabel}
             </h4>
@@ -279,45 +310,6 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
           </div>
         </div>
 
-        {/* Promise */}
-        <div className="bg-primary/5 border border-primary/15 rounded-xl p-6 mb-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-semibold mb-3">{promessaTitulo}</p>
-          <p className="text-foreground/80 text-sm italic leading-relaxed font-light">
-            "{house.promessa_texto}"
-          </p>
-        </div>
-
-        {/* Areas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.prof}</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{prof}</p>
-          </div>
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.amor}</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{amor}</p>
-          </div>
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">{areaLabels.pessoal}</p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{pessoal}</p>
-          </div>
-        </div>
-
-        {/* Benefício & Ideal */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">
-              {isPast ? "O Que Foi Colhido" : "Benefício"}
-            </p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{beneficio}</p>
-          </div>
-          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">
-              {isPast ? "O Que Era Necessário" : "Ideal Para"}
-            </p>
-            <p className="text-foreground/60 text-xs leading-relaxed">{ideal}</p>
-          </div>
-        </div>
       </div>
     </motion.div>
   );

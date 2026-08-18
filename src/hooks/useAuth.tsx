@@ -49,6 +49,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    // TEMPORARY BYPASS: Force a logged in user with infinite credits for testing
+    setUser({ id: "test-user", email: "test@example.com" } as any);
+    setSession({} as any);
+    setProfile({
+      display_name: "Test User",
+      email: "test@example.com",
+      avatar_url: null,
+      credits: 9999
+    });
+    setLoading(false);
+
+    /* Original auth code commented out for testing
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
@@ -70,6 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
+    */
   }, []);
 
   const signOut = async () => {

@@ -188,7 +188,7 @@ const Index = () => {
       {user && <UserMenu />}
 
       {/* ===== HERO SECTION ===== */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden">
+      <section className="relative min-h-[100svh] flex flex-col items-center justify-center px-5 py-10 md:py-16 overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="orbital-ring w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-30" style={{ "--speed": "80s" } as React.CSSProperties}>
             <div className="orbital-dot" />
@@ -203,7 +203,7 @@ const Index = () => {
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mb-8 float-gentle"
+          className="relative mb-4 md:mb-8 float-gentle"
         >
           <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/20 flex items-center justify-center backdrop-blur-sm">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-gold-dark to-gold flex items-center justify-center shadow-[0_0_40px_hsl(var(--gold)/0.4)]">
@@ -217,7 +217,7 @@ const Index = () => {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="mb-6 inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm">
+          className="mb-4 md:mb-6 inline-flex items-center gap-2 px-4 py-1.5 md:px-5 md:py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm">
           <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
           <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.3em] text-gold">
             Protocolo Solar · Astrologia de Relocalização
@@ -225,13 +225,13 @@ const Index = () => {
         </motion.div>
 
         <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }}
-          className="font-cinzel text-center text-4xl md:text-6xl lg:text-[5.5rem] font-bold mb-6 leading-[1.05] tracking-tight max-w-5xl">
+          className="font-cinzel text-center text-[1.75rem] md:text-6xl lg:text-[5.5rem] font-bold mb-4 md:mb-6 leading-[1.1] tracking-tight max-w-5xl">
           <span className="text-foreground block mb-2">DESCUBRA ONDE PASSAR</span>
           <span className="gold-gradient text-glow-gold block">SEU PRÓXIMO ANIVERSÁRIO</span>
         </motion.h1>
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          className="text-center text-muted-foreground text-sm md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-10 px-4">
+          className="text-center text-muted-foreground text-xs md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-6 md:mb-10 px-2 md:px-4">
           Assuma o controle absoluto dos próximos 12 meses.
           Destrave o <span className="text-gold font-medium">GPS exato</span> da sua{" "}
           <span className="text-foreground font-medium">Prosperidade</span>,{" "}
@@ -241,7 +241,7 @@ const Index = () => {
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="flex items-center gap-6 md:gap-12 mb-12">
+          className="flex items-center gap-4 md:gap-12 mb-8 md:mb-12">
           {stats.map((s, i) => (
             <div key={i} className="text-center">
               <p className="text-gold font-cinzel text-xl md:text-2xl font-bold">{s.value}</p>
@@ -262,7 +262,7 @@ const Index = () => {
       </section>
 
       {/* ===== STEPPER SECTION ===== */}
-      <section id="form-section" className="relative px-4 pb-20 max-w-5xl mx-auto">
+      <section id="form-section" className="relative px-4 md:px-4 pb-20 max-w-5xl mx-auto">
 
         {/* Step Indicator */}
         {(() => {
@@ -315,7 +315,7 @@ const Index = () => {
           const activeTheme = mode ? modeThemes[mode] : null;
           return (
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="glass-panel glass-panel-glow p-6 md:p-12 lg:p-16 relative"
+          className="glass-panel glass-panel-glow p-5 md:p-12 lg:p-16 relative"
           style={activeTheme ? { borderColor: `rgba(${activeTheme.rgb}, 0.15)` } : undefined}
         >
           <div
@@ -350,7 +350,7 @@ const Index = () => {
                         whileHover={{ scale: 1.02, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleSelectMode(opt.id)}
-                        className="p-6 md:p-8 rounded-xl border text-left transition-all duration-300 group"
+                        className="p-5 md:p-8 rounded-xl border text-left transition-all duration-300 group"
                         style={{
                           borderColor: isSelected ? `rgba(${cardColor.rgb}, 0.6)` : `rgba(${cardColor.rgb}, 0.15)`,
                           background: isSelected ? `rgba(${cardColor.rgb}, 0.1)` : undefined,
@@ -497,7 +497,7 @@ const Index = () => {
                 </div>
 
                 {/* Natal Data Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-10">
                   <div className="space-y-7">
                     <div>
                       <div className="field-label"><span className="label-dot" /> Nome Completo</div>
@@ -560,7 +560,7 @@ const Index = () => {
                 )}
 
                 {/* Lookup Component */}
-                <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-6 md:p-8">
+                <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-4 md:p-8">
                   {searchPath === "cidade" && (
                     <CityLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
                   )}

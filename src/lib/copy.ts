@@ -11,11 +11,11 @@
 
 export const copy = {
   // Loading
-  loadingCosmos: "Consultando o cosmos...",
-  loadingRoutes: "Calculando rotas estelares...",
-  loadingCity: "Simulando deslocamento...",
+  loadingCosmos: "Calculando seu Ascendente Anual...",
+  loadingRoutes: "Ancorando o seu Sol (Foco de Energia)...",
+  loadingCity: "Mapeando a posição da Lua (Clima Emocional)...",
   loadingHistory: "Carregando histórico...",
-  loadingMap: "Carregando mapa estelar...",
+  loadingMap: "Sintetizando Atlas do Destino...",
   loadingGeneric: "Carregando...",
   processing: "Processando...",
 
