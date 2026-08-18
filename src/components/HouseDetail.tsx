@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { HouseData, houseColors } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
+import HouseGuidePanel from "@/components/HouseGuidePanel";
 
 interface CityOption {
   city: string;
@@ -242,6 +243,11 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
           <p className="text-primary font-cinzel text-sm font-bold uppercase tracking-wider mb-2">{house.resumo}</p>
           <p className="text-foreground/70 text-sm leading-relaxed">{mainText}</p>
+        </div>
+
+        {/* Guia completo da casa */}
+        <div className="mb-6">
+          <HouseGuidePanel house={house.id} />
         </div>
 
         {/* Sombra (past only) */}

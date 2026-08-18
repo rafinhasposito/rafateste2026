@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { getCountryFlag } from "@/lib/countryFlags";
 import { cityDatabase, houseColors, type HouseData } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
+import HouseGuidePanel from "@/components/HouseGuidePanel";
 import { supabase } from "@/integrations/supabase/client";
 import { TEST_MODE } from "@/lib/testMode";
 
@@ -746,6 +747,11 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                   <p className="font-cinzel text-sm font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>{houseData.resumo}</p>
                   <p className="text-white/95 text-sm leading-relaxed">{timedMain}</p>
                 </div>
+
+                {/* Guia completo da casa */}
+                <HouseGuidePanel house={house} accentColor={accentColor} />
+
+
 
                 {/* Radar de Impacto */}
                 <div className="p-5 rounded-xl space-y-4" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
