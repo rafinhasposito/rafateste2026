@@ -50,10 +50,10 @@ const App = () => (
             <Route path="/apple-3d" element={<AppleScrollExplosion />} />
             <Route path="/showcase-onboarding" element={<OrbitalOnboarding />} />
             <Route path="/showcase-admin" element={<AdminShowcase />} />
-            
+
             {/* Mobile App Flow */}
             <Route path="/app/*" element={<MobileAppRoutes />} />
-            
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

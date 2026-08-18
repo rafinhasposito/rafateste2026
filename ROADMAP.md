@@ -1,8 +1,9 @@
 # Roadmap de Evolução - Voyage Flow
 
 ## Prioridades (Curto Prazo - Foco Atual)
+- [x] Implementar as 6 telas interativas do Onboarding do Protocolo Solar (UX de alta conversão).
+- [x] Executar redesign e unificação visual (UX/UI) com layout Premium, dourado e vidro cósmico.
 - [ ] Coletar novo conteúdo (Textos/Copy) do Notebook LM fornecido pelo Product Owner.
-- [ ] Planejar redesign (UX/UI) focando em clareza, legibilidade e layout Premium.
 - [ ] Fatiar os "God Components" (ex: `DestinyResults.tsx`) em componentes menores e reutilizáveis.
 - [ ] Implementar Git Flow e separar ambiente de `develop` e `main`.
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Crown, Scroll, Clock, CalendarDays, Rocket, ChevronLeft } from "lucide-react";
+import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, Sparkles } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -17,15 +17,15 @@ type Mode = "futuro" | "passado" | "presente";
 type SearchPath = "cidade" | "casa" | "intencao" | null;
 
 const modeThemes: Record<Mode, { accent: string; rgb: string; glow: string; border: string; bg: string }> = {
-  passado: { accent: "hsl(30, 76%, 50%)", rgb: "205, 127, 50", glow: "rgba(205,127,50,0.3)", border: "rgba(205,127,50,0.4)", bg: "rgba(205,127,50,0.08)" },
-  presente: { accent: "hsl(160, 100%, 35%)", rgb: "0, 180, 120", glow: "rgba(0,180,120,0.3)", border: "rgba(0,180,120,0.4)", bg: "rgba(0,180,120,0.08)" },
-  futuro: { accent: "hsl(260, 58%, 59%)", rgb: "120, 80, 220", glow: "rgba(120,80,220,0.3)", border: "rgba(120,80,220,0.4)", bg: "rgba(120,80,220,0.08)" },
+  passado: { accent: "hsl(270, 91%, 65%)", rgb: "168, 85, 247", glow: "rgba(168,85,247,0.3)", border: "rgba(168,85,247,0.4)", bg: "rgba(168,85,247,0.08)" },
+  presente: { accent: "hsl(43, 85%, 53%)", rgb: "212, 175, 55", glow: "rgba(212,175,55,0.3)", border: "rgba(212,175,55,0.4)", bg: "rgba(212,175,55,0.08)" },
+  futuro: { accent: "hsl(348, 83%, 60%)", rgb: "244, 63, 94", glow: "rgba(244,63,94,0.3)", border: "rgba(244,63,94,0.4)", bg: "rgba(244,63,94,0.08)" },
 };
 
 const modeCardColors: Record<Mode, { rgb: string }> = {
-  passado: { rgb: "205, 127, 50" },
-  presente: { rgb: "0, 180, 120" },
-  futuro: { rgb: "120, 80, 220" },
+  passado: { rgb: "168, 85, 247" },
+  presente: { rgb: "212, 175, 55" },
+  futuro: { rgb: "244, 63, 94" },
 };
 
 const mantras = [
@@ -45,21 +45,21 @@ const stats = [
 const modeOptions = [
   {
     id: "passado" as Mode,
-    icon: Clock,
+    icon: Hourglass,
     title: "Passado",
     desc: "Onde você passou seu aniversário?",
     tagline: "Auditar um ciclo anterior",
   },
   {
     id: "presente" as Mode,
-    icon: CalendarDays,
+    icon: Sun,
     title: "Presente",
     desc: "Onde você está passando seu aniversário este ano?",
     tagline: "Analisar o ciclo atual",
   },
   {
     id: "futuro" as Mode,
-    icon: Rocket,
+    icon: Compass,
     title: "Futuro",
     desc: "Onde você ancora o seu Sol, define os próximos 12 meses.",
     tagline: "Projetar o próximo ciclo",
@@ -93,6 +93,7 @@ const Index = () => {
   const { showAlert } = useAlert();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [mode, setMode] = useState<Mode | null>(null);
@@ -108,6 +109,19 @@ const Index = () => {
 
   const [submitted, setSubmitted] = useState(false);
   const [mantraIndex, setMantraIndex] = useState(0);
+
+  // Auto-seleciona modo caso venha do Onboarding (?mode=passado|presente|futuro)
+  useEffect(() => {
+    const modeParam = searchParams.get("mode") as Mode | null;
+    if (modeParam && ["passado", "presente", "futuro"].includes(modeParam)) {
+      setMode(modeParam);
+      if (modeParam === "presente") setYear(currentYear);
+      setStep(2);
+      setTimeout(() => {
+        document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -241,7 +255,7 @@ const Index = () => {
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="flex items-center gap-4 md:gap-12 mb-8 md:mb-12">
+          className="flex items-center gap-4 md:gap-12 mb-8 md:mb-10">
           {stats.map((s, i) => (
             <div key={i} className="text-center">
               <p className="text-gold font-cinzel text-xl md:text-2xl font-bold">{s.value}</p>
@@ -250,10 +264,28 @@ const Index = () => {
           ))}
         </motion.div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
+        {/* Hero CTAs */}
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+          className="flex flex-col sm:flex-row items-center gap-3.5 mb-10 z-20">
+          <button
+            onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}
+            className="btn-gold-luxury px-8 py-3.5 text-xs tracking-[0.16em] shadow-[0_0_25px_rgba(212,175,55,0.4)]"
+          >
+            Iniciar Protocolo →
+          </button>
+          <Link
+            to="/app/onboarding"
+            className="px-6 py-3 rounded-full border border-gold/30 hover:border-gold/60 bg-gold/5 hover:bg-gold/10 text-gold text-xs font-semibold uppercase tracking-[0.15em] transition-all flex items-center gap-2 backdrop-blur-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Ver Onboarding (6 Telas)
+          </Link>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }}
           className="flex flex-col items-center gap-2 text-muted-foreground/40 cursor-pointer hover:text-gold/60 transition-colors"
           onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}>
-          <span className="text-[9px] uppercase tracking-[0.3em] font-medium">Iniciar Protocolo</span>
+          <span className="text-[9px] uppercase tracking-[0.3em] font-medium">Rolar para o Formulário</span>
           <motion.svg animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 2 }}
             className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m6 9 6 6 6-6" />
@@ -316,7 +348,7 @@ const Index = () => {
           return (
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="glass-panel glass-panel-glow p-5 md:p-12 lg:p-16 relative"
-          style={activeTheme ? { borderColor: `rgba(${activeTheme.rgb}, 0.15)` } : undefined}
+          style={activeTheme ? { borderColor: `rgba(${activeTheme.rgb}, 0.2)` } : undefined}
         >
           <div
             className="absolute top-0 left-[10%] right-[10%] h-px"
@@ -350,31 +382,35 @@ const Index = () => {
                         whileHover={{ scale: 1.02, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleSelectMode(opt.id)}
-                        className="p-5 md:p-8 rounded-xl border text-left transition-all duration-300 group"
+                        className="p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 group backdrop-blur-xl"
                         style={{
-                          borderColor: isSelected ? `rgba(${cardColor.rgb}, 0.6)` : `rgba(${cardColor.rgb}, 0.15)`,
-                          background: isSelected ? `rgba(${cardColor.rgb}, 0.1)` : undefined,
-                          boxShadow: isSelected ? `0 0 30px rgba(${cardColor.rgb}, 0.15)` : undefined,
+                          borderColor: isSelected ? `rgba(${cardColor.rgb}, 0.7)` : `rgba(${cardColor.rgb}, 0.25)`,
+                          background: isSelected ? `rgba(${cardColor.rgb}, 0.12)` : "rgba(10, 12, 20, 0.6)",
+                          boxShadow: isSelected ? `0 0 30px rgba(${cardColor.rgb}, 0.2)` : undefined,
                         }}
                       >
                         <div
-                          className="w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-all"
+                          className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all"
                           style={{
-                            background: isSelected ? `rgba(${cardColor.rgb}, 0.2)` : `rgba(${cardColor.rgb}, 0.08)`,
+                            background: isSelected ? `rgba(${cardColor.rgb}, 0.25)` : `rgba(${cardColor.rgb}, 0.1)`,
+                            border: `1px solid rgba(${cardColor.rgb}, 0.3)`,
                           }}
                         >
-                          <Icon className="w-5 h-5 transition-colors" style={{ color: isSelected ? `rgb(${cardColor.rgb})` : `rgba(${cardColor.rgb}, 0.6)` }} />
+                          <Icon className="w-5 h-5 transition-colors" style={{ color: isSelected ? `rgb(${cardColor.rgb})` : `rgba(${cardColor.rgb}, 0.8)` }} />
                         </div>
-                        <h3
-                          className="font-cinzel text-sm md:text-base font-bold uppercase tracking-[0.1em] mb-2"
-                          style={{ color: isSelected ? `rgb(${cardColor.rgb})` : undefined }}
+                        <span 
+                          className="text-[9px] font-bold tracking-[0.2em] uppercase block mb-1"
+                          style={{ color: `rgb(${cardColor.rgb})` }}
                         >
                           {opt.title}
+                        </span>
+                        <h3
+                          className="font-sans text-sm md:text-base font-bold text-foreground mb-2"
+                        >
+                          {opt.tagline}
                         </h3>
-                        <p className="text-muted-foreground text-[11px] md:text-xs leading-relaxed mb-3">{opt.tagline}</p>
                         <p
-                          className="text-[10px] md:text-[11px] italic leading-relaxed"
-                          style={{ color: isSelected ? `rgba(${cardColor.rgb}, 0.7)` : undefined }}
+                          className="text-[11px] md:text-xs italic leading-relaxed text-muted-foreground"
                         >
                           "{opt.desc}"
                         </p>
@@ -418,7 +454,7 @@ const Index = () => {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {(() => {
                     const theme = mode ? modeThemes[mode] : null;
                     return pathOptions.map((opt) => {
@@ -426,19 +462,32 @@ const Index = () => {
                       return (
                         <motion.button
                           key={opt.id}
-                          whileHover={{ scale: 1.02 }}
+                          whileHover={{ scale: 1.02, y: -2 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectPath(opt.id)}
-                          className="p-5 md:p-6 rounded-xl border bg-card/30 text-left transition-all duration-300 group"
-                          style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.15)` : undefined }}
+                          className="p-6 rounded-2xl border text-left transition-all duration-300 group backdrop-blur-xl"
+                          style={{
+                            borderColor: theme ? `rgba(${theme.rgb}, 0.25)` : "rgba(212, 175, 55, 0.2)",
+                            background: "rgba(10, 12, 20, 0.65)",
+                            boxShadow: theme ? `0 0 25px rgba(${theme.rgb}, 0.08)` : undefined,
+                          }}
                         >
-                          <div className="flex items-center gap-3 mb-2">
-                            <Icon className="w-5 h-5 text-muted-foreground transition-colors" style={{ '--hover-color': theme ? `rgb(${theme.rgb})` : undefined } as React.CSSProperties} />
-                            <span className="font-cinzel text-xs font-bold uppercase tracking-[0.1em] text-foreground transition-colors">
-                              {opt.title}
-                            </span>
+                          <div 
+                            className="w-11 h-11 rounded-xl flex items-center justify-center mb-3.5 transition-all"
+                            style={{
+                              background: theme ? `rgba(${theme.rgb}, 0.15)` : "rgba(212, 175, 55, 0.1)",
+                              border: `1px solid ${theme ? `rgba(${theme.rgb}, 0.3)` : "rgba(212, 175, 55, 0.25)"}`,
+                            }}
+                          >
+                            <Icon 
+                              className="w-5 h-5 transition-colors" 
+                              style={{ color: theme ? `rgb(${theme.rgb})` : "#D4AF37" }} 
+                            />
                           </div>
-                          <p className="text-muted-foreground text-[11px] leading-relaxed">{opt.desc}</p>
+                          <span className="font-cinzel text-xs md:text-sm font-bold uppercase tracking-[0.1em] text-foreground block mb-1">
+                            {opt.title}
+                          </span>
+                          <p className="text-muted-foreground text-[11px] md:text-xs leading-relaxed">{opt.desc}</p>
                         </motion.button>
                       );
                     });

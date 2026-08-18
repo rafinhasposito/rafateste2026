@@ -53,20 +53,25 @@ const UserMenu = () => {
             <span className="text-primary text-xs font-bold">{profile?.display_name?.charAt(0) || "?"}</span>
           </div>
         )}
-        <div className="absolute right-0 top-full mt-2 w-40 bg-card border border-border rounded-xl p-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all shadow-xl">
+        <div className="absolute right-0 top-full mt-2 w-48 bg-[#0A0C14] border border-gold/20 rounded-2xl p-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl">
           <p className="text-foreground text-xs font-medium px-3 py-2 truncate">{profile?.display_name || profile?.email}</p>
-          <div className="h-px bg-border my-1" />
-          <button onClick={() => navigate("/perfil")} className="w-full text-left px-3 py-2 text-foreground text-xs hover:bg-primary/10 rounded-lg transition-colors">
+          <div className="h-px bg-border/40 my-1" />
+          <button onClick={() => navigate("/app/onboarding")} className="w-full text-left px-3 py-2 text-[#D4AF37] text-xs hover:bg-gold/10 rounded-xl transition-colors flex items-center justify-between">
+            <span>Ver Onboarding</span>
+            <span className="text-[9px] uppercase tracking-wider text-[#D4AF37]/60">6 telas</span>
+          </button>
+          <button onClick={() => navigate("/perfil")} className="w-full text-left px-3 py-2 text-foreground text-xs hover:bg-primary/10 rounded-xl transition-colors">
             Meu Perfil
           </button>
           {isAdmin && (
-            <button onClick={() => navigate("/admin")} className="w-full text-left px-3 py-2 text-primary text-xs hover:bg-primary/10 rounded-lg transition-colors">
+            <button onClick={() => navigate("/admin")} className="w-full text-left px-3 py-2 text-primary text-xs hover:bg-primary/10 rounded-xl transition-colors">
               Painel Admin
             </button>
           )}
+          <div className="h-px bg-border/40 my-1" />
           <button
             onClick={signOut}
-            className="w-full text-left px-3 py-2 text-destructive text-xs hover:bg-destructive/10 rounded-lg transition-colors"
+            className="w-full text-left px-3 py-2 text-destructive text-xs hover:bg-destructive/10 rounded-xl transition-colors"
           >
             Sair
           </button>

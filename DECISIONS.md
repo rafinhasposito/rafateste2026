@@ -8,3 +8,9 @@ Este documento registra as decisões arquiteturais, de design e produto, além d
 - **Decisão:** Realizar um redesign completo (UX/UI) com um sistema de cores, tipografia e espaçamentos mais limpos e sofisticados. Paralelamente, desacoplar os textos das casas astrológicas usando uma fonte externa (Notebook LM) que o Product Owner irá fornecer, criando uma estrutura de dados dedicada.
 - **Alternativas consideradas:** Manter a estrutura atual e apenas mudar cores. (Rejeitada pois não resolve a escalabilidade do código nem a clareza da UX).
 - **Motivo:** Garantir que o produto atinja um padrão "World Class" compatível com startups unicórnio, com código sustentável.
+
+## Decisão 2: Implementação das 6 Telas do Onboarding e Unificação do Design Cósmico
+- **Data:** 18 de Agosto de 2026
+- **Contexto:** Necessidade de transformar as referências visuais do onboarding em código React nativo interativo (6 telas de alta conversão) e alinhar todas as interfaces do app (Index, Auth, Credits, Profile, Dashboard) ao tema de luxo "Protocolo Solar".
+- **Decisão:** Criação de componentes dedicados (`CelestialMandala`, `CityComparisonBeacons`, `TimelineModeCards`, `BrandHeader`, `EditorialBlock`, `CinematicEarth`), suporte a gestos touch/teclado, fluxo contínuo de onboarding até o cálculo (`/?mode=...`), e tokens de design dourados/vidro cósmico em `index.css`.
+- **Resultado:** Experiência consistente em mobile e desktop, build validado e suíte de testes no Vitest aprovada.

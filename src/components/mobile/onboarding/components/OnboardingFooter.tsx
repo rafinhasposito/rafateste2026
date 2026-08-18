@@ -1,29 +1,51 @@
 import React from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { StepProgress } from "./StepProgress";
 
-export const OnboardingFooter = ({ step, total, onNext, onPrev }: any) => (
-  <footer className="w-full h-[100px] shrink-0 px-6 flex items-center justify-between pb-6 z-40 relative">
-    <button
-      onClick={onPrev}
-      className={cn(
-        "w-12 h-12 rounded-full border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] bg-[#030306]/40 backdrop-blur-md transition-all",
-        step === 0 ? "opacity-100 pointer-events-none" : "opacity-100"
-      )}
-      aria-disabled={step === 0}
-    >
-      <ArrowLeft className="w-5 h-5" />
-    </button>
-    <StepProgress current={step} total={total} />
-    <button
-      onClick={onNext}
-      className={cn(
-        "w-12 h-12 rounded-full border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] bg-[#030306]/40 backdrop-blur-md transition-all",
-        step === total - 1 ? "opacity-0 pointer-events-none" : "opacity-100"
-      )}
-    >
-      <ArrowRight className="w-5 h-5" />
-    </button>
-  </footer>
-);
+interface OnboardingFooterProps {
+  step: number;
+  total: number;
+  onNext: () => void;
+  onPrev: () => void;
+  onSelectStep?: (index: number) => void;
+}
+
+export const OnboardingFooter = ({
+  step,
+  total,
+  onNext,
+  onPrev,
+  onSelectStep,
+}: OnboardingFooterProps) => {
+  const isFirst = step === 0;
+
+  return (
+    <footer className="w-full h-[90px] shrink-0 px-6 flex items-center justify-between pb-6 pt-2 z-40 relative select-none">
+      {/* Botão Voltar */}
+      <button
+        onClick={onPrev}
+        disabled={isFirst}
+        className={`w-11 h-11 rounded-full border border-[#D4AF37]/50 flex items-center justify-center bg-[#030306]/70 backdrop-blur-md text-[#D4AF37] transition-all duration-200 ${
+          isFirst
+            ? "opacity-0 pointer-events-none"
+            : "opacity-100 hover:scale-105 active:scale-95 hover:border-[#D4AF37] hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]"
+        }`}
+        aria-label="Tela anterior"
+      >
+        <ChevronLeft className="w-5 h-5 -ml-0.5" />
+      </button>
+
+      {/* 6 Barras de Progresso */}
+      <StepProgress current={step} total={total} onSelectStep={onSelectStep} />
+
+      {/* Botão Avançar */}
+      <button
+        onClick={onNext}
+        className="w-11 h-11 rounded-full border border-[#D4AF37]/50 flex items-center justify-center bg-[#030306]/70 backdrop-blur-md text-[#D4AF37] transition-all duration-200 opacity-100 hover:scale-105 active:scale-95 hover:border-[#D4AF37] hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]"
+        aria-label="Próxima tela"
+      >
+        <ChevronRight className="w-5 h-5 -mr-0.5" />
+      </button>
+    </footer>
+  );
+};

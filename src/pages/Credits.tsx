@@ -81,9 +81,13 @@ const Credits = () => {
               </div>
               <button
                 onClick={() => handlePurchase(pkg)}
-                className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] transition-all ${highlight ? "bg-primary text-background hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)]" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
+                className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.16em] transition-all ${
+                  highlight
+                    ? "btn-gold-luxury shadow-[0_0_25px_rgba(212,175,55,0.4)]"
+                    : "bg-secondary/70 border border-primary/20 text-foreground hover:border-primary/50 hover:bg-secondary"
+                }`}
               >
-                Comprar
+                Comprar Créditos
               </button>
             </motion.div>
           );})}
