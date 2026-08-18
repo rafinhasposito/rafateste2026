@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { HouseData, houseColors } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
+import HouseGuidePanel from "@/components/HouseGuidePanel";
 
 interface CityOption {
   city: string;
