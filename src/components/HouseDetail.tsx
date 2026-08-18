@@ -244,6 +244,11 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
           <p className="text-foreground/70 text-sm leading-relaxed">{mainText}</p>
         </div>
 
+        {/* Guia completo da casa */}
+        <div className="mb-6">
+          <HouseGuidePanel house={house.id} />
+        </div>
+
         {/* Sombra (past only) */}
         {isPast && house.sombra && (
           <div className="bg-destructive/5 border border-destructive/15 rounded-xl p-5 mb-6">
