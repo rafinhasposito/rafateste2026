@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { getCountryFlag } from "@/lib/countryFlags";
 import { cityDatabase, houseColors, type HouseData } from "@/data/houses";
 import { getHouseArchetype, houseSigns } from "@/lib/houseMeta";
+import HouseGuidePanel from "@/components/HouseGuidePanel";
 import { supabase } from "@/integrations/supabase/client";
 import { TEST_MODE } from "@/lib/testMode";
 
