@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* PROTOCOLO SOLAR — LUXURY COSMIC THEME */
+    /* PROTOCOLO SOLAR — LUXURY COSMIC THEME (LEGACY) */
     --background: 240 33% 2%; /* #030306 Deep OLED Space */
     --foreground: 45 40% 96%; /* #FAF7EE Warm Celestial Ivory */
 
@@ -42,6 +42,74 @@
     --gold-dark: 36 90% 40%; /* #C28912 */
     --gold-light: 45 95% 72%; /* #F6D678 */
     --gold-muted: 43 50% 35%;
+
+    /* ========================================================
+       DESIGN FOUNDATION (PHASE 1) 
+       Cosmic Travel Intelligence Theme (Option B - Hybrid)
+       ======================================================== */
+    
+    /* 1. Base Neutrals (Void/Ink & Cream) */
+    --foundation-bg: 240 33% 2%; /* Void Black (#030306) */
+    --foundation-fg: 45 40% 96%; /* Cream / Celestial Ivory (#FAF7EE) */
+    --foundation-muted: 240 10% 8%; /* Darker muted neutral */
+    --foundation-muted-fg: 240 5% 65%; /* Soft gray for UI text */
+
+    /* 2. Semantic Surfaces (Opaque/Semi-opaque hierarchy) */
+    --surface: 240 25% 6%; /* #0A0C14 Deep Cosmic Glass base */
+    --surface-elevated: 240 20% 10%; /* Lighter for floating panels */
+    --surface-border: 240 20% 16%; /* Discrete borders */
+
+    /* 3. Brand & Accents (Gold is Brand, not universal) */
+    --brand-primary: 43 85% 53%; /* #D4AF37 Imperial Gold */
+    --brand-primary-fg: 240 33% 2%; /* Void text inside primary */
+    --brand-secondary: 240 20% 12%; /* #161824 Deep Accent */
+    --brand-secondary-fg: 45 40% 96%;
+    --brand-accent: 43 50% 35%; /* Muted Gold for subtle highlights */
+    --brand-accent-fg: 45 40% 96%;
+
+    /* 4. Feedback / Status */
+    --status-success: 142 71% 45%;
+    --status-warning: 38 92% 50%;
+    --status-error: 0 84.2% 60.2%; /* Harmonized with legacy destructive */
+    --status-info: 217 91% 60%;
+
+    /* 5. Interactive States */
+    --state-hover: rgba(255, 255, 255, 0.08);
+    --state-pressed: rgba(255, 255, 255, 0.12);
+    --state-selected: rgba(212, 175, 55, 0.15); /* Gold tint */
+    --state-focus: 43 85% 53%; /* Gold ring */
+    --state-disabled-opacity: 0.5;
+
+    /* 6. Typography Scale (Cinzel + Inter) */
+    --font-display: 'Cinzel', serif;
+    --font-sans: 'Inter', sans-serif;
+    --text-display: 4rem;
+    --text-h1: 2.5rem;
+    --text-h2: 2rem;
+    --text-h3: 1.5rem;
+    --text-h4: 1.25rem;
+    --text-body-lg: 1.125rem;
+    --text-body: 1rem;
+    --text-body-sm: 0.875rem;
+    --text-caption: 0.75rem;
+    --text-label: 0.875rem;
+
+    /* 7. Layout & Touch */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+    --touch-target: 44px; /* Minimum mobile touch area */
+    --container-max-width: 1400px;
+    --layout-gutter: 1.5rem;
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* 8. Motion & Easing */
+    --motion-fast: 150ms;
+    --motion-normal: 300ms;
+    --motion-slow: 500ms;
+    --ease-out-cushion: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 }
 

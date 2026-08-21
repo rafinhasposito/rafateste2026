@@ -8,7 +8,7 @@ import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete
 import CityLookup from "@/components/CityLookup";
 import HouseLookup from "@/components/HouseLookup";
 import IntentLookup from "@/components/IntentLookup";
-import UserMenu from "@/components/UserMenu";
+
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { detectUserLocation } from "@/lib/astro";
@@ -199,7 +199,7 @@ const Index = () => {
     <>
       <StarryBackground />
       <ScanningOverlay visible={isScanning} mode={mode || "futuro"} year={year} />
-      {user && <UserMenu />}
+
 
       {/* ===== HERO SECTION ===== */}
       <section className="relative min-h-[100svh] flex flex-col items-center justify-center px-5 py-10 md:py-16 overflow-hidden">

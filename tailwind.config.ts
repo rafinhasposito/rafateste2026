@@ -7,25 +7,89 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "var(--layout-gutter)",
       screens: {
-        "2xl": "1400px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "var(--container-max-width)",
       },
     },
     extend: {
+      spacing: {
+        "1": "4px",
+        "2": "8px",
+        "3": "12px",
+        "4": "16px",
+        "6": "24px",
+        "8": "32px",
+        "12": "48px",
+        "16": "64px",
+      },
       fontFamily: {
+        /* LEGACY (To be migrated progressively) */
         inter: ["Inter", "sans-serif"],
         sfpro: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "sans-serif"],
         outfit: ["Outfit", "sans-serif"],
         space: ["Space Grotesk", "sans-serif"],
         cinzel: ["Cinzel", "serif"],
+        /* NEW FOUNDATION */
+        display: ["var(--font-display)"],
+        sans: ["var(--font-sans)"],
+      },
+      fontSize: {
+        "display": "var(--text-display)",
+        "h1": "var(--text-h1)",
+        "h2": "var(--text-h2)",
+        "h3": "var(--text-h3)",
+        "h4": "var(--text-h4)",
+        "body-lg": "var(--text-body-lg)",
+        "body": "var(--text-body)",
+        "body-sm": "var(--text-body-sm)",
+        "caption": "var(--text-caption)",
+        "label": "var(--text-label)",
       },
       colors: {
+        /* LEGACY TOKENS (To be migrated) */
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        
+        /* NEW FOUNDATION TOKENS (Phase 1) */
+        foundation: {
+          bg: "hsl(var(--foundation-bg))",
+          fg: "hsl(var(--foundation-fg))",
+          muted: "hsl(var(--foundation-muted))",
+          "muted-fg": "hsl(var(--foundation-muted-fg))",
+        },
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          elevated: "hsl(var(--surface-elevated))",
+          border: "hsl(var(--surface-border))",
+        },
+        brand: {
+          primary: "hsl(var(--brand-primary))",
+          "primary-fg": "hsl(var(--brand-primary-fg))",
+          secondary: "hsl(var(--brand-secondary))",
+          "secondary-fg": "hsl(var(--brand-secondary-fg))",
+          accent: "hsl(var(--brand-accent))",
+          "accent-fg": "hsl(var(--brand-accent-fg))",
+        },
+        status: {
+          success: "hsl(var(--status-success))",
+          warning: "hsl(var(--status-warning))",
+          error: "hsl(var(--status-error))",
+          info: "hsl(var(--status-info))",
+        },
+        state: {
+          hover: "var(--state-hover)",
+          pressed: "var(--state-pressed)",
+          selected: "var(--state-selected)",
+          focus: "hsl(var(--state-focus))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -76,9 +140,36 @@ export default {
         },
       },
       borderRadius: {
+        /* LEGACY */
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        /* NEW FOUNDATION */
+        "base-sm": "var(--radius-sm)",
+        "base-md": "var(--radius-md)",
+        "base-lg": "var(--radius-lg)",
+        "base-full": "var(--radius-full)",
+      },
+      boxShadow: {
+        "elevation-1": "0 4px 20px -2px rgba(0,0,0,0.5)",
+        "glow-primary": "0 0 20px -5px hsl(var(--brand-primary) / 0.3)",
+      },
+      opacity: {
+        "disabled": "var(--state-disabled-opacity)",
+      },
+      minHeight: {
+        "touch": "var(--touch-target)",
+      },
+      minWidth: {
+        "touch": "var(--touch-target)",
+      },
+      transitionDuration: {
+        "fast": "var(--motion-fast)",
+        "normal": "var(--motion-normal)",
+        "slow": "var(--motion-slow)",
+      },
+      transitionTimingFunction: {
+        "cushion": "var(--ease-out-cushion)",
       },
       keyframes: {
         "accordion-down": {

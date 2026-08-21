@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Calendar, Clock, MapPin, Compass, Crown, Scroll } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
-import UserMenu from "@/components/UserMenu";
+
 import HouseCard from "@/components/HouseCard";
 import HouseDetail from "@/components/HouseDetail";
 import DestinyResults from "@/components/DestinyResults";
@@ -293,7 +293,7 @@ const Dashboard = () => {
   return (
     <>
       <StarryBackground />
-      {user && <UserMenu />}
+
       <div className="min-h-screen px-4 py-8 max-w-7xl mx-auto relative z-10">
         {/* Top Bar */}
         <div className="flex items-center justify-between mb-8">

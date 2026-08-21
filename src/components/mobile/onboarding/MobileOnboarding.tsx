@@ -9,73 +9,74 @@ import { CelestialMandala } from "./components/CelestialMandala";
 import { CityComparisonBeacons } from "./components/CityComparisonBeacons";
 import { TimelineModeCards, type OnboardingMode } from "./components/TimelineModeCards";
 import { OnboardingFooter } from "./components/OnboardingFooter";
+import { Screen1NorthStar } from "./screens/Screen1NorthStar";
 
 export const ONBOARDING_SCREENS = [
   {
     step: 1,
     title: (
       <>
-        O CÉU SE MOVE.
+        O LUGAR ONDE VOCÊ ESTÁ
         <br />
-        <span className="text-[#D4AF37]">E VOCÊ TAMBÉM.</span>
+        <span className="text-[#D4AF37]">MUDA TUDO.</span>
       </>
     ),
-    subtitle: "A Astrologia de Relocalização mostra como os planetas ativam diferentes áreas da sua vida em cada lugar do mundo.",
+    subtitle: "A energia do seu próximo ano não depende apenas de quando você nasceu, mas de onde você escolhe estar.",
   },
   {
     step: 2,
     title: (
       <>
-        CADA LUGAR
+        CADA DESTINO,
         <br />
-        <span className="text-[#D4AF37]">ATIVA UMA ENERGIA.</span>
+        <span className="text-[#D4AF37]">UMA NOVA POSSIBILIDADE.</span>
       </>
     ),
-    subtitle: "Seu mapa muda conforme o lugar onde você está ou escolhe estar. E isso muda tudo.",
+    subtitle: "As posições dos astros ativam áreas completamente diferentes da sua vida dependendo da sua localização no mundo.",
   },
   {
     step: 3,
     title: (
       <>
-        SEU MAPA. QUALQUER LUGAR.
+        O SEU
         <br />
-        <span className="text-[#D4AF37]">QUALQUER POSSIBILIDADE.</span>
+        <span className="text-[#D4AF37]">PRÓXIMO CICLO.</span>
       </>
     ),
-    subtitle: "Calculamos sua Revolução Solar para o lugar e data que você escolher e revelamos como será seu próximo ciclo.",
+    subtitle: "Diferentes cidades podem impulsionar sua carreira, favorecer seus relacionamentos ou trazer paz interior.",
   },
   {
     step: 4,
     title: (
       <>
-        MESMO CÉU.
+        A MESMA DATA.
         <br />
         <span className="text-[#D4AF37]">ENERGIAS DIFERENTES.</span>
       </>
     ),
-    subtitle: "Veja como seu mapa muda de um lugar para outro.",
+    subtitle: "Compare destinos e descubra qual lugar oferece a melhor configuração para o seu momento de vida.",
   },
   {
     step: 5,
     title: (
       <>
-        ESCOLHA SEU CAMINHO.
+        NÃO É APENAS
         <br />
-        <span className="text-[#D4AF37]">EXPLORE SEU CICLO.</span>
+        <span className="text-[#D4AF37]">UMA VIAGEM.</span>
       </>
     ),
-    subtitle: "Você pode analisar o que já viveu, entender o que está vivendo agora ou projetar o que deseja viver.",
+    subtitle: "É a escolha consciente da energia que vai reger os seus próximos 365 dias.",
   },
   {
     step: 6,
     title: (
       <>
-        AGORA É
+        O SEU NOVO DESTINO
         <br />
-        <span className="text-[#D4AF37]">SOBRE VOCÊ.</span>
+        <span className="text-[#D4AF37]">ESTÁ ESCRITO NO CÉU.</span>
       </>
     ),
-    subtitle: "Use seus dados de nascimento para calcular sua Revolução Solar e explorar diferentes possibilidades pelo mundo.",
+    subtitle: "Descubra qual cidade guarda as melhores energias para o seu próximo aniversário.",
   },
 ];
 
@@ -126,61 +127,71 @@ export const MobileOnboarding = () => {
     }, 250);
   };
 
+  // ── VISUAL EXPLORATION: NORTH STAR (TELA 1) ──
+  if (step === 0) {
+    return (
+      <Screen1NorthStar 
+        onNext={goNext}
+        title={current.title}
+        subtitle={current.subtitle}
+      />
+    );
+  }
+
   return (
-    <div className="w-full h-[100dvh] bg-[#000000] flex items-center justify-center overflow-hidden select-none">
+    <div className="w-full min-h-[100dvh] bg-[#000000] flex items-center justify-center overflow-hidden select-none relative">
       {/* 
-        CHASSI DO APP (Mobile-first, centralizado em monitores maiores)
+        CHASSI DO APP 
+        Mobile: Preenche a tela toda.
+        Desktop: Grid de 2 colunas, limitando o visual de um lado e o texto do outro.
       */}
-      <div className="w-full max-w-[430px] h-full max-h-[932px] bg-[#030306] relative flex flex-col justify-between overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.95)] border-x border-[#D4AF37]/10">
+      <div className="w-full lg:max-w-7xl h-[100dvh] lg:h-auto lg:min-h-[700px] lg:aspect-[16/9] bg-[#030306] relative flex flex-col lg:flex-row justify-between overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.95)] lg:border lg:border-[#D4AF37]/20 lg:rounded-2xl mx-auto">
         
         {/* ── CAMADA CINEMATOGRÁFICA DE FUNDO (TERRA + ESPAÇO) ── */}
         <CinematicEarth step={step} />
 
-        {/* ── CABEÇALHO DO PROTOCOLO SOLAR COM CONTADOR 1/6 ── */}
-        <BrandHeader step={step} totalSteps={totalSteps} />
+        {/* ── ESQUERDA (Desktop) / TOPO E RODAPÉ (Mobile) ── */}
+        <div className="w-full lg:w-[45%] h-full flex flex-col justify-between z-40 relative pointer-events-none lg:p-8 lg:bg-gradient-to-r lg:from-[#030306]/80 lg:to-transparent">
+          <div className="w-full flex flex-col items-center justify-start pointer-events-auto">
+            {/* ── CABEÇALHO DO PROTOCOLO SOLAR COM CONTADOR 1/6 ── */}
+            <BrandHeader step={step} totalSteps={totalSteps} />
 
-        {/* ── BLOCO EDITORIAL (TÍTULO, DIVISOR DOURADO, SUBTÍTULO) ── */}
-        <EditorialBlock
-          title={current.title}
-          subtitle={current.subtitle}
-          step={step}
-        />
+            {/* ── BLOCO EDITORIAL (TÍTULO, DIVISOR DOURADO, SUBTÍTULO) ── */}
+            <div className="w-full lg:mt-6">
+              <EditorialBlock
+                title={current.title}
+                subtitle={current.subtitle}
+                step={step}
+              />
+            </div>
+          </div>
 
-        {/* ── ÁREA CENTRAL INTERATIVA (SLOT VISUAL) COM DRAG SWIPE ── */}
-        <motion.div
-          className="relative w-full flex-1 flex flex-col items-center justify-center z-30 px-4 overflow-hidden cursor-grab active:cursor-grabbing"
+          <div className="w-full mt-auto pointer-events-auto lg:pb-8">
+            {/* ── RODAPÉ DE NAVEGAÇÃO INTERATIVA (SETAS + PROGRESSO) ── */}
+            <OnboardingFooter
+              step={step}
+              total={totalSteps}
+              onNext={goNext}
+              onPrev={goPrev}
+              onSelectStep={(idx) => setStep(idx)}
+            />
+          </div>
+        </div>
+
+        {/* ── DIREITA (Desktop) / CENTRO (Mobile) ── */}
+        <div className="absolute inset-0 lg:relative lg:inset-auto lg:w-[55%] h-full flex flex-col z-30 pointer-events-none">
+          {/* Empurra o slot visual para o centro no mobile */}
+          <div className="h-[210px] lg:h-0 shrink-0 pointer-events-none" />
+
+          {/* ── ÁREA CENTRAL INTERATIVA (SLOT VISUAL) COM DRAG SWIPE ── */}
+          <motion.div
+            className="relative w-full flex-1 flex flex-col items-center justify-center px-4 overflow-hidden cursor-grab active:cursor-grabbing pointer-events-auto"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.15}
           onDragEnd={handleDragEnd}
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            {/* TELA 1/6: Botão "VAMOS COMEÇAR" + Cadeado */}
-            {step === 0 && (
-              <motion.div
-                key="screen1-action"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-                className="w-full flex flex-col items-center justify-end h-full pb-4"
-              >
-                <div className="w-full max-w-[320px] flex flex-col items-center gap-3">
-                  <button
-                    onClick={goNext}
-                    className="btn-gold-luxury w-full py-4 text-xs tracking-[0.18em]"
-                  >
-                    VAMOS COMEÇAR →
-                  </button>
-
-                  <div className="flex items-center gap-1.5 text-[10px] tracking-[0.15em] text-[#FAF7EE]/50 uppercase font-medium">
-                    <Lock className="w-3 h-3 text-[#D4AF37]/80" />
-                    <span>DADOS 100% PRIVADOS</span>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
             {/* TELA 2/6: Espaço livre para visualização do Globo 3D */}
             {step === 1 && (
               <motion.div
@@ -252,7 +263,7 @@ export const MobileOnboarding = () => {
                     onClick={() => navigate(`/?mode=${selectedMode}`)}
                     className="btn-gold-luxury w-full py-4 text-xs tracking-[0.18em]"
                   >
-                    CALCULAR MEU MAPA →
+                    DESCOBRIR MEU DESTINO →
                   </button>
 
                   <div className="flex items-center gap-1.5 text-[10px] tracking-[0.15em] text-[#FAF7EE]/50 uppercase font-medium">
@@ -263,16 +274,11 @@ export const MobileOnboarding = () => {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
-
-        {/* ── RODAPÉ DE NAVEGAÇÃO INTERATIVA (SETAS + PROGRESSO) ── */}
-        <OnboardingFooter
-          step={step}
-          total={totalSteps}
-          onNext={goNext}
-          onPrev={goPrev}
-          onSelectStep={(idx) => setStep(idx)}
-        />
+          </motion.div>
+          
+          {/* Espaço para o rodapé no mobile */}
+          <div className="h-[90px] lg:h-0 shrink-0 pointer-events-none" />
+        </div>
       </div>
     </div>
   );

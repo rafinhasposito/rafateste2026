@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, MapPin, Eye, Unlock, CreditCard, Compass, Crown, Scroll, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
-import UserMenu from "@/components/UserMenu";
+
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -78,7 +78,7 @@ const History = () => {
   return (
     <>
       <StarryBackground />
-      {user && <UserMenu />}
+
       <div className="min-h-screen px-4 py-16 max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">

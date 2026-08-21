@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import PageLoader from "@/components/PageLoader";
-import UserMenu from "@/components/UserMenu";
+
 import CityAutocomplete from "@/components/CityAutocomplete";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,7 +89,7 @@ const Profile = () => {
   return (
     <>
       <StarryBackground />
-      <UserMenu />
+
       <div className="min-h-screen px-4 py-12 max-w-3xl mx-auto">
         <motion.button
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
