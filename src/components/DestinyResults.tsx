@@ -608,237 +608,193 @@ const DestinyResults = ({ house, houseName, houseData, cities, allResults, onUnl
                 {/* Divider */}
                 <div className="border-t border-white/10" />
 
-                {/* Egrégora + Significado */}
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                    <div className="flex items-center gap-2">
-                      <Gem className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">
-                        A Egrégora de Poder
-                      </p>
-                    </div>
-                    <p className="text-white/95 text-sm leading-relaxed">
-                      {houseData.resumo}: {houseData.porque}
+                {/* ===== NARRATIVA — leitura contínua, sem painéis ===== */}
+                <div className="space-y-10 max-w-2xl">
+                  {/* Abertura da história */}
+                  <section className="space-y-4">
+                    <p
+                      className="text-[10px] font-bold uppercase tracking-[0.3em]"
+                      style={{ color: `rgb(${accentColor})` }}
+                    >
+                      {houseData.resumo}
                     </p>
-                  </div>
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                      <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">
-                        O Que Significa Passar o Aniversário Aqui?
-                      </p>
-                    </div>
-                    <p className="text-white/95 text-sm leading-relaxed">
+                    <p className="text-xl md:text-2xl leading-[1.6] text-white font-light">
+                      {houseData.porque}
+                    </p>
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                      {timedMain}
+                    </p>
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
                       {houseData.beneficio}
                     </p>
-                  </div>
-                </div>
+                  </section>
 
-                {/* Wikipedia */}
-                {/* Sobre — City photo + Wikipedia */}
-                {(wikiData?.extract || heroImage) && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl overflow-hidden space-y-0"
-                    style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}
-                  >
-                    {/* City photo — deslumbrante */}
-                    {heroImage && (
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={heroImage}
-                          alt={cityName}
-                          className="w-full h-64 md:h-72 object-cover"
-                          loading="eager"
-                        />
-                        {/* Strong dark gradient for legibility */}
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            background: `linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)`,
-                          }}
-                        />
-                        <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
-                          {/* Color bar as accent */}
-                          <span
-                            className="block w-1 h-5 rounded-full"
-                            style={{ background: `rgb(${accentColor})` }}
+                  {/* A cidade — foto + relato */}
+                  {(wikiData?.extract || heroImage) && (
+                    <motion.section
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-4"
+                    >
+                      <p
+                        className="text-[10px] font-bold uppercase tracking-[0.3em]"
+                        style={{ color: `rgb(${accentColor})` }}
+                      >
+                        O cenário: {wikiData?.title || cityName}
+                      </p>
+                      {heroImage && (
+                        <div className="relative overflow-hidden rounded-xl">
+                          <img
+                            src={heroImage}
+                            alt={cityName}
+                            className="w-full h-64 md:h-80 object-cover"
+                            loading="eager"
                           />
-                          <BookOpen className="w-4 h-4 text-white" />
-                          <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-white" style={{ textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
-                            Sobre {wikiData?.title || cityName}
-                          </h3>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Wikipedia text */}
-                    {wikiData?.extract && (
-                      <div className="p-5 space-y-3">
-                        {!heroImage && (
-                          <div className="flex items-center gap-2">
-                            <BookOpen className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-white">
-                              Sobre {wikiData.title || cityName}
+                          <div
+                            className="absolute inset-0"
+                            style={{
+                              background:
+                                "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
+                            }}
+                          />
+                          <div className="absolute bottom-4 left-5 right-5">
+                            <h3
+                              className="font-cinzel text-xl md:text-2xl font-bold text-white"
+                              style={{ textShadow: "0 2px 12px rgba(0,0,0,0.85)" }}
+                            >
+                              {cityName}
                             </h3>
                           </div>
-                        )}
-                        <p className="text-white/95 text-sm leading-relaxed">{wikiData.extract}</p>
-                        {wikiData.content_urls?.desktop?.page && (
-                          <a href={wikiData.content_urls.desktop.page} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[10px] hover:underline text-white/80 hover:text-white">
-                            <ExternalLink className="w-3 h-3" /> Wikipedia
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Rituais */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">
-                      Rituais de Revolução Solar
-                    </h4>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {rituals.map((r, i) => (
-                      <div key={i} className="relative overflow-hidden p-5 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                        <span className="absolute -top-2 -right-1 text-[80px] font-cinzel font-black leading-none select-none pointer-events-none" style={{ color: "rgba(255,255,255,0.04)" }}>
-                          {i + 1}
-                        </span>
-                        <div className="relative z-10 flex gap-3 items-start">
-                          <span
-                            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-                            style={{ background: `rgba(${accentColor}, 0.25)`, border: `1px solid rgba(${accentColor}, 0.6)` }}
-                          >
-                            {i + 1}
-                          </span>
-                          <p className="text-white/95 text-xs leading-relaxed pt-1">{r}</p>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                      )}
+                      {wikiData?.extract && (
+                        <>
+                          <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                            {wikiData.extract}
+                          </p>
+                          {wikiData.content_urls?.desktop?.page && (
+                            <a
+                              href={wikiData.content_urls.desktop.page}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-[10px] text-white/70 hover:text-white hover:underline"
+                            >
+                              <ExternalLink className="w-3 h-3" /> Wikipedia
+                            </a>
+                          )}
+                        </>
+                      )}
+                    </motion.section>
+                  )}
 
-                {/* Leitura de Ativação */}
-                <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-white">{leituraTitulo}</p>
-                  </div>
-                  <p className="text-white/95 text-sm leading-relaxed">{leituraTexto}</p>
-                </div>
+                  {/* Guia narrativo da casa */}
+                  <HouseGuidePanel house={house} accentColor={accentColor} />
 
-                {/* Origin highlight — past + goal only */}
-                {isPast && isGoal && originCity && (
-                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(251, 191, 36, 0.10)", border: "1px solid rgba(251, 191, 36, 0.25)" }}>
-                    <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-amber-300">Cidade do Aniversário</p>
-                    <p className="text-white/95 text-sm leading-relaxed">
-                      Você passou o aniversário em <span className="text-white font-semibold">{originCity}</span>, e o Sol se posicionou na Casa {house} — ativando a área de <span className="font-semibold" style={{ color: `rgb(${accentColor})` }}>{houseData.label}</span>.
+                  {/* Como o ciclo se desdobra */}
+                  <section className="space-y-3">
+                    <p
+                      className="text-[10px] font-bold uppercase tracking-[0.3em]"
+                      style={{ color: `rgb(${accentColor})` }}
+                    >
+                      Como o ciclo se desdobra
                     </p>
-                  </div>
-                )}
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                      <span className="font-semibold text-white">{areaLabels.pessoal}. </span>
+                      {timedPessoal}
+                    </p>
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                      <span className="font-semibold text-white">{areaLabels.amor}. </span>
+                      {timedAmor}
+                    </p>
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                      <span className="font-semibold text-white">{areaLabels.prof}. </span>
+                      {timedProf}
+                    </p>
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                      <span className="font-semibold text-white">{beneficioLabel}. </span>
+                      {timedBeneficio}
+                    </p>
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                      <span className="font-semibold text-white">{idealLabel}. </span>
+                      {timedIdeal}
+                    </p>
+                  </section>
 
-                {/* Resumo principal */}
-                <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                  <p className="font-cinzel text-sm font-bold uppercase tracking-wider" style={{ color: `rgb(${accentColor})` }}>{houseData.resumo}</p>
-                  <p className="text-white/95 text-sm leading-relaxed">{timedMain}</p>
-                </div>
-
-                {/* Guia completo da casa */}
-                <HouseGuidePanel house={house} accentColor={accentColor} />
-
-
-
-                {/* Radar de Impacto */}
-                <div className="p-5 rounded-xl space-y-4" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">Radar de Impacto</h4>
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { label: "Dinheiro", value: houseData.radar.dinheiro },
-                      { label: "Amor", value: houseData.radar.amor },
-                      { label: "Saúde", value: houseData.radar.saude },
-                    ].map(({ label, value }) => (
-                      <div key={label} className="space-y-1">
-                        <div className="flex justify-between items-center">
-                          <span className="text-white/80 text-[10px] uppercase tracking-wider">{label}</span>
-                          <span className="text-white/70 text-[10px] font-mono">{value}%</span>
-                        </div>
-                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${value}%` }}
-                            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-                            className="h-full rounded-full"
-                            style={{ background: `rgb(${accentColor})` }}
-                          />
-                        </div>
-                      </div>
+                  {/* Rituais — como narrativa de gestos */}
+                  <section className="space-y-3">
+                    <p
+                      className="text-[10px] font-bold uppercase tracking-[0.3em]"
+                      style={{ color: `rgb(${accentColor})` }}
+                    >
+                      Os gestos que ancoram este ciclo
+                    </p>
+                    {rituals.map((r, i) => (
+                      <p
+                        key={i}
+                        className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light"
+                      >
+                        <span className="font-cinzel font-bold" style={{ color: `rgb(${accentColor})` }}>
+                          {i + 1}.{" "}
+                        </span>
+                        {r}
+                      </p>
                     ))}
-                  </div>
+                  </section>
+
+                  {/* Leitura de ativação */}
+                  <section className="space-y-3">
+                    <p
+                      className="text-[10px] font-bold uppercase tracking-[0.3em]"
+                      style={{ color: `rgb(${accentColor})` }}
+                    >
+                      {leituraTitulo}
+                    </p>
+                    <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                      {leituraTexto}
+                    </p>
+                  </section>
+
+                  {/* Cidade do aniversário — passado */}
+                  {isPast && isGoal && originCity && (
+                    <section className="space-y-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300">
+                        Cidade do Aniversário
+                      </p>
+                      <p className="text-white/90 text-[15px] md:text-base leading-[1.85] font-light">
+                        Você passou o aniversário em{" "}
+                        <span className="text-white font-semibold">{originCity}</span>, e o Sol se
+                        posicionou na Casa {house} — ativando a área de{" "}
+                        <span className="font-semibold text-white">{houseData.label}</span>.
+                      </p>
+                    </section>
+                  )}
+
+                  {/* Sombra — passado */}
+                  {isPast && houseData.sombra && (
+                    <section className="space-y-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-red-300">
+                        O Lado Sombra Daquele Ciclo
+                      </p>
+                      <p className="text-white/85 text-[15px] md:text-base leading-[1.85] font-light">
+                        {houseData.sombra}
+                      </p>
+                    </section>
+                  )}
+
+                  {/* Fecho — promessa do universo */}
+                  <section className="pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }}>
+                    <p
+                      className="pt-6 text-[10px] font-bold uppercase tracking-[0.3em]"
+                      style={{ color: `rgb(${accentColor})` }}
+                    >
+                      {promessaTitulo}
+                    </p>
+                    <p className="mt-3 text-xl md:text-2xl leading-[1.65] text-white font-light italic">
+                      "{houseData.promessa_texto}"
+                    </p>
+                  </section>
                 </div>
 
-                {/* Promessa do Universo */}
-                <div className="p-5 rounded-xl space-y-3" style={{ background: `rgba(${accentColor}, 0.08)`, border: `1px solid rgba(${accentColor}, 0.28)` }}>
-                  <p className="text-[10px] uppercase tracking-[0.25em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{promessaTitulo}</p>
-                  <p className="text-white/95 text-sm italic leading-relaxed font-light">"{houseData.promessa_texto}"</p>
-                </div>
-
-                {/* Sombra — past only */}
-                {isPast && houseData.sombra && (
-                  <div className="p-5 rounded-xl space-y-3" style={{ background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.25)" }}>
-                    <p className="text-[10px] uppercase tracking-[0.25em] font-semibold text-red-300">O Lado Sombra Daquele Ciclo</p>
-                    <p className="text-white/85 text-xs leading-relaxed">{houseData.sombra}</p>
-                  </div>
-                )}
-
-                {/* Previsões */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                    <h4 className="font-cinzel text-xs font-bold uppercase tracking-[0.15em] text-white">
-                      Previsões do Ciclo
-                    </h4>
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { icon: User, label: areaLabels.pessoal, text: timedPessoal },
-                      { icon: Heart, label: areaLabels.amor, text: timedAmor },
-                      { icon: Briefcase, label: areaLabels.prof, text: timedProf },
-                    ].map(({ icon: Icon, label, text }) => (
-                      <div key={label} className="flex gap-4 items-start p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                        <div
-                          className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ border: `2px solid rgba(${accentColor}, 0.5)`, background: `rgba(${accentColor}, 0.15)` }}
-                        >
-                          <Icon className="w-4 h-4" style={{ color: `rgb(${accentColor})` }} />
-                        </div>
-                        <div className="space-y-1 flex-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-white">{label}</span>
-                          <p className="text-white/95 text-xs leading-relaxed">{text}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Benefício & Ideal Para */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{beneficioLabel}</p>
-                    <p className="text-white/90 text-xs leading-relaxed">{timedBeneficio}</p>
-                  </div>
-                  <div className="p-5 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.40)", border: "1px solid rgba(255,255,255,0.18)" }}>
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: `rgb(${accentColor})` }}>{idealLabel}</p>
-                    <p className="text-white/90 text-xs leading-relaxed">{timedIdeal}</p>
-                  </div>
-                </div>
               </div>
             </motion.div>
           )}
