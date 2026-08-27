@@ -37,12 +37,13 @@ const TransactionsTable = () => {
 
   return (
     <div>
-      <div className="flex gap-2 mb-4 flex-wrap">
-        <button onClick={() => setTypeFilter("all")} className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest border ${typeFilter === "all" ? "bg-primary text-background border-primary" : "border-border text-muted-foreground"}`}>Tudo</button>
+      <div className="h-scroll mb-4 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap">
+        <button onClick={() => setTypeFilter("all")} className={`px-3 py-2 rounded-full text-xs uppercase tracking-widest border whitespace-nowrap ${typeFilter === "all" ? "bg-primary text-background border-primary" : "border-border text-muted-foreground"}`}>Tudo</button>
         {types.map(t => (
-          <button key={t} onClick={() => setTypeFilter(t)} className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest border ${typeFilter === t ? "bg-primary text-background border-primary" : "border-border text-muted-foreground"}`}>{t}</button>
+          <button key={t} onClick={() => setTypeFilter(t)} className={`px-3 py-2 rounded-full text-xs uppercase tracking-widest border whitespace-nowrap ${typeFilter === t ? "bg-primary text-background border-primary" : "border-border text-muted-foreground"}`}>{t}</button>
         ))}
       </div>
+
       <div className="space-y-1.5">
         {filtered.map(t => (
           <div key={t.id} className="glass-panel p-3 flex items-center gap-3 text-xs">

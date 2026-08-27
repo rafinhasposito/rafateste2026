@@ -88,8 +88,8 @@ const UsersTable = () => {
       />
       <div className="space-y-2">
         {filtered.map(row => (
-          <div key={row.id} className="glass-panel p-4 flex items-center gap-3">
-            <div className="flex-1 min-w-0">
+          <div key={row.id} className="glass-panel p-4 flex flex-wrap items-center gap-2 md:gap-3">
+            <div className="flex-1 min-w-[60%] md:min-w-0">
               <div className="flex items-center gap-2">
                 <p className="text-foreground font-medium text-sm truncate">{row.display_name || "—"}</p>
                 {row.is_admin && <span className="text-[9px] uppercase tracking-widest bg-primary/20 text-primary px-2 py-0.5 rounded">Admin</span>}
@@ -101,6 +101,7 @@ const UsersTable = () => {
               <span className="text-primary font-bold text-lg">{row.credits}</span>
               <span className="text-muted-foreground text-[10px] uppercase">cr</span>
             </div>
+
             <button onClick={() => adjustCredits(row, 1)} disabled={busy === row.user_id}
               className="px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-30 text-[11px] font-bold text-emerald-400" title="+1 crédito">+1</button>
             <button onClick={() => adjustCredits(row, 10)} disabled={busy === row.user_id}

@@ -51,20 +51,21 @@ const Admin = () => {
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen px-4 py-12 max-w-6xl mx-auto">
+      <div className="min-h-screen px-4 py-10 md:py-12 max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary mb-6 inline-block">← Voltar</button>
-          <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider mb-2">Painel Admin</h1>
+          <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary mb-6 inline-flex items-center min-h-[44px]">← Voltar</button>
+          <h1 className="font-cinzel text-2xl md:text-4xl font-bold text-foreground uppercase tracking-wider mb-2">Painel Admin</h1>
           <p className="text-muted-foreground text-sm mb-8">Gerencie preços, usuários e transações da plataforma.</p>
 
-          <div className="flex gap-2 mb-6 border-b border-border pb-3">
+          <div className="h-scroll mb-6 border-b border-border pb-3 -mx-4 px-4">
             {tabs.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
-                className={`px-4 py-2 rounded-t-lg text-xs uppercase tracking-widest font-semibold transition-all ${tab === t.id ? "bg-primary text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                className={`px-4 py-2.5 rounded-t-lg text-[11px] md:text-xs uppercase tracking-widest font-semibold whitespace-nowrap transition-all ${tab === t.id ? "bg-primary text-background" : "text-muted-foreground hover:text-foreground"}`}>
                 {t.label}
               </button>
             ))}
           </div>
+
 
           {tab === "metrics" && <MetricsDashboard />}
           {tab === "pricing" && <PricingEditor />}
