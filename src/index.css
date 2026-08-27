@@ -54,14 +54,29 @@
 
 @layer base {
   * { @apply border-border; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Outfit', 'Space Grotesk', sans-serif;
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    overscroll-behavior-y: none;
+  }
+  /* Espaço para a barra de navegação inferior no celular */
+  @media (max-width: 767px) {
+    body { padding-bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
+  }
+  /* Alvos de toque confortáveis em telas pequenas */
+  @media (max-width: 767px) and (pointer: coarse) {
+    button, a[role="button"], [role="tab"] { touch-action: manipulation; }
+    input, select, textarea { font-size: 16px; }
   }
 }
+
 
 /* ========================================
    COSMIC CANVAS
