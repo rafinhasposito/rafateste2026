@@ -66,6 +66,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
   };
 
   const selectCity = (item: SuggestionItem) => {
+    clearTimeout(timerRef.current);
     onChange(item.display, true, item.coords);
     setIsValid(true);
     setShowSuggestions(false);
@@ -73,13 +74,13 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
   };
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    const handleOutside = (e: Event) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowSuggestions(false);
       }
     };
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
+    document.addEventListener("pointerdown", handleOutside);
+    return () => document.removeEventListener("pointerdown", handleOutside);
   }, []);
 
   return (
@@ -88,15 +89,27 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
         type="text"
         value={value}
         onChange={(e) => handleInput(e.target.value)}
+        onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
         placeholder={placeholder}
         required={required}
+        inputMode="search"
+        enterKeyHint="search"
+        autoCapitalize="words"
+        autoCorrect="off"
+        spellCheck={false}
         className={`quantum-input transition-colors duration-300 ${invalid && !isValid ? "invalid" : ""} ${className || ""}`}
         autoComplete="off"
       />
       {showSuggestions && suggestions.length > 0 && (
         <div className="autocomplete-results">
           {suggestions.map((item, i) => (
-            <div key={i} className="suggestion-item" onClick={() => selectCity(item)}>
+            <div
+              key={i}
+              className="suggestion-item"
+              role="option"
+              onPointerDown={(e) => { e.preventDefault(); selectCity(item); }}
+              onClick={() => selectCity(item)}
+            >
               <svg className="w-4 h-4 text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                 <circle cx="12" cy="10" r="3" />
