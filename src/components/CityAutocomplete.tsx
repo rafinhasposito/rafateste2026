@@ -66,6 +66,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
   };
 
   const selectCity = (item: SuggestionItem) => {
+    clearTimeout(timerRef.current);
     onChange(item.display, true, item.coords);
     setIsValid(true);
     setShowSuggestions(false);
@@ -73,13 +74,13 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
   };
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    const handleOutside = (e: Event) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowSuggestions(false);
       }
     };
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
+    document.addEventListener("pointerdown", handleOutside);
+    return () => document.removeEventListener("pointerdown", handleOutside);
   }, []);
 
   return (
