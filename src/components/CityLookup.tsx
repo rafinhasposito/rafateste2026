@@ -208,7 +208,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         Digite a cidade onde deseja passar seu aniversário em {year}. O sistema calculará em qual casa astrológica ela se posiciona.
       </p>
 
-      <div className="flex gap-3 items-start">
+      <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-start">
         <div className="flex-1">
           <CityAutocomplete
             value={city}
