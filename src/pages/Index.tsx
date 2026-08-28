@@ -188,26 +188,27 @@ const Index = () => {
       {user && <UserMenu />}
 
       {/* ===== HERO SECTION ===== */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16 overflow-hidden">
+      <section className="relative min-h-[88svh] md:min-h-screen flex flex-col items-center justify-center px-5 py-14 md:py-16 overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="orbital-ring w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-30" style={{ "--speed": "80s" } as React.CSSProperties}>
+          <div className="orbital-ring w-[380px] h-[380px] md:w-[700px] md:h-[700px] opacity-30" style={{ "--speed": "80s" } as React.CSSProperties}>
             <div className="orbital-dot" />
           </div>
-          <div className="orbital-ring w-[350px] h-[350px] md:w-[500px] md:h-[500px] opacity-20" style={{ "--speed": "50s", animationDirection: "reverse" } as React.CSSProperties}>
+          <div className="orbital-ring w-[260px] h-[260px] md:w-[500px] md:h-[500px] opacity-20" style={{ "--speed": "50s", animationDirection: "reverse" } as React.CSSProperties}>
             <div className="orbital-dot" style={{ opacity: 0.5 }} />
           </div>
-          <div className="orbital-ring w-[200px] h-[200px] md:w-[300px] md:h-[300px] opacity-15" style={{ "--speed": "30s" } as React.CSSProperties} />
+          <div className="orbital-ring hidden md:block w-[300px] h-[300px] opacity-15" style={{ "--speed": "30s" } as React.CSSProperties} />
         </div>
+
 
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mb-8 float-gentle"
+          className="relative mb-6 md:mb-8 float-gentle"
         >
-          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/20 flex items-center justify-center backdrop-blur-sm">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-gold-dark to-gold flex items-center justify-center shadow-[0_0_40px_hsl(var(--gold)/0.4)]">
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/20 flex items-center justify-center backdrop-blur-sm">
+            <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-gold-dark to-gold flex items-center justify-center shadow-[0_0_40px_hsl(var(--gold)/0.4)]">
+              <svg className="w-5 h-5 md:w-7 md:h-7 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
@@ -217,21 +218,21 @@ const Index = () => {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="mb-6 inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm">
-          <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
-          <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.3em] text-gold">
-            Protocolo Solar · Astrologia de Relocalização
+          className="mb-5 md:mb-6 inline-flex items-center gap-2 px-4 py-1.5 md:px-5 md:py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm">
+          <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse shrink-0" />
+          <span className="text-[9px] md:text-[11px] font-semibold uppercase tracking-[0.18em] md:tracking-[0.3em] text-gold text-center">
+            Protocolo Solar · Relocalização
           </span>
         </motion.div>
 
         <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }}
-          className="font-cinzel text-center text-4xl md:text-6xl lg:text-[5.5rem] font-bold mb-6 leading-[1.05] tracking-tight max-w-5xl">
-          <span className="text-foreground block mb-2">DESCUBRA ONDE PASSAR</span>
+          className="font-cinzel text-center text-[1.75rem] leading-[1.15] md:text-6xl lg:text-[5.5rem] font-bold mb-5 md:mb-6 md:leading-[1.05] tracking-tight max-w-5xl">
+          <span className="text-foreground block mb-1.5 md:mb-2">DESCUBRA ONDE PASSAR</span>
           <span className="gold-gradient text-glow-gold block">SEU PRÓXIMO ANIVERSÁRIO</span>
         </motion.h1>
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          className="text-center text-muted-foreground text-sm md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-10 px-4">
+          className="text-center text-muted-foreground text-[13px] md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-8 md:mb-10">
           Assuma o controle absoluto dos próximos 12 meses.
           Destrave o <span className="text-gold font-medium">GPS exato</span> da sua{" "}
           <span className="text-foreground font-medium">Prosperidade</span>,{" "}
@@ -241,14 +242,15 @@ const Index = () => {
         </motion.p>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="flex items-center gap-6 md:gap-12 mb-12">
+          className="flex items-start justify-center gap-5 md:gap-12 mb-10 md:mb-12 w-full">
           {stats.map((s, i) => (
-            <div key={i} className="text-center">
-              <p className="text-gold font-cinzel text-xl md:text-2xl font-bold">{s.value}</p>
-              <p className="text-muted-foreground text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-medium">{s.label}</p>
+            <div key={i} className="text-center flex-1 max-w-[110px]">
+              <p className="text-gold font-cinzel text-lg md:text-2xl font-bold">{s.value}</p>
+              <p className="text-muted-foreground text-[8px] md:text-[10px] uppercase tracking-[0.15em] md:tracking-[0.2em] font-medium leading-snug">{s.label}</p>
             </div>
           ))}
         </motion.div>
+
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
           className="flex flex-col items-center gap-2 text-muted-foreground/40 cursor-pointer hover:text-gold/60 transition-colors"
