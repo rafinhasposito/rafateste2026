@@ -264,7 +264,7 @@ const Index = () => {
       </section>
 
       {/* ===== STEPPER SECTION ===== */}
-      <section id="form-section" className="relative px-4 pb-20 max-w-5xl mx-auto">
+      <section id="form-section" className="relative px-4 pb-16 md:pb-20 max-w-5xl mx-auto scroll-mt-24 pt-6 md:pt-0">
 
         {/* Step Indicator */}
         {(() => {
