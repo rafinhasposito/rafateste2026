@@ -208,8 +208,8 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         Digite a cidade onde deseja passar seu aniversário em {year}. O sistema calculará em qual casa astrológica ela se posiciona.
       </p>
 
-      <div className="flex gap-3 items-start">
-        <div className="flex-1">
+      <div className="flex flex-col md:flex-row gap-3 md:items-start">
+        <div className="w-full md:flex-1 md:min-w-0">
           <CityAutocomplete
             value={city}
             onChange={(v, valid, coords) => {
@@ -224,14 +224,14 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         <button
           onClick={handleLookup}
           disabled={loading || !cityValid}
-          className="shrink-0 h-12 px-5 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+          className="w-full md:w-auto md:shrink-0 min-h-[52px] px-5 rounded-xl bg-primary text-primary-foreground font-bold text-[11px] md:text-xs uppercase tracking-[0.12em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-center leading-tight"
         >
           {loading ? (
-            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin shrink-0" />
           ) : (
-            <Search className="w-4 h-4" />
+            <Search className="w-4 h-4 shrink-0" />
           )}
-          {loading ? "Simulando deslocamento..." : "Simular deslocamento (1 crédito)"}
+          <span>{loading ? "Simulando deslocamento..." : "Simular deslocamento (1 crédito)"}</span>
         </button>
       </div>
 
