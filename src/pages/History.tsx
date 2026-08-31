@@ -44,11 +44,15 @@ function inferSearchType(c: ConsultationRow): { label: string; icon: typeof Comp
 }
 
 const History = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [consultations, setConsultations] = useState<ConsultationRow[]>([]);
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && !user) navigate("/auth");
+  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     if (!user) return;

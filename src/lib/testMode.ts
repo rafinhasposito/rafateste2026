@@ -2,7 +2,7 @@
  * MODO DE TESTE — permite usar o site sem login e sem cobrar créditos.
  * Troque para `false` para voltar ao comportamento normal (login + créditos).
  */
-export const TEST_MODE = true;
+export const TEST_MODE = false;
 
 export const GUEST_USER_ID = "00000000-0000-0000-0000-000000000000";
 

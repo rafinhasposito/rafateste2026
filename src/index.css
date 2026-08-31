@@ -373,6 +373,11 @@ input[type="date"], input[type="time"], input[type="number"], input[type="checkb
 }
 .mobile-nav-item:active { color: hsl(var(--gold-light)); }
 
+/* Espaço para a barra inferior não cobrir botões */
+@media (max-width: 767px) {
+  body { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
+
 /* Área de topo respeitando o notch */
 .safe-top { padding-top: env(safe-area-inset-top); top: calc(0.75rem + env(safe-area-inset-top)); }
 
