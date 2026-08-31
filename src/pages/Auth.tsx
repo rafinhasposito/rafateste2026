@@ -23,10 +23,13 @@ const Auth = () => {
   }, [user, loading, navigate]);
 
   const handleGoogleLogin = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      }
     });
-    if (result.error) toast.error("Erro no login com Google");
+    if (error) toast.error("Erro no login com Google");
   };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -55,7 +58,14 @@ const Auth = () => {
         setMode("signin");
       }
     } catch (err) {
-      toast.error((err as Error).message);
+      const message = (err as Error).message;
+      if (message.includes("weak") || message.includes("Password should be")) {
+        toast.error("Essa senha é muito fraca ou já apareceu em vazamentos. Escolha uma senha mais segura com letras e números.");
+      } else if (message.includes("Invalid login")) {
+        toast.error("Email ou senha incorretos.");
+      } else {
+        toast.error(message);
+      }
     } finally { setBusy(false); }
   };
 
@@ -137,12 +147,17 @@ const Auth = () => {
               />
             </div>
             {mode !== "forgot" && (
-              <div className="text-left">
+              <div>
                 <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Senha</label>
                 <input
                   type="password" required placeholder="••••••••" minLength={6} value={password} onChange={e => setPassword(e.target.value)}
                   className="quantum-input w-full"
                 />
+                {mode === "signup" && (
+                  <p className="text-white/40 text-[10px] mt-2 font-inter leading-tight">
+                    Mínimo de 6 caracteres. Evite senhas comuns. O sistema recusa senhas expostas em vazamentos de dados.
+                  </p>
+                )}
               </div>
             )}
             <button
