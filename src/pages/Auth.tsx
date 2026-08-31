@@ -150,12 +150,12 @@ const Auth = () => {
               <div>
                 <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Senha</label>
                 <input
-                  type="password" required placeholder="••••••••" minLength={6} value={password} onChange={e => setPassword(e.target.value)}
+                  type="password" required placeholder="••••••••" minLength={8} value={password} onChange={e => setPassword(e.target.value)}
                   className="quantum-input w-full"
                 />
                 {mode === "signup" && (
                   <p className="text-white/40 text-[10px] mt-2 font-inter leading-tight">
-                    Mínimo de 6 caracteres. Evite senhas comuns. O sistema recusa senhas expostas em vazamentos de dados.
+                    Mínimo de 8 caracteres. Evite senhas comuns. O sistema recusa senhas expostas em vazamentos de dados.
                   </p>
                 )}
               </div>
