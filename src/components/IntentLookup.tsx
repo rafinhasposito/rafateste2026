@@ -77,8 +77,12 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       description: `Consulta por Intenção — Casa ${houseId} (${houseData.label}) em ${year}`,
     });
     if (!charge.ok) {
-      showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
-      navigate("/credits");
+      if (charge.reason === "no_credits") {
+        showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
+        navigate("/credits");
+      } else {
+        showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
+      }
       return;
     }
     await refreshProfile();

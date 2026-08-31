@@ -81,8 +81,12 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       description: `Consulta por Cidade — ${city} em ${year}`,
     });
     if (!charge.ok) {
-      showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
-      navigate("/credits");
+      if (charge.reason === "no_credits") {
+        showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
+        navigate("/credits");
+      } else {
+        showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
+      }
       return;
     }
     await refreshProfile();
