@@ -129,6 +129,8 @@ const Index = () => {
   // Auto-seleciona modo caso venha do Onboarding (?mode=passado|presente|futuro) ou via pendingMode
   useEffect(() => {
     let targetMode = searchParams.get("mode") as Mode | null;
+    const targetPath = searchParams.get("path") as SearchPath | null;
+    
     if (!targetMode) {
       targetMode = sessionStorage.getItem("ps_pending_mode") as Mode | null;
       if (targetMode && user) {
@@ -140,12 +142,20 @@ const Index = () => {
 
     if (targetMode && ["passado", "presente", "futuro"].includes(targetMode)) {
       if (user && !loading && !isNatalProfileComplete(profile)) {
-         navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${targetMode}`)}`);
+         const ret = targetPath ? `/?mode=${targetMode}&path=${targetPath}` : `/?mode=${targetMode}`;
+         navigate(`/perfil?returnTo=${encodeURIComponent(ret)}`);
          return;
       }
       setMode(targetMode);
       if (targetMode === "presente") setYear(currentYear);
-      setStep(2);
+      
+      if (targetPath && ["cidade", "casa", "intencao"].includes(targetPath)) {
+        setSearchPath(targetPath);
+        setStep(3);
+      } else {
+        setStep(2);
+      }
+      
       setTimeout(() => {
         document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" });
       }, 300);
@@ -477,7 +487,7 @@ const Index = () => {
                         {profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0, 5)}<br/>
                         {profile?.birth_city}
                       </p>
-                      <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}`)}`)} className="text-[#D4AF37] text-[10px] uppercase tracking-widest hover:text-white transition-colors pl-7 mt-2 underline decoration-[#D4AF37]/30 underline-offset-4">
+                      <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}${searchPath ? `&path=${searchPath}` : ''}`)}`)} className="text-[#D4AF37] text-[10px] uppercase tracking-widest hover:text-white transition-colors pl-7 mt-2 underline decoration-[#D4AF37]/30 underline-offset-4">
                         Editar Dados Natais
                       </button>
                     </div>
