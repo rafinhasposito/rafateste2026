@@ -9,11 +9,16 @@ import { toast } from "sonner";
 const ICONS: Record<string, any> = { cost_house_1: Lock, cost_house_3: Unlock, cost_full_map: Map, cost_city: Map };
 
 const Credits = () => {
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { packages, costs, loading } = usePricing();
 
   const handlePurchase = (pkg: PricingItem) => {
+    if (!user) {
+      toast.info("Entre na sua conta para comprar créditos.");
+      navigate("/auth");
+      return;
+    }
     toast.info(`Pagamento de R$ ${pkg.price_brl?.toFixed(2)} para ${pkg.credits} crédito(s) será integrado em breve.`);
   };
   const fmt = (n: number | null) => n == null ? ["0", "00"] : n.toFixed(2).split(".");
