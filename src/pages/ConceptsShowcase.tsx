@@ -13,7 +13,7 @@ export default function ConceptsShowcase() {
 }
 
 const ConceptA = () => (
-  <div className="relative w-full min-h-screen bg-[#030306] flex flex-col justify-end overflow-hidden selection:bg-[#D4AF37]/30">
+  <div className="relative w-full min-h-[100dvh] bg-[#030306] flex flex-col justify-end overflow-hidden selection:bg-[#D4AF37]/30">
     {/* Editorial Travel Photography */}
     <img 
       src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&q=80&w=2000" 
@@ -48,7 +48,7 @@ const ConceptA = () => (
 );
 
 const ConceptB = () => (
-  <div className="relative w-full min-h-screen bg-[#030306] flex items-center justify-center overflow-hidden font-inter selection:bg-white/20">
+  <div className="relative w-full min-h-[100dvh] bg-[#030306] flex items-center justify-center overflow-hidden font-inter selection:bg-white/20">
     {/* Tech Map Wireframe / Geo Data */}
     <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030306_85%)]" />
@@ -102,7 +102,7 @@ const ConceptB = () => (
 );
 
 const ConceptC = () => (
-  <div className="relative w-full min-h-screen bg-[#030306] flex items-center justify-center overflow-hidden text-center selection:bg-white/20">
+  <div className="relative w-full min-h-[100dvh] bg-[#030306] flex items-center justify-center overflow-hidden text-center selection:bg-white/20">
     {/* Cinematic Depth & Movement */}
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-gradient-to-b from-[#D4AF37]/10 to-transparent rounded-full blur-[100px] pointer-events-none" />
     <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/20 to-[#030306] pointer-events-none" />

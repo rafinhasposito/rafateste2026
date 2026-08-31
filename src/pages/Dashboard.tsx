@@ -294,7 +294,7 @@ const Dashboard = () => {
     <>
       <StarryBackground />
 
-      <div className="min-h-screen px-4 py-8 max-w-7xl mx-auto relative z-10">
+      <div className="min-h-[100dvh] px-4 py-8 max-w-7xl mx-auto relative z-10">
         {/* Top Bar */}
         <div className="flex items-center justify-between mb-8">
           <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary transition-colors">

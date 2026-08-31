@@ -78,7 +78,7 @@ const History = () => {
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen px-4 py-16 md:py-24 max-w-4xl mx-auto">
+      <div className="min-h-[100dvh] px-4 py-16 md:py-24 max-w-4xl mx-auto">
         <div className="mb-12">
           <motion.button
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}

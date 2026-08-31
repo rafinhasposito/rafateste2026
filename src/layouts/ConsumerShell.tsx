@@ -11,7 +11,7 @@ export function ConsumerShell() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   return (
-    <div className="relative min-h-screen bg-foundation-bg font-sans selection:bg-brand-primary/30">
+    <div className="relative min-h-[100dvh] bg-foundation-bg font-sans selection:bg-brand-primary/30">
       {/* Background Universal */}
       <StarryBackground />
 
@@ -27,7 +27,7 @@ export function ConsumerShell() {
         No Desktop, a navegação de cima precisa de padding-top.
       */}
       <main 
-        className={`relative z-10 w-full h-full min-h-screen flex flex-col
+        className={`relative z-10 w-full h-full min-h-[100dvh] flex flex-col
           ${isDesktop ? "pt-14 pb-0" : "pt-0 pb-16"}
         `}
       >

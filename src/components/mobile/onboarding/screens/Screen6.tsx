@@ -45,7 +45,7 @@ export const Screen6 = () => (
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
-        className="w-full max-w-sm bg-[#08090F]/95 backdrop-blur-2xl border border-white/[0.08] rounded-xl overflow-hidden shadow-2xl"
+        className="w-full max-w-md bg-[#08090F]/95 backdrop-blur-2xl border border-white/[0.08] rounded-xl overflow-hidden shadow-2xl"
       >
         {/* Header with city photo strip */}
         <div className="relative h-28 overflow-hidden">

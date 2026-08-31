@@ -55,7 +55,7 @@ export const Screen5 = () => (
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7 }}
-      className="relative z-10 max-w-sm w-full text-center mb-8"
+      className="relative z-10 max-w-sm md:max-w-md w-full text-center mb-8"
     >
       <h2 className="font-cinzel text-2xl sm:text-3xl text-white mb-2 leading-tight">
         Você escolhe o lugar.<br />Nós fazemos as contas.
@@ -66,7 +66,7 @@ export const Screen5 = () => (
     </motion.div>
 
     {/* Data flow visualization */}
-    <div className="relative z-10 w-full max-w-xs">
+    <div className="relative z-10 w-full max-w-xs md:max-w-sm">
       {/* Input data points */}
       <div className="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 backdrop-blur-sm shadow-xl">
         {dataPoints.map((d, i) => (

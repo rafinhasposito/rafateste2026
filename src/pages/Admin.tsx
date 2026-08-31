@@ -21,7 +21,7 @@ const Admin = () => {
     return (
       <>
         <StarryBackground />
-        <div className="min-h-screen flex items-center justify-center text-primary font-cinzel animate-pulse">Verificando acesso…</div>
+        <div className="min-h-[100dvh] flex items-center justify-center text-primary font-cinzel animate-pulse">Verificando acesso…</div>
       </>
     );
   }
@@ -32,7 +32,7 @@ const Admin = () => {
     return (
       <>
         <StarryBackground />
-        <div className="min-h-screen flex flex-col items-center justify-center px-4 gap-4">
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center px-4 gap-4">
           <h1 className="font-cinzel text-2xl text-foreground uppercase tracking-wider">Acesso restrito</h1>
           <p className="text-muted-foreground text-sm text-center max-w-md">Esta área é apenas para administradores.</p>
           <button onClick={() => navigate("/")} className="px-4 py-2 rounded-xl border border-border text-muted-foreground text-xs uppercase tracking-widest">← Voltar</button>
@@ -51,7 +51,7 @@ const Admin = () => {
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen px-4 py-12 max-w-6xl mx-auto">
+      <div className="min-h-[100dvh] px-4 py-12 max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary mb-6 inline-block">← Voltar</button>
           <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider mb-2">Painel Admin</h1>

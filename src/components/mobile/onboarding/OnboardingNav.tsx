@@ -42,16 +42,18 @@ export function OnboardingNav({
 
       {/* Bottom CTA */}
       <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-[#030306]/80 to-transparent">
-        <button
-          onClick={onNext}
-          className={`h-12 w-full font-inter text-xs font-bold tracking-[0.15em] uppercase transition-all ${
-            isFinal
-              ? 'bg-[#D4AF37] text-black hover:bg-[#c9a832] active:scale-[0.98]'
-              : 'bg-white text-black hover:bg-white/90 active:scale-[0.98]'
-          }`}
-        >
-          {isFinal ? 'Começar Minha Análise' : 'Continuar'}
-        </button>
+        <div className="w-full max-w-md mx-auto">
+          <button
+            onClick={onNext}
+            className={`h-12 w-full font-inter text-xs font-bold tracking-[0.15em] uppercase transition-all ${
+              isFinal
+                ? 'bg-[#D4AF37] text-black hover:bg-[#c9a832] active:scale-[0.98]'
+                : 'bg-white text-black hover:bg-white/90 active:scale-[0.98]'
+            }`}
+          >
+            {isFinal ? 'Começar Minha Análise' : 'Continuar'}
+          </button>
+        </div>
       </div>
     </>
   );

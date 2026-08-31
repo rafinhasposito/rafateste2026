@@ -36,7 +36,7 @@ const ResetPassword = () => {
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-[100dvh] flex items-center justify-center px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-panel glass-panel-glow p-8 md:p-12 max-w-md w-full border border-gold/20 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
           <h1 className="font-cinzel text-xl md:text-2xl font-bold text-foreground uppercase tracking-[0.12em] text-center mb-1">Nova Senha</h1>
           <p className="text-muted-foreground text-xs text-center mb-8">Defina uma nova senha para sua conta</p>

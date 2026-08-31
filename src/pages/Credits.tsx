@@ -66,7 +66,7 @@ const Credits = () => {
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen px-4 py-16 md:py-24 max-w-5xl mx-auto">
+      <div className="min-h-[100dvh] px-4 py-16 md:py-24 max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

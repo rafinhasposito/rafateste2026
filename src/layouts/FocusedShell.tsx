@@ -11,7 +11,7 @@ export function FocusedShell() {
   const isOnboarding = location.pathname === "/app/onboarding";
 
   return (
-    <div className="relative min-h-screen bg-foundation-bg font-sans selection:bg-brand-primary/30">
+    <div className="relative min-h-[100dvh] bg-foundation-bg font-sans selection:bg-brand-primary/30">
       {!isOnboarding && <StarryBackground />}
 
       {/* 
@@ -32,7 +32,7 @@ export function FocusedShell() {
       )}
 
       {/* Conteúdo focado - o Outlet preserva estado. */}
-      <main className={`relative z-10 w-full h-full min-h-screen ${isOnboarding ? '' : ''}`}>
+      <main className={`relative z-10 w-full h-full min-h-[100dvh] ${isOnboarding ? '' : ''}`}>
         <Outlet />
       </main>
     </div>

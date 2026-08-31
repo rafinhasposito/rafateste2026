@@ -63,7 +63,7 @@ const Auth = () => {
     return (
       <>
         <StarryBackground />
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-[100dvh] flex items-center justify-center">
           <div className="text-primary font-cinzel text-lg animate-pulse">Verificando sessão...</div>
         </div>
       </>
@@ -74,11 +74,11 @@ const Auth = () => {
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="min-h-[100dvh] flex items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel glass-panel-glow p-8 md:p-12 max-w-md w-full border border-gold/20 shadow-[0_0_50px_rgba(0,0,0,0.8)]"
+          className="glass-panel glass-panel-glow p-8 md:p-12 max-w-[480px] w-full border border-gold/20 shadow-[0_0_50px_rgba(0,0,0,0.8)]"
         >
           <div className="text-center mb-6">
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/30 flex items-center justify-center mx-auto mb-3 shadow-[0_0_20px_rgba(212,175,55,0.2)]">

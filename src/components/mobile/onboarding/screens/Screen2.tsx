@@ -12,7 +12,7 @@ export const Screen2 = () => {
     <div className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden px-5 pt-16 pb-28 bg-[#030306]">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/[0.03] via-[#030306] to-[#030306]" />
 
-      <div className="relative z-10 w-full max-w-sm mx-auto">
+      <div className="relative z-10 w-full max-w-md lg:max-w-lg mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
