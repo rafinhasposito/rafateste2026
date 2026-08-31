@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft } from "lucide-react";
+import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, User } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -124,18 +124,33 @@ const Index = () => {
   const [submitted, setSubmitted] = useState(false);
   const [mantraIndex, setMantraIndex] = useState(0);
 
-  // Auto-seleciona modo caso venha do Onboarding (?mode=passado|presente|futuro)
+  const isNatalProfileComplete = (p: any) => !!(p?.full_name && p?.birth_date && p?.birth_time && p?.birth_city);
+
+  // Auto-seleciona modo caso venha do Onboarding (?mode=passado|presente|futuro) ou via pendingMode
   useEffect(() => {
-    const modeParam = searchParams.get("mode") as Mode | null;
-    if (modeParam && ["passado", "presente", "futuro"].includes(modeParam)) {
-      setMode(modeParam);
-      if (modeParam === "presente") setYear(currentYear);
+    let targetMode = searchParams.get("mode") as Mode | null;
+    if (!targetMode) {
+      targetMode = sessionStorage.getItem("ps_pending_mode") as Mode | null;
+      if (targetMode && user) {
+        sessionStorage.removeItem("ps_pending_mode");
+      } else if (!user) {
+        targetMode = null; // Wait for login
+      }
+    }
+
+    if (targetMode && ["passado", "presente", "futuro"].includes(targetMode)) {
+      if (user && !loading && !isNatalProfileComplete(profile)) {
+         navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${targetMode}`)}`);
+         return;
+      }
+      setMode(targetMode);
+      if (targetMode === "presente") setYear(currentYear);
       setStep(2);
       setTimeout(() => {
         document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" });
       }, 300);
     }
-  }, [searchParams]);
+  }, [searchParams, user, profile, loading, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -144,31 +159,29 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-fill com dados natais salvos no perfil
+  // Sync profile data to local state for the lookup components
   useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, birth_date, birth_time, birth_city")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (cancelled || !data) return;
-      if (data.full_name && !name) setName(data.full_name);
-      if (data.birth_date && !birthdate) setBirthdate(data.birth_date);
-      if (data.birth_time && !birthtime) setBirthtime(String(data.birth_time).slice(0, 5));
-      if (data.birth_city && !birthPlace) {
-        setBirthPlace(data.birth_city);
+    if (profile) {
+      if (profile.full_name && !name) setName(profile.full_name);
+      if (profile.birth_date && !birthdate) setBirthdate(profile.birth_date);
+      if (profile.birth_time && !birthtime) setBirthtime(String(profile.birth_time).slice(0, 5));
+      if (profile.birth_city && !birthPlace) {
+        setBirthPlace(profile.birth_city);
         setBirthPlaceValid(true);
       }
-    })();
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+    }
+  }, [profile]);
 
   const handleSelectMode = (m: Mode) => {
+    if (!user) {
+      sessionStorage.setItem("ps_pending_mode", m);
+      navigate("/auth");
+      return;
+    }
+    if (!isNatalProfileComplete(profile)) {
+      navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${m}`)}`);
+      return;
+    }
     setMode(m);
     setSearchPath(null);
     if (m === "presente") setYear(currentYear);
@@ -453,42 +466,71 @@ const Index = () => {
                 </div>
 
                 {/* Natal Data Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-10">
-                  <div className="space-y-6 md:space-y-7">
-                    <div>
-                      <div className="field-label"><span className="label-dot" /> Nome Completo</div>
-                      <input type="text" className="quantum-input w-full" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-4">
-                      <div>
-                        <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
-                        <input type="date" className="quantum-input w-full" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+                {isNatalProfileComplete(profile) ? (
+                  <div className="flex flex-col md:flex-row items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 md:mb-10 gap-6">
+                    <div className="text-left flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <User className="w-4 h-4 text-[#D4AF37]" />
+                        <span className="text-white font-bold text-sm uppercase tracking-widest">{profile?.full_name}</span>
                       </div>
-                      <div>
-                        <div className="field-label"><span className="label-dot" /> Hora Exata</div>
-                        <input type="time" className="quantum-input w-full" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
-                      </div>
+                      <p className="text-white/50 text-xs font-inter leading-relaxed pl-7">
+                        {profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0, 5)}<br/>
+                        {profile?.birth_city}
+                      </p>
+                      <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}`)}`)} className="text-[#D4AF37] text-[10px] uppercase tracking-widest hover:text-white transition-colors pl-7 mt-2 underline decoration-[#D4AF37]/30 underline-offset-4">
+                        Editar Dados Natais
+                      </button>
                     </div>
-                  </div>
-                  <div className="space-y-6 md:space-y-7">
-                    <div>
-                      <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
-                      <div className="w-full">
-                        <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
+                    
+                    <div className="w-full md:w-48 bg-black/40 rounded-xl p-4 border border-white/5">
+                      <div className="field-label justify-center mb-3"><span className="label-dot" /> {yearLabel}</div>
                       <input
                         type="number"
-                        className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-gold h-14 font-cinzel"
+                        className="quantum-input w-full text-center text-2xl font-bold text-[#D4AF37] h-12 font-cinzel bg-transparent border-b border-white/20 focus:border-[#D4AF37] outline-none"
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
                         disabled={mode === "presente"}
                       />
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-10">
+                    <div className="space-y-6 md:space-y-7">
+                      <div>
+                        <div className="field-label"><span className="label-dot" /> Nome Completo</div>
+                        <input type="text" className="quantum-input w-full" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-4">
+                        <div>
+                          <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
+                          <input type="date" className="quantum-input w-full" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+                        </div>
+                        <div>
+                          <div className="field-label"><span className="label-dot" /> Hora Exata</div>
+                          <input type="time" className="quantum-input w-full" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-6 md:space-y-7">
+                      <div>
+                        <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
+                        <div className="w-full">
+                          <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
+                        <input
+                          type="number"
+                          className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-[#D4AF37] h-14 font-cinzel"
+                          value={year}
+                          onChange={(e) => setYear(e.target.value)}
+                          disabled={mode === "presente"}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Divider */}
                 <div className="flex items-center gap-4 mb-10">

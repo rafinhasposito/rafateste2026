@@ -93,8 +93,10 @@ const Auth = () => {
             </div>
             <h1 className="font-cinzel text-xl md:text-2xl font-bold text-foreground uppercase tracking-[0.12em]">Protocolo Solar</h1>
             <p className="text-[#D4AF37] text-[9px] uppercase tracking-[0.25em] font-medium mt-1">Astrologia de Relocalização</p>
-            <p className="text-muted-foreground text-xs mt-3">
-              {mode === "signup" ? "Crie sua conta estelar" : mode === "forgot" ? "Recupere sua senha" : "Acesse seu mapa cósmico"}
+            <p className="text-muted-foreground text-xs mt-3 leading-relaxed">
+              {mode === "signup" 
+                ? "Crie sua conta para salvar seus dados natais e não precisar preenchê-los em cada consulta." 
+                : mode === "forgot" ? "Recupere sua senha" : "Acesse seu mapa cósmico e recupere seus dados."}
             </p>
           </div>
 

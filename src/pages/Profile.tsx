@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
@@ -20,8 +20,10 @@ interface ConsultRow {
 }
 
 const Profile = () => {
-  const { user, profile, loading, refreshProfile } = useAuth();
+  const { user, profile, loading, refreshProfile, signOut } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
@@ -78,8 +80,11 @@ const Profile = () => {
     }).eq("user_id", user.id);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Perfil salvo. Suas próximas consultas virão pré-preenchidas.");
-    refreshProfile();
+    toast.success("Perfil salvo com sucesso.");
+    await refreshProfile();
+    if (returnTo) {
+      navigate(returnTo);
+    }
   };
 
   if (loading || !user) {
@@ -93,10 +98,13 @@ const Profile = () => {
       <div className="min-h-screen px-4 py-16 md:py-24 max-w-4xl mx-auto">
         <motion.button
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          onClick={() => navigate("/")}
+          onClick={() => {
+            if (returnTo) navigate(returnTo);
+            else navigate("/");
+          }}
           className="flex items-center gap-2 text-white/50 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-[#D4AF37] mb-8 transition-colors"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao Descobrir
+          <ArrowLeft className="w-3.5 h-3.5" /> {returnTo ? "Voltar à Consulta" : "Voltar ao Descobrir"}
         </motion.button>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
