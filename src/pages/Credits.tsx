@@ -1,20 +1,64 @@
 import { motion } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
-import { Lock, Unlock, Map } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Lock, Unlock, Map, ArrowLeft, CreditCard } from "lucide-react";
 import { usePricing, type PricingItem } from "@/hooks/usePricing";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 const ICONS: Record<string, any> = { cost_house_1: Lock, cost_house_3: Unlock, cost_full_map: Map, cost_city: Map };
 
 const Credits = () => {
   const { profile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { packages, costs, loading } = usePricing();
+  const [busyPkg, setBusyPkg] = useState<string | null>(null);
 
-  const handlePurchase = (pkg: PricingItem) => {
-    toast.info(`Pagamento de R$ ${pkg.price_brl?.toFixed(2)} para ${pkg.credits} crédito(s) será integrado em breve.`);
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (status === "success") {
+      toast.success("Pagamento aprovado! Seus créditos já estão disponíveis.");
+      // Limpar param
+      window.history.replaceState({}, document.title, "/credits");
+    } else if (status === "failure") {
+      toast.error("O pagamento foi recusado ou cancelado.");
+      window.history.replaceState({}, document.title, "/credits");
+    } else if (status === "pending") {
+      toast.info("Pagamento pendente. Os créditos cairão quando confirmado.");
+      window.history.replaceState({}, document.title, "/credits");
+    }
+  }, [searchParams]);
+
+  const handlePurchase = async (pkg: PricingItem) => {
+    if (!profile) {
+      toast.error("Você precisa estar logado para adquirir créditos.");
+      navigate("/auth");
+      return;
+    }
+
+    setBusyPkg(pkg.key);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-mercadopago-checkout", {
+        body: { pricing_config_id: pkg.key }
+      });
+
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error("Checkout URL não recebida do servidor.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Ocorreu um erro ao iniciar o pagamento. Tente novamente.");
+    } finally {
+      setBusyPkg(null);
+    }
   };
   const fmt = (n: number | null) => n == null ? ["0", "00"] : n.toFixed(2).split(".");
   const housesLabel = (c: number) => c === 1 ? "1 Casa" : c === 2 ? "3 Casas" : "12 Casas";
@@ -97,11 +141,12 @@ const Credits = () => {
                 onClick={() => handlePurchase(pkg)}
                 className={`w-full py-4 text-[10px] font-sans uppercase tracking-widest font-bold flex items-center justify-center gap-2 transition-all ${
                   highlight
-                    ? "bg-white text-black hover:bg-gray-200"
-                    : "bg-transparent border border-white/30 text-white hover:bg-white hover:text-black"
+                    ? "bg-white text-black hover:bg-gray-200 disabled:opacity-50"
+                    : "bg-transparent border border-white/30 text-white hover:bg-white hover:text-black disabled:opacity-50"
                 }`}
+                disabled={busyPkg === pkg.key}
               >
-                Adquirir Acesso
+                {busyPkg === pkg.key ? "Redirecionando..." : "Adquirir Acesso"}
               </button>
             </motion.div>
           );})}
