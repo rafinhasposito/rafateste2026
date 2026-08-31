@@ -1,0 +1,8 @@
+{
+  "ready": false,
+  "human_blocker": true,
+  "human_blocker_reason": "Rodada UX+Copy+Conversão aplicada às 6 telas. Build OK. Aguardando revisão visual do usuário antes de marcar como aprovado.",
+  "blockers_remaining": [],
+  "last_build": "success",
+  "notes": "V4 refinement applied: all 6 screens rewritten per user UX/copy/conversion guidelines. FocusedShell hides shell header during onboarding. OnboardingNav unchanged. Build passes."
+}

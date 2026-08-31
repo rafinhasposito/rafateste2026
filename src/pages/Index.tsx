@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, Sparkles } from "lucide-react";
+import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -47,22 +47,22 @@ const modeOptions = [
     id: "passado" as Mode,
     icon: Hourglass,
     title: "Passado",
-    desc: "Onde você passou seu aniversário?",
-    tagline: "Auditar um ciclo anterior",
+    desc: "Descubra qual área da vida esteve em destaque no seu último aniversário.",
+    tagline: "Revisar o ano que passou",
   },
   {
     id: "presente" as Mode,
     icon: Sun,
     title: "Presente",
-    desc: "Onde você está passando seu aniversário este ano?",
-    tagline: "Analisar o ciclo atual",
+    desc: "Veja o que está guiando o seu ano agora — a partir de onde você passou seu aniversário.",
+    tagline: "Entender o momento atual",
   },
   {
     id: "futuro" as Mode,
     icon: Compass,
     title: "Futuro",
-    desc: "Onde você ancora o seu Sol, define os próximos 12 meses.",
-    tagline: "Projetar o próximo ciclo",
+    desc: "Escolha onde passar seu próximo aniversário e descubra o que cada cidade coloca em destaque.",
+    tagline: "Planejar o próximo ano",
   },
 ];
 
@@ -71,19 +71,19 @@ const pathOptions = [
     id: "cidade" as SearchPath,
     icon: MapPin,
     title: "Por Cidade",
-    desc: "Já sabe onde quer ir? Descubra qual casa a cidade ativa.",
+    desc: "Já tenho um destino em mente.",
   },
   {
     id: "casa" as SearchPath,
     icon: Crown,
     title: "Por Casa",
-    desc: "Escolha a área da vida e veja as cidades ideais.",
+    desc: "Quero escolher uma área da vida.",
   },
   {
     id: "intencao" as SearchPath,
     icon: Scroll,
     title: "Por Intenção",
-    desc: "Descreva seu desejo e o sistema encontra a casa certa.",
+    desc: "Sei o que quero mudar, mas não sei qual Casa escolher.",
   },
 ];
 
@@ -97,6 +97,20 @@ const Index = () => {
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [mode, setMode] = useState<Mode | null>(null);
+
+  // --- ONBOARDING FIRST ACCESS LOGIC ---
+  useEffect(() => {
+    if (searchParams.get("resetOnboarding") === "true") {
+      localStorage.removeItem("ps_onboarding_completed");
+      navigate("/", { replace: true });
+      return;
+    }
+    const hasCompleted = localStorage.getItem("ps_onboarding_completed");
+    if (!hasCompleted) {
+      navigate("/app/onboarding", { replace: true });
+    }
+  }, [searchParams, navigate]);
+  // -------------------------------------
   const [isScanning, setIsScanning] = useState(false);
   const [searchPath, setSearchPath] = useState<SearchPath>(null);
 
@@ -195,225 +209,102 @@ const Index = () => {
       ? "Insira suas coordenadas natais para analisar a configuração energética deste ciclo."
       : "Insira suas coordenadas natais para que o algoritmo astrofísico calcule a rota exata da sua prosperidade.";
 
+  const activeTheme = mode ? modeThemes[mode] : null;
+
   return (
     <>
       <StarryBackground />
       <ScanningOverlay visible={isScanning} mode={mode || "futuro"} year={year} />
 
-
-      {/* ===== HERO SECTION ===== */}
-      <section className="relative min-h-[100svh] flex flex-col items-center justify-center px-5 py-10 md:py-16 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="orbital-ring w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-30" style={{ "--speed": "80s" } as React.CSSProperties}>
-            <div className="orbital-dot" />
-          </div>
-          <div className="orbital-ring w-[350px] h-[350px] md:w-[500px] md:h-[500px] opacity-20" style={{ "--speed": "50s", animationDirection: "reverse" } as React.CSSProperties}>
-            <div className="orbital-dot" style={{ opacity: 0.5 }} />
-          </div>
-          <div className="orbital-ring w-[200px] h-[200px] md:w-[300px] md:h-[300px] opacity-15" style={{ "--speed": "30s" } as React.CSSProperties} />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mb-4 md:mb-8 float-gentle"
-        >
-          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/20 flex items-center justify-center backdrop-blur-sm">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-gold-dark to-gold flex items-center justify-center shadow-[0_0_40px_hsl(var(--gold)/0.4)]">
-              <svg className="w-6 h-6 md:w-7 md:h-7 text-background" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-            </div>
-          </div>
-          <div className="absolute -inset-4 rounded-full border border-gold/10 pulse-ring" />
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="mb-4 md:mb-6 inline-flex items-center gap-2 px-4 py-1.5 md:px-5 md:py-2 rounded-full border border-gold/15 bg-gold/5 backdrop-blur-sm">
-          <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
-          <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.3em] text-gold">
-            Protocolo Solar · Astrologia de Relocalização
-          </span>
-        </motion.div>
-
-        <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }}
-          className="font-cinzel text-center text-[1.75rem] md:text-6xl lg:text-[5.5rem] font-bold mb-4 md:mb-6 leading-[1.1] tracking-tight max-w-5xl">
-          <span className="text-foreground block mb-2">DESCUBRA ONDE PASSAR</span>
-          <span className="gold-gradient text-glow-gold block">SEU PRÓXIMO ANIVERSÁRIO</span>
-        </motion.h1>
-
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          className="text-center text-muted-foreground text-xs md:text-lg font-light tracking-wide max-w-3xl mx-auto leading-relaxed mb-6 md:mb-10 px-2 md:px-4">
-          Assuma o controle absoluto dos próximos 12 meses.
-          Destrave o <span className="text-gold font-medium">GPS exato</span> da sua{" "}
-          <span className="text-foreground font-medium">Prosperidade</span>,{" "}
-          <span className="text-foreground font-medium">Casamento</span> ou{" "}
-          <span className="text-foreground font-medium">Sucesso</span>{" "}
-          mudando a sua coordenada geográfica.
-        </motion.p>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="flex items-center gap-4 md:gap-12 mb-8 md:mb-10">
-          {stats.map((s, i) => (
-            <div key={i} className="text-center">
-              <p className="text-gold font-cinzel text-xl md:text-2xl font-bold">{s.value}</p>
-              <p className="text-muted-foreground text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-medium">{s.label}</p>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Hero CTAs */}
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
-          className="flex flex-col sm:flex-row items-center gap-3.5 mb-10 z-20">
-          <button
-            onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}
-            className="btn-gold-luxury px-8 py-3.5 text-xs tracking-[0.16em] shadow-[0_0_25px_rgba(212,175,55,0.4)]"
-          >
-            Iniciar Protocolo →
-          </button>
-          <Link
-            to="/app/onboarding"
-            className="px-6 py-3 rounded-full border border-gold/30 hover:border-gold/60 bg-gold/5 hover:bg-gold/10 text-gold text-xs font-semibold uppercase tracking-[0.15em] transition-all flex items-center gap-2 backdrop-blur-sm"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Ver Onboarding (6 Telas)
-          </Link>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }}
-          className="flex flex-col items-center gap-2 text-muted-foreground/40 cursor-pointer hover:text-gold/60 transition-colors"
-          onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}>
-          <span className="text-[9px] uppercase tracking-[0.3em] font-medium">Rolar para o Formulário</span>
-          <motion.svg animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 2 }}
-            className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="m6 9 6 6 6-6" />
-          </motion.svg>
-        </motion.div>
-      </section>
-
-      {/* ===== STEPPER SECTION ===== */}
-      <section id="form-section" className="relative px-4 md:px-4 pb-20 max-w-5xl mx-auto">
-
-        {/* Step Indicator */}
-        {(() => {
-          const activeTheme = mode ? modeThemes[mode] : null;
-          const stepActiveBg = activeTheme ? `rgb(${activeTheme.rgb})` : undefined;
-          const stepActiveShadow = activeTheme ? `0 0 15px rgba(${activeTheme.rgb}, 0.3)` : undefined;
-          const stepLineColor = activeTheme ? `rgba(${activeTheme.rgb}, 0.5)` : undefined;
-          return (
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              className="flex justify-center items-center gap-3 mb-10">
-              {[1, 2, 3].map((s) => (
-                <div key={s} className="flex items-center gap-3">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                      step >= s
-                        ? "text-background"
-                        : "bg-secondary/50 text-muted-foreground border border-primary/10"
-                    }`}
-                    style={step >= s ? { backgroundColor: stepActiveBg || 'hsl(var(--gold))', boxShadow: stepActiveShadow || '0 0 15px hsl(var(--gold)/0.3)' } : undefined}
-                  >
-                    {s}
-                  </div>
-                  {s < 3 && (
-                    <div
-                      className={`w-12 md:w-20 h-px transition-all duration-300 ${step > s ? '' : 'bg-primary/10'}`}
-                      style={step > s ? { backgroundColor: stepLineColor || 'hsl(var(--gold)/0.5)' } : undefined}
-                    />
-                  )}
-                </div>
-              ))}
-            </motion.div>
-          );
-        })()}
-
-        {/* Back Button */}
-        {step > 1 && (
-          <motion.button
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            onClick={handleBack}
-            className="flex items-center gap-1.5 text-muted-foreground hover:text-gold transition-colors mb-6 text-xs uppercase tracking-[0.15em] font-medium"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Voltar
-          </motion.button>
-        )}
-
-        {/* Main Card */}
-        {(() => {
-          const activeTheme = mode ? modeThemes[mode] : null;
-          return (
+      {/* Hero section removida a pedido do usuario para não duplicar onboarding */}
+      <div className="pt-8 md:pt-32 pb-32 md:pb-12 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh]">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="glass-panel glass-panel-glow p-5 md:p-12 lg:p-16 relative"
-          style={activeTheme ? { borderColor: `rgba(${activeTheme.rgb}, 0.2)` } : undefined}
+          className="surface-base p-5 sm:p-6 md:p-12 lg:p-16 relative w-full max-w-5xl"
+          style={activeTheme ? {
+            borderColor: `rgba(${activeTheme.rgb}, 0.15)`,
+            background: "rgba(10, 10, 12, 0.85)",
+          } : {
+            background: "rgba(10, 10, 12, 0.85)",
+          }}
         >
           <div
             className="absolute top-0 left-[10%] right-[10%] h-px"
             style={{ background: activeTheme
-              ? `linear-gradient(90deg, transparent, rgba(${activeTheme.rgb}, 0.4), transparent)`
-              : 'linear-gradient(90deg, transparent, hsl(var(--gold)/0.3), transparent)'
+              ? `linear-gradient(90deg, transparent, rgba(${activeTheme.rgb}, 0.3), transparent)`
+              : 'linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent)'
             }}
           />
 
           <AnimatePresence mode="wait">
             {/* ===== STEP 1: Temporal Selection ===== */}
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
-                <div className="text-center mb-10">
-                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
+              <motion.div key="step1" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-4">
+                <div className="text-center mb-12">
+                  <span className="inline-block font-inter text-[10px] tracking-[0.3em] text-white/40 uppercase mb-4">
+                    Ponto de Partida
+                  </span>
+                  <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
                     Seleção Temporal
                   </h2>
-                  <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
+                  <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
                     Escolha o período que deseja explorar. Cada linha do tempo revela uma configuração energética única.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {modeOptions.map((opt) => {
-                    const Icon = opt.icon;
+                <div className="flex flex-col gap-4 max-w-2xl mx-auto">
+                  {modeOptions.map((opt, idx) => {
                     const isSelected = mode === opt.id;
                     const cardColor = modeCardColors[opt.id];
                     return (
                       <motion.button
                         key={opt.id}
-                        whileHover={{ scale: 1.02, y: -2 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                         onClick={() => handleSelectMode(opt.id)}
-                        className="p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 group backdrop-blur-xl"
+                        className="w-full relative overflow-hidden rounded-2xl border text-left transition-all duration-300 group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-6 md:p-8"
                         style={{
-                          borderColor: isSelected ? `rgba(${cardColor.rgb}, 0.7)` : `rgba(${cardColor.rgb}, 0.25)`,
-                          background: isSelected ? `rgba(${cardColor.rgb}, 0.12)` : "rgba(10, 12, 20, 0.6)",
-                          boxShadow: isSelected ? `0 0 30px rgba(${cardColor.rgb}, 0.2)` : undefined,
+                          borderColor: isSelected ? `rgba(${cardColor.rgb}, 0.4)` : "rgba(255,255,255,0.06)",
+                          background: isSelected ? `rgba(${cardColor.rgb}, 0.08)` : "rgba(255,255,255,0.02)",
                         }}
                       >
-                        <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all"
+                        {/* Glow effect on hover */}
+                        <div 
+                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                           style={{
-                            background: isSelected ? `rgba(${cardColor.rgb}, 0.25)` : `rgba(${cardColor.rgb}, 0.1)`,
-                            border: `1px solid rgba(${cardColor.rgb}, 0.3)`,
+                            background: `radial-gradient(circle at left center, rgba(${cardColor.rgb}, 0.15), transparent 70%)`
                           }}
-                        >
-                          <Icon className="w-5 h-5 transition-colors" style={{ color: isSelected ? `rgb(${cardColor.rgb})` : `rgba(${cardColor.rgb}, 0.8)` }} />
+                        />
+
+                        {/* Number & Icon */}
+                        <div className="flex items-center gap-4 shrink-0">
+                          <span
+                            className="font-mono text-2xl font-light"
+                            style={{ color: `rgba(${cardColor.rgb}, 0.5)` }}
+                          >
+                            {String(idx + 1).padStart(2, "0")}
+                          </span>
+                          <div className="w-px h-8 bg-white/10 hidden sm:block" />
                         </div>
-                        <span 
-                          className="text-[9px] font-bold tracking-[0.2em] uppercase block mb-1"
-                          style={{ color: `rgb(${cardColor.rgb})` }}
-                        >
-                          {opt.title}
-                        </span>
-                        <h3
-                          className="font-sans text-sm md:text-base font-bold text-foreground mb-2"
-                        >
-                          {opt.tagline}
-                        </h3>
-                        <p
-                          className="text-[11px] md:text-xs italic leading-relaxed text-muted-foreground"
-                        >
-                          "{opt.desc}"
-                        </p>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-baseline gap-x-3 mb-1.5">
+                            <h3 className="font-cinzel text-xl text-white">
+                              {opt.title}
+                            </h3>
+                            <span className="font-inter text-[10px] tracking-widest uppercase text-white/40">
+                              {opt.tagline}
+                            </span>
+                          </div>
+                          <p className="font-inter text-[13px] leading-relaxed text-white/50">
+                            {opt.desc}
+                          </p>
+                        </div>
+
+                        {/* Chevron */}
+                        <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-full border border-white/10 items-center justify-center group-hover:border-white/30 transition-colors">
+                          <span className="text-white/40 group-hover:text-white transition-colors">→</span>
+                        </div>
                       </motion.button>
                     );
                   })}
@@ -423,71 +314,87 @@ const Index = () => {
 
             {/* ===== STEP 2: Method Selection ===== */}
             {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
-                <div className="text-center mb-8">
+              <motion.div key="step2" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-4">
+                <div className="text-center mb-12">
                   {/* Selected mode badge */}
                   {(() => {
                     const theme = mode ? modeThemes[mode] : null;
                     return (
-                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6"
+                      <button onClick={() => setStep(1)} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6 cursor-pointer hover:scale-105 transition-transform"
                         style={{
                           borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
                           background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
                         }}
                       >
-                        {mode && (() => {
-                          const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
-                          return <ModeIcon className="w-3.5 h-3.5" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
-                        })()}
                         <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
-                          {modeOptions.find(m => m.id === mode)?.title}
+                          ← {modeOptions.find(m => m.id === mode)?.title}
                         </span>
-                      </div>
+                      </button>
                     );
                   })()}
 
-                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
+                  <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
                     Como Deseja Consultar?
                   </h2>
-                  <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
-                    Escolha um dos três caminhos abaixo. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
+                  <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
+                    Escolha um dos três caminhos. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-4 max-w-2xl mx-auto">
                   {(() => {
                     const theme = mode ? modeThemes[mode] : null;
-                    return pathOptions.map((opt) => {
+                    return pathOptions.map((opt, idx) => {
                       const Icon = opt.icon;
                       return (
                         <motion.button
                           key={opt.id}
-                          whileHover={{ scale: 1.02, y: -2 }}
-                          whileTap={{ scale: 0.98 }}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
                           onClick={() => handleSelectPath(opt.id)}
-                          className="p-6 rounded-2xl border text-left transition-all duration-300 group backdrop-blur-xl"
+                          className="w-full relative overflow-hidden rounded-2xl border text-left transition-all duration-300 group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-6 md:p-8"
                           style={{
-                            borderColor: theme ? `rgba(${theme.rgb}, 0.25)` : "rgba(212, 175, 55, 0.2)",
-                            background: "rgba(10, 12, 20, 0.65)",
-                            boxShadow: theme ? `0 0 25px rgba(${theme.rgb}, 0.08)` : undefined,
+                            borderColor: theme ? `rgba(${theme.rgb}, 0.15)` : "rgba(212, 175, 55, 0.15)",
+                            backgroundColor: "rgba(255, 255, 255, 0.02)",
                           }}
                         >
+                          {/* Glow effect on hover */}
                           <div 
-                            className="w-11 h-11 rounded-xl flex items-center justify-center mb-3.5 transition-all"
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                             style={{
-                              background: theme ? `rgba(${theme.rgb}, 0.15)` : "rgba(212, 175, 55, 0.1)",
-                              border: `1px solid ${theme ? `rgba(${theme.rgb}, 0.3)` : "rgba(212, 175, 55, 0.25)"}`,
+                              background: theme ? `radial-gradient(circle at left center, rgba(${theme.rgb}, 0.1), transparent 70%)` : `radial-gradient(circle at left center, rgba(212,175,55,0.1), transparent 70%)`
                             }}
-                          >
-                            <Icon 
-                              className="w-5 h-5 transition-colors" 
-                              style={{ color: theme ? `rgb(${theme.rgb})` : "#D4AF37" }} 
-                            />
+                          />
+
+                          {/* Icon area */}
+                          <div className="flex items-center gap-4 shrink-0">
+                            <div 
+                              className="w-12 h-12 rounded-full border flex items-center justify-center transition-colors"
+                              style={{ 
+                                borderColor: theme ? `rgba(${theme.rgb}, 0.2)` : 'rgba(212,175,55,0.2)',
+                                background: theme ? `rgba(${theme.rgb}, 0.05)` : 'rgba(212,175,55,0.05)',
+                                color: theme ? `rgb(${theme.rgb})` : "#D4AF37"
+                              }}
+                            >
+                              <Icon className="w-5 h-5 opacity-90" strokeWidth={1.5} />
+                            </div>
+                            <div className="w-px h-8 bg-white/10 hidden sm:block" />
                           </div>
-                          <span className="font-cinzel text-xs md:text-sm font-bold uppercase tracking-[0.1em] text-foreground block mb-1">
-                            {opt.title}
-                          </span>
-                          <p className="text-muted-foreground text-[11px] md:text-xs leading-relaxed">{opt.desc}</p>
+                          
+                          {/* Content */}
+                          <div className="flex-1">
+                            <h3 className="font-cinzel text-xl text-white mb-1.5">
+                              {opt.title}
+                            </h3>
+                            <p className="font-inter text-[13px] leading-relaxed text-white/50">
+                              {opt.desc}
+                            </p>
+                          </div>
+
+                          {/* Chevron */}
+                          <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-full border border-white/10 items-center justify-center group-hover:border-white/30 transition-colors">
+                            <span className="text-white/40 group-hover:text-white transition-colors">→</span>
+                          </div>
                         </motion.button>
                       );
                     });
@@ -536,43 +443,45 @@ const Index = () => {
                   );
                 })()}
 
-                <div className="text-center mb-10 md:mb-14">
-                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground uppercase tracking-[0.1em] mb-3">
+                <div className="text-center mb-12">
+                  <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
                     {formTitle}
                   </h2>
-                  <p className="text-muted-foreground text-xs md:text-sm font-light max-w-xl mx-auto">
+                  <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
                     {formSubtitle}
                   </p>
                 </div>
 
                 {/* Natal Data Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-10">
-                  <div className="space-y-7">
+                  <div className="space-y-6 md:space-y-7">
                     <div>
                       <div className="field-label"><span className="label-dot" /> Nome Completo</div>
-                      <input type="text" className="quantum-input" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
+                      <input type="text" className="quantum-input w-full" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-4">
                       <div>
                         <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
-                        <input type="date" className="quantum-input" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+                        <input type="date" className="quantum-input w-full" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
                       </div>
                       <div>
                         <div className="field-label"><span className="label-dot" /> Hora Exata</div>
-                        <input type="time" className="quantum-input" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
+                        <input type="time" className="quantum-input w-full" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-7">
+                  <div className="space-y-6 md:space-y-7">
                     <div>
                       <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
-                      <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
+                      <div className="w-full">
+                        <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
+                      </div>
                     </div>
                     <div>
                       <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
                       <input
                         type="number"
-                        className="quantum-input text-center text-2xl font-bold text-gold h-14 font-cinzel"
+                        className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-gold h-14 font-cinzel"
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
                         disabled={mode === "presente"}
@@ -609,7 +518,7 @@ const Index = () => {
                 )}
 
                 {/* Lookup Component */}
-                <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-4 md:p-8">
+                <div className="w-full mt-4">
                   {searchPath === "cidade" && (
                     <CityLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
                   )}
@@ -626,12 +535,17 @@ const Index = () => {
 
           <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
         </motion.div>
-          );
-        })()}
+
+        {/* Discreet onboarding reset */}
+        <div className="w-full text-center mt-6 mb-2">
+          <Link to="/app/onboarding" className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white/30 pb-0.5">
+            Ver como funciona
+          </Link>
+        </div>
 
         {/* Trust badges */}
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-6 md:gap-10 mt-8 px-4">
+          className="flex flex-wrap justify-center gap-6 md:gap-10 mt-6 px-4 pb-12">
           {[
             { text: "Dados 100% Privados" },
             { text: "Efemérides Suíças (JPL)" },
@@ -643,7 +557,7 @@ const Index = () => {
             </div>
           ))}
         </motion.div>
-      </section>
+      </div>
     </>
   );
 };

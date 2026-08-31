@@ -27,7 +27,7 @@ export default function SolarGameV2() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#FAFAFA] font-outfit relative overflow-hidden flex flex-col">
+    <div className="min-h-[100dvh] w-full bg-[#FAFAFA] font-sans relative overflow-hidden flex flex-col">
       {/* Premium Header */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/20 px-4 py-3 flex justify-between items-center">
          <button onClick={handleBack} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-800 hover:bg-slate-50 transition-colors">

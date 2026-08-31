@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Temp and backup files
+test-results/
+*.bak
+.*!*
+*.zip
+protocolo-solar-antigravity-release*/

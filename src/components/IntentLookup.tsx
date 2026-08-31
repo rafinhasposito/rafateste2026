@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Scroll, Sparkles } from "lucide-react";
+import { Scroll, Sparkles, ArrowRight, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { matchIntentToHouse } from "@/lib/intentMap";
 import { cityDatabase } from "@/data/houses";
@@ -11,6 +11,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { chargeConsultation } from "@/lib/credits";
 import { saveConsultation } from "@/lib/consultations";
 import DestinyResults from "@/components/DestinyResults";
+import { PremiumButton } from "@/components/shell";
 
 interface IntentLookupProps {
   mode: string;
@@ -52,7 +53,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
-  const [intent, setIntent] = useState("");
+  const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<IntentResult | null>(null);
 
@@ -61,15 +62,11 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
     onLoadingChange?.(state);
   };
 
-  const handleLookup = async () => {
-    if (intent.length < 10) { showAlert("Descreva seu desejo com pelo menos 10 caracteres."); return; }
+  const handleSelectIntent = async (houseId: number) => {
     if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
-
-    const match = matchIntentToHouse(intent);
-    if (!match) { showAlert("Não conseguimos identificar a área. Tente palavras como: dinheiro, amor, carreira, saúde ou viagem."); return; }
-
-    const houseNum = match.house;
-    const houseData = cityDatabase[houseNum];
+    
+    setSelectedHouse(houseId);
+    const houseData = cityDatabase[houseId];
     if (!houseData) return;
 
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
@@ -77,7 +74,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       userId: user.id,
       currentCredits: profile?.credits ?? 0,
       isAdmin,
-      description: `Consulta por Intenção — Casa ${houseNum} (${houseData.label}) em ${year}`,
+      description: `Consulta por Intenção — Casa ${houseId} (${houseData.label}) em ${year}`,
     });
     if (!charge.ok) {
       showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
@@ -86,7 +83,6 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
     }
     await refreshProfile();
     if (!isAdmin) showAlert("Consulta iniciada. 1 crédito debitado.");
-
 
     setLoadingState(true);
     setResult(null);
@@ -104,15 +100,15 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
           dob: dataFormatada,
           time: birthtime,
           target_year: year,
-          alvoId: houseNum,
-          intent: intent.trim(),
+          alvoId: houseId,
+          intent: houseData.intent,
         }),
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
 
-      const houseResult = data.results?.[String(houseNum)];
+      const houseResult = data.results?.[String(houseId)];
       const rawOptions = houseResult?.options || {};
 
       const toArray = (v: any): CityOption[] => {
@@ -127,7 +123,6 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         nacional: toArray(rawOptions.nacional),
       };
 
-      // Build allResults from the full API response
       const allResults: Record<string, any> = {};
       if (data.results) {
         for (const [key, val] of Object.entries(data.results)) {
@@ -143,16 +138,17 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         birth_place: birthPlace.trim(),
         year,
         mode,
-        goal: houseNum,
-        intent: intent.trim(),
-        result: { results: allResults, house: houseNum },
+        goal: houseId,
+        intent: houseData.intent,
+        result: { results: allResults, house: houseId },
       }) ?? undefined;
 
-      setResult({ house: houseNum, houseName: houseData.label, houseData, cities, allResults, consultationId });
-      onHouseFound?.(houseNum);
+      setResult({ house: houseId, houseName: houseData.label, houseData, cities, allResults, consultationId });
+      onHouseFound?.(houseId);
     } catch (error) {
       const err = error as Error;
       showAlert("Falha na consulta: " + err.message);
+      setSelectedHouse(null);
     } finally {
       setLoadingState(false);
     }
@@ -161,59 +157,73 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-2">
-        <Scroll className="w-5 h-5 text-primary" />
-        <h3 className="font-cinzel text-sm md:text-base font-bold text-foreground uppercase tracking-[0.1em]">
-          Manifesto de Intenção
-        </h3>
-      </div>
-      <p className="text-muted-foreground text-xs font-light">
-        Descreva o que você deseja para este ciclo. O sistema identificará a casa astrológica mais alinhada e sugerirá cidades ideais.
-      </p>
+      {!result && !loading && (
+        <>
+          <div className="flex items-center gap-3 mb-2">
+            <Scroll className="w-5 h-5 text-[#D4AF37]" />
+            <h3 className="font-cinzel text-sm md:text-base font-bold text-white uppercase tracking-[0.1em]">
+              Manifesto de Intenção
+            </h3>
+          </div>
+          <p className="text-white/60 text-xs font-light mb-6">
+            O que você gostaria que fosse diferente no seu próximo ano? Escolha o seu desejo principal e a nossa engine fará os cálculos para encontrar o destino exato.
+          </p>
 
-      <textarea
-        className="quantum-input h-28 resize-none text-sm"
-        value={intent}
-        onChange={(e) => { setIntent(e.target.value); setResult(null); }}
-        placeholder="Ex: Quero ganhar mais dinheiro e construir patrimônio... / Quero encontrar o amor da minha vida... / Quero ser promovido e ter reconhecimento..."
-      />
-
-      {intent.length >= 10 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-primary/70">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span className="text-[10px] uppercase tracking-wider font-semibold">
-            {matchIntentToHouse(intent)
-              ? `Detectado: Casa ${matchIntentToHouse(intent)!.house} — ${cityDatabase[matchIntentToHouse(intent)!.house]?.label}`
-              : "Continue digitando para identificar a casa..."}
-          </span>
-        </motion.div>
+          <div className="flex flex-col gap-3 md:gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+            {Object.values(cityDatabase).map((house) => (
+              <motion.button
+                key={house.id}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                onClick={() => handleSelectIntent(house.id)}
+                className="w-full text-left p-4 rounded-xl bg-black/40 hover:bg-black/60 border border-white/5 hover:border-[#D4AF37]/50 transition-all duration-300 group"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-white md:text-sm font-medium mb-1 group-hover:text-[#D4AF37] transition-colors leading-snug">
+                      {house.intent}
+                    </h3>
+                    <p className="text-white/40 text-[10px] font-light">
+                      {house.realLife}
+                    </p>
+                  </div>
+                  <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#D4AF37]/10 transition-colors">
+                    <ArrowRight className="w-3 h-3 text-white/30 group-hover:text-[#D4AF37] transition-colors" />
+                  </div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </>
       )}
 
-      <button
-        onClick={handleLookup}
-        disabled={loading || intent.length < 10}
-        className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        {loading ? (
-          <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-        ) : (
-          <Sparkles className="w-4 h-4" />
-        )}
-        {loading ? "Consultando o cosmos..." : "Revelar meu destino (1 crédito)"}
-      </button>
+      {loading && (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <div className="w-8 h-8 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
+          <p className="text-[#D4AF37] font-cinzel text-sm animate-pulse">Consultando o cosmos...</p>
+        </div>
+      )}
 
       <AnimatePresence>
         {result && (
-          <DestinyResults
-            house={result.house}
-            houseName={result.houseName}
-            houseData={result.houseData}
-            cities={result.cities}
-            allResults={result.allResults}
-            consultationId={result.consultationId}
-            userCredits={profile?.credits ?? 0}
-            isAuthenticated={!!user}
-          />
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <button 
+              onClick={() => { setResult(null); setSelectedHouse(null); }}
+              className="mb-6 flex items-center gap-2 text-white/40 hover:text-white text-xs uppercase tracking-widest transition-colors"
+            >
+              ← Trocar Intenção
+            </button>
+            <DestinyResults
+              house={result.house}
+              houseName={result.houseName}
+              houseData={result.houseData}
+              cities={result.cities}
+              allResults={result.allResults}
+              consultationId={result.consultationId}
+              userCredits={profile?.credits ?? 0}
+              isAuthenticated={!!user}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

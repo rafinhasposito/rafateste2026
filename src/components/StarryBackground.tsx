@@ -1,45 +1,29 @@
-import { useEffect, useRef } from "react";
+import React from "react";
 
 const StarryBackground = () => {
-  const starsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const container = starsRef.current;
-    if (!container) return;
-
-    // Create stars
-    for (let i = 0; i < 250; i++) {
-      const star = document.createElement("div");
-      star.className = `star ${Math.random() > 0.92 ? "bright" : ""}`;
-      const size = Math.random() * 2 + 0.5;
-      star.style.width = `${size}px`;
-      star.style.height = `${size}px`;
-      star.style.top = `${Math.random() * 100}%`;
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.setProperty("--duration", `${Math.random() * 8 + 3}s`);
-      star.style.animationDelay = `${Math.random() * 5}s`;
-      container.appendChild(star);
-    }
-
-    // Create subtle constellation lines
-    for (let i = 0; i < 8; i++) {
-      const line = document.createElement("div");
-      line.className = "constellation-line";
-      line.style.top = `${Math.random() * 80 + 10}%`;
-      line.style.left = `${Math.random() * 60}%`;
-      line.style.width = `${Math.random() * 200 + 50}px`;
-      line.style.transform = `rotate(${Math.random() * 360}deg)`;
-      container.appendChild(line);
-    }
-
-    return () => { container.innerHTML = ""; };
-  }, []);
-
   return (
     <>
-      <div className="cosmic-canvas" />
-      <div className="nebula-layer" />
-      <div ref={starsRef} className="fixed inset-0 z-[-1]" />
+      {/* Void black base */}
+      <div
+        className="fixed inset-0 z-[-2]"
+        style={{ background: "#030306" }}
+      />
+      {/* Subtle radial gold at top for depth */}
+      <div
+        className="fixed inset-0 z-[-1] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 40% at 50% -10%, rgba(212,175,55,0.07) 0%, transparent 70%)",
+        }}
+      />
+      {/* Film grain for premium tactile feel */}
+      <div
+        className="fixed inset-0 z-[-1] pointer-events-none opacity-[0.025]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          backgroundSize: "256px 256px",
+        }}
+      />
     </>
   );
 };

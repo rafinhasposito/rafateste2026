@@ -8,16 +8,14 @@ interface CinematicEarthProps {
 export const CinematicEarth = ({ step }: CinematicEarthProps) => {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-      {/* ── BACKGROUND: DEEP STARRY COSMOS ── */}
-      <div 
-        className="absolute inset-0 bg-[#030306] bg-cover bg-center"
-        style={{
-          backgroundImage: "radial-gradient(circle at 50% 30%, rgba(20, 24, 40, 0.6) 0%, #030306 80%)"
-        }}
-      />
+      {/* Base void black */}
+      <div className="absolute inset-0 bg-[#030306]" />
 
-      {/* Subtle Star Particles */}
-      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
+      {/* Subtle top radial glow */}
+      <div
+        className="absolute inset-0"
+        style={{ background: "radial-gradient(ellipse 70% 40% at 50% 10%, rgba(212,175,55,0.04) 0%, transparent 70%)" }}
+      />
 
       {/* ── STEP-SPECIFIC EARTH RENDERING ── */}
       <AnimatePresence mode="wait">

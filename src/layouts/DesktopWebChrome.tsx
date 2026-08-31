@@ -27,7 +27,15 @@ export function DesktopWebChrome() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 z-50 bg-foundation-bg/80 backdrop-blur-xl border-b border-surface-border">
+    <header
+      className="fixed top-0 left-0 right-0 h-14 z-50"
+      style={{
+        background: "rgba(3,3,6,0.85)",
+        backdropFilter: "blur(20px) saturate(1.2)",
+        WebkitBackdropFilter: "blur(20px) saturate(1.2)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+      }}
+    >
       <div className="container mx-auto h-full flex items-center justify-between px-6">
         
         {/* Left: Logo */}

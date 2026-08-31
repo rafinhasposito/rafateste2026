@@ -81,7 +81,7 @@ export function InteractiveHouseSelector() {
   }, [activeId]);
 
   return (
-    <div className="w-full min-h-[100dvh] bg-[#F8F9FB] font-outfit pb-32 flex flex-col relative overflow-x-hidden">
+    <div className="w-full min-h-[100dvh] bg-[#F8F9FB] font-sans pb-32 flex flex-col relative overflow-x-hidden">
       
       {/* 1. MOBILE-FIRST HEADER (Glassmorphism & Persona Pill) */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-slate-100 px-4 py-3 flex justify-between items-center shadow-sm">

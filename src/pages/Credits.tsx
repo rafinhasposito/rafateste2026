@@ -67,7 +67,7 @@ const Credits = () => {
             >
               {highlight && (<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-dark via-primary to-gold-light" />)}
               <div className="mb-4">
-                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-space">{housesLabel(pkg.credits)}</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-sans">{housesLabel(pkg.credits)}</span>
               </div>
               <h3 className="font-cinzel text-xl font-bold text-foreground mb-2 uppercase tracking-wider">{pkg.label}</h3>
               <p className="text-muted-foreground text-xs font-light mb-6 min-h-[2.5rem]">{pkg.description}</p>

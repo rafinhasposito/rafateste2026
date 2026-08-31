@@ -80,7 +80,7 @@ const SwipeButton = ({ onComplete, checked }: SwipeButtonProps) => {
     <div className="w-full max-w-xl mx-auto select-none">
       {/* Label */}
       <div className="text-center mb-4">
-        <p className="text-[10px] md:text-xs font-space tracking-[0.3em] uppercase text-muted-foreground">
+        <p className="text-[10px] md:text-xs font-sans tracking-[0.3em] uppercase text-muted-foreground">
           {checked ? "Protocolo Selado" : "Sele o Protocolo das 24 Horas"}
         </p>
       </div>
@@ -249,7 +249,7 @@ const SwipeButton = ({ onComplete, checked }: SwipeButtonProps) => {
                   <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
                 </svg>
               </motion.div>
-              <p className="text-[9px] md:text-[10px] text-muted-foreground/60 tracking-widest uppercase font-space">
+              <p className="text-[9px] md:text-[10px] text-muted-foreground/60 tracking-widest uppercase font-sans">
                 {isHolding ? "Selando..." : "Pressione e segure"}
               </p>
             </motion.div>
@@ -283,7 +283,7 @@ const SwipeButton = ({ onComplete, checked }: SwipeButtonProps) => {
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </motion.div>
-              <p className="text-[10px] text-green-500/70 tracking-[0.3em] uppercase font-space font-semibold">
+              <p className="text-[10px] text-green-500/70 tracking-[0.3em] uppercase font-sans font-semibold">
                 Protocolo Selado
               </p>
             </motion.div>

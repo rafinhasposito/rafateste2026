@@ -90,14 +90,14 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
         onChange={(e) => handleInput(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className={`quantum-input transition-colors duration-300 ${invalid && !isValid ? "invalid" : ""} ${className || ""}`}
+        className={`w-full h-full bg-white/5 border rounded-xl px-4 text-white placeholder:text-white/30 text-sm focus:outline-none focus:bg-white/[0.08] transition-all duration-300 ${invalid && !isValid ? "border-red-500/50" : "border-white/10 focus:border-[#D4AF37]/50"} ${className || ""}`}
         autoComplete="off"
       />
       {showSuggestions && suggestions.length > 0 && (
-        <div className="autocomplete-results">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0A0C10]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl">
           {suggestions.map((item, i) => (
-            <div key={i} className="suggestion-item" onClick={() => selectCity(item)}>
-              <svg className="w-4 h-4 text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div key={i} className="px-4 py-3 cursor-pointer hover:bg-white/5 flex items-center gap-3 text-white/80 text-sm transition-colors border-b border-white/5 last:border-0" onClick={() => selectCity(item)}>
+              <svg className="w-4 h-4 text-[#D4AF37] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>

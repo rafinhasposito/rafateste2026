@@ -77,7 +77,7 @@ export function OrbitalOnboardingV2({ onComplete }: OrbitalOnboardingV2Props) {
             className="space-y-8"
           >
             <div>
-              <h1 className="text-3xl font-outfit font-black text-slate-900 tracking-tight mb-2">
+              <h1 className="text-3xl font-sans font-black text-slate-900 tracking-tight mb-2">
                 {steps[step].title}
               </h1>
               <p className="text-slate-500 font-inter font-medium text-sm">

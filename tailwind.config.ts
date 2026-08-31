@@ -28,15 +28,14 @@ export default {
         "16": "64px",
       },
       fontFamily: {
-        /* LEGACY (To be migrated progressively) */
-        inter: ["Inter", "sans-serif"],
-        sfpro: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "sans-serif"],
-        outfit: ["Outfit", "sans-serif"],
-        space: ["Space Grotesk", "sans-serif"],
-        cinzel: ["Cinzel", "serif"],
-        /* NEW FOUNDATION */
-        display: ["var(--font-display)"],
-        sans: ["var(--font-sans)"],
+        /* DESIGN SYSTEM v2.0: apenas Cinzel + Inter */
+        display: ['Cinzel', 'serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        /* Aliases semânticos */
+        inter: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        cinzel: ['Cinzel', 'serif'],
+        /* LEGADO (não usar em componentes novos) */
+        sfpro: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
       },
       fontSize: {
         "display": "var(--text-display)",
@@ -151,7 +150,13 @@ export default {
         "base-full": "var(--radius-full)",
       },
       boxShadow: {
-        "elevation-1": "0 4px 20px -2px rgba(0,0,0,0.5)",
+        "elevation-1": "var(--shadow-sm)",
+        "elevation-2": "var(--shadow-md)",
+        "elevation-3": "var(--shadow-lg)",
+        "glow-gold-sm": "var(--shadow-gold-sm)",
+        "glow-gold-md": "var(--shadow-gold-md)",
+        "glow-gold-lg": "var(--shadow-gold-lg)",
+        /* Legado */
         "glow-primary": "0 0 20px -5px hsl(var(--brand-primary) / 0.3)",
       },
       opacity: {

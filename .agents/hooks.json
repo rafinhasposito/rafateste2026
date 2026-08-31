@@ -1,0 +1,12 @@
+{
+  "protocolo-solar-release-guard": {
+    "enabled": true,
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python3 .agents/scripts/release_stop_guard.py",
+        "timeout": 10
+      }
+    ]
+  }
+}

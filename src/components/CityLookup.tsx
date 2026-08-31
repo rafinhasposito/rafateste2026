@@ -11,6 +11,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { chargeConsultation } from "@/lib/credits";
 import { saveConsultation } from "@/lib/consultations";
 import DestinyResults from "@/components/DestinyResults";
+import { PremiumButton } from "@/components/shell";
 
 interface CityLookupProps {
   mode: string;
@@ -134,7 +135,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
 
       // Enrich in parallel with full 12-house city map so unlocks work later
       // just like in the "futuro" flow (HouseLookup / IntentLookup).
-      let allResults: Record<string, any> = {};
+      const allResults: Record<string, any> = {};
       try {
         const enrichResp = await fetch(`${API_URL}/find_all_cities`, {
           method: "POST",
@@ -198,41 +199,41 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-2">
-        <Compass className="w-5 h-5 text-primary" />
-        <h3 className="font-cinzel text-sm md:text-base font-bold text-foreground uppercase tracking-[0.1em]">
-          Consultar por Cidade
-        </h3>
-      </div>
-      <p className="text-muted-foreground text-xs font-light">
-        Digite a cidade onde deseja passar seu aniversário em {year}. O sistema calculará em qual casa astrológica ela se posiciona.
-      </p>
-
-      <div className="flex gap-3 items-start">
-        <div className="flex-1">
-          <CityAutocomplete
-            value={city}
-            onChange={(v, valid, coords) => {
-              setCity(v);
-              setCityValid(valid);
-              setCityCoords(coords ?? null);
-              setResult(null);
-            }}
-            placeholder="Ex: Nova York, Londres, Jerusalém..."
-          />
+      <div className="flex flex-col mb-12">
+        <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-4">
+          Defina o Ponto no Mapa
+        </label>
+        
+        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+          <div className="flex-1 relative">
+            <CityAutocomplete
+              value={city}
+              onChange={(v, valid, coords) => {
+                setCity(v);
+                setCityValid(valid);
+                setCityCoords(coords ?? null);
+                setResult(null);
+              }}
+              placeholder="Ex: Nova York, Londres, Jerusalém..."
+              className="w-full text-xl font-cinzel placeholder:font-sans placeholder:text-lg border-b border-white/20 bg-transparent pb-3 pt-2 text-white focus:border-[#D4AF37] focus:ring-0 transition-colors rounded-none"
+            />
+          </div>
+          <button
+            onClick={handleLookup}
+            disabled={loading || !cityValid}
+            className="shrink-0 h-14 px-8 bg-white text-black hover:bg-gray-200 disabled:bg-white/10 disabled:text-white/30 transition-all font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+            ) : (
+              <Search className="w-4 h-4" />
+            )}
+            {loading ? "Simulando" : "Simular Destino"}
+          </button>
         </div>
-        <button
-          onClick={handleLookup}
-          disabled={loading || !cityValid}
-          className="shrink-0 h-12 px-5 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          {loading ? (
-            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-          ) : (
-            <Search className="w-4 h-4" />
-          )}
-          {loading ? "Simulando deslocamento..." : "Simular deslocamento (1 crédito)"}
-        </button>
+        <p className="font-inter text-[10px] text-white/40 mt-3 font-light tracking-wide">
+          * A consulta exige 1 crédito da sua conta.
+        </p>
       </div>
 
 

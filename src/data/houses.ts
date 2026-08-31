@@ -1,394 +1,551 @@
 export interface HouseData {
   id: number;
-  name: string;
-  emoji: string;
-  cristal: string;
-  img: string;
-  label: string;
-  regente: string;
-  tags: string[];
-
-  entender_10s: string;
-  favorece: string[];
-  tema_ano: string;
-  ganhar: string;
-  vida_real: string;
-  dinheiro: string;
-  amor: string;
-  trabalho: string;
-  vida_pessoal: string;
-  como_aproveitar: string;
-  cuidado: string;
-  resumo: string;
-
-  quiz: string[];
+  label: string; // Maintain for legacy ui
+  intent: string;
+  translation: string;
+  realLife: string;
+  deepDive: string;
+  astrologyDefinition: string;
   radar: { dinheiro: number; amor: number; saude: number };
+
+  // New Lovable/Dossie Editorial Fields
+  name?: string;
+  oQueVocePrecisaEntender?: string;
+  podeFavorecer?: string[];
+  oSegredo?: string;
+  oTema?: string;
+  oQueVocePodeGanhar?: string;
+  comoApareceNaVidaReal?: string;
+  dinheiro?: string;
+  amor?: string;
+  trabalho?: string;
+  vidaPessoal?: string;
+  comoAproveitar?: string;
+  cuidadoCom?: string;
+  resumo?: string;
+
+  diagnosticoCaos?: string;
+  diagnosticoEscala?: string;
+  revelacaoCaos?: string;
+  revelacaoEscala?: string;
+  
+  fase1?: string;
+  fase2?: string;
+  fase3?: string;
+  
+  idealPara?: string;
+  conselhoCosmico?: string;
+  mantra?: string;
 }
+
+export const houseColors: Record<number, string> = {
+  1: "linear-gradient(135deg, #FF416C, #FF4B2B)",
+  2: "linear-gradient(135deg, #00B4DB, #0083B0)",
+  3: "linear-gradient(135deg, #f12711, #f5af19)",
+  4: "linear-gradient(135deg, #11998e, #38ef7d)",
+  5: "linear-gradient(135deg, #FC466B, #3F5EFB)",
+  6: "linear-gradient(135deg, #4b6cb7, #182848)",
+  7: "linear-gradient(135deg, #DA4453, #89216B)",
+  8: "linear-gradient(135deg, #1f4037, #99f2c8)",
+  9: "linear-gradient(135deg, #8E2DE2, #4A00E0)",
+  10: "linear-gradient(135deg, #1D976C, #93F9B9)",
+  11: "linear-gradient(135deg, #FF8008, #FFC837)",
+  12: "linear-gradient(135deg, #3C3B3F, #605C3C)",
+};
 
 export const cityDatabase: Record<number, HouseData> = {
   1: {
-    id: 1, name: "Casa 1 — Protagonismo e Novas Iniciativas", emoji: "⚡", cristal: "Granada", label: "Ação & Autonomia",
-    img: "https://images.unsplash.com/photo-1587313083321-71fb5de3ea7b?w=400&q=80",
-    regente: "Regência de Marte", tags: ["Iniciativa", "Autonomia", "Renovação"],
-    entender_10s: "Este é um ano para focar em você, tomar as rédeas das suas decisões, renovar seu visual e iniciar projetos pessoais com muito mais disposição e autonomia.",
-    favorece: [
+    id: 1,
+    label: "Autonomia",
+    intent: "Quero ter mais autonomia e focar em mim.",
+    translation: "O ano coloca as suas decisões e a sua independência no centro.",
+    realLife: "Novos projetos pessoais · Mudança de visual · Autoconfiança · Iniciativa",
+    deepDive: "Se você vem de uma fase onde as vontades dos outros sempre passavam na frente das suas, o cenário muda. Aqui o foco volta para você. É um período que pede mais ação independente, coragem para dar o primeiro passo em coisas novas e energia para cuidar da própria vida, sem precisar que alguém segure a sua mão.",
+    astrologyDefinition: "a vitalidade física, as novas iniciativas, a independência e a forma como o mundo percebe a sua identidade",
+    radar: { dinheiro: 60, amor: 50, saude: 90 },
+    
+    name: "Casa 1 — Protagonismo e Novas Iniciativas",
+    oQueVocePrecisaEntender: "Este é um ano para focar em você, tomar as rédeas das suas decisões, renovar seu visual e iniciar projetos pessoais com muito mais disposição e autonomia.",
+    podeFavorecer: [
       "Tomar decisões importantes de forma independente",
       "Aumento perceptível de disposição física e vitalidade",
       "Tirar projetos pessoais do papel por iniciativa própria",
       "Renovar sua imagem pública, estilo e autocuidado",
-      "Conquistar mais independência de forma real"
+      "Conquistar mais independência e autoconfiança de forma real"
     ],
-    tema_ano: "Seu ano gira em torno de você, da sua independência, coragem e da sua capacidade de se reinventar.",
-    ganhar: "Mais autoconfiança no dia a dia, clareza sobre o que você quer para os próximos anos e energia física para realizar suas metas.",
-    vida_real: "Você sentirá mais vontade de iniciar novos hábitos de saúde, mudar o visual, começar projetos de forma solo, dizer não a situações que te limitavam e investir tempo em si mesma.",
-    dinheiro: "O retorno financeiro dependerá diretamente da sua iniciativa e esforço pessoal. Projetos criados, liderados ou executados de forma solo por você têm mais espaço para crescer do que parcerias onde você fica apagada.",
+    oSegredo: "nada acontece se você ficar de braços cruzados esperando a vida se resolver sozinha ou dependendo dos outros. A Casa 1 é ativada quando você assume a liderança do seu dia a dia e se coloca em primeiro lugar.",
+    oTema: "Seu ano gira em torno de você, da sua independência, coragem e da sua capacidade de se reinventar.",
+    oQueVocePodeGanhar: "Mais autoconfiança no dia a dia, clareza sobre o que você quer para os próximos anos e energia física para realizar suas metas.",
+    comoApareceNaVidaReal: "Você sentirá mais vontade de iniciar novos hábitos de saúde, mudar o visual, começar projetos de forma solo, dizer não a situações que te limitavam e investir tempo em si mesma.",
+    dinheiro: "O retorno financeiro dependerá diretamente da sua iniciativa e do seu esforço pessoal. Projetos criados, liderados ou executados de forma solo por você têm mais espaço para crescer do que parcerias onde você fica apagada.",
     amor: "O amor-próprio é a sua maior força de atração. Para solteiras, é um ótimo ano porque sua energia pessoal estará em destaque. Em relacionamentos, você exigirá mais respeito à sua privacidade e ao seu espaço; dinâmicas muito dependentes enfrentarão cobranças saudáveis.",
     trabalho: "Momento ideal para liderar projetos, assumir novas funções, lançar novos rumos ou iniciar um negócio próprio. Suas decisões e resultados serão mais notados por chefes ou clientes.",
-    vida_pessoal: "Internamente, você sentirá mais força de vontade. A disposição para cuidar de si mesma aumenta, reduzindo a sensação de sobrecarga causada por carregar problemas de terceiros.",
-    como_aproveitar: "Cuide da sua saúde física, faça as pazes com seu espelho, mude algo que deseja na aparência, assuma riscos calculados e tome decisões importantes sem esperar a aprovação dos outros.",
-    cuidado: "Agir com individualismo excessivo, perder a paciência com o ritmo mais lento das outras pessoas ou tomar atitudes impulsivas demais sem planejar.",
+    vidaPessoal: "Internamente, você sentirá mais força de vontade. A disposição para cuidar de si mesma aumenta, reduzindo a sensação de sobrecarga causada por carregar problemas de terceiros.",
+    comoAproveitar: "Cuide da sua saúde física, faça as pazes com seu espelho, mude algo que deseja na aparência, assuma riscos calculados e tome decisões importantes sem esperar a aprovação dos outros.",
+    cuidadoCom: "Agir com individualismo excessivo, perder a paciência com o ritmo mais lento das outras pessoas ou tomar atitudes impulsivas demais sem planejar.",
     resumo: "Se você quer focar em si mesma, vencer a estagnação e recuperar o controle sobre suas próprias escolhas, esta é a melhor Casa para escolher.",
-    quiz: [
-      "Tomei decisões corajosas que priorizaram a minha própria evolução.",
-      "Iniciei algo novo — um projeto, hábito ou caminho que me representava.",
-      "Senti-me mais confiante e vitalizado(a) do que nos anos anteriores."
-    ],
-    radar: { dinheiro: 40, amor: 55, saude: 90 }
+    diagnosticoCaos: "Sinto-me estagnado nos bastidores, com a vitalidade baixa, vivendo no automático e cedendo o controle das minhas decisões para agradar aos outros.",
+    diagnosticoEscala: "Sou independente, mas quero dar uma guinada radical, renovar meu magnetismo de forma avassaladora e me tornar a força motriz inquestionável do meu ambiente.",
+    revelacaoCaos: "A Rota 1 destruirá a sua passividade e subserviência. O padrão letal de viver esperando a vida acontecer acaba aqui. O universo vai forçar um renascimento brutal da sua identidade, devolvendo a sua audácia e o comando absoluto sobre si mesmo.",
+    revelacaoEscala: "A Rota 1 será o seu palco de liderança máxima. Vamos elevar a sua vitalidade ao pico. Prepare-se para destravar uma autonomia magnética; suas decisões de alto risco serão coroadas com sucesso, protagonismo e uma reinvenção de imagem inesquecível.",
+    fase1: "Mês 1-3 (Desconstruir o Passado): Rompa imediatamente com a velha identidade e corte tudo o que aprisiona a sua autonomia. Mude o visual de forma tática e elimine comportamentos passivos da sua rotina.",
+    fase2: "Mês 4-8 (Assumir o Comando): A sua coragem atinge um pico explosivo. Tome a linha da frente de grandes projetos, encabece iniciativas arriscadas e posicione-se como o único protagonista do seu mercado.",
+    fase3: "Mês 9-12 (A Liderança Incontestável): Usufrua dos lucros atraídos pela sua autoconfiança magnética. O seu estatuto de líder está consolidado e o mundo gravita ao redor da sua nova e poderosa versão.",
+    idealPara: "Pessoas estagnadas nos bastidores que exigem assumir o protagonismo absoluto, dar guinadas radicais e liderar o próprio destino.",
+    conselhoCosmico: "Ao focar tanto na construção do seu próprio império pessoal, o ego pode tornar-se o seu maior inimigo. Não confunda autonomia magnética com arrogância implacável. Se você se tornar autoritário demais e ignorar o valor dos aliados que o suportam, a sua liderança se transformará numa prisão solitária.",
+    mantra: "Eu assumo o comando absoluto do meu destino e a minha presença magnetiza o sucesso."
   },
   2: {
-    id: 2, name: "Casa 2 — Dinheiro, Valor e Segurança", emoji: "💰", cristal: "Pirita", label: "Dinheiro & Bens",
-    img: "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=400&q=80",
-    regente: "Regência de Vênus", tags: ["Finanças", "Recursos", "Segurança"],
-    entender_10s: "Este é um ano para melhorar sua relação com o dinheiro, organizar suas contas, aumentar sua renda e construir mais estabilidade material.",
-    favorece: [
+    id: 2,
+    label: "Recursos",
+    intent: "Quero organizar minha vida financeira e ter mais segurança.",
+    translation: "Finanças, produtividade e a construção de estabilidade ganham destaque.",
+    realLife: "Organização de contas · Novas fontes de renda · Bens práticos · Valorização",
+    deepDive: "Quem trabalha muito e sente que o dinheiro some precisa de um freio. A proposta deste ciclo é olhar com calma para o seu bolso. Esse foco pode ajudar você a negociar melhor o próprio valor, arrumar o orçamento de casa e focar naquilo que traz conforto material para o dia a dia, sem grandes saltos arriscados.",
+    astrologyDefinition: "recursos, valores, segurança material e à forma como você administra e constrói aquilo que possui",
+    radar: { dinheiro: 95, amor: 40, saude: 60 },
+
+    name: "Casa 2 — Dinheiro, Valor e Segurança",
+    oQueVocePrecisaEntender: "Este é um ano para melhorar sua relação com o dinheiro, organizar suas contas, aumentar sua renda e construir mais estabilidade material.",
+    podeFavorecer: [
       "Aumentar seus ganhos financeiros e faturamento",
       "Negociar melhores contratos, tarifas ou salários",
       "Criar e consolidar novas fontes de receita",
       "Organizar dívidas, despesas e investimentos",
       "Ter mais segurança e estabilidade financeira real"
     ],
-    tema_ano: "Seu ano gira em torno de dinheiro, valor pessoal, segurança material e produtividade.",
-    ganhar: "Mais clareza para gerir o que ganha, capacidade de planejar compras importantes de forma segura e uma rotina muito mais produtiva.",
-    vida_real: "Você sentirá necessidade de rever seus preços, buscar novas formas de rentabilizar seus talentos, comprar bens de valor duradouro, organizar seu orçamento e focar em projetos que tragam lucros tangíveis.",
+    oSegredo: "não basta simplesmente torcer para o dinheiro aparecer de forma mágica. A Casa 2 funciona quando você valoriza o seu próprio trabalho, cobra melhor pelos seus serviços e organiza suas planilhas com dedicação prática.",
+    oTema: "Seu ano gira em torno de dinheiro, valor pessoal, segurança material e produtividade.",
+    oQueVocePodeGanhar: "Mais clareza para gerir o que ganha, capacidade de planejar compras importantes de forma segura e uma rotina muito mais produtiva.",
+    comoApareceNaVidaReal: "Você sentirá necessidade de rever seus preços, buscar novas formas de rentabilizar seus talentos, comprar bens de valor duradouro, organizar seu orçamento e focar em projetos que tragam lucros tangíveis.",
     dinheiro: "É o assunto principal do seu ciclo. O ano facilita a atração de recursos, mas exige esforço real e organização prática. Não é hora de viver de sonhos e idealismos, mas sim de focar no que dá resultado real e palpável.",
     amor: "Não é uma Casa focada em romances e paixões intensas. No amor, você buscará estabilidade. Dinheiro, moradia, contas conjuntas e planos futuros de patrimônio ganham importância no relacionamento.",
     trabalho: "O trabalho ganha peso pelo retorno financeiro direto que ele traz. É um bom momento para pedir aumento, procurar clientes melhores, cobrar de forma justa pelo seu serviço e mudar a sua forma de gerir o seu negócio.",
-    vida_pessoal: "Internamente, você desejará mais segurança e pé no chão. Ter uma reserva financeira estruturada trará a calma mental necessária para você render e viver melhor.",
-    como_aproveitar: "Revise seus preços, crie novas formas de rentabilizar suas habilidades, organize suas planilhas de forma realista e evite desperdícios financeiros.",
-    cuidado: "O medo de escassez que impede investimentos necessários no seu crescimento, ou o oposto: gastar por impulso para compensar carências emocionais.",
+    vidaPessoal: "Internamente, você desejará mais segurança e pé no chão. Ter uma reserva financeira estruturada trará a calma mental necessária para você render e viver melhor.",
+    comoAproveitar: "Revise seus preços, crie novas formas de rentabilizar suas habilidades, organize suas planilhas de forma realista e evite desperdícios financeiros.",
+    cuidadoCom: "O medo de escassez que impede investimentos necessários no seu crescimento, ou o oposto: gastar por impulso para compensar carências emocionais.",
     resumo: "Se você quer organizar as finanças, aumentar seus ganhos de trabalho e consolidar sua segurança material, esta é a melhor Casa para escolher.",
-    quiz: [
-      "Consegui aumentar minha renda ou patrimônio de forma organizada.",
-      "Tomei decisões financeiras práticas que me trouxeram segurança.",
-      "Cobrei um valor mais justo pelo meu trabalho e talento."
-    ],
-    radar: { dinheiro: 95, amor: 50, saude: 45 }
+    diagnosticoCaos: "Vivo a instabilidade e a desorganização financeira, apagando incêndios diários e carregando o medo oculto de cobrar o que o meu trabalho realmente vale.",
+    diagnosticoEscala: "Tenho lucros consistentes, mas recuso o básico; exijo conforto real, aquisições luxuosas e a multiplicação direta do meu patrimônio e segurança material.",
+    revelacaoCaos: "A Rota 2 aniquilará a escassez da sua vida. Vamos quebrar o seu teto de vidro psicológico. Esta coordenada âncora sua energia na concretização, secando os ralos financeiros e forçando lucros palpáveis. O dinheiro deixará de ser um caos.",
+    revelacaoEscala: "A Rota 2 é o seu GPS exato de riqueza. Você ativará uma visão cirúrgica para investimentos imobiliários e aquisições de altíssimo padrão. Prepare-se para atrair recursos pesados e blindar a construção do seu império material.",
+    fase1: "Mês 1-3 (Cortar Ralos): Faça uma auditoria implacável nas suas finanças e elimine impiedosamente o que não gera retorno. Reajuste a sua precificação e obrigue o mercado a reconhecer o seu verdadeiro valor.",
+    fase2: "Mês 4-8 (Multiplicação Ativa): Avance para fechar negócios paralisados e ative novas e pujantes fontes de rendimento. É a janela de oportunidade perfeita para assinar contratos que injetem capital real.",
+    fase3: "Mês 9-12 (O Cofre-Forte): Converta a alta rentabilidade em patrimônio duradouro e blindado. Mova os lucros para investimentos seguros que alicerçam a fundação do seu império material.",
+    idealPara: "Construtores de riqueza, empreendedores e investidores exaustos do caos financeiro que exigem multiplicar o seu patrimônio tangível.",
+    conselhoCosmico: "O Universo não tolera escassez nesta coordenada. Se você tiver medo de cobrar pelo peso real da sua excelência ou hesitar em fechar implacavelmente as torneiras por onde o seu dinheiro vaza hoje, os lucros do seu trabalho irão direto para a conta bancária da concorrência.",
+    mantra: "Eu exijo a excelência, e o meu próprio valor se converte na materialização de um império inabalável."
   },
   3: {
-    id: 3, name: "Casa 3 — Comunicação, Estudos e Contatos", emoji: "📡", cristal: "Ágata Azul", label: "Vendas & Contatos",
-    img: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&q=80",
-    regente: "Regência de Mercúrio", tags: ["Comunicação", "Vendas", "Estudos"],
-    entender_10s: "Este é um ano de movimento e aprendizado prático, onde sua fala, sua escrita e sua capacidade de dialogar vão ajudar a abrir portas de negócios e parcerias.",
-    favorece: [
+    id: 3,
+    label: "Comunicação",
+    intent: "Quero melhorar minha comunicação, vender mais e aprender coisas rápidas.",
+    translation: "O fluxo de ideias, os contatos próximos e os negócios práticos são enfatizados.",
+    realLife: "Cursos curtos · Vendas locais · Reuniões · Conversas destravadas",
+    deepDive: "Se as coisas estão muito paradas e você precisa que a rotina ande, a ênfase aqui é no movimento. Essa ênfase combina especialmente com quem precisa se expressar com clareza, fechar acordos através de uma boa conversa ou estudar assuntos rápidos que podem ser aplicados imediatamente no trabalho.",
+    astrologyDefinition: "a mente lógica, a comunicação, as pequenas viagens, as vendas e o aprendizado prático",
+    radar: { dinheiro: 75, amor: 60, saude: 50 },
+
+    name: "Casa 3 — Comunicação, Estudos e Contatos",
+    oQueVocePrecisaEntender: "Este é um ano de movimento e aprendizado rápido, onde sua fala, sua escrita e sua capacidade de dialogar vão abrir portas importantes de negócios.",
+    podeFavorecer: [
       "Vendas, reuniões e negociações de serviços",
-      "Fazer novos contatos e networking útil",
-      "Cursos rápidos, leituras e aprendizados práticos",
-      "Viagens curtas frequentes a trabalho ou lazer",
-      "Uso mais estratégico e dinâmico de redes sociais"
+      "Fazer contatos rápidos e networking prático",
+      "Cursos rápidos, leituras úteis e novos aprendizados",
+      "Viagens curtas e frequentes a trabalho ou lazer",
+      "Atividade digital dinâmica e uso focado de redes sociais"
     ],
-    tema_ano: "Seu ano gira em torno de comunicação, trânsito de ideias, negociações e interações com quem está ao seu redor.",
-    ganhar: "Mais facilidade para apresentar suas ideias, agilidade para aprender assuntos novos e uma rede de contatos mais ampla.",
-    vida_real: "Você se verá escrevendo mais, marcando reuniões, fazendo pequenas viagens, comprando livros, iniciando cursos curtos e usando o celular de forma muito mais focada.",
-    dinheiro: "O dinheiro vem de sua capacidade de comunicar, negociar e intermediar. Vendas, palestras, serviços prestados ou atividades comerciais ganham um impulso.",
-    amor: "A afinidade mental ganha peso. Você vai querer alguém com quem possa conversar bastante. O flerte acontece pelas palavras, mensagens e encontros animados.",
-    trabalho: "Muito favorável se você trabalha com vendas, marketing, ensino, tecnologia ou atendimento ao público. A rotina será mais rápida, com várias coisas acontecendo ao mesmo tempo.",
-    vida_pessoal: "Sua mente estará muito mais desperta. Isso traz curiosidade para resolver problemas, mas também pede que você encontre momentos para desligar e não se esgotar.",
-    como_aproveitar: "Escreva mais, exponha suas ideias, puxe assunto com pessoas que não conhece, faça cursos para adquirir habilidades novas e responda e-mails com mais agilidade.",
-    cuidado: "Dispersão ao tentar aprender muitas coisas e não focar em nada, participar de fofocas ou prometer prazos e entregas que não vai conseguir cumprir.",
-    resumo: "Se você quer melhorar sua forma de se expressar, vender mais, fazer networking e aprender coisas novas rapidamente, esta é a melhor Casa.",
-    quiz: [
-      "Usei minha comunicação de forma ativa para resolver problemas ou vender.",
-      "Fiz novos contatos que ajudaram nos meus objetivos.",
-      "Estudei assuntos práticos ou li muito mais do que o normal."
-    ],
-    radar: { dinheiro: 65, amor: 60, saude: 50 }
+    oSegredo: "a sua mente é o seu maior ativo. A Casa 3 recompensa a agilidade e a troca de informações; quanto mais você se comunica e se movimenta, mais oportunidades aparecem.",
+    oTema: "Seu ano gira em torno de comunicação, circulação de ideias, negociações e redes de relacionamento próximas.",
+    oQueVocePodeGanhar: "Mais facilidade para explicar suas ideias, agilidade mental para resolver problemas do cotidiano e uma rede de contatos renovada e útil.",
+    comoApareceNaVidaReal: "Você se verá escrevendo mais, participando de reuniões constantes, comprando livros, fazendo viagens rápidas a trabalho e usando o celular de forma muito mais dinâmica para fechar acordos.",
+    dinheiro: "A renda vem da sua capacidade de negociar, intermediar e vender. Ganhos por comissões, aulas, comércio rápido, consultorias, palestras ou novos clientes de serviços estão bem favorecidos.",
+    amor: "No amor, a afinidade mental e uma boa conversa serão fundamentais. A paquera e a conquista acontecem por meio de mensagens e de encontros dinâmicos. Você precisa de alguém com quem possa dialogar de verdade sobre tudo.",
+    trabalho: "Excelente para quem trabalha com vendas, marketing, escrita, comércio ou atendimento. Sua rotina profissional será rápida e cheia de novas tarefas, exigindo flexibilidade para lidar com vários afazeres.",
+    vidaPessoal: "Sua mente estará mais curiosa e ativa. Isso facilita o aprendizado de novas habilidades úteis, mas exige pausas conscientes para evitar a ansiedade e o cansaço mental.",
+    comoAproveitar: "Faça novos contatos profissionais, escreva e divulgue suas ideias de forma aberta, faça cursos rápidos que agreguem valor imediato ao seu trabalho e melhore seus canais de comunicação.",
+    cuidadoCom: "Falar demais sobre assuntos sigilosos de negócios, dispersar a atenção com fofocas e assumir compromissos além do que consegue entregar fisicamente.",
+    resumo: "Se você quer melhorar sua comunicação, vender mais, fazer contatos rápidos e adquirir novos conhecimentos práticos, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Minha comunicação falha, sofro de lentidão mental perante problemas e vivo um isolamento comercial que me impede de sentar à mesa com as pessoas certas.",
+    diagnosticoEscala: "Tenho boa oratória, mas quero transformá-la numa máquina de fechamento de contratos ágeis, viralizar minhas ideias e acessar um networking intelectual de elite.",
+    revelacaoCaos: "A Rota 3 destruirá as barreiras do seu isolamento comercial. Suas falhas de comunicação serão substituídas por uma clareza cortante. O teto mental se abre, e a sua voz passará a abrir as portas institucionais que antes pareciam cimentadas.",
+    revelacaoEscala: "A Rota 3 é o seu passaporte de influência absoluta. Vamos acelerar a sua genialidade e torná-lo uma referência irrefutável nos meios digitais e intelectuais. O fechamento de contratos rápidos e a atração de conexões de ouro serão seu novo padrão.",
+    fase1: "Mês 1-3 (O Radar Tático): Acelere o fluxo de novas informações e identifique quais conexões estão travadas. Faça networking intencional e prepare o terreno comercial com conversas e viagens rápidas.",
+    fase2: "Mês 4-8 (A Máquina de Vendas): Coloque a sua comunicação em campo e force o fechamento rápido de acordos. Exponha as suas ideias sem hesitação; a sua oratória agora abre portas fechadas.",
+    fase3: "Mês 9-12 (A Colheita de Elite): Assine os grandes contratos e rentabilize as pontes mentais que construiu. Colha os lucros de uma rede de networking vasta e engajada que o valida como referência.",
+    idealPara: "Comunicadores, negociadores, estrategistas digitais e mentes que precisam viralizar ideias e selar grandes contratos rapidamente.",
+    conselhoCosmico: "A sua mente e oratória estarão aceleradas ao extremo. Não dissipe essa energia genial com fofocas, \"disse-me-disse\" ou promessas levianas. Assuma controle cirúrgico do que fala: um segredo revelado na hora errada ou uma comunicação mal calculada pode implodir o seu maior negócio.",
+    mantra: "A minha voz abre todas as portas e as minhas ideias têm um valor incalculável no mercado."
   },
   4: {
-    id: 4, name: "Casa 4 — Lar, Família e Raízes", emoji: "🏡", cristal: "Quartzo Rosa", label: "Lar & Imóveis",
-    img: "https://images.unsplash.com/photo-1567360425618-1594206637d2?w=400&q=80",
-    regente: "Regência da Lua", tags: ["Família", "Imóveis", "Conforto"],
-    entender_10s: "Este é um ano mais focado para dentro, ideal para organizar sua casa, cuidar da família e resolver pendências da sua vida particular para ter mais paz.",
-    favorece: [
-      "Mudanças de casa, compra, venda ou reforma de imóveis",
-      "Resolver pendências familiares e se aproximar dos parentes",
-      "Criar uma rotina de trabalho em casa (home office)",
-      "Descansar e recuperar sua estabilidade emocional",
-      "Deixar o seu ambiente físico mais confortável e seguro"
+    id: 4,
+    label: "Raízes",
+    intent: "Quero cuidar da minha casa e fortalecer minha base familiar.",
+    translation: "O mapa sugere um ano mais voltado ao seu lar, à privacidade e à estrutura emocional.",
+    realLife: "Mudança de imóvel · Reformas · Conforto familiar · Paz de espírito",
+    deepDive: "Tem vezes em que o barulho lá fora cansa e a gente só quer um porto seguro. A ênfase deste ano se volta totalmente para dentro. É o tempo certo para arrumar o seu espaço físico, resolver em paz os assuntos de família e garantir que o você tenha um lugar acolhedor para recarregar as energias.",
+    astrologyDefinition: "as raízes, o lar físico, a base familiar, a privacidade e a segurança emocional",
+    radar: { dinheiro: 40, amor: 70, saude: 80 },
+
+    name: "Casa 4 — Lar, Família e Vida Privada",
+    oQueVocePrecisaEntender: "Este é um ano voltado para dentro, excelente para cuidar do seu lar, se aproximar da família e fortalecer suas bases emocionais e privacidade.",
+    podeFavorecer: [
+      "Comprar, vender ou reformar imóveis",
+      "Recuperar o equilíbrio interno e descansar",
+      "Resolver pendências e estreitar laços familiares",
+      "Estruturar negócios ou trabalho home office com privacidade",
+      "Organizar o seu espaço doméstico para ter mais conforto"
     ],
-    tema_ano: "Seu ano gira em torno da sua casa, vida privada, relações familiares e sensação de conforto.",
-    ganhar: "Mais acolhimento no dia a dia, melhorias no lugar onde você vive e a tranquilidade de resolver velhas questões do passado.",
-    vida_real: "Você sentirá mais vontade de ficar em casa, comprar móveis, cozinhar, passar tempo com os pais, investir no seu quarto ou cuidar do seu jardim.",
-    dinheiro: "Ganhos podem vir de atividades feitas a partir de casa, vendas imobiliárias ou apoio familiar. É um ótimo período para economizar e reduzir gastos com o estilo de vida 'na rua'.",
-    amor: "As relações buscam aconchego. Programas em casa serão mais atrativos que grandes festas. Se já tem alguém, é um bom ano para morar junto ou melhorar a casa do casal.",
-    trabalho: "Seu desejo profissional pode estar mais voltado para ter flexibilidade. É um momento melhor para o trabalho remoto ou para quem deseja construir uma base própria e mais estável de operações.",
-    vida_pessoal: "Você sentirá necessidade de mais recolhimento e privacidade. A vida social perde o brilho em troca do descanso, e as lembranças do passado podem surgir para serem finalmente curadas.",
-    como_aproveitar: "Organize e decore seu espaço físico, converse com sua família, invista na segurança do seu lar e tire um tempo para recarregar as energias longe do barulho externo.",
-    cuidado: "Ficar isolado(a) demais do mundo, remoer tristezas do passado ou carregar os problemas da família nas suas próprias costas.",
-    resumo: "Se você quer melhorar o lugar onde mora, focar na família ou buscar mais conforto e estabilidade interna, esta é a Casa ideal.",
-    quiz: [
-      "Foquei na minha casa, fazendo reformas ou mudanças importantes.",
-      "Resolvi questões de família que estavam pendentes.",
-      "Senti necessidade de ficar mais recluso(a) para me cuidar emocionalmente."
-    ],
-    radar: { dinheiro: 35, amor: 75, saude: 65 }
+    oSegredo: "não adianta tentar expandir para o mundo se a sua base estiver frágil. A Casa 4 funciona quando você cuida do que está instável no seu íntimo e organiza seu lar para que ele sirva de alicerce para seus próximos passos.",
+    oTema: "Seu ano gira em torno de moradia, privacidade, raízes familiares e estabilidade emocional.",
+    oQueVocePodeGanhar: "Sensação de porto seguro, melhora no conforto físico do seu lar e uma forte restauração das suas energias após períodos de cansaço.",
+    comoApareceNaVidaReal: "Você sentirá mais vontade de ficar em casa, cozinhar, cuidar do ambiente doméstico, resolver pendências de propriedades e conviver de perto com as pessoas mais íntimas da sua vida.",
+    dinheiro: "Favorece investimentos no mercado imobiliário, transações de imóveis ou ganhos ligados a negócios de base familiar e privada. É uma fase propícia para economizar dinheiro na sua base.",
+    amor: "O foco está no aconchego e na cumplicidade. Para casais, é um ótimo ano para morar junto, investir na casa própria ou focar na convivência familiar de forma tranquila e discreta.",
+    trabalho: "Sua ambição profissional pode se voltar para o home office, escritórios privados ou a consolidação de estruturas internas. Você preferirá trabalhar com mais privacidade, longe da agitação pública.",
+    vidaPessoal: "Internamente, você viverá uma fase mais introspectiva. É o momento de desacelerar o ritmo frenético das ruas e restabelecer sua energia para se sentir emocionalmente segura.",
+    comoAproveitar: "Invista no conforto da sua moradia, resolva conflitos domésticos pendentes, passe mais tempo de qualidade com quem ama e use este período para recuperar suas forças de forma madura.",
+    cuidadoCom: "Isolar-se de forma excessiva do convívio social, remoer mágoas e nostalgias do passado ou carregar problemas dos familiares nas suas costas.",
+    resumo: "Se você quer mudar de casa, reformar seu lar, focar na família ou recuperar sua estabilidade emocional e descanso, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Opero no puro modo de sobrevivência. Sinto exaustão emocional profunda, insegurança patrimonial e o peso contínuo de feridas e instabilidades do passado.",
+    diagnosticoEscala: "Tenho base sólida, mas busco consolidar aquisições gigantes no mercado imobiliário, proteger as minhas raízes e erguer um santuário de descanso suntuoso.",
+    revelacaoCaos: "A Rota 4 curará cirurgicamente a sua raiz. A exaustão mental e os padrões tóxicos herdados serão purgados. O Universo entregará a blindagem e o refúgio seguro de que você precisa urgentemente para aterrar e voltar a respirar.",
+    revelacaoEscala: "A Rota 4 é a construção inabalável do seu legado. Você atrairá a coordenada perfeita para aquisições prósperas de patrimônio, garantindo o conforto, a estabilidade orgânica e a retaguarda suntuosa para bancar seus próximos voos.",
+    fase1: "Mês 1-3 (Purificação de Raízes): Realize uma faxina drástica na sua vida pessoal e ambiente físico. Corte laços familiares ou laços do passado que apenas drenam o seu foco de sobressair.",
+    fase2: "Mês 4-8 (Ancoragem Física): Foque nas manobras de real estate: compre, remodele ou consolide propriedades sólidas. Estruture um ambiente doméstico que funcione como um verdadeiro santuário.",
+    fase3: "Mês 9-12 (A Base de Aço): Usufrua de uma paz de espírito raríssima. O seu refúgio e o seu nível de segurança patrimonial estão cimentados para suportar qualquer salto de carreira no futuro.",
+    idealPara: "Investidores imobiliários e indivíduos emocionalmente exaustos que necessitam ancorar raízes luxuosas, paz de espírito e segurança patrimonial.",
+    conselhoCosmico: "Não confunda segurança com estagnação letal. Se você utilizar este refúgio magnético apenas para se esconder dos desafios do mundo e remoer tristezas ou nostalgias tóxicas do passado, a sua zona de conforto se tornará a sua cova profissional. Cure-se para voar, não para se enterrar.",
+    mantra: "A minha base é inabalável; a minha paz de espírito sustenta o peso das minhas maiores ambições."
   },
   5: {
-    id: 5, name: "Casa 5 — Prazer, Criatividade e Lazer", emoji: "🎭", cristal: "Pedra do Sol", label: "Romances & Hobbies",
-    img: "https://images.unsplash.com/photo-1586782294158-b1129b0f44de?w=400&q=80",
-    regente: "Regência do Sol", tags: ["Criatividade", "Diversão", "Autoexpressão"],
-    entender_10s: "Este é um ano para redescobrir o que te dá prazer, investir em hobbies criativos, cuidar da sua aparência e trazer mais leveza para a sua rotina.",
-    favorece: [
-      "Expressar seu lado criativo e fazer coisas que gosta",
-      "Viver romances interessantes e paqueras",
-      "Lidar com filhos, crianças ou engravidar",
-      "Voltar a frequentar lugares de lazer e entretenimento",
-      "Aumentar a autoconfiança e a vontade de se cuidar"
+    id: 5,
+    label: "Prazer",
+    intent: "Quero voltar a me divertir, criar e sentir prazer.",
+    translation: "Expressão pessoal, romances e criatividade ganham muito mais espaço.",
+    realLife: "Hobbies · Paquera · Projetos autorais · Momentos de lazer",
+    deepDive: "A vida não precisa ser só pagar boletos. Um ciclo assim abre espaço para você respirar e resgatar o que te faz sorrir. Favorece o resgate da vontade de se expressar, aquele flerte que traz animação para a rotina e o envolvimento com projetos que não precisam necessariamente dar dinheiro, mas dão muito orgulho.",
+    astrologyDefinition: "a expressão criativa, os romances, os hobbies, a sorte e o prazer genuíno de viver",
+    radar: { dinheiro: 50, amor: 95, saude: 70 },
+
+    name: "Casa 5 — Criatividade, Lazer e Autoestima",
+    oQueVocePrecisaEntender: "Este é um ano focado em trazer alegria de volta à sua rotina, resgatar seu magnetismo pessoal e lucrar com seus talentos únicos.",
+    podeFavorecer: [
+      "Projetos criativos, autorais e expressão de ideias",
+      "Romances, namoros, paqueras e vida afetiva leve",
+      "Fertilidade, gravidez e maior proximidade com filhos",
+      "Dedicar mais tempo a hobbies e lazer de qualidade",
+      "Recuperar a autoconfiança, a vaidade e o prazer de viver"
     ],
-    tema_ano: "Seu ano gira em torno de lazer, criatividade, romances e expressão da sua própria identidade.",
-    ganhar: "Mais alegria no dia a dia, ideias criativas para resolver problemas e uma vida social e afetiva mais ativa.",
-    vida_real: "Você terá vontade de sair mais, se arrumar, começar um curso de algo que é puramente hobby, ir a festas, marcar encontros e fazer coisas sem a obrigação de serem 'produtivas'.",
-    dinheiro: "Ganhos podem surgir ao usar seus talentos naturais ou através de especulações moderadas, mas cuidado com riscos excessivos. Projetos que dependem de criatividade e originalidade são os mais favorecidos.",
-    amor: "É uma das melhores casas para conhecer pessoas. Se está solteiro(a), seu magnetismo atrairá atenção. Se está com alguém, a dica é reacender a paixão fazendo programas divertidos e românticos juntos.",
-    trabalho: "Se o seu trabalho permite originalidade e você precisa ser o centro das atenções, será um período excelente. Projetos burocráticos ou mecânicos podem se tornar entediantes.",
-    vida_pessoal: "A energia é de expansão e otimismo. A sensação de que a vida é só pagar boletos diminui, dando espaço para uma vontade de aproveitar o momento presente.",
-    como_aproveitar: "Tire tempo para se divertir sem culpa, marque encontros, cuide de si mesmo(a), retome aquele hobby que você abandonou e tente colocar seu toque pessoal no que você produz.",
-    cuidado: "Gastar demais com coisas desnecessárias apenas por vaidade, se envolver em dramas amorosos ou agir com muito ego nas relações profissionais.",
-    resumo: "Se você quer voltar a se divertir, melhorar sua vida amorosa, usar mais a criatividade e aproveitar o lado bom da vida, escolha esta Casa.",
-    quiz: [
-      "Dediquei mais tempo a hobbies, lazer ou projetos criativos.",
-      "Vivi momentos de romance e alegria intensa.",
-      "Voltei a me sentir bonito(a), confiante e de bem com a vida."
-    ],
-    radar: { dinheiro: 45, amor: 90, saude: 55 }
+    oSegredo: "o mercado nota quem brilha de verdade. A Casa 5 funciona melhor quando você se permite criar sem amarras, se diverte e coloca a sua essência autêntica em tudo o que faz.",
+    oTema: "Seu ano gira em torno de expressão pessoal, criatividade, romances, lazer e valorização de si mesma.",
+    oQueVocePodeGanhar: "Mais inspiração no dia a dia, ideias inovadoras para os seus negócios e uma vida afetiva mais leve e divertida.",
+    comoApareceNaVidaReal: "Você sentirá mais vontade de se cuidar, frequentar festas, sair para jantar, iniciar novos hobbies e trabalhar em projetos onde possa colocar sua marca pessoal.",
+    dinheiro: "Favorece ganhos que vêm do seu talento pessoal ou de projetos criativos. É um período em que a sorte pode ajudar em investimentos calculados e na monetização do que você faz com entusiasmo.",
+    amor: "É a casa clássica dos romances leves. Solteiros têm facilidade para atrair pretendentes interessantes. Para quem já tem um relacionamento, o foco é resgatar o namoro, fazer viagens românticas e planejar momentos divertidos a dois.",
+    trabalho: "Seus projetos profissionais precisam de entusiasmo para dar certo. É o ano ideal para focar no design de produtos, campanhas de divulgação ousadas e áreas onde sua assinatura pessoal faça a diferença.",
+    vidaPessoal: "A sua autoestima ganha força de verdade. Você deixa de lado a mentalidade de obrigação pesada e redescobre o prazer de desfrutar das coisas boas da vida sem culpa.",
+    comoAproveitar: "Coloque seus talentos em prática, mude o que deseja na aparência, organize momentos de lazer com qualidade e coloque amor nas suas criações profissionais.",
+    cuidadoCom: "Gastos impulsivos com prazeres rápidos, excesso de orgulho ou se envolver em dramas sentimentais que tiram o seu foco de desenvolvimento real.",
+    resumo: "Se você quer resgatar o entusiasmo pela vida, viver romances felizes, liberar sua criatividade e aumentar sua autoestima, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Encaro o trabalho como um castigo diário. Sofro com estagnação criativa e uma perigosa apatia em relação a romances e diversão.",
+    diagnosticoEscala: "Minha vida flui bem, mas quero despertar meu brilhantismo criativo, atrair lucros rápidos (especulação) e viver romances magnéticos de padrão cinematográfico.",
+    revelacaoCaos: "A Rota 5 rompe imediatamente a inércia da sua vida cinza. Os bloqueios neurais e a amargura serão aniquilados. O céu ressuscitará a sua força criativa, forçando a rotina a voltar a ser apaixonante, fertilizada por puro magnetismo e dopamina.",
+    revelacaoEscala: "A Rota 5 é a montagem do seu tapete vermelho VIP. A sua capacidade autoral será transformada em dinheiro. Prepare-se para ser aplaudido no seu palco, atrair a pura \"sorte\" da criação e vivenciar o mais alto nível de magnetismo romântico e hedonista.",
+    fase1: "Mês 1-3 (Despertar da Genialidade): Afaste-se do trabalho engessado e reacenda projetos que dependem exclusivamente do seu talento autoral. Volte a apostar na intuição rápida e em flertes poderosos.",
+    fase2: "Mês 4-8 (O Domínio do Palco): Coloque as suas criações no centro das atenções e deixe a sorte trabalhar a seu favor. O seu magnetismo vai atrair romances espetaculares ou lucros via especulações inteligentes.",
+    fase3: "Mês 9-12 (A Obra Mestra): Imortalize a energia caótica de paixão numa realização concreta. Estruture o seu portfólio de excelência ou consolide um grande romance numa parceria duradoura.",
+    idealPara: "Criadores autorais, artistas, especuladores audaciosos e líderes que precisam resgatar a genialidade, o brilho de palco e viver paixões avassaladoras.",
+    conselhoCosmico: "O brilho excessivo atrai a cegueira da vaidade. Não se torne refém e viciado na validação externa e nos aplausos fáceis. Evite a atração letal por dramas e escândalos amorosos desnecessários, e nunca jogue o seu capital em riscos financeiros ilógicos apenas para sentir a adrenalina.",
+    mantra: "A minha genialidade é magnética e eu transformo os meus talentos na minha obra-prima mais lucrativa."
   },
   6: {
-    id: 6, name: "Casa 6 — Saúde, Rotina e Produtividade", emoji: "⚙️", cristal: "Jaspe Verde", label: "Saúde & Organização",
-    img: "https://images.unsplash.com/photo-1614002167150-f1db1e723cc7?w=400&q=80",
-    regente: "Regência de Mercúrio", tags: ["Saúde", "Rotina", "Trabalho Diário"],
-    entender_10s: "Este é um ano focado em colocar a sua vida em ordem, cuidando rigorosamente da saúde, da alimentação e organizando sua rotina de trabalho.",
-    favorece: [
-      "Organizar sua agenda e o dia a dia",
-      "Iniciar dieta, exercícios físicos e fazer exames",
-      "Aumentar a produtividade no trabalho",
-      "Contratar ou treinar pessoas que te ajudam na rotina",
-      "Limpar hábitos prejudiciais e desorganização"
+    id: 6,
+    label: "Rotina",
+    intent: "Quero arrumar minha rotina diária e trabalhar com mais eficiência.",
+    translation: "O ano pede foco na organização do seu tempo, hábitos e obrigações do dia a dia.",
+    realLife: "Produtividade · Cuidados preventivos · Eficiência no trabalho · Menos estresse",
+    deepDive: "Quando a bagunça diária começa a pesar, é preciso colocar a casa em ordem. Sem grandes dramas, este é o momento para criar uma rotina que funcione de verdade. Limpar o que não serve na agenda, arrumar espaço para exercícios sem pressa e garantir que o trabalho ande sem que você chegue ao final do dia exausto.",
+    astrologyDefinition: "a rotina diária, a organização do tempo, a saúde prática, a utilidade e a eficiência no trabalho",
+    radar: { dinheiro: 70, amor: 40, saude: 95 },
+
+    name: "Casa 6 — Organização, Rotina e Saúde",
+    oQueVocePrecisaEntender: "O foco total deste ano está em organizar o seu cotidiano, cuidar da saúde com hábitos melhores e aumentar a eficiência do seu trabalho diário.",
+    podeFavorecer: [
+      "Organizar a agenda diária e eliminar tarefas inúteis",
+      "Recondicionamento físico, dieta equilibrada e exames médicos",
+      "Prestar serviços de alta qualidade e refinar prazos",
+      "Otimizar fluxos de trabalho e processos diários",
+      "Abandonar hábitos ruins e desorganizações da sua vida"
     ],
-    tema_ano: "Seu ano gira em torno de saúde preventiva, organização prática, rotina e dedicação ao trabalho diário.",
-    ganhar: "Um corpo com mais disposição e menos dores, uma rotina que funciona sem estresse e a sensação de dever cumprido todos os dias.",
-    vida_real: "Você se pegará comprando organizadores, indo a médicos, adotando novas planilhas, mudando sua alimentação, limpando armários e focando muito nas pequenas tarefas do trabalho.",
-    dinheiro: "O foco aqui não é ficar milionário da noite para o dia, mas sim manter a renda através de esforço contínuo. Melhorar sua eficiência e evitar gastos com desperrisos serão fundamentais.",
-    amor: "Os relacionamentos se fortalecem com o companheirismo prático. Ajudar o parceiro a resolver problemas do dia a dia e dividir as tarefas vai valer mais do que surpresas românticas.",
-    trabalho: "A carga de trabalho costuma aumentar. Será preciso foco em entregar com qualidade e melhorar processos. É a fase de suar a camisa, resolver pepinos e mostrar serviço real.",
-    vida_pessoal: "Pode haver certa monotonia, pois o foco está nas obrigações. A paz de espírito virá de ter o ambiente limpo, as contas em dia e a saúde bem cuidada.",
-    como_aproveitar: "Marque seus médicos, invista na sua academia, elimine tarefas que não dão resultado, mantenha sua mesa de trabalho limpa e durma as horas necessárias.",
-    cuidado: "O perfeccionismo exagerado, o excesso de trabalho que leva ao cansaço extremo (burnout) e a tendência a criticar demais as pessoas ao seu redor.",
-    resumo: "Se você precisa organizar a vida, cuidar mais da sua saúde e tornar o seu trabalho do dia a dia mais produtivo, esta é a Casa certa.",
-    quiz: [
-      "Mudei meus hábitos alimentares, comecei a treinar ou cuidei da saúde.",
-      "Coloquei a rotina em ordem e fiquei mais organizado(a).",
-      "Trabalhei bastante, focando na qualidade e nos detalhes do dia a dia."
-    ],
-    radar: { dinheiro: 55, amor: 40, saude: 95 }
+    oSegredo: "pequenos hábitos diários constroem grandes resultados. A Casa 6 funciona quando você aceita a disciplina não como uma prisão, mas como o caminho exato para a sua produtividade e bem-estar.",
+    oTema: "Seu ano gira em torno de hábitos cotidianos, cuidados de saúde, rotina de trabalho e organização prática.",
+    oQueVocePodeGanhar: "Mais energia física, processos de trabalho organizados que poupam seu tempo e a calma de ter o seu dia a dia sob controle.",
+    comoApareceNaVidaReal: "Você se pegará marcando consultas de rotina, arrumando armários e arquivos, planejando seus treinos, cuidando da alimentação e focando em entregar um trabalho técnico impecável no dia a dia.",
+    dinheiro: "O dinheiro vem da eficiência do seu serviço e de uma boa prestação de serviços. Cortar desperdícios na sua rotina de gastos pessoais e profissionais também fará sua conta bancária render mais de forma sustentável.",
+    amor: "No amor, o companheirismo prático fala mais alto. Atitudes simples, apoio mútuo nas tarefas diárias e cuidado com a rotina do parceiro constroem uma relação estável e confiável neste período.",
+    trabalho: "É o momento ideal para organizar a rotina do seu negócio, treinar equipes, otimizar prazos e focar na qualidade técnica do seu produto. Seu valor de mercado cresce pela excelência das suas entregas.",
+    vidaPessoal: "Há um desejo sincero de auto-aperfeiçoamento. A organização física do ambiente doméstico e de trabalho ajudará muito a limpar a ansiedade do cotidiano.",
+    comoAproveitar: "Montar uma agenda diária realista, marcar exames médicos preventivos, organizar seus fluxos de trabalho e eliminar as pequenas bagunças que travam a sua produtividade.",
+    cuidadoCom: "Cobrar perfeição demais de si mesma e dos outros, assumir tarefas operacionais além da conta (correndo o risco de cansaço extremo) ou se preocupar excessivamente com pequenos detalhes sem importância.",
+    resumo: "Se você quer estruturar uma rotina produtiva e saudável, organizar o seu dia a dia e refinar a qualidade do seu trabalho, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Colapsos de saúde, tempo perdido com processos malfeitos, sobrecarga brutal, somados a uma perigosa inclinação para a procrastinação.",
+    diagnosticoEscala: "Sou produtivo, mas exijo o próximo patamar: biohacking avançado do meu corpo, disciplina implacável e excelência técnica inquestionável na minha gestão.",
+    revelacaoCaos: "A Rota 6 é o seu resgate funcional. A desorganização sistêmica que destrói suas ambições será limpa da sua vida. O mapa forçará a purificação eficiente do seu corpo e a otimização radical do seu uso de tempo. Você voltará a funcionar.",
+    revelacaoEscala: "A Rota 6 instalará um \"Relógio Suíço\" na sua operação. Sua produtividade diária sofrerá um \"upgrade\" de alta performance. Recondicionamento físico avançado e uma gestão impecável do cotidiano farão seus resultados atingirem o máximo de excelência.",
+    fase1: "Mês 1-3 (O Purge Disciplinar): Elimine falhas de sistema, vícios ocultos e excesso de procrastinação. Execute um diagnóstico total à sua saúde e insira a base de uma rotina corporativa inflexível.",
+    fase2: "Mês 4-8 (O Relógio Suíço): Acelere e refine ao máximo os seus métodos; a sua produtividade diária deve triplicar. Preste serviços de altíssimo nível que tornem o seu know-how insubstituível para chefes ou clientes.",
+    fase3: "Mês 9-12 (Execução Premium): Transforme a excelência extrema no seu novo estilo de vida definitivo. Desfrute do poder prático, lucros contínuos e bem-estar físico de operar diariamente no topo da eficiência.",
+    idealPara: "Biohackers, executivos obcecados por excelência e profissionais que precisam estruturar uma rotina de produtividade impecável e saúde de ferro.",
+    conselhoCosmico: "A linha entre a alta performance e o colapso físico (burnout) é microscópica nesta dimensão. Não exija de si mesmo e da sua equipe uma perfeição desumana e doentia. Se você não agendar o seu descanso com a mesma severidade militar com que agenda o seu trabalho, o seu corpo forçará a sua parada.",
+    mantra: "A minha rotina é um relógio suíço; a minha disciplina e saúde me tornam uma máquina insubstituível."
   },
   7: {
-    id: 7, name: "Casa 7 — Parcerias, Relacionamentos e Contratos", emoji: "🤝", cristal: "Lápis Lazúli", label: "Casamento & Acordos",
-    img: "https://images.unsplash.com/photo-1605330366627-e43598db44a3?w=400&q=80",
-    regente: "Regência de Vênus", tags: ["Casamento", "Sociedades", "Contratos"],
-    entender_10s: "Este é um ano em que você precisará lidar muito mais com as outras pessoas, sendo excelente para fechar acordos, oficializar uniões ou encontrar parceiros.",
-    favorece: [
-      "Casar, morar junto ou oficializar o relacionamento",
-      "Formar sociedades profissionais",
-      "Fechar contratos importantes de prestação de serviços",
-      "Atender mais clientes de forma direta",
-      "Resolver conflitos legais ou jurídicos por meio de acordos"
+    id: 7,
+    label: "Parcerias",
+    intent: "Quero atrair bons parceiros e melhorar meus relacionamentos sérios.",
+    translation: "As parcerias, os acordos formais e a vida a dois se tornam fundamentais.",
+    realLife: "Relacionamentos sólidos · Sociedades · Bons contratos · Alinhamento",
+    deepDive: "Você não precisa resolver tudo por conta própria o tempo todo. A proposta aqui é construir junto com os outros. Um período que destaca muito os namoros que viram compromisso, a clareza de expectativas no casamento e mais atenção às parcerias, sociedades e relações profissionais que podem crescer.",
+    astrologyDefinition: "os relacionamentos sérios, o casamento, as sociedades e os acordos ou contratos formais",
+    radar: { dinheiro: 80, amor: 90, saude: 50 },
+
+    name: "Casa 7 — Parcerias, Sociedades e Relações",
+    oQueVocePrecisaEntender: "Este é o ano de unir forças. O seu progresso profissional e pessoal dependerá da sua capacidade de negociar, fechar boas parcerias e estruturar relacionamentos sérios.",
+    podeFavorecer: [
+      "Selar sociedades e parcerias de negócios importantes",
+      "Casamento, acordos estáveis e namoros sérios",
+      "Resolução favorável de contratos, acordos ou processos",
+      "Expandir o seu público e carteira de clientes",
+      "Desenvolver diplomacia, escuta e capacidade de negociação"
     ],
-    tema_ano: "Seu ano gira em torno dos seus relacionamentos sérios, parcerias de trabalho e da capacidade de negociar com os outros.",
-    ganhar: "Pessoas dispostas a ajudar nos seus projetos, um parceiro mais comprometido e oportunidades comerciais que vêm através de outras pessoas.",
-    vida_real: "Você gastará mais tempo conversando sobre as vontades do seu parceiro, negociando propostas de trabalho, assinando documentos, ouvindo clientes ou ajustando as coisas a dois.",
-    dinheiro: "Ganhos podem surgir através de contratos sólidos ou ao formar uma parceria com alguém cujas habilidades complementam as suas. Tentar resolver tudo sozinho pode estagnar as finanças.",
-    amor: "Se está solteiro(a), a chance de iniciar um namoro sério aumenta consideravelmente. Se está em um relacionamento, é o momento para dar um passo adiante, como oficializar, casar ou alinhar os planos do casal.",
-    trabalho: "Muito foco no atendimento direto a clientes e parceiros. Boa época para buscar um sócio. Lembre-se: o sucesso será decidido pela sua habilidade de agradar o outro sem perder seus direitos.",
-    vida_pessoal: "Você vai sentir que as decisões precisam ser tomadas em conjunto. A dependência (no bom sentido) de terceiros vai te ensinar diplomacia e flexibilidade.",
-    como_aproveitar: "Escute as pessoas, busque parceiros para o que você não consegue fazer sozinho, não brigue por orgulho e seja justo(a) nas suas negociações.",
-    cuidado: "Aceitar sociedades ou contratos ruins apenas para evitar discussões, focar tanto no outro a ponto de esquecer suas próprias necessidades e entrar em dependência emocional.",
-    resumo: "Se você quer casar, formar uma sociedade ou atrair pessoas parceiras para ajudar nos seus projetos, esta Casa vai abrir essas portas.",
-    quiz: [
-      "Assumi um compromisso sério no amor ou formei uma sociedade.",
-      "Aprendi a ceder, negociar e conviver melhor com as pessoas.",
-      "Assinei contratos importantes que trouxeram melhorias reais."
-    ],
-    radar: { dinheiro: 60, amor: 95, saude: 40 }
+    oSegredo: "você não deve voar sozinha. A Casa 7 funciona com poder quando você deixa o orgulho de lado, une forças com parceiros de alta capacidade e divide os riscos e os lucros da jornada.",
+    oTema: "Seu ano gira em torno de parcerias profissionais, relacionamentos afetivos sérios, contratos jurídicos e cooperação.",
+    oQueVocePodeGanhar: "Parceiros complementares que ajudam a carregar seus projetos, acordos comerciais sólidos e um fortalecimento real na união com quem ama.",
+    comoApareceNaVidaReal: "Você passará bastante tempo negociando termos de contratos, conversando de perto com parceiros ou clientes importantes, lidando com dinâmicas de casal e buscando o consenso em decisões conjuntas.",
+    dinheiro: "O retorno financeiro vem de projetos divididos, contratos de prestação de serviços em parceria, sociedades equilibradas e de negócios onde ambas as partes ganham de forma justa.",
+    amor: "Para quem está solteira, é o ano ideal para iniciar um compromisso sério de verdade. Para quem já está comprometido, o período pede para focar em objetivos comuns, oficializar a relação ou dar passos importantes planejados a dois.",
+    trabalho: "O trabalho isolado perde força para a colaboração. É hora de buscar parceiros complementares que resolvam o que você não domina, estruturar contratos claros e focar no relacionamento direto com seus clientes principais.",
+    vidaPessoal: "Você aprende a ouvir mais e a ceder quando necessário, percebendo que a cooperação sincera com as pessoas certas leva você muito mais longe do que o esforço solitário.",
+    comoAproveitar: "Seja diplomática nas suas relações, defina acordos profissionais por escrito com clareza jurídica, dedique tempo de qualidade aos relacionamentos importantes e saiba dividir as decisões com seus aliados.",
+    cuidadoCom: "Atrair parceiros ou sócios que cobram demais e entregam de menos por carência sua, aceitar termos desfavoráveis para não gerar conflitos ou anular suas próprias vontades para agradar o outro.",
+    resumo: "Se você quer fechar contratos de sociedade importantes, construir parcerias de negócios de peso ou dar um passo sério e maduro no amor, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Estou exausto de carregar todos os riscos sozinhos. Enfrento impasses legais e pareço atrair parceiros que paralisam meus negócios ou sugam meu valor.",
+    diagnosticoEscala: "Opero bem o meu navio, mas decidi escalar de vez atraindo sócios \"Premium\" e celebrando uniões oficiais de poder estratégico e diplomacia.",
+    revelacaoCaos: "A Rota 7 decreta a morte do seu exaustivo esforço solitário. Ela aniquilará a energia que atrai deslealdades comerciais e acordos ruins. O cosmos trará as peças diplomáticas e contratuais exatas para você dividir o peso da ascensão sem medo.",
+    revelacaoEscala: "A Rota 7 é a assinatura irrefutável do seu sucesso em dupla (\"O Casal Imperial\"). O seu charme passará a fechar negócios e corações. O sistema magnetizará sócios de extrema capacidade ou uma aliança conjugal voltada para a vitória mútua.",
+    fase1: "Mês 1-3 (Filtro de Conexões): Pare de sustentar pesos sozinhos e encerre parcerias, fornecedores ou sociedades que parasitam os seus lucros. Defina friamente o nível VIP de quem poderá sentar-se à sua mesa.",
+    fase2: "Mês 4-8 (As Negociações de Poder): Atraia pessoas com alta capacidade executiva e acione a diplomacia máxima. É a fase decisiva para encabeçar uniões matrimoniais ou formar corporações estratégicas.",
+    fase3: "Mês 9-12 (A Escala Compartilhada): Usufrua de contratos já selados de forma oficial e expanda a sua influência. O crescimento financeiro avança pesado exatamente pela soma brutal da atuação em dupla.",
+    idealPara: "Negociadores de elite, líderes em busca de fusões corporativas poderosas e indivíduos focados em selar o casamento ou parcerias diplomáticas de status.",
+    conselhoCosmico: "Nunca, sob nenhuma hipótese, carregue os fardos ou tente o \"voo solo\" neste ano. Tentar executar os riscos sozinho atrairá o fracasso total. Contudo, seja implacável na seleção: não assine contratos por carência. Um sócio fraco, desleal ou passivo afundará o seu navio de ouro.",
+    mantra: "Eu atraio alianças de ouro e as minhas parcerias multiplicam o meu poder e os meus lucros."
   },
   8: {
-    id: 8, name: "Casa 8 — Transições, Desapego e Profundidade", emoji: "🔥", cristal: "Obsidiana", label: "Mudanças & Dinheiro Extra",
-    img: "https://images.unsplash.com/photo-1615568165038-d63604f378a5?w=400&q=80",
-    regente: "Regência de Plutão", tags: ["Transições", "Desapego", "Dinheiro Conjunto"],
-    entender_10s: "Este é um ano de transformações mais profundas, onde você vai encerrar ciclos que não funcionam mais e lidar de perto com o dinheiro e os recursos dos outros.",
-    favorece: [
-      "Quitar dívidas, conseguir empréstimos ou negociar financiamentos",
-      "Lidar com partilhas, heranças ou questões burocráticas financeiras",
-      "Fazer mudanças psicológicas, como iniciar terapia",
-      "Cortar de vez pessoas ou situações que te faziam mal",
-      "Aumentar a intimidade e a confiança nos relacionamentos"
+    id: 8,
+    label: "Transformação",
+    intent: "Quero resolver pendências antigas e fechar ciclos importantes.",
+    translation: "Transições necessárias e a gestão do que você divide com outras pessoas entram em foco.",
+    realLife: "Quitação de dívidas · Partilhas · Autoconhecimento · Desapego",
+    deepDive: "Às vezes é preciso soltar algumas amarras para conseguir andar. O ciclo favorece olhar de frente para as coisas que costumamos evitar, como a organização de uma dívida antiga ou a aceitação de que uma fase da vida realmente acabou. É um período maduro, que ajuda a limpar o terreno e lidar melhor com assuntos complexos.",
+    astrologyDefinition: "as grandes transições, a regeneração, os recursos compartilhados, as partilhas e o autoconhecimento profundo",
+    radar: { dinheiro: 85, amor: 60, saude: 75 },
+
+    name: "Casa 8 — Transições, Investimentos e Mudanças",
+    oQueVocePrecisaEntender: "Este é um ano de transformações profundas e decisões financeiras importantes, focado em gerir recursos e desapegar de estruturas e relacionamentos falidos.",
+    podeFavorecer: [
+      "Atrair investidores, financiamentos ou recursos de parceiros",
+      "Mudança psicológica profunda e eliminação de hábitos antigos",
+      "Organizar impostos, partilhas, heranças ou dívidas pendentes",
+      "Eliminar de vez relações ou projetos que desgastam sua energia",
+      "Fortalecer o controle financeiro e o desapego com maturidade"
     ],
-    tema_ano: "Seu ano gira em torno de grandes mudanças internas, dinheiro compartilhado e a coragem de desapegar do passado.",
-    ganhar: "Mais força emocional, resolução de pendências financeiras complexas e libertação de medos e inseguranças antigas.",
-    vida_real: "Você se verá organizando impostos, negociando dívidas, lidando com o fim de certas fases, tendo conversas muito profundas e perdendo a paciência com coisas superficiais.",
-    dinheiro: "A atenção não está no seu salário mensal, mas em quantias de outras fontes: acertos de contas, indenizações, heranças, dinheiro do sócio/cônjuge ou aprovação de crédito.",
-    amor: "As relações exigirão confiança total e entrega. É a fase de ir para o tudo ou nada, aprofundando o vínculo. Superficialidade pode gerar atritos e cobranças.",
-    trabalho: "Não é um ano para mudanças corriqueiras, mas sim para finalizar projetos grandes e reestruturar sua forma de trabalhar. Pode haver oportunidades em gestão financeira ou análise de dados profundos.",
-    vida_pessoal: "O ano pode trazer crises existenciais passageiras que servem para jogar fora o 'lixo mental'. Você sai deste ciclo muito mais forte e maduro(a).",
-    como_aproveitar: "Pague suas dívidas se possível, encare seus medos de frente, não tenha receio de terminar ciclos ruins e faça uma faxina na sua vida e na sua casa.",
-    cuidado: "Sentimentos de posse, brigas ou conflitos envolvendo dinheiro com familiares/sócios e uma tendência a guardar mágoas em silêncio.",
-    resumo: "Se você está disposto(a) a fazer grandes mudanças internas, desapegar do que não serve mais e organizar a parte mais complexa da sua vida financeira, escolha esta Casa.",
-    quiz: [
-      "Encerrei ciclos difíceis e deixei o passado para trás.",
-      "Resolvi questões complexas de dinheiro, dívidas ou heranças.",
-      "Aprofundei muito minha intimidade com alguém de confiança."
-    ],
-    radar: { dinheiro: 70, amor: 45, saude: 50 }
+    oSegredo: "para o novo nascer, o velho precisa morrer. A Casa 8 exige que você encare seus medos de frente, desapegue de situações falidas e assuma o controle tático sobre suas finanças e decisões de transição.",
+    oTema: "Seu ano gira em torno de grandes mudanças de rumo, recursos de terceiros, psicologia profunda e desapego de velhas estruturas.",
+    oQueVocePodeGanhar: "Acesso a recursos financeiros externos para seus projetos, capacidade de dar a volta por cima em momentos difíceis e uma mente mais madura e forte contra medos.",
+    comoApareceNaVidaReal: "Você se verá organizando impostos e finanças complexas, resolvendo partilhas ou acordos de investimento, cortando relações desgastadas da sua rotina e buscando processos profundos de autoconhecimento.",
+    dinheiro: "Favorece a atração de recursos que não vêm diretamente do seu esforço diário de trabalho, mas de fontes externas como comissões, investimentos passados, heranças, empréstimos ou dinheiro vindo do cônjuge/sócio.",
+    amor: "A energia afetiva ganha intensidade e intimidade. Relacionamentos superficiais perdem o sentido. É um bom ano para resolver a divisão de finanças e responsabilidades do casal, exigindo diálogo honesto para evitar crises de controle.",
+    trabalho: "Momento propício para reestruturar empresas, fechar setores deficitários, renegociar dívidas e focar em projetos de grande porte que exijam captação de recursos externos de investidores.",
+    vidaPessoal: "Você passará por um processo de faxina psicológica. Crenças limitantes antigas e medos inconscientes perdem força à medida que você assume o controle do seu valor e do seu poder pessoal.",
+    comoAproveitar: "Faça uma limpa em hábitos ruins do passado, organize sua vida tributária de forma madura, resolva as pendências que tiram seu sono e use o silêncio estratégico para planejar suas transições profissionais.",
+    cuidadoCom: "Entrar em disputas cegas de poder ou disputas por controle, tomar decisões financeiras arriscadas por impulso emocional ou remoer mágoas e ressentimentos antigos que pesam na saúde.",
+    resumo: "Se você quer fazer mudanças estruturais na sua carreira, reestruturar suas finanças ou passar por uma profunda transformação pessoal, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Estou paralisado por uma autossabotagem letal e crises profundas de identidade, ou refém de dívidas, inventários estagnados e controle financeiro de terceiros.",
+    diagnosticoEscala: "Tenho controle emocional, mas quero focar em alquimia financeira pesada: multiplicar heranças, acessar cofres de investidores ocultos e metamorfosear o meu ego.",
+    revelacaoCaos: "A Rota 8 será o seu exorcismo estratégico. As crises vulneráveis ou bloqueios de capital amarrados por outros serão destruídos. O céu forçará a morte da sua identidade fraca para estancar as perdas e purgar traumas enraizados na raiz do seu ego.",
+    revelacaoEscala: "A Rota 8 acorda a \"Fênix\" e o seu domínio tático absoluto. Seu magnetismo se tornará beirando ao obsessivo nas negociações de risco. O ano abrirá torneiras colossais de ganho de capitais de terceiros, comissões de elite e investimentos restritos.",
+    fase1: "Mês 1-3 (Fogo no Velho Ego): Desfaça medos enraizados e autossabotagens em investimentos arriscados. Estanque perdas de forma calculista e promova uma reformulação impiedosa na sua mentalidade emocional.",
+    fase2: "Mês 4-8 (Alquimia de Mercado): Entre estrategicamente no território do capital de terceiros. Gira heranças, movimente grandes comissões e atraia aportes pesados de investidores-anjo com o seu novo magnetismo.",
+    fase3: "Mês 9-12 (O Mestre Intocável): Comande silenciosamente o seu novo volume de poder. Com a sua mente indestrutível e os novos recursos gerados, o domínio corporativo e psicológico será inteiramente seu.",
+    idealPara: "Gestores de grandes fundos, estrategistas de risco e personalidades magnéticas que exigem metamorfose psicológica profunda e acesso ao capital de terceiros.",
+    conselhoCosmico: "Não faça movimentações corporativas ou íntimas motivadas por vingança, ciúmes ou sede cega de controle. Se você misturar os seus recursos financeiros com indivíduos não confiáveis, ou hesitar em \"matar\" a sua velha identidade, o poder obscuro que você busca se voltará violentamente contra você.",
+    mantra: "Eu transformo o caos em capital e domino com maestria absoluta o poder e os recursos ao meu redor."
   },
   9: {
-    id: 9, name: "Casa 9 — Novos Horizontes, Estudos e Viagens", emoji: "🦉", cristal: "Ametista", label: "Viagens & Estudos",
-    img: "https://images.unsplash.com/photo-1562916843-157945d81bba?w=400&q=80",
-    regente: "Regência de Júpiter", tags: ["Viagens", "Estudos", "Novos Horizontes"],
-    entender_10s: "Este é um ano em que você sentirá necessidade de expandir sua visão de mundo, seja estudando algo que não conhecia, viajando ou resolvendo questões legais.",
-    favorece: [
-      "Realizar viagens longas ou para lugares inéditos",
-      "Iniciar faculdade, pós-graduação, idiomas ou cursos densos",
-      "Resolver processos judiciais de maneira mais favorável",
-      "Lidar com estrangeiros ou assuntos fora da sua região",
-      "Encontrar um novo propósito e ser mais otimista"
+    id: 9,
+    label: "Expansão",
+    intent: "Quero ampliar meus horizontes, fazer viagens ou focar em estudos maiores.",
+    translation: "A busca por sentido, as viagens e as grandes visões ganham destaque.",
+    realLife: "Viagens · Especializações · Outras culturas · Novas perspectivas",
+    deepDive: "Quando a rotina parece pequena demais, a mente precisa viajar. Seja começando a planejar um mochilão, entrando numa pós-graduação ou simplesmente mudando muito a sua visão de mundo, o foco agora é expandir. O ano convida a olhar lá na frente e a buscar coisas que deem mais sentido aos seus próximos passos.",
+    astrologyDefinition: "a expansão de horizontes, as grandes viagens, os estudos superiores, a fé e a busca por sentido",
+    radar: { dinheiro: 60, amor: 60, saude: 60 },
+
+    name: "Casa 9 — Expansão, Viagens e Aprendizado Avançado",
+    oQueVocePrecisaEntender: "Este é um ano para alargar seus horizontes, excelente para focar em estudos profundos, viagens de longa distância, mentorias e processos judiciais favoráveis.",
+    podeFavorecer: [
+      "Realizar viagens internacionais ou de longa distância",
+      "Cursos avançados, graduações, publicações e mentorias",
+      "Conquistar vitórias em questões de justiça, vistos e contratos",
+      "Expandir os limites do seu negócio para fora do mercado local",
+      "Fortalecer a sua fé, otimismo e novos rumos de vida"
     ],
-    tema_ano: "Seu ano gira em torno de expansão geográfica, estudos aprofundados, busca por sentido e otimismo.",
-    ganhar: "Uma visão muito mais ampla e positiva sobre a vida, além de oportunidades de crescimento pessoal através do conhecimento.",
-    vida_real: "Você se pegará olhando preços de passagens, pesquisando cursos novos, lidando com advogados para destravar processos, ensinando pessoas ou participando de questões religiosas ou filosóficas.",
-    dinheiro: "As chances financeiras estão ligadas a outras cidades ou países, assim como à área acadêmica ou a ganhos vindos da resolução de um processo legal. Pensar pequeno não trará retorno.",
-    amor: "Se está solteiro(a), há a possibilidade de conhecer alguém de fora (outra cidade, país) ou em um ambiente acadêmico/espiritual. Se está em um relacionamento, o que une vocês são viagens e planos grandiosos de futuro.",
-    trabalho: "Você pode sentir falta de propósito no trabalho atual caso ele seja muito repetitivo. Excelente momento para buscar capacitação de longo prazo, ensinar ou atuar em novos mercados e cidades.",
-    vida_pessoal: "O ano é marcado por uma sensação renovada de esperança. Você começa a perceber que os problemas antigos ficaram pequenos diante de um mundo tão vasto a ser explorado.",
-    como_aproveitar: "Aprenda um novo idioma, viaje para longe, estude assuntos complexos, procure estar perto de pessoas de culturas diferentes e resolva suas pendências jurídicas.",
-    cuidado: "O excesso de confiança achando que as coisas se resolvem sozinhas, gastos impulsivos com viagens mal planejadas e achar que sempre é o(a) dono(a) da verdade.",
-    resumo: "Se você quer voltar a estudar com foco, fazer viagens mais distantes, lidar com assuntos legais ou encontrar motivação para o futuro, esta é a Casa ideal.",
-    quiz: [
-      "Viajei ou tive bastante contato com pessoas e assuntos de fora.",
-      "Estudei profundamente um assunto, curso longo ou filosofia de vida.",
-      "Senti muito otimismo e busquei um propósito maior para o dia a dia."
-    ],
-    radar: { dinheiro: 50, amor: 55, saude: 60 }
+    oSegredo: "recuse a mediocridade do cenário habitual e do mercado local. A Casa 9 funciona com poder absoluto quando você pensa em grande escala, investe na sua sabedoria superior e ousa dar passos firmes rumo a novas experiências.",
+    oTema: "Seu ano gira em torno de expansão geográfica e intelectual, estudos profundos, questões jurídicas e busca de novos horizontes.",
+    oQueVocePodeGanhar: "Uma sensação renovada de otimismo e fé, novas perspectivas de mundo e o reconhecimento da sua autoridade intelectual no trabalho.",
+    comoApareceNaVidaReal: "Você se pegará planejando viagens longas de estudo ou lazer, estudando assuntos que ampliam sua bagagem, ensinando outros, lidando com passaportes e resolvendo de forma favorável trâmites legais.",
+    dinheiro: "O dinheiro vem da ampliação das suas fronteiras: clientes de fora da sua cidade ou país, palestras, lançamentos de cursos ou publicações e liberação de recursos travados de forma justa.",
+    amor: "O amor neste ano ganha liberdade e novos horizontes. Há espaço para conhecer alguém de outra cultura ou cidade, ou de viver momentos especiais e renovadores viajando com o seu parceiro, fugindo do tédio da rotina.",
+    trabalho: "É a hora de expandir as operações do seu negócio, dar palestras, publicar livros ou criar mentorias de alto nível acadêmico. Posicione-se como especialista no seu assunto de atuação.",
+    vidaPessoal: "Sua mente se liberta de crenças limitantes que te encolhiam. Você recupera a confiança no futuro e percebe que as possibilidades da vida são muito maiores do que o seu cenário habitual.",
+    comoAproveitar: "Estude de forma profunda, planeje viagens que agreguem conhecimento real, publique seu trabalho, resolva pendências burocráticas pendentes e pense em grande escala para seus negócios.",
+    cuidadoCom: "A teimosia de querer ser o dono da verdade, julgar os outros com excesso de rigidez ou agir com um otimismo ingênuo que ignora os custos práticos das suas decisões.",
+    resumo: "Se você quer expandir seus estudos, internacionalizar sua marca, realizar viagens longas e vencer disputas burocráticas ou contratuais, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Estagnado. Tolero operar dentro de um teto de mercado banal, lutando contra impasses legais e barreiras fronteiriças que me impedem de escalar minha liberdade.",
+    diagnosticoEscala: "Sou a referência local, mas exijo o Salto Quântico globalizado: publicações em alto nível, vitórias definitivas nos tribunais e internacionalização de patrimônio.",
+    revelacaoCaos: "A Rota 9 destruirá o seu teto de vidro bairrista e rasteiro. O seu padrão letal de lutar localmente dará lugar à pura força do acaso expansivo e à sorte direcionada. Problemas maçantes e jurídicos serão eliminados magicamente de cima para baixo.",
+    revelacaoEscala: "A Rota 9 coloca a Coroa do Intocável na sua cabeça. Trata-se de uma blindagem providencial absoluta. O ano coroará a sua autoridade no campo das sabedorias de elite, chancelando saltos milionários livres de qualquer atrito em águas estrangeiras.",
+    fase1: "Mês 1-3 (Destruir a Mediocridade): Declare guerra às fronteiras geográficas e limites de vendas locais. Trace planos estratégicos de internacionalização, estudos elitizados ou resoluções nos tribunais.",
+    fase2: "Mês 4-8 (O Salto Quântico): Avance sem atrito sobre territórios desconhecidos, amparado por vitórias jurídicas ou chancelas intelectuais de peso. É a hora de pisar no exterior, publicar e expandir com pura sorte providencial.",
+    fase3: "Mês 9-12 (A Autoridade Global): Coroe o seu status incontestável após as vitórias maciças. Desfrute da elevação de nível que coloca a sua imagem para sempre fora e muito acima do radar dos seus antigos concorrentes.",
+    idealPara: "Visionários globais, acadêmicos de elite e empresários em expansão internacional que exigem o \"Salto Quântico\" e a proteção da pura sorte.",
+    conselhoCosmico: "Não confunda o seu \"Toque de Midas\" cósmico e a sua proteção espiritual com passaporte para a irresponsabilidade cega. Acreditar que a \"sorte resolve tudo\" sem o apoio do esforço prático, ou cair na arrogância intelectual do \"dono da verdade absoluta\", fechará instantaneamente as fronteiras de ouro que acabaram de se abrir.",
+    mantra: "As minhas fronteiras são ilimitadas; a minha visão e autoridade atraem a pura sorte e o salto quântico."
   },
   10: {
-    id: 10, name: "Casa 10 — Carreira, Imagem Pública e Responsabilidades", emoji: "👑", cristal: "Olho de Tigre", label: "Carreira & Responsabilidade",
-    img: "https://images.unsplash.com/photo-1587313264448-f0275525531b?w=400&q=80",
-    regente: "Regência de Saturno", tags: ["Carreira", "Reconhecimento", "Responsabilidade"],
-    entender_10s: "Este é um ano em que você sairá dos bastidores para o palco. A carreira será o grande foco, trazendo muito trabalho e também as recompensas desse esforço.",
-    favorece: [
-      "Ser reconhecido(a) e valorizado(a) no trabalho",
-      "Assumir cargos de chefia ou maiores responsabilidades",
-      "Conseguir aquele emprego ou promoção desejada",
-      "Construir ou melhorar sua reputação e imagem pública",
-      "Tornar suas metas de vida mais sólidas e focadas"
+    id: 10,
+    label: "Carreira",
+    intent: "Quero crescer na minha carreira e ser mais reconhecido profissionalmente.",
+    translation: "Carreira, reputação e ambição pública ficam no centro da mesa.",
+    realLife: "Promoção · Liderança · Responsabilidade · Foco no trabalho",
+    deepDive: "Se você vem trabalhando muito nos bastidores, talvez seja a hora de assumir o seu espaço. A ênfase do ano está em responsabilidade, posicionamento e crescimento. Favorece bastante os momentos de se posicionar sobre o próprio valor, assumir cargos maiores e construir uma imagem profissional mais sólida e respeitada.",
+    astrologyDefinition: "a carreira, a reputação pública, as ambições de longo prazo e a imagem de autoridade no mundo",
+    radar: { dinheiro: 90, amor: 40, saude: 50 },
+
+    name: "Casa 10 — Carreira, Reputação e Sucesso Público",
+    oQueVocePrecisaEntender: "Este é o ano de colher os resultados do seu trabalho profissional, consolidar sua autoridade no mercado e assumir o controle absoluto da sua carreira.",
+    podeFavorecer: [
+      "Promoções, cargos de liderança ou novas oportunidades de negócio",
+      "Oficializar e legalizar empresas, marcas ou contratos importantes",
+      "Aumentar sua visibilidade, prestígio e boa reputação pública",
+      "Ser reconhecida pelo seu esforço profissional acumulado",
+      "Construção de metas sólidas de longo prazo para a sua carreira"
     ],
-    tema_ano: "Seu ano gira em torno de evolução profissional, reputação, esforço focado e realizações de longo prazo.",
-    ganhar: "Respeito profissional, segurança na sua carreira e a sensação de estar construindo algo para o seu futuro.",
-    vida_real: "Você vai trabalhar mais, assumir tarefas importantes, cuidar muito mais do seu lado profissional (como melhorar seu currículo ou perfil no LinkedIn), e a opinião de chefes ou pessoas mais velhas terá grande peso.",
-    dinheiro: "A recompensa financeira não surge por 'sorte', e sim pelo suor e competência do trabalho entregue ao longo do tempo. É quando você finalmente cobra o preço por ter persistido na carreira.",
-    amor: "Os relacionamentos tendem a ficar mais sérios e as pessoas reparam se o parceiro(a) compartilha das mesmas ambições de futuro. Você não terá muita energia para romances dramáticos que atrapalhem o seu foco.",
-    trabalho: "É o ponto alto desta Casa. Cuidado apenas com as cobranças: mais poder atrai mais responsabilidade. Foque na organização de metas profissionais, pois é um período em que seus acertos (e erros) serão vistos por todos.",
-    vida_pessoal: "O lazer pode ficar um pouco em segundo plano. Você estará mais maduro(a), preocupando-se mais com 'onde quero estar daqui a dez anos' do que com as farras do final de semana.",
-    como_aproveitar: "Defina claramente as suas metas de vida, demonstre responsabilidade para as chefias, invista em uma imagem profissional séria e coloque sua carreira como prioridade no momento.",
-    cuidado: "O excesso de trabalho, tornar-se rígido(a) demais ou muito focado(a) no status a ponto de negligenciar a sua saúde física e a sua família.",
-    resumo: "Se a sua vida profissional está travada e você quer focar com tudo em crescer, assumir liderança e construir seu legado, esta é a Casa que você deve escolher.",
-    quiz: [
-      "Recebi reconhecimento, ganhei visibilidade no mercado ou fui promovido(a).",
-      "Assumi uma carga muito maior de responsabilidades profissionais.",
-      "Tive foco total em metas práticas de médio e longo prazo."
-    ],
-    radar: { dinheiro: 80, amor: 35, saude: 45 }
+    oSegredo: "o sucesso aqui depende diretamente do seu mérito e da sua iniciativa. A Casa 10 exige que você assuma sua postura profissional de liderança, saia dos bastidores e aja com maturidade e compromisso.",
+    oTema: "Seu ano gira em torno de progresso de carreira, reputação no mercado, responsabilidades e oficialização de status.",
+    oQueVocePodeGanhar: "Maior credibilidade profissional, reconhecimento do mercado pelo seu valor e uma posição estável e madura para liderar seus negócios.",
+    comoApareceNaVidaReal: "Você assumirá tarefas de liderança, resolverá a documentação oficial da sua firma, participará de eventos corporativos, concederá entrevistas ou palestras e sentirá que as pessoas respeitam mais o seu posicionamento.",
+    dinheiro: "O retorno financeiro vem diretamente da consolidação do seu prestígio e da sua maturidade no trabalho. É uma fase para cobrar de forma correspondente à sua autoridade no assunto e fechar contratos comerciais robustos.",
+    amor: "Traz a energia da oficialização prática. Se o relacionamento já está no rumo certo, é o período clássico para casar, registrar a união estável de papel assinado ou assumir publicamente um novo status social em casal.",
+    trabalho: "Foco absoluto na sua atuação profissional de elite. É hora de profissionalizar todas as pontas do seu negócio, livrar-se do amadorismo, assumir a responsabilidade pelas suas decisões e agir como o verdadeiro líder do seu trabalho.",
+    vidaPessoal: "Sua mente se volta para o longo prazo. Há um desejo profundo de consolidar segurança material estável para sua vida, o que te dá foco, maturidade e sobriedade nas suas escolhas pessoais diárias.",
+    comoAproveitar: "Invista na profissionalização da sua imagem de trabalho, formalize suas operações comerciais, assuma cargos de liderança e mostre seus resultados de forma consistente para o mercado.",
+    cuidadoCom: "Excesso de frieza emocional com familiares, focar na ambição profissional a ponto de comprometer a saúde e agir de forma excessivamente rígida com subordinados ou parceiros próximos.",
+    resumo: "Se você quer alcançar conquistas de destaque na carreira, assumir cargos de chefia ou consolidar e formalizar a autoridade do seu nome no mercado, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Patino na obscuridade. Batalho nos bastidores de forma amadora, engolindo ordens de chefes inferiores e sofrendo atrasos revoltantes de promoção na carreira.",
+    diagnosticoEscala: "Já sou grande, mas o objetivo único agora é escalar publicamente ao grau de CEO indiscutível, chancelar uma reputação avassaladora e deixar um legado histórico.",
+    revelacaoCaos: "A Rota 10 erradicará a sua síndrome de obscuridade e de submissão. O amadorismo morre. O mapa obrigará você a vestir a pele de Governante e ir ao centro do palco assinar promoções que estavam injustamente estagnadas.",
+    revelacaoEscala: "A Rota 10 é o coroamento material e moral da sua biografia. Toda a sua energia será convertida na cadeira de topo corporativa. Sua imagem ganhará força de mercado incontestável; os grandes do seu nicho serão obrigados a reverenciar sua ascensão.",
+    fase1: "Mês 1-3 (A Postura Executiva): Descarte qualquer atitude amadora e vista publicamente a \"roupa\" do cargo que você exige ter. Pare de ceder o palco e inicie um duro ataque pela liderança na sua área.",
+    fase2: "Mês 4-8 (A Dominação de Mercado): Concretize os golpes mestres que elevam a sua fama. Receba premiações, formalize a sua empresa para o cenário institucional e conquiste as cadeiras de alta gerência no seu nicho.",
+    fase3: "Mês 9-12 (A Cadeira de Ouro): Governe do ponto mais alto do mapa com autoridade absoluta. Mantenha os seus ganhos monumentais exigindo total subordinação de mercado ao prestígio embutido no seu nome.",
+    idealPara: "Futuros CEOs, figuras de extrema autoridade pública e profissionais implacáveis prontos para assumir a coroa do mercado e cimentar o seu legado.",
+    conselhoCosmico: "A subida ao cume exige um esforço colossal, mas a frieza emocional destruirá a sua base. Não negligencie a sua saúde mental, a sua família e, acima de tudo, a sua ética, em prol de uma ambição cega. Uma vitória monumental sem escrúpulos ou alicerces garantirá uma queda pública catastrófica e irreversível.",
+    mantra: "Eu governo do topo; a minha reputação é inquestionável e o meu legado é absoluto."
   },
   11: {
-    id: 11, name: "Casa 11 — Amigos, Contatos e Oportunidades", emoji: "🌐", cristal: "Sodalita", label: "Networking & Apoio",
-    img: "https://images.unsplash.com/photo-1587313350162-8e7c1ebefc20?w=400&q=80",
-    regente: "Regência de Urano", tags: ["Amigos", "Networking", "Projetos"],
-    entender_10s: "Este é um ano em que pessoas, amizades, grupos, internet e novos contatos podem ter um papel muito maior na realização dos seus objetivos práticos.",
-    favorece: [
-      "Conhecer pessoas que abrem novas portas",
-      "Aumentar sua rede de contatos e networking",
-      "Crescer nas redes sociais ou se envolver em comunidades",
-      "Tirar projetos antigos do papel e receber indicações",
-      "Encontrar pessoas com objetivos parecidos com os seus"
+    id: 11,
+    label: "Grupos",
+    intent: "Quero me conectar com grupos e ter apoio para os meus projetos.",
+    translation: "Amizades, networking e ações no coletivo ganham mais importância.",
+    realLife: "Comunidades · Redes sociais · Apoio mútuo · Visão de futuro",
+    deepDive: "Trabalhar sozinho o tempo todo tem um limite. A ideia aqui é olhar para o lado e entender quem pode somar forças com você. O ciclo fortalece a criação de laços com pessoas que pensam parecido, a entrada em novos grupos de interesse e o uso da rede de contatos para fazer ideias ganharem vida mais rápido.",
+    astrologyDefinition: "o networking, as amizades, as comunidades, as ações no coletivo e as visões de futuro",
+    radar: { dinheiro: 75, amor: 70, saude: 50 },
+
+    name: "Casa 11 — Amigos, Contatos e Oportunidades",
+    oQueVocePrecisaEntender: "Este é um ano em que pessoas, amizades, grupos, internet e novos contatos podem ter um papel muito maior na realização dos seus objetivos.",
+    podeFavorecer: [
+      "Conhecer pessoas que abrem novas portas profissionais",
+      "Aumentar de forma consistente a sua rede de contatos",
+      "Receber indicações, propostas e convites de forma mais leve",
+      "Criar parcerias estratégicas, programas de afiliados ou coproduções",
+      "Tirar projetos antigos do papel com a ajuda de terceiros ou grupos"
     ],
-    tema_ano: "Seu ano gira em torno de projetos para o futuro, amizades ativas, grupos e envolvimento com causas coletivas.",
-    ganhar: "Apoio de pessoas nos seus sonhos, um calendário social movimentado e ideias modernas para o seu futuro.",
-    vida_real: "Você passará muito tempo participando de grupos de WhatsApp profissionais ou hobbies, indo a encontros de comunidades, recebendo convites de amigos, trabalhando com a internet e desenhando ideias para o futuro.",
-    dinheiro: "As oportunidades financeiras surgem muito mais através de contatos, indicações e parcerias com grupos do que por um esforço puramente individual.",
-    amor: "Você pode conhecer alguém por meio de amigos, grupos de interesses em comum ou nas redes sociais. Se já está em um relacionamento, compartilhar planos de longo prazo pode unir ainda mais o casal.",
-    trabalho: "Um ano para criar laços com colegas, fazer networking, divulgar seu trabalho em grupos e na internet, e trabalhar focado nos ideais de uma equipe.",
-    vida_pessoal: "O seu olhar se volta muito para o que está à frente, sonhando com o que pode vir. Você sentirá que fazer parte de algo com outras pessoas te dá mais energia.",
-    como_aproveitar: "Não fique isolado(a). Conheça novas pessoas, aceite convites interessantes, ajude amigos quando puder, alimente suas redes de contatos profissionais e esteja aberto a colaborar.",
-    cuidado: "Amizades muito interesseiras, se envolver em muitos projetos sociais esquecendo dos compromissos básicos e confiar em pessoas sem checar bem antes.",
-    resumo: "Escolha esta Casa se você quer ampliar seus contatos, conhecer novas amizades, crescer na internet e ter ajuda externa para fazer seus projetos acontecerem.",
-    quiz: [
-      "Ampliei muito minha rede de contatos, amizades e círculo social.",
-      "Fiz projetos coletivos, atuei na internet ou com grupos grandes.",
-      "Senti forte conexão com o futuro e desenhei meus sonhos de longo prazo."
-    ],
-    radar: { dinheiro: 55, amor: 65, saude: 45 }
+    oSegredo: "não fique isolado. A Casa 11 funciona quando você está de braços abertos para colaborar, aceitar convites, participar de projetos coletivos e permitir que a sua rede de contatos ajude na sua expansão.",
+    oTema: "Seu ano gira em torno de projetos coletivos, tecnologia, novas amizades, parcerias de negócios e metas de longo prazo.",
+    oQueVocePodeGanhar: "Um fluxo de oportunidades de trabalho mais leve gerado por indicações sinceras de amigos e parceiros que admiram suas ideias e competência profissional.",
+    comoApareceNaVidaReal: "Você se verá inserida em grupos de discussão úteis, participando de conselhos e associações, utilizando mídias digitais de forma estratégica para se conectar com mais pessoas e liderando grupos em torno de propósitos comuns.",
+    dinheiro: "As oportunidades financeiras podem surgir mais através de contatos, indicações, público, parcerias e resultados do seu trabalho profissional do que de um esforço totalmente individual. O dinheiro flui através do network.",
+    amor: "O romance neste período nasce de forma muito natural através da amizade e da cumplicidade intelectual. Se solteira, é comum se apaixonar por alguém do seu círculo de amizades ou que compartilha dos mesmos objetivos de vida que você.",
+    trabalho: "É um ótimo período para quem trabalha com redes sociais, internet, mídias, marketing, eventos ou gestão de comunidades. Suas metas profissionais avançam com parcerias complementares de sucesso mútuo.",
+    vidaPessoal: "Sua mente se liberta do imediatismo angustiante. Você sente que faz parte de uma rede de suporte real e ganha fôlego para desenhar metas ambiciosas para os próximos anos com tranquilidade.",
+    comoAproveitar: "Não se isole de forma alguma. Faça networking intencional, participe de eventos úteis do seu nicho, divulgue seus projetos na internet, aceite convites e esteja disposta a colaborar com o trabalho dos outros.",
+    cuidadoCom: "Amizades interesseiras, falsas promessas de apoio sem compromisso real, confiar rápido demais ou abraçar muitas atividades de grupo ao mesmo tempo e acabar sem foco nas suas obrigações diárias.",
+    resumo: "Se você quer mais contatos profissionais, novas oportunidades de negócios, amizades sinceras, networking ativo e apoio de pessoas queridas para fazer seus projetos crescerem, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Nasce do meu suor isolado e brutal. Luto sozinho na trincheira contra lançamentos fracassados e uma ausência sufocante de pessoas dispostas a bancar ou endossar minha visão.",
+    diagnosticoEscala: "Engajo bem com meu grupo, mas meu plano de fundo agora é escalar minha audiência digital, magnetizar \"investidores-anjo\" e estruturar fortunas pela força do coletivo.",
+    revelacaoCaos: "A Rota 11 destruirá o fardo da sua luta isolada diária. A falta crônica de apoios estratégicos será implodida. O universo ativará a \"Sorte Social\", conectando-o imediatamente aos anjos certos que colocarão capital e visibilidade sob o seu comando.",
+    revelacaoEscala: "A Rota 11 fará você sentar-se nas \"Cúpulas do Futuro\". Os masterminds de elite se renderão ao seu projeto. Seu sistema ganhará força viral, alavancado massivamente por aliados ocultos poderosos e patrocínios formidáveis sem esforço direto seu.",
+    fase1: "Mês 1-3 (Purga de Seguidores): Descarte os parceiros de trincheira que sugam a sua energia sem acrescentar visão e escala. Abandone de vez o trabalho pesado e solitário no limite do palco.",
+    fase2: "Mês 4-8 (Networking Viral): Alavanque a sua visibilidade inserindo-se nos grupos e \"Masterminds\" onde os figurões decidem o futuro. Acione os benfeitores influentes que farão os seus projetos crescerem.",
+    fase3: "Mês 9-12 (A Escala Inevitável): Usufrua dos picos virais de vendas, campanhas grandiosas na internet ou grandes somas de financiamento atraídas pelo poder dos seus sócios não visíveis e das comunidades.",
+    idealPara: "Líderes de comunidades massivas, inovadores tecnológicos, estrategistas digitais e mentes focadas em viralizar e atrair \"investidores-anjo\".",
+    conselhoCosmico: "Não tente carregar o peso da execução pesada nas suas próprias costas; tentar fazer tudo sozinho destruirá a mágica desta rota. Em contrapartida, vigie a sua roda: cuidado com parasitas que se aproximam por puro interesse financeiro ou com o perigo de perder a sua identidade única apenas para agradar o comportamento das massas.",
+    mantra: "A minha visão inspira multidões. Os meus aliados elevam e aceleram os meus resultados."
   },
   12: {
-    id: 12, name: "Casa 12 — Retiro, Autoconhecimento e Finalizações", emoji: "👁️", cristal: "Quartzo Transparente", label: "Bastidores & Descanso",
-    img: "https://images.unsplash.com/photo-1515091943-9d5c0ad475af?w=400&q=80",
-    regente: "Regência de Netuno", tags: ["Introspecção", "Bastidores", "Finalizações"],
-    entender_10s: "Este é um ano em que você precisará de descanso e reflexão, ideal para ficar mais longe do barulho do mundo, cuidar da mente e finalizar assuntos desgastados.",
-    favorece: [
-      "Fazer retiros, meditação, terapia e curar ansiedades",
-      "Trabalhar focado(a) nos bastidores, sem precisar de holofotes",
-      "Descansar, recuperar energia e dormir melhor",
-      "Afinar a intuição para tomar decisões com mais calma",
-      "Finalizar ciclos e encerrar assuntos que já deram o que tinham que dar"
-    ],
-    tema_ano: "Seu ano gira em torno de encerramentos, espiritualidade, necessidade de descanso físico e trabalho mais silencioso.",
-    ganhar: "Um resgate do equilíbrio mental, percepções muito intuitivas e a paz de se livrar de problemas antigos.",
-    vida_real: "Você vai preferir ficar em silêncio no seu canto em vez de ir a festas badaladas, dormirá mais, procurará terapias ou respostas espirituais, e terminará projetos ou relacionamentos que estavam se arrastando.",
-    dinheiro: "Ganhos podem surgir através de trabalhos que você faz longe dos olhos do público (pesquisa, bastidores, produção interna) ou em áreas ligadas a cuidado e saúde.",
-    amor: "As relações precisam de muita privacidade. Expor a vida amorosa pode trazer opiniões indesejadas. Podem ocorrer finalizações de relações que já não têm base sólida.",
-    trabalho: "Não é um período favorável para a agitação e a auto-promoção excessiva. Projetos feitos no sossego de casa ou em pesquisa trarão melhores resultados do que estar no palco.",
-    vida_pessoal: "O corpo e a mente pedirão pausa. Qualquer tentativa de se sobrecarregar de responsabilidades sociais gerará muito cansaço. A intuição estará extremamente alta.",
-    como_aproveitar: "Tire férias, aceite que nem todo ano é de aceleração total, faça meditação, invista no seu conforto e aproveite o sossego para recarregar as energias para o ano seguinte (que será o ciclo da Casa 1).",
-    cuidado: "O cansaço excessivo se você não respeitar os limites do corpo, o risco de fugir da realidade e tentar salvar as pessoas ao seu redor esquecendo-se de si.",
-    resumo: "Se você vem de um período de estresse profundo e precisa de um ano para recarregar a bateria, se conhecer mais e encerrar ciclos, esta é a Casa necessária.",
-    quiz: [
-      "Precisei me isolar mais do barulho para encontrar paz interna.",
-      "Finalizei pendências do passado ou encerrei relações desgastadas.",
-      "Aprofundei muito meu lado intuitivo ou espiritual."
-    ],
-    radar: { dinheiro: 30, amor: 50, saude: 70 }
-  }
-};
+    id: 12,
+    label: "Retiro",
+    intent: "Quero diminuir o barulho e ter mais espaço para mim.",
+    translation: "O mapa sugere um tempo voltado à quietude, observação e descanso prático.",
+    realLife: "Pausa · Menos exposição · Autocuidado · Projetos de bastidor",
+    deepDive: "O mundo exige muito, e quase sempre ao mesmo tempo. Em vez de acelerar de novo, este ano sugere que você vá um pouco mais devagar. É a fase ideal para priorizar o sono, evitar ambientes que drenam sua bateria e focar em coisas que precisam ser feitas no silêncio, sem ninguém dando palpite. Um tempo valioso para recuperar fôlego.",
+    astrologyDefinition: "a intuição, a quietude, o recolhimento, o autocuidado e o encerramento de ciclos nos bastidores",
+    radar: { dinheiro: 30, amor: 40, saude: 95 },
 
-export const houseColors: Record<number, string> = {
-  1: "radial-gradient(circle at 50% 0%, rgba(139,0,0,0.6) 0%, rgba(2,4,8,1) 80%)",
-  2: "radial-gradient(circle at 50% 0%, rgba(0,100,0,0.5) 0%, rgba(2,4,8,1) 80%)",
-  3: "radial-gradient(circle at 50% 0%, rgba(184,134,11,0.5) 0%, rgba(2,4,8,1) 80%)",
-  4: "radial-gradient(circle at 50% 0%, rgba(192,192,192,0.4) 0%, rgba(2,4,8,1) 80%)",
-  5: "radial-gradient(circle at 50% 0%, rgba(255,140,0,0.5) 0%, rgba(2,4,8,1) 80%)",
-  6: "radial-gradient(circle at 50% 0%, rgba(85,107,47,0.5) 0%, rgba(2,4,8,1) 80%)",
-  7: "radial-gradient(circle at 50% 0%, rgba(219,112,147,0.5) 0%, rgba(2,4,8,1) 80%)",
-  8: "radial-gradient(circle at 50% 0%, rgba(74,4,4,0.7) 0%, rgba(2,4,8,1) 80%)",
-  9: "radial-gradient(circle at 50% 0%, rgba(75,0,130,0.5) 0%, rgba(2,4,8,1) 80%)",
-  10: "radial-gradient(circle at 50% 0%, rgba(47,79,79,0.6) 0%, rgba(2,4,8,1) 80%)",
-  11: "radial-gradient(circle at 50% 0%, rgba(0,0,128,0.6) 0%, rgba(2,4,8,1) 80%)",
-  12: "radial-gradient(circle at 50% 0%, rgba(0,128,128,0.5) 0%, rgba(2,4,8,1) 80%)"
+    name: "Casa 12 — O Retiro Estratégico e Trabalho de Bastidores",
+    oQueVocePrecisaEntender: "Este é o ano da incubação silenciosa. O foco está em proteger seus projetos de ruídos, trabalhar nos bastidores e recuperar a sua saúde e intuição profunda.",
+    podeFavorecer: [
+      "Trabalhar em projetos sigilosos longe dos olhos da concorrência",
+      "Realizar exames de saúde, rotinas de desintoxicação e descanso",
+      "Fortalecer a sua intuição profunda para tomar melhores decisões",
+      "Encerrar de vez ciclos emocionais cansativos e pendências do passado",
+      "Desfrutar de um escudo de proteção e privacidade contra intromissões externas"
+    ],
+    oSegredo: "o silêncio é a sua melhor estratégia de negócios. A Casa 12 funciona quando você deixa de lado a cobrança por aplausos imediatos e se recolhe estrategicamente para gestar suas próximas jogadas com segurança.",
+    oTema: "Seu ano gira em torno de privacidade, cuidados de saúde, trabalho de bastidores e encerramento de ciclos.",
+    oQueVocePodeGanhar: "Uma intuição muito aguçada para os negócios, a paz mental de uma rotina sem barulho excessivo e a cura profunda de desgastes físicos acumulados.",
+    comoApareceNaVidaReal: "Você sentirá vontade de se afastar um pouco das redes públicas, trabalhar focada de portas trancadas em um projeto próprio, reestruturar seus exames preventivos, meditar e ler mais assuntos de desenvolvimento interno.",
+    dinheiro: "Favorece ganhos que vêm do seu trabalho de bastidores: royalties de obras, produção intelectual sigilosa, direitos autorais, licenciamento de produtos ou negócios digitais que funcionam sem que sua imagem esteja em evidência pública.",
+    amor: "Exige discrição total na sua vida afetiva. Proteja o seu namoro ou casamento evitando expor a intimidade do casal para curiosos. Solteiras encontram paz na própria solitude regeneradora antes de iniciarem relacionamentos sérios.",
+    trabalho: "Período excelente para quem trabalha com pesquisas, escrita, desenvolvimento de projetos, consultorias confidenciais ou no campo holístico de terapias e saúde. Seu rendimento no trabalho silencioso é muito alto por não sofrer interrupções externas.",
+    vidaPessoal: "Ocorre um processo natural de limpeza de mágoas e arrependimentos antigos. Você fecha portas que já não servem para a sua vida com maturidade, limpando o terreno mental para os seus próximos anos.",
+    comoAproveitar: "Dedique tempo para o trabalho focado em silêncio, resolva pendências médicas antigas com seriedade preventiva, confie plenamente na sua intuição para decisões difíceis e resguarde sua privacidade.",
+    cuidadoCom: "Usar a solitude como desculpa para procrastinar com melancolia, fugir das obrigações práticas do dia a dia ou expor projetos de negócios que ainda não estão totalmente maduros.",
+    resumo: "Se você quer desenvolver um projeto de forma reservada, blindar e tratar a sua saúde física e mental e proteger sua privacidade das pressões externas, esta é a melhor Casa para escolher.",
+    diagnosticoCaos: "Exaustão máxima (\"Burnout\"). Minha alma absorveu demandas do público, inveja silenciosa ou opositores de bastidor. Requer um sumiço estratégico da humanidade para evitar colapsar.",
+    diagnosticoEscala: "Minha mente opera bem, mas preciso sumir em Deep Work confidencial absoluto para arquitetar o meu maior golpe mestre financeiro em total silêncio e blindagem espiritual.",
+    revelacaoCaos: "A Rota 12 cortará, como uma lâmina, as armadilhas públicas de vaidade e as parasitoses energéticas ao seu redor. Este destino cria um casulo de total proteção invisível que forçará o silêncio salvador da sua mente estraçalhada.",
+    revelacaoEscala: "A Rota 12 é a sua sala de planejamento confidencial (o cofre da intuição). Sem perder a realeza, você ativará instintos proféticos e se blindará na privacidade total. É a semente inviolável do seu próximo milhão, gestada de portas trancadas.",
+    fase1: "Mês 1-3 (O Apagão Estratégico): Abandone o vício doentes nos aplausos ou nas exigências públicas e faça um sumiço providencial. Limpe a desordem do ego e erga barreiras severas em favor do silêncio absoluto.",
+    fase2: "Mês 4-8 (O Cofre Confidencial): Incube a sua próxima jogada milionária escondido da concorrência e das más vibrações (Deep Work). Treine e use a sua intuição purificada como bússola exclusiva de negócios.",
+    fase3: "Mês 9-12 (Gestação Final do Salto): Alcance o pico de alinhamento psicológico e sabedoria cósmica inabalável. Finalize a produção de todo o material secreto que o projetará feito uma bomba atómica no próximo ano.",
+    idealPara: "Estrategistas esgotados da vida pública, criadores geniais em fase de incubação e mentes que exigem Deep Work sigiloso e intuição inabalável.",
+    conselhoCosmico: "O absoluto segredo é a sua arma letal; se você expor os seus projetos geniais prematuramente aos olhos da concorrência e à inveja pública, eles serão aniquilados. No entanto, vigie a sua sanidade: não permita que este retiro sagrado se converta numa fuga melancólica e depressiva. Você deve isolar-se temporariamente para gestar grandeza, não para desistir do mundo.",
+    mantra: "O meu silêncio é a minha estratégia letal; a minha intuição é o cofre inviolável do meu próximo milhão."
+  }
 };
 
 export const fallbackOraclesFuture: Record<number, string> = {
@@ -415,7 +572,7 @@ export const fallbackOraclesPast: Record<number, string> = {
   6: "As rotinas diárias e os cuidados com o corpo e trabalho ganharam prioridade máxima.",
   7: "As alianças e o convívio em parceria tomaram conta das suas decisões.",
   8: "Um tempo de mudanças profundas, finalizações complexas e partilha de recursos.",
-  9: "Você buscriptou respostas além da rotina, talvez através de viagens ou estudos maiores.",
+  9: "Você buscou respostas além da rotina, talvez através de viagens ou estudos maiores.",
   10: "A responsabilidade profissional aumentou consideravelmente, junto com sua imagem.",
   11: "Foi o momento de agir em grupo e de buscar amigos que ajudassem nos seus projetos.",
   12: "Sua intuição pediu calma; foi um momento para descansar e agir silenciosamente."

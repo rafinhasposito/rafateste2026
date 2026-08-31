@@ -5,35 +5,25 @@ export const onboardingScreens = [
     title: (
       <>
         O CÉU SE MOVE.<br />
-        <span className="text-[#D4AF37]">E VOCÊ TAMBÉM.</span>
+        <span className="text-[#D4AF37]">E O SEU MAPA TAMBÉM.</span>
       </>
     ),
-    subtitle: "A Astrologia de Relocalização mostra como os planetas ativam diferentes áreas da sua vida em cada lugar do mundo.",
+    subtitle: "O lugar onde você passa o seu aniversário ativa focos diferentes para o seu ano pessoal.",
     earthProps: EARTH_STATES[0]
   },
   {
-    title: "CADA LUGAR\nATIVA UMA ENERGIA.",
-    subtitle: "Seu mapa muda conforme o lugar onde você está ou escolhe estar. E isso muda tudo.",
+    title: "CADA CIDADE,\nUMA NOVA ENERGIA.",
+    subtitle: "Descubra como mudar de localização pode abrir novas oportunidades para a sua carreira, finanças ou amor.",
     earthProps: EARTH_STATES[1]
   },
   {
-    title: "SEU MAPA. QUALQUER LUGAR. QUALQUER POSSIBILIDADE.",
-    subtitle: "Calculamos sua Revolução Solar para o lugar e data que você escolher e revelamos como será seu próximo ciclo.",
-    earthProps: EARTH_STATES[2]
-  },
-  {
-    title: "MESMO CÉU.\nENERGIAS DIFERENTES.",
-    subtitle: "Veja como seu mapa muda de um lugar para outro.",
-    earthProps: EARTH_STATES[3]
-  },
-  {
-    title: "ESCOLHA SEU CAMINHO. EXPLORE SEU CICLO.",
-    subtitle: "Você pode analisar o que já viveu, entender o que está vivendo agora ou projetar o que deseja viver.",
+    title: "ESCOLHA O SEU CAMINHO.",
+    subtitle: "Analise o ano que passou, entenda o seu momento atual ou planeje o destino ideal para o seu próximo aniversário.",
     earthProps: EARTH_STATES[4]
   },
   {
     title: "AGORA É\nSOBRE VOCÊ.",
-    subtitle: "Use seus dados de nascimento para calcular sua Revolução Solar e explorar diferentes possibilidades pelo mundo.",
+    subtitle: "Insira seus dados de nascimento para calcular sua Revolução Solar e explorar as coordenadas pelo mundo.",
     earthProps: EARTH_STATES[5]
   }
 ];

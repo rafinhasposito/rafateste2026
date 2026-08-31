@@ -5,76 +5,67 @@ import { Sun, Sparkles } from "lucide-react";
 export const CityComparisonBeacons = () => {
   return (
     <div className="relative w-full h-full flex flex-col justify-between pointer-events-none select-none">
-      {/* ── BEACONS AREA (Upper Half of Visual Slot) ── */}
       <div className="relative w-full flex items-center justify-around px-4 pt-4 z-20">
         
-        {/* BEACON 1: SÃO PAULO (Gold / Sun) */}
+        {/* BEACON 1: SÃO PAULO (Gold) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="flex flex-col items-center"
         >
-          {/* Badge Icon */}
-          <div className="w-10 h-10 rounded-full border border-[#D4AF37] bg-[#0A0C14]/90 backdrop-blur-md flex items-center justify-center text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.4)]">
-            <Sun className="w-5 h-5 animate-pulse" />
+          <div className="w-10 h-10 rounded-full border border-[#D4AF37]/50 bg-[#0A0C14]/90 backdrop-blur-md flex items-center justify-center text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+            <Sun className="w-4 h-4" />
           </div>
 
-          {/* City & Country Label */}
-          <div className="text-center mt-2">
-            <span className="font-cinzel text-xs font-bold tracking-[0.15em] text-[#FAF7EE] uppercase block">
+          <div className="text-center mt-3">
+            <span className="font-cinzel text-[11px] font-bold tracking-[0.2em] text-[#FAF7EE] uppercase block">
               SÃO PAULO
             </span>
-            <span className="font-inter text-[10px] tracking-[0.1em] text-[#FAF7EE]/60 block mt-0.5">
+            <span className="font-inter text-[9px] tracking-[0.1em] text-[#FAF7EE]/40 block mt-1 uppercase">
               Brasil
             </span>
           </div>
 
-          {/* Vertical Glowing Light Ray */}
-          <div className="relative w-0.5 h-20 md:h-28 mt-2 flex flex-col items-center">
-            <div className="w-full h-full bg-gradient-to-b from-[#D4AF37] via-[#D4AF37]/50 to-transparent" />
+          <div className="relative w-px h-24 md:h-32 mt-3 flex flex-col items-center">
+            <div className="w-full h-full bg-gradient-to-b from-[#D4AF37]/60 via-[#D4AF37]/20 to-transparent" />
             <motion.div
-              animate={{ y: [0, 60, 0], opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-0 w-1 h-3 rounded-full bg-[#FAF7EE] shadow-[0_0_8px_#D4AF37]"
+              animate={{ y: [0, 60, 0], opacity: [0.2, 0.8, 0.2] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-0 w-px h-6 bg-[#FAF7EE] shadow-[0_0_8px_#D4AF37]"
             />
-            {/* Ground anchor pulse dot */}
-            <div className="absolute -bottom-1 w-2.5 h-2.5 rounded-full bg-[#D4AF37] shadow-[0_0_12px_#D4AF37]" />
+            <div className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-[#D4AF37]/50" />
           </div>
         </motion.div>
 
-        {/* BEACON 2: NOVA YORK (Cyan / Star) */}
+        {/* BEACON 2: NOVA YORK (Cream/White) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
           className="flex flex-col items-center"
         >
-          {/* Badge Icon */}
-          <div className="w-10 h-10 rounded-full border border-[#5EEAD4] bg-[#0A0C14]/90 backdrop-blur-md flex items-center justify-center text-[#5EEAD4] shadow-[0_0_15px_rgba(94,234,212,0.4)]">
-            <Sparkles className="w-5 h-5 animate-pulse" />
+          <div className="w-10 h-10 rounded-full border border-white/20 bg-[#0A0C14]/90 backdrop-blur-md flex items-center justify-center text-white/80 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+            <Sparkles className="w-4 h-4" />
           </div>
 
-          {/* City & Country Label */}
-          <div className="text-center mt-2">
-            <span className="font-cinzel text-xs font-bold tracking-[0.15em] text-[#FAF7EE] uppercase block">
+          <div className="text-center mt-3">
+            <span className="font-cinzel text-[11px] font-bold tracking-[0.2em] text-[#FAF7EE] uppercase block">
               NOVA YORK
             </span>
-            <span className="font-inter text-[10px] tracking-[0.1em] text-[#FAF7EE]/60 block mt-0.5">
+            <span className="font-inter text-[9px] tracking-[0.1em] text-[#FAF7EE]/40 block mt-1 uppercase">
               EUA
             </span>
           </div>
 
-          {/* Vertical Glowing Light Ray */}
-          <div className="relative w-0.5 h-20 md:h-28 mt-2 flex flex-col items-center">
-            <div className="w-full h-full bg-gradient-to-b from-[#5EEAD4] via-[#5EEAD4]/50 to-transparent" />
+          <div className="relative w-px h-24 md:h-32 mt-3 flex flex-col items-center">
+            <div className="w-full h-full bg-gradient-to-b from-white/40 via-white/10 to-transparent" />
             <motion.div
-              animate={{ y: [0, 60, 0], opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-              className="absolute top-0 w-1 h-3 rounded-full bg-[#FAF7EE] shadow-[0_0_8px_#5EEAD4]"
+              animate={{ y: [0, 60, 0], opacity: [0.2, 0.7, 0.2] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute top-0 w-px h-6 bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]"
             />
-            {/* Ground anchor pulse dot */}
-            <div className="absolute -bottom-1 w-2.5 h-2.5 rounded-full bg-[#5EEAD4] shadow-[0_0_12px_#5EEAD4]" />
+            <div className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-white/30" />
           </div>
         </motion.div>
 

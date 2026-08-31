@@ -181,7 +181,7 @@ const ConstellationSubmit = ({ onComplete, label, disabled = false, resetTrigger
             <span className="text-primary font-black uppercase tracking-[0.15em] md:tracking-[0.25em] text-xs md:text-sm">
               {disabled ? "Processando" : completed ? "Rota Calculada" : label}
             </span>
-            <span className="text-[8px] md:text-[9px] text-muted-foreground/60 tracking-[0.3em] uppercase font-space">
+            <span className="text-[8px] md:text-[9px] text-muted-foreground/60 tracking-[0.3em] uppercase font-sans">
               {disabled ? "Aguarde o retorno estelar" : completed ? "Protocolo selado" : isHolding ? "Selando protocolo..." : "Pressione e segure para selar"}
             </span>
           </div>

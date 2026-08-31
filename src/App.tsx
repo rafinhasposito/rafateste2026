@@ -22,8 +22,9 @@ import NotFound from "./pages/NotFound";
 import SolarGameV2 from "./pages/SolarGameV2";
 import NorthStarFlow from "./pages/NorthStarFlow";
 import AppleScrollExplosion from "./pages/AppleScrollExplosion";
-import { OrbitalOnboarding } from "./components/onboarding/OrbitalOnboarding";
-import { MobileOnboarding } from "./components/mobile/onboarding/MobileOnboarding";
+import ConceptsShowcase from "./pages/ConceptsShowcase";
+// OrbitalOnboarding removido para unificação visual
+import MobileOnboarding from "./components/mobile/onboarding/MobileOnboarding";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { UsersTable } from "./components/admin/UsersTable";
 
@@ -43,6 +44,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/concepts" element={<ConceptsShowcase />} />
+            
             {/* 1. Consumer Shell (Main App - Preserves state across resize) */}
             <Route element={<ConsumerShell />}>
               <Route path="/" element={<Index />} />
@@ -67,7 +70,7 @@ const App = () => (
             <Route path="/v2/game" element={<SolarGameV2 />} />
             <Route path="/northstar" element={<NorthStarFlow />} />
             <Route path="/apple-3d" element={<AppleScrollExplosion />} />
-            <Route path="/showcase-onboarding" element={<OrbitalOnboarding />} />
+            <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
