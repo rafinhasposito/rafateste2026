@@ -91,7 +91,7 @@ const currentYear = new Date().getFullYear().toString();
 
 const Index = () => {
   const { showAlert } = useAlert();
-  const { user } = useAuth();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
