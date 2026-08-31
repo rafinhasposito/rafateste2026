@@ -90,117 +90,135 @@ const Profile = () => {
     <>
       <StarryBackground />
 
-      <div className="min-h-screen px-4 py-12 max-w-3xl mx-auto">
+      <div className="min-h-screen px-4 py-16 md:py-24 max-w-4xl mx-auto">
         <motion.button
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-widest hover:text-primary mb-6"
+          className="flex items-center gap-2 text-white/50 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-[#D4AF37] mb-8 transition-colors"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Voltar
+          <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao Descobrir
         </motion.button>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="font-cinzel text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider mb-2"
-        >
-          Meu Perfil
-        </motion.h1>
-        <p className="text-muted-foreground text-sm mb-8">Salve seus dados natais uma vez. O sistema lembra para sempre.</p>
-
-        {/* Minha Conta */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-          className="glass-panel p-6 mb-6 border-l-4" style={{ borderColor: "hsl(var(--gold) / 0.5)" }}>
-          <div className="flex items-center gap-4">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-16 h-16 rounded-full border-2 border-primary/30 object-cover" />
-            ) : (
-              <div className="w-16 h-16 rounded-full border-2 border-primary/30 bg-primary/10 flex items-center justify-center">
-                <User className="w-7 h-7 text-primary" />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-foreground font-medium truncate">{fullName || profile?.display_name || profile?.email}</p>
-              <p className="text-muted-foreground text-xs truncate">{profile?.email}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Créditos</p>
-              <p className="font-cinzel text-3xl text-primary font-bold leading-none">{profile?.credits ?? 0}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => navigate("/credits")}
-            className="mt-5 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all"
-          >
-            <CreditCard className="w-4 h-4" /> Comprar mais créditos
-          </button>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+          <h1 className="font-cinzel text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">
+            Seu Arquivo Cósmico
+          </h1>
+          <p className="font-inter text-white/50 text-sm">Gerencie sua identidade astrológica e acessos ao Protocolo.</p>
         </motion.div>
 
-        {/* Dados Natais */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-          className="glass-panel p-6 mb-6">
-          <h2 className="font-cinzel text-base uppercase tracking-wider text-foreground mb-1">Meus Dados Natais</h2>
-          <p className="text-muted-foreground text-xs mb-5">Opcional. Quando preenchido, as consultas vêm pré-preenchidas.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          
+          {/* Lado Esquerdo: Identidade e Créditos */}
+          <div className="md:col-span-1 space-y-10">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-4">Acesso Oficial</span>
+              <div className="flex items-center gap-4">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover grayscale opacity-80" />
+                ) : (
+                  <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                    <User className="w-6 h-6 text-white/40" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-white font-cinzel text-lg">{fullName || profile?.display_name || "Membro"}</p>
+                  <p className="text-white/40 font-inter text-xs">{profile?.email}</p>
+                </div>
+              </div>
+            </motion.div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 mb-1.5"><User className="w-3 h-3" />Nome Completo</label>
-              <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Seu nome e sobrenome" className="quantum-input" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 mb-1.5"><Calendar className="w-3 h-3" />Data</label>
-                <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} className="quantum-input" />
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+              <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-white/40 block mb-2">Créditos de Consulta</span>
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="font-cinzel text-5xl text-[#D4AF37] leading-none">{profile?.credits ?? 0}</span>
+                <span className="font-inter text-xs text-[#D4AF37]/60 uppercase tracking-widest">Saldo Atual</span>
               </div>
-              <div>
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 mb-1.5"><Clock className="w-3 h-3" />Hora</label>
-                <input type="time" value={birthTime} onChange={e => setBirthTime(e.target.value)} className="quantum-input" />
-              </div>
-            </div>
-            <div>
-              <label className="text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 mb-1.5"><MapPin className="w-3 h-3" />Cidade de Nascimento</label>
-              <CityAutocomplete
-                value={birthCity}
-                onChange={(v, valid, coords) => {
-                  setBirthCity(v);
-                  setBirthCityValid(valid);
-                  if (coords) setBirthCoords(coords);
-                }}
-                placeholder="Digite e selecione da lista"
-              />
-            </div>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-primary/40 bg-primary/10 text-primary font-bold text-xs uppercase tracking-[0.14em] hover:bg-primary/20 transition-all disabled:opacity-40"
-            >
-              <Save className="w-4 h-4" /> {saving ? "Salvando..." : "Salvar perfil"}
+              <button
+                onClick={() => navigate("/credits")}
+                className="w-full py-3 bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 hover:bg-[#D4AF37]/20 transition-all font-sans text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2"
+              >
+                <CreditCard className="w-4 h-4" /> Adquirir Mais Créditos
+              </button>
+            </motion.div>
+            
+            <button onClick={signOut} className="text-white/30 hover:text-white transition-colors text-[10px] font-sans uppercase tracking-[0.2em] pt-4 border-t border-white/10 w-full text-left">
+              Sair do Sistema
             </button>
           </div>
-        </motion.div>
 
-        {/* Últimas Consultas */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="glass-panel p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-cinzel text-base uppercase tracking-wider text-foreground flex items-center gap-2"><HistoryIcon className="w-4 h-4 text-primary" />Últimas Consultas</h2>
-            <button onClick={() => navigate("/history")} className="text-primary text-[10px] uppercase tracking-widest hover:underline">Ver todas →</button>
-          </div>
-          {recent.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-6">Nenhuma consulta ainda.</p>
-          ) : (
-            <div className="space-y-2">
-              {recent.map(c => (
-                <div key={c.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/60 bg-background/30">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-foreground text-sm font-medium truncate">{c.name} · {c.year}</p>
-                    <p className="text-muted-foreground text-xs truncate">{c.mode}{c.origin ? ` · ${c.origin}` : ""}</p>
-                  </div>
-                  <p className="text-muted-foreground/60 text-[10px]">{new Date(c.created_at).toLocaleDateString("pt-BR")}</p>
+          {/* Lado Direito: Formulário Natal e Histórico */}
+          <div className="md:col-span-2 space-y-12">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+              <div className="flex items-center gap-4 mb-6">
+                 <h2 className="font-cinzel text-2xl text-white">Coordenadas de Nascimento</h2>
+                 <div className="flex-1 h-px bg-white/10" />
+              </div>
+              <p className="text-white/50 font-inter text-xs mb-8">Defina seus dados uma vez. O sistema carregará sua identidade astral automaticamente em todas as próximas consultas.</p>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-2 block">Nome para a Consulta</label>
+                  <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Seu nome completo" className="quantum-input w-full border-b border-white/20 pb-3 pt-2 text-lg text-white placeholder:text-white/20 focus:border-[#D4AF37] bg-transparent" />
                 </div>
-              ))}
-            </div>
-          )}
-        </motion.div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-2 block">Data</label>
+                    <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} className="quantum-input w-full border-b border-white/20 pb-3 pt-2 text-lg text-white focus:border-[#D4AF37] bg-transparent" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-2 block">Hora Exata</label>
+                    <input type="time" value={birthTime} onChange={e => setBirthTime(e.target.value)} className="quantum-input w-full border-b border-white/20 pb-3 pt-2 text-lg text-white focus:border-[#D4AF37] bg-transparent" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-2 block">Cidade de Origem</label>
+                  <CityAutocomplete
+                    value={birthCity}
+                    onChange={(v, valid, coords) => {
+                      setBirthCity(v);
+                      setBirthCityValid(valid);
+                      if (coords) setBirthCoords(coords);
+                    }}
+                    placeholder="Digite e selecione na lista"
+                    className="w-full text-lg border-b border-white/20 bg-transparent pb-3 pt-2 text-white focus:border-[#D4AF37] focus:ring-0 transition-colors rounded-none"
+                  />
+                </div>
+                
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full md:w-auto mt-4 px-8 py-4 bg-white text-black hover:bg-gray-200 disabled:bg-white/10 disabled:text-white/30 transition-all font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2"
+                >
+                  <Save className="w-4 h-4" /> {saving ? "Salvando..." : "Gravar Coordenadas"}
+                </button>
+              </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="pt-8 border-t border-white/10">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-cinzel text-xl text-white">Consultas Recentes</h2>
+                <button onClick={() => navigate("/history")} className="text-[#D4AF37] text-[10px] uppercase tracking-widest hover:text-white transition-colors">Acessar Arquivo →</button>
+              </div>
+              
+              {recent.length === 0 ? (
+                <p className="text-white/40 text-sm font-inter">Nenhum dossiê gerado ainda.</p>
+              ) : (
+                <div className="space-y-3">
+                  {recent.map(c => (
+                    <div key={c.id} className="flex items-center justify-between p-4 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-colors rounded-lg group">
+                      <div>
+                        <p className="text-white font-cinzel text-sm group-hover:text-[#D4AF37] transition-colors">{c.name} · {c.year}</p>
+                        <p className="text-white/40 font-inter text-[10px] uppercase tracking-widest mt-1">{c.mode}{c.origin ? ` · ${c.origin}` : ""}</p>
+                      </div>
+                      <p className="text-white/30 font-inter text-[10px]">{new Date(c.created_at).toLocaleDateString("pt-BR")}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+
+          </div>
+        </div>
       </div>
     </>
   );

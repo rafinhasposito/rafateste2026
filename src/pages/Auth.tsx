@@ -117,38 +117,44 @@ const Auth = () => {
             <div className="flex-1 h-px bg-border/60" />
           </div>
 
-          <form onSubmit={handleEmailSubmit} className="space-y-3.5">
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
             {mode === "signup" && (
-              <input
-                type="text" placeholder="Seu nome completo" value={name} onChange={e => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/80 focus:border-gold/60 outline-none text-foreground text-sm transition-colors"
-              />
+              <div className="text-left">
+                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Nome Completo</label>
+                <input
+                  type="text" required placeholder="Seu nome completo" value={name} onChange={e => setName(e.target.value)}
+                  className="quantum-input w-full"
+                />
+              </div>
             )}
-            <input
-              type="email" required placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/80 focus:border-gold/60 outline-none text-foreground text-sm transition-colors"
-            />
-            {mode !== "forgot" && (
+            <div className="text-left">
+              <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Email</label>
               <input
-                type="password" required placeholder="Senha" minLength={6} value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-background/60 border border-border/80 focus:border-gold/60 outline-none text-foreground text-sm transition-colors"
+                type="email" required placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)}
+                className="quantum-input w-full"
               />
+            </div>
+            {mode !== "forgot" && (
+              <div className="text-left">
+                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Senha</label>
+                <input
+                  type="password" required placeholder="••••••••" minLength={6} value={password} onChange={e => setPassword(e.target.value)}
+                  className="quantum-input w-full"
+                />
+              </div>
             )}
             <button
               type="submit" disabled={busy}
-              className="btn-gold-luxury w-full py-3.5 text-xs tracking-[0.15em] mt-2 disabled:opacity-50"
+              className="w-full h-14 mt-6 bg-white text-black hover:bg-gray-200 disabled:bg-white/10 disabled:text-white/30 transition-all font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2"
             >
+              {busy ? (
+                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              ) : null}
               {busy ? "Processando..." : mode === "signup" ? "Criar conta estelar" : mode === "forgot" ? "Enviar link" : "Entrar no Protocolo"}
             </button>
           </form>
 
-          {/* Botão de Bypass para Testes Locais */}
-          <button
-            onClick={() => navigate('/showcase-onboarding')}
-            className="w-full py-3 mt-3 rounded-xl border border-primary/30 text-primary font-bold text-sm uppercase tracking-widest hover:bg-primary/10 transition-all"
-          >
-            Pular Login (Testar Game)
-          </button>
+          {/* Botão de Bypass para Testes Locais removido na versão premium/lançamento para evitar ruído. */}
 
           <div className="flex justify-between mt-5 text-xs">
             {mode !== "signin" ? (

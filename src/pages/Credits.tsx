@@ -22,38 +22,41 @@ const Credits = () => {
   return (
     <>
       <StarryBackground />
-      <div className="min-h-screen px-4 py-16 max-w-5xl mx-auto">
+      <div className="min-h-screen px-4 py-16 md:py-24 max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
           <button
             onClick={() => navigate("/")}
-            className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary transition-colors mb-8 inline-block"
+            className="flex items-center justify-center gap-2 text-white/50 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-[#D4AF37] mb-8 transition-colors mx-auto"
           >
-            ← Voltar
+            <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao Descobrir
           </button>
-          <h1 className="font-cinzel text-3xl md:text-5xl font-bold text-foreground mb-3 uppercase tracking-wider">
-            Créditos Estelares
+          <h1 className="font-cinzel text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-widest">
+            Créditos de Acesso
           </h1>
-          <p className="text-muted-foreground text-sm font-light max-w-lg mx-auto">
-            Cada crédito desbloqueia casas no seu mapa de Revolução Solar. Quanto mais casas, mais rotas de prosperidade você descobre.
+          <p className="text-white/50 text-sm font-inter max-w-lg mx-auto">
+            Cada crédito desbloqueia casas específicas no seu mapa de Revolução Solar. Obtenha acesso para descobrir suas rotas de prosperidade.
           </p>
           {profile && (
-            <div className="mt-6 inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5">
-              <span className="text-primary font-cinzel text-xl font-bold">{profile.credits}</span>
-              <span className="text-muted-foreground text-xs uppercase tracking-widest">créditos disponíveis</span>
+            <div className="mt-8 inline-flex flex-col items-center justify-center">
+              <span className="text-white/40 text-[10px] uppercase tracking-widest font-sans mb-2">Seu Saldo Oficial</span>
+              <span className="text-[#D4AF37] font-cinzel text-5xl font-bold leading-none">{profile.credits}</span>
             </div>
           )}
         </motion.div>
 
         {/* Packages Grid */}
         {loading ? (
-          <p className="text-primary font-cinzel text-base md:text-lg uppercase tracking-[0.2em] animate-pulse text-center py-8" role="status" aria-live="polite">Carregando pacotes...</p>
+          <div className="text-center py-16">
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-white/60 font-sans text-xs uppercase tracking-widest">Calculando valores cósmicos...</p>
+          </div>
         ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
           {packages.map((pkg, i) => {
             const highlight = i === 1;
             const [int, dec] = fmt(pkg.price_brl);
@@ -63,31 +66,42 @@ const Credits = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`glass-panel p-8 text-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${highlight ? "border-primary/40 shadow-[0_0_40px_hsl(var(--gold)/0.15)]" : ""}`}
+              className={`p-8 md:p-10 text-center relative transition-all duration-300 flex flex-col justify-between ${
+                highlight 
+                  ? "border border-[#D4AF37]/50 bg-[#D4AF37]/5 shadow-[0_0_50px_rgba(212,175,55,0.1)]" 
+                  : "border border-white/10 bg-white/[0.02] hover:bg-white/[0.04]"
+              }`}
             >
-              {highlight && (<div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-dark via-primary to-gold-light" />)}
-              <div className="mb-4">
-                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-sans">{housesLabel(pkg.credits)}</span>
-              </div>
-              <h3 className="font-cinzel text-xl font-bold text-foreground mb-2 uppercase tracking-wider">{pkg.label}</h3>
-              <p className="text-muted-foreground text-xs font-light mb-6 min-h-[2.5rem]">{pkg.description}</p>
-              <div className="mb-6">
-                <span className="text-muted-foreground text-xs">R$</span>
-                <span className="text-foreground font-cinzel text-4xl font-bold mx-1">{int}</span>
-                <span className="text-muted-foreground text-sm">,{dec}</span>
-              </div>
-              <div className="mb-6 text-[10px] text-muted-foreground/60 uppercase tracking-widest">
-                {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}
+              <div>
+                <div className="mb-4">
+                  <span className={`text-[10px] font-sans font-bold uppercase tracking-[0.3em] ${highlight ? 'text-[#D4AF37]' : 'text-white/40'}`}>
+                    {housesLabel(pkg.credits)}
+                  </span>
+                </div>
+                <h3 className={`font-cinzel text-2xl font-bold uppercase tracking-wider mb-3 ${highlight ? 'text-white' : 'text-white/80'}`}>
+                  {pkg.label}
+                </h3>
+                <p className="text-white/50 text-xs font-inter mb-8 min-h-[3rem] leading-relaxed">
+                  {pkg.description}
+                </p>
+                <div className="mb-6 flex items-start justify-center text-white">
+                  <span className="text-white/50 text-sm mt-1 mr-1">R$</span>
+                  <span className="font-cinzel text-5xl font-bold leading-none">{int}</span>
+                  <span className="text-white/50 text-base mt-1">,{dec}</span>
+                </div>
+                <div className="mb-8 text-[10px] text-white/40 font-sans uppercase tracking-widest font-bold">
+                  {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""} incl.
+                </div>
               </div>
               <button
                 onClick={() => handlePurchase(pkg)}
-                className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.16em] transition-all ${
+                className={`w-full py-4 text-[10px] font-sans uppercase tracking-widest font-bold flex items-center justify-center gap-2 transition-all ${
                   highlight
-                    ? "btn-gold-luxury shadow-[0_0_25px_rgba(212,175,55,0.4)]"
-                    : "bg-secondary/70 border border-primary/20 text-foreground hover:border-primary/50 hover:bg-secondary"
+                    ? "bg-white text-black hover:bg-gray-200"
+                    : "bg-transparent border border-white/30 text-white hover:bg-white hover:text-black"
                 }`}
               >
-                Comprar Créditos
+                Adquirir Acesso
               </button>
             </motion.div>
           );})}
@@ -96,55 +110,26 @@ const Credits = () => {
 
         {/* Unlock Pricing Table */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mt-16"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+          className="mt-24 pt-16 border-t border-white/10"
         >
-          <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-6 text-center">
-            Quanto Custa Cada Desbloqueio
+          <h3 className="font-cinzel text-xl text-white uppercase tracking-widest mb-10 text-center">
+            Tabela de Conversão
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {costs.map((item) => {
               const Icon = ICONS[item.key] || Map;
               return (
-                <div key={item.key} className="p-5 rounded-xl border border-primary/15 bg-card/40 backdrop-blur-sm text-center">
-                  <div className="w-10 h-10 rounded-full border border-primary/30 bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                    <Icon className="w-4 h-4 text-primary" />
+                <div key={item.key} className="p-6 text-center">
+                  <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-5 h-5 text-white/60" />
                   </div>
-                  <p className="font-cinzel text-sm font-bold text-foreground mb-1">{item.label}</p>
-                  <p className="text-primary font-bold text-lg">{item.credits} crédito{item.credits > 1 ? "s" : ""}</p>
-                  <p className="text-muted-foreground text-[10px] mt-1">{item.description}</p>
+                  <p className="font-cinzel text-base text-white mb-2">{item.label}</p>
+                  <p className="text-[#D4AF37] font-sans text-xs uppercase tracking-widest font-bold mb-2">{item.credits} crédito{item.credits > 1 ? "s" : ""}</p>
+                  <p className="text-white/40 text-[10px] font-inter leading-relaxed">{item.description}</p>
                 </div>
               );
             })}
-          </div>
-        </motion.div>
-
-        {/* How credits work */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-16 text-center"
-        >
-          <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-6">
-            Como Funcionam os Créditos
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            {[
-              { step: "1", title: "Compre Créditos", desc: "Escolha o pacote ideal para sua jornada" },
-              { step: "2", title: "Calcule a Rota", desc: "Preencha seus dados e receba o mapa estelar" },
-              { step: "3", title: "Desbloqueie Casas", desc: "Use créditos para ver mais destinos e rotas" },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-primary font-cinzel font-bold">{item.step}</span>
-                </div>
-                <p className="text-foreground text-sm font-medium mb-1">{item.title}</p>
-                <p className="text-muted-foreground text-xs font-light">{item.desc}</p>
-              </div>
-            ))}
           </div>
         </motion.div>
       </div>

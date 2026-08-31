@@ -22,17 +22,13 @@ export interface ChargeResult {
 export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult> => {
   const cost = args.amount ?? 1;
 
-  // TEMPORARY BYPASS: Return success without hitting the database
-  return { ok: true, newBalance: args.currentCredits };
-  
-  /* Original code
   if (args.isAdmin) {
     // Log para auditoria mas sem debitar
     await supabase.from("credit_transactions").insert({
       user_id: args.userId,
       amount: 0,
       type: args.type ?? "consulta_admin",
-      description: `[ADMIN — sem cobrança] ${args.description}`,
+      description: args.description,
     });
     return { ok: true, newBalance: args.currentCredits };
   }
@@ -42,6 +38,8 @@ export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult
   }
 
   const newBalance = args.currentCredits - cost;
+
+  // 1. Atualizar saldo no profile
   const { error } = await supabase
     .from("profiles")
     .update({ credits: newBalance })
@@ -49,13 +47,13 @@ export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult
 
   if (error) return { ok: false, reason: "db_error" };
 
+  // 2. Registrar transação
   await supabase.from("credit_transactions").insert({
     user_id: args.userId,
-    amount: -cost,
+    amount: -cost, // Negativo pois é débito
     type: args.type ?? "consulta",
     description: args.description,
   });
 
   return { ok: true, newBalance };
-  */
 };

@@ -8,13 +8,35 @@ import { motion } from 'framer-motion';
  */
 export const Screen1 = () => (
   <div className="relative w-full h-[100dvh] overflow-hidden flex flex-col">
-    {/* Earth + Milky Way — user's image, maximum sharpness */}
-    <img
-      src="/assets/earth-blue.jpg"
-      alt="Terra no universo"
-      className="absolute inset-0 w-full h-full object-cover object-center"
-      style={{ filter: 'contrast(1.08) saturate(1.15) brightness(1.05)' }}
-    />
+    {/* Earth + Milky Way — MP4 Videos with prefers-reduced-motion fallback */}
+    <div className="absolute inset-0 w-full h-full" style={{ filter: 'contrast(1.08) saturate(1.15) brightness(1.05)' }}>
+      {/* Static Fallback for reduced motion users */}
+      <img
+        src="/assets/earth-blue.jpg"
+        alt="Terra no universo"
+        className="absolute inset-0 w-full h-full object-cover object-center block motion-safe:hidden"
+      />
+      
+      {/* Videos for motion-safe users */}
+      <div className="absolute inset-0 w-full h-full hidden motion-safe:block">
+        {/* Mobile Video */}
+        <video
+          autoPlay muted loop playsInline
+          poster="/assets/earth-blue.jpg"
+          className="absolute inset-0 w-full h-full object-cover object-center md:hidden"
+        >
+          <source src="/assets/video-mobile.mp4" type="video/mp4" />
+        </video>
+        {/* Desktop Video */}
+        <video
+          autoPlay muted loop playsInline
+          poster="/assets/earth-blue.jpg"
+          className="absolute inset-0 w-full h-full object-cover object-center hidden md:block"
+        >
+          <source src="/assets/video-desktop.mp4" type="video/mp4" />
+        </video>
+      </div>
+    </div>
     {/* Single precise gradient — only bottom 50% gets darkened for text legibility */}
     <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/70 to-transparent" style={{ background: 'linear-gradient(to top, #030306 0%, #030306cc 30%, #03030640 60%, transparent 100%)' }} />
 
