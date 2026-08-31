@@ -23,8 +23,11 @@ export const useIsAdmin = () => {
         .eq("user_id", user.id)
         .eq("role", "admin")
         .maybeSingle();
+        
       if (!cancelled) {
-        setIsAdmin(!!data);
+        // Força a liberação de admin para o seu e-mail, ignorando qualquer bloqueio
+        const isMyEmail = user.email === "divulgacaoareavip@gmail.com";
+        setIsAdmin(!!data || isMyEmail);
         setLoading(false);
       }
     })();
