@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, MapPin, Eye, Unlock, CreditCard, Compass, Crown, Scroll, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { Calendar, Clock, MapPin, Eye, Unlock, CreditCard, Compass, Crown, Scroll, ArrowDownLeft, ArrowUpRight, ArrowLeft, Map } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 
 import EmptyState from "@/components/EmptyState";

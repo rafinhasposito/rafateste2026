@@ -192,14 +192,15 @@ const Dashboard = () => {
     setUnlocking(true);
 
     try {
-      const remainingCredits = (profile.credits ?? 0) - creditsNeeded;
+      const { data: success, error: rpcError } = await supabase.rpc("charge_credits", {
+        p_amount: creditsNeeded,
+        p_type: "unlock_houses",
+        p_description: `Desbloqueio de +${creditsNeeded} casa${creditsNeeded > 1 ? "s" : ""}`
+      });
 
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({ credits: remainingCredits })
-        .eq("user_id", user.id);
-
-      if (profileError) throw profileError;
+      if (rpcError || !success) {
+        throw new Error("Failed to charge credits");
+      }
 
       const { error: consultationError } = await supabase
         .from("consultations")
@@ -208,16 +209,6 @@ const Dashboard = () => {
         .eq("user_id", user.id);
 
       if (consultationError) throw consultationError;
-
-      await supabase
-        .from("credit_transactions")
-        .insert({
-          user_id: user.id,
-          amount: -creditsNeeded,
-          type: "unlock_houses",
-          consultation_id: consultation.id,
-          description: `Desbloqueio de +${creditsNeeded} casa${creditsNeeded > 1 ? "s" : ""}`,
-        });
 
       setConsultation((prev) => (prev ? { ...prev, houses_unlocked: targetUnlocked } : prev));
       await refreshProfile();

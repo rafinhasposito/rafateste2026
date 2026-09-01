@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Compass, MapPin, Zap, ShieldAlert, Star } from "lucide-react";
+import { Compass, MapPin, Zap, ShieldAlert, Star, Lock, Eye, Crown } from "lucide-react";
+import { useAlert } from "@/hooks/useAlert";
+import { useNavigate } from "react-router-dom";
 import { ATLAS_DO_DESTINO } from "@/data/atlas";
 import { cityDatabase } from "@/data/houses";
 import { mockDestinyNewYork } from "@/data/destiny";
@@ -18,12 +20,16 @@ export interface DestinyResultsProps {
   consultationId?: string;
   autoUnlocked?: boolean;
   mode?: "passado" | "presente" | "futuro";
+  embedded?: boolean;
 }
 
 export const DestinyResults: React.FC<DestinyResultsProps> = ({
   house, cities, autoUnlocked = false, mode = "futuro",
 }) => {
   const [unlocked] = useState(autoUnlocked);
+  const { showAlert } = useAlert();
+  const navigate = useNavigate();
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [aiInsight, setAiInsight] = useState<string>("");
   const [loadingInsight, setLoadingInsight] = useState(false);
 
@@ -166,39 +172,127 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
         </section>
 
         {/* 4. EXPLORAR OUTRAS CASAS */}
-        <section className="border-t border-white/10 pt-16">
-          <div className="text-center mb-10">
-            <span className="text-[10px] uppercase tracking-[0.3em] font-semibold text-white/40 block mb-3">
-              Visão Completa
-            </span>
-            <h3 className="font-cinzel text-2xl text-white">As 12 Coordenadas do Ano</h3>
-          </div>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Object.values(cityDatabase).map((houseItem) => (
-              <div
-                key={houseItem.id}
-                className={`p-5 rounded-xl transition-all cursor-pointer ${
-                  houseItem.id === house 
-                    ? "bg-[#D4AF37]/10 border border-[#D4AF37]/30" 
-                    : "bg-white/[0.02] border border-white/5 hover:border-white/20"
-                }`}
-              >
-                <div className="flex justify-between items-center mb-3">
-                  <span className={`text-[10px] font-mono tracking-widest ${houseItem.id === house ? "text-[#D4AF37]" : "text-white/40"}`}>
-                    {String(houseItem.id).padStart(2, "0")}
-                  </span>
-                  {houseItem.id === house && <Star className="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]" />}
-                </div>
-                <h4 className={`font-cinzel text-sm mb-1 ${houseItem.id === house ? "text-white" : "text-white/70"}`}>
-                  {houseItem.label}
-                </h4>
-                <p className="text-[10px] text-white/30 font-sans truncate">{houseItem.intent}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        {!embedded && (
+          <section className="border-t border-white/10 pt-16">
+            <div className="text-center mb-10">
+              <span className="text-[10px] uppercase tracking-[0.3em] font-semibold text-white/40 block mb-3">
+                Visão Completa
+              </span>
+              <h3 className="font-cinzel text-2xl text-white">As 12 Coordenadas do Ano</h3>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Object.values(cityDatabase).map((houseItem) => {
+                // In fallback standalone mode (initial lookup), only the initial house is unlocked.
+                const isCurrentHouse = houseItem.id === house;
+                const isUnlocked = isCurrentHouse || autoUnlocked;
+                
+                return (
+                  <div
+                    key={houseItem.id}
+                    onClick={() => {
+                      if (!isUnlocked) {
+                        setShowUnlockModal(true);
+                      }
+                    }}
+                    className={`relative p-5 rounded-xl transition-all ${!isUnlocked ? "cursor-pointer opacity-60 hover:opacity-100 hover:border-white/20" : ""} ${
+                      isCurrentHouse 
+                        ? "bg-[#D4AF37]/10 border border-[#D4AF37]/30" 
+                        : "bg-white/[0.02] border border-white/5"
+                    }`}
+                  >
+                    {!isUnlocked && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/60 backdrop-blur-[2px] z-10 transition-all hover:bg-black/40">
+                        <div className="text-center">
+                          <Lock className="w-5 h-5 mx-auto mb-2 text-white/50" />
+                          <span className="text-white/40 text-[9px] uppercase tracking-widest font-bold">Bloqueada</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center mb-3">
+                      <span className={`text-[10px] font-mono tracking-widest ${isCurrentHouse ? "text-[#D4AF37]" : "text-white/40"}`}>
+                        {String(houseItem.id).padStart(2, "0")}
+                      </span>
+                      {isCurrentHouse && <Star className="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]" />}
+                    </div>
+                    <h4 className={`font-cinzel text-sm mb-1 ${isCurrentHouse ? "text-white" : "text-white/70"}`}>
+                      {houseItem.label}
+                    </h4>
+                    <p className="text-[10px] text-white/30 font-sans truncate">{houseItem.intent}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
+        {/* Modal de Desbloqueio */}
+        {showUnlockModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-[#0a0a0f] border border-white/10 rounded-2xl p-6 md:p-8 max-w-md w-full relative"
+            >
+              <button 
+                onClick={() => setShowUnlockModal(false)}
+                className="absolute top-4 right-4 text-white/40 hover:text-white"
+              >
+                ✕
+              </button>
+              
+              <div className="text-center mb-8">
+                <Crown className="w-8 h-8 text-[#D4AF37] mx-auto mb-4" />
+                <h3 className="font-cinzel text-xl text-white mb-2">Desbloquear Mapa Completo</h3>
+                <p className="text-white/50 text-xs font-inter leading-relaxed">
+                  Esta casa faz parte da sua mandala estelar estendida. 
+                  Você tem {userCredits ?? 0} créditos disponíveis.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  { houses: 1, credits: 1, label: "+1 Casa", desc: "Revele a próxima casa do mapa" },
+                  { houses: 3, credits: 3, label: "+3 Casas", desc: "Expanda sua visão do ano" },
+                  { houses: 12, credits: 11, label: "Todas as Casas", desc: "Desbloqueio total do dossiê" }
+                ].map(pkg => (
+                  <button
+                    key={pkg.houses}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        navigate("/auth");
+                        return;
+                      }
+                      if ((userCredits ?? 0) < pkg.credits) {
+                        showAlert(`Você precisa de ${pkg.credits} créditos. Redirecionando...`);
+                        navigate("/credits");
+                        return;
+                      }
+                      if (consultationId) {
+                        navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
+                      } else {
+                        showAlert("Erro: Dossiê não encontrado.");
+                      }
+                    }}
+                    className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-[#D4AF37]/30 transition-all flex items-center justify-between group text-left"
+                  >
+                    <div>
+                      <div className="font-cinzel text-sm text-white group-hover:text-[#D4AF37] transition-colors">
+                        {pkg.label}
+                      </div>
+                      <div className="text-[10px] text-white/40 font-sans mt-1">
+                        {pkg.desc}
+                      </div>
+                    </div>
+                    <div className="text-xs font-bold text-white/80 bg-white/10 px-3 py-1.5 rounded-full">
+                      {pkg.credits} CR
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
