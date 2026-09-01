@@ -23,18 +23,19 @@ export interface DestinyResultsProps {
   embedded?: boolean;
   isHouseUnlocked?: (houseNum: number) => boolean;
   onSelectHouse?: (houseNum: number) => void;
+  unlockedCount?: number;
 }
 
 export const DestinyResults: React.FC<DestinyResultsProps> = ({
   house, cities, autoUnlocked = false, mode = "futuro",
   consultationId, userCredits, isAuthenticated, embedded = false,
-  isHouseUnlocked, onSelectHouse
+  isHouseUnlocked, onSelectHouse, unlockedCount = 1
 }) => {
   // Always show content — access gating is handled by Dashboard's isHouseLocked
   const [unlocked] = useState(true);
   const { showAlert } = useAlert();
   const navigate = useNavigate();
-  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [unlockTarget, setUnlockTarget] = useState<number | null>(null);
   const [aiInsight, setAiInsight] = useState<string>("");
   const [loadingInsight, setLoadingInsight] = useState(false);
 
@@ -202,7 +203,7 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
                     key={houseItem.id}
                     onClick={() => {
                       if (!isUnlocked) {
-                        setShowUnlockModal(true);
+                        setUnlockTarget(houseItem.id);
                       } else if (onSelectHouse && !isCurrentHouse) {
                         onSelectHouse(houseItem.id);
                         // Scroll to top of results for better UX
@@ -237,11 +238,20 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
                 );
               })}
             </div>
+            
+            <div className="text-center mt-8">
+              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest block mb-2">
+                {unlockedCount} DE 12 CASAS REVELADAS
+              </span>
+              <p className="text-white/40 text-xs font-inter">
+                Clique em qualquer Casa para explorar aquela área do seu próximo ano.
+              </p>
+            </div>
           </section>
         )}
 
         {/* Modal de Desbloqueio */}
-        {showUnlockModal && (
+        {unlockTarget && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
@@ -249,61 +259,93 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
               className="bg-[#0a0a0f] border border-white/10 rounded-2xl p-6 md:p-8 max-w-md w-full relative"
             >
               <button 
-                onClick={() => setShowUnlockModal(false)}
+                onClick={() => setUnlockTarget(null)}
                 className="absolute top-4 right-4 text-white/40 hover:text-white"
               >
                 ✕
               </button>
               
-              <div className="text-center mb-8">
-                <Crown className="w-8 h-8 text-[#D4AF37] mx-auto mb-4" />
-                <h3 className="font-cinzel text-xl text-white mb-2">Desbloquear Mapa Completo</h3>
-                <p className="text-white/50 text-xs font-inter leading-relaxed">
-                  Esta casa faz parte da sua mandala estelar estendida. 
-                  Você tem {userCredits ?? 0} créditos disponíveis.
-                </p>
-              </div>
+              {(() => {
+                const targetHouseData = cityDatabase[unlockTarget];
+                // For UI mock purposes: Base is 29,90 (1 house). Each additional house unlocked cost 14,90.
+                // We know unlockedCount.
+                const alreadyPaid = 29.90 + Math.max(0, unlockedCount - 1) * 14.90;
+                const remainingToComplete = Math.max(0, 99.90 - alreadyPaid);
+                const formatBRL = (val: number) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-              <div className="space-y-3">
-                {[
-                  { houses: 1, credits: 1, label: "+1 Casa", desc: "Revele a próxima casa do mapa" },
-                  { houses: 3, credits: 3, label: "+3 Casas", desc: "Expanda sua visão do ano" },
-                  { houses: 12, credits: 11, label: "Todas as Casas", desc: "Desbloqueio total do dossiê" }
-                ].map(pkg => (
-                  <button
-                    key={pkg.houses}
-                    onClick={() => {
-                      if (!isAuthenticated) {
-                        navigate("/auth");
-                        return;
-                      }
-                      if ((userCredits ?? 0) < pkg.credits) {
-                        showAlert(`Você precisa de ${pkg.credits} créditos. Redirecionando...`);
-                        navigate("/credits");
-                        return;
-                      }
-                      if (consultationId) {
-                        navigate(`/dashboard?id=${consultationId}&unlock=${pkg.houses}`);
-                      } else {
-                        showAlert("Erro: Dossiê não encontrado.");
-                      }
-                    }}
-                    className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-[#D4AF37]/30 transition-all flex items-center justify-between group text-left"
-                  >
-                    <div>
-                      <div className="font-cinzel text-sm text-white group-hover:text-[#D4AF37] transition-colors">
-                        {pkg.label}
-                      </div>
-                      <div className="text-[10px] text-white/40 font-sans mt-1">
-                        {pkg.desc}
+                return (
+                  <>
+                    <div className="text-center mb-6">
+                      <Lock className="w-8 h-8 text-white/40 mx-auto mb-4" />
+                      <h3 className="font-cinzel text-xl text-white mb-2">
+                        Desbloquear Casa {unlockTarget} — {targetHouseData?.label}
+                      </h3>
+                      <p className="text-white/50 text-xs font-inter leading-relaxed max-w-xs mx-auto">
+                        Descubra como este destino influencia {targetHouseData?.intent?.toLowerCase()} no seu próximo ciclo.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => {
+                          showAlert("Integração com Mercado Pago em breve.");
+                        }}
+                        className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/30 transition-all flex items-center justify-between group text-left"
+                      >
+                        <div>
+                          <div className="font-cinzel text-sm text-white transition-colors">
+                            Desbloquear esta Casa
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[#D4AF37] font-bold text-sm block">
+                            R$ 14,90
+                          </span>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          showAlert("Integração com Mercado Pago em breve.");
+                        }}
+                        className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/30 transition-all flex items-center justify-between group text-left"
+                      >
+                        <div>
+                          <div className="font-cinzel text-sm text-white transition-colors">
+                            Escolher +3 Casas
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[#D4AF37] font-bold text-sm block">
+                            R$ 29,90
+                          </span>
+                        </div>
+                      </button>
+
+                      <div className="mt-6 pt-6 border-t border-white/10">
+                        <button
+                          onClick={() => {
+                            showAlert("Integração com Mercado Pago em breve.");
+                          }}
+                          className="w-full p-5 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 hover:bg-[#D4AF37]/10 transition-all flex flex-col items-center justify-center group text-center"
+                        >
+                          <div className="font-cinzel text-base text-[#D4AF37] font-bold mb-1">
+                            MAPA COMPLETO
+                          </div>
+                          <div className="text-white/60 text-[11px] mb-3">
+                            Todas as 12 áreas da sua Revolução Solar<br/>
+                            <span className="line-through opacity-50">R$ 178,80 individualmente</span> • R$ 99,90 no total
+                          </div>
+                          
+                          <div className="bg-[#D4AF37] text-black px-4 py-2 rounded-lg font-bold text-sm w-full">
+                            Como você já pagou R$ {formatBRL(alreadyPaid)}, complete por R$ {formatBRL(remainingToComplete)}.
+                          </div>
+                        </button>
                       </div>
                     </div>
-                    <div className="text-xs font-bold text-white/80 bg-white/10 px-3 py-1.5 rounded-full">
-                      {pkg.credits} CR
-                    </div>
-                  </button>
-                ))}
-              </div>
+                  </>
+                );
+              })()}
             </motion.div>
           </div>
         )}

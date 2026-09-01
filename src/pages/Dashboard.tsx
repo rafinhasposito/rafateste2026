@@ -459,72 +459,14 @@ const Dashboard = () => {
                   isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
                   onSelectHouse={(h) => setSelectedHouse(h)}
                   mode={currentMode}
+                  unlockedCount={consultation.houses_unlocked}
                 />
               </div>
             );
           })()}
         </AnimatePresence>
 
-        {/* Unlock CTA */}
-        {lockedCount > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-12">
-            <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-8 max-w-xl mx-auto">
-              <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-2">
-                Desbloqueie Mais Casas
-              </h3>
-              <p className="text-muted-foreground text-xs font-light mb-6">
-                {consultation.houses_unlocked} de {TOTAL_HOUSES} casas visíveis · {credits} créditos disponíveis
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                {unlockOptions.map((opt) => {
-                  const canAfford = credits >= opt.cost;
-                  const requiresConfirm = opt.cost >= 2;
-                  return (
-                    <button
-                      key={opt.amount}
-                      onClick={() => {
-                        if (!canAfford) return;
-                        if (requiresConfirm) setPendingUnlock(opt.amount);
-                        else handleUnlock(opt.amount);
-                      }}
-                      disabled={unlocking || !canAfford}
-                      className="px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {unlocking ? "Processando..." : `${opt.label} (${opt.cost} crédito${opt.cost > 1 ? "s" : ""})`}
-                    </button>
-                  );
-                })}
-                <button
-                  onClick={() => navigate("/credits")}
-                  className="px-5 py-3 rounded-xl border border-primary/25 bg-card/40 text-foreground font-bold text-xs uppercase tracking-[0.14em] hover:border-primary/40 transition-all"
-                >
-                  Comprar Créditos
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
-
-      <ConfirmCreditAction
-        open={pendingUnlock !== null}
-        onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}
-        onConfirm={() => {
-          const n = pendingUnlock;
-          setPendingUnlock(null);
-          if (n) handleUnlock(n);
-        }}
-        title="Desbloquear casas"
-        description={
-          pendingUnlock
-            ? `Você está prestes a desbloquear ${pendingUnlock} casa${pendingUnlock > 1 ? "s" : ""} desta consulta.`
-            : undefined
-        }
-        credits={pendingUnlock ?? 0}
-        currentBalance={credits}
-        confirmLabel="Desbloquear agora"
-        loading={unlocking}
-      />
     </>
   );
 };
