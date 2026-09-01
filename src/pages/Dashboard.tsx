@@ -405,22 +405,44 @@ const Dashboard = () => {
               );
             }
             // Convert single-option HouseResult → DestinyResults arrays.
-            const master = result.city;
-            const seen = new Set<string>();
-            const push = (arr: CityOption[], c: CityOption | null | undefined) => {
-              if (!c) return;
-              const k = `${c.city}|${c.country}`;
-              if (seen.has(k)) return;
-              seen.add(k);
-              arr.push(c);
+            // API may return arrays OR single objects for options — handle both.
+            const toArr = (v: any): CityOption[] => {
+              if (!v) return [];
+              if (Array.isArray(v)) return v.filter(Boolean);
+              return [v];
             };
-            const highticket: CityOption[] = [];
-            const acessivel: CityOption[] = [];
-            const nacional: CityOption[] = [];
-            push(highticket, master);
-            push(highticket, result.options.highticket);
-            push(acessivel, result.options.acessivel);
-            push(nacional, result.options.nacional);
+            const htArr = toArr(result.options?.highticket);
+            const acArr = toArr(result.options?.acessivel);
+            const naArr = toArr(result.options?.nacional);
+            // master city: prefer result.city, fallback to first of any tier
+            const masterCity = result.city || htArr[0] || acArr[0] || naArr[0] || null;
+            const seen = new Set<string>();
+            const dedup = (arr: CityOption[]): CityOption[] => {
+              return arr.filter(c => {
+                if (!c) return false;
+                const k = `${c.city}|${c.country}`;
+                if (seen.has(k)) return false;
+                seen.add(k);
+                return true;
+              });
+            };
+            if (masterCity) seen.add(`${masterCity.city}|${masterCity.country}`);
+            const highticket: CityOption[] = masterCity ? [masterCity, ...dedup(htArr)] : dedup(htArr);
+            const acessivel: CityOption[] = dedup(acArr);
+            const nacional: CityOption[] = dedup(naArr);
+            if (highticket.length === 0 && acessivel.length === 0 && nacional.length === 0) {
+              // No city data — show a fallback instead of black screen
+              return (
+                <HouseDetail
+                  house={house}
+                  result={result}
+                  mode={currentMode}
+                  isGoal={goalHouse === selectedHouse}
+                  originCity={consultation.origin}
+                  onClose={() => setSelectedHouse(null)}
+                />
+              );
+            }
             return (
               <div key={selectedHouse} className="mb-12">
                 <DestinyResults

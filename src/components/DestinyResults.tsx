@@ -25,8 +25,10 @@ export interface DestinyResultsProps {
 
 export const DestinyResults: React.FC<DestinyResultsProps> = ({
   house, cities, autoUnlocked = false, mode = "futuro",
+  consultationId, userCredits, isAuthenticated, embedded = false,
 }) => {
-  const [unlocked] = useState(autoUnlocked);
+  // Always show content — access gating is handled by Dashboard's isHouseLocked
+  const [unlocked] = useState(true);
   const { showAlert } = useAlert();
   const navigate = useNavigate();
   const [showUnlockModal, setShowUnlockModal] = useState(false);
@@ -60,7 +62,13 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
     }
   }, [unlocked, masterCity, house, mode]);
 
-  if (!masterCity) return null;
+  if (!masterCity) {
+    return (
+      <div className="w-full mt-12 p-8 text-center border border-white/10 rounded-2xl">
+        <p className="text-white/60 text-sm font-inter">Nenhuma cidade calculada para esta Casa.</p>
+      </div>
+    );
+  }
 
   const cityName = masterCity.city || masterCity.display_name;
   const cityContext = cityName.includes("New York") ? mockDestinyNewYork : null;
