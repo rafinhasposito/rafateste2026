@@ -15,15 +15,10 @@ export interface ChargeResult {
   newBalance?: number;
 }
 
-/**
- * Debita créditos do usuário antes da consulta. Admin não é cobrado.
- * Retorna ok=false com reason="no_credits" se faltar saldo.
- */
 export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult> => {
   const cost = args.amount ?? 1;
 
   if (args.isAdmin) {
-    // Log para auditoria mas sem debitar
     await supabase.from("credit_transactions").insert({
       user_id: args.userId,
       amount: 0,
@@ -37,23 +32,16 @@ export const chargeConsultation = async (args: ChargeArgs): Promise<ChargeResult
     return { ok: false, reason: "no_credits" };
   }
 
-  const newBalance = args.currentCredits - cost;
-
-  // 1. Atualizar saldo no profile
-  const { error } = await supabase
-    .from("profiles")
-    .update({ credits: newBalance })
-    .eq("user_id", args.userId);
-
-  if (error) return { ok: false, reason: "db_error" };
-
-  // 2. Registrar transação
-  await supabase.from("credit_transactions").insert({
-    user_id: args.userId,
-    amount: -cost, // Negativo pois é débito
-    type: args.type ?? "consulta",
-    description: args.description,
+  const { data: success, error } = await supabase.rpc("charge_credits", {
+    p_amount: cost,
+    p_type: args.type ?? "consulta",
+    p_description: args.description,
   });
 
+  if (error || !success) {
+    return { ok: false, reason: "db_error" };
+  }
+
+  const newBalance = args.currentCredits - cost;
   return { ok: true, newBalance };
 };
