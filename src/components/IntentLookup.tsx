@@ -64,6 +64,10 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
 
   const handleSelectIntent = async (houseId: number) => {
     if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
+    if (birthtime === "00:00" || birthtime === "00:00:00") {
+      showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora real de nascimento (ex: 07:30, 14:15).");
+      return;
+    }
     
     setSelectedHouse(houseId);
     const houseData = cityDatabase[houseId];

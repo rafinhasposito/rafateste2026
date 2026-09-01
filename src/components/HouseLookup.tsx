@@ -77,6 +77,10 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
     
     if (target === undefined) { showAlert("Selecione uma opção."); return; }
     if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
+    if (birthtime === "00:00" || birthtime === "00:00:00") {
+      showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora real de nascimento (ex: 07:30, 14:15).");
+      return;
+    }
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
 
     const houseData0 = target ? cityDatabase[target] : null;

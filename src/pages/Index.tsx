@@ -174,7 +174,11 @@ const Index = () => {
     if (profile) {
       if (profile.full_name && !name) setName(profile.full_name);
       if (profile.birth_date && !birthdate) setBirthdate(profile.birth_date);
-      if (profile.birth_time && !birthtime) setBirthtime(String(profile.birth_time).slice(0, 5));
+      if (profile.birth_time && !birthtime) {
+        const t = String(profile.birth_time).slice(0, 5);
+        // Don't auto-fill "00:00" — backend rejects it. Leave blank so user fills in real time.
+        if (t !== "00:00") setBirthtime(t);
+      }
       if (profile.birth_city && !birthPlace) {
         setBirthPlace(profile.birth_city);
         setBirthPlaceValid(true);

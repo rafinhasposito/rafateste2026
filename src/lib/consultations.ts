@@ -19,10 +19,6 @@ export interface SaveConsultationArgs {
  * or null on failure (non-blocking — caller may still render results).
  */
 export const saveConsultation = async (args: SaveConsultationArgs): Promise<string | null> => {
-  // TEMPORARY BYPASS: Return a fake ID without hitting the database
-  return "test-consultation-id";
-  
-  /* Original code
   const { data, error } = await supabase
     .from("consultations")
     .insert({
@@ -47,5 +43,4 @@ export const saveConsultation = async (args: SaveConsultationArgs): Promise<stri
     return null;
   }
   return data?.id ?? null;
-  */
 };
