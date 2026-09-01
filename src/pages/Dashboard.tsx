@@ -454,40 +454,16 @@ const Dashboard = () => {
                   userCredits={credits}
                   isAuthenticated={!!user}
                   consultationId={consultation.id}
-                  autoUnlocked
-                  embedded
+                  autoUnlocked={true}
+                  embedded={false} // Use the sleek compact grid from DestinyResults!
+                  isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
+                  onSelectHouse={(h) => setSelectedHouse(h)}
                   mode={currentMode}
-                  isGoal={goalHouse === selectedHouse}
-                  originCity={consultation.origin}
                 />
               </div>
             );
           })()}
         </AnimatePresence>
-
-        {/* Houses Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4 mb-12">
-          {Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).map((houseNum) => {
-            const house = cityDatabase[houseNum];
-            const result = getHouseResult(houseNum);
-            const locked = isHouseLocked(houseNum);
-            const isGoal = goalHouse === houseNum;
-            const isSelected = selectedHouse === houseNum;
-
-            return (
-              <HouseCard
-                key={houseNum}
-                houseNum={houseNum}
-                house={house}
-                result={result}
-                locked={locked}
-                isGoal={isGoal}
-                isSelected={isSelected}
-                onSelect={() => setSelectedHouse(isSelected ? null : houseNum)}
-              />
-            );
-          })}
-        </div>
 
         {/* Unlock CTA */}
         {lockedCount > 0 && (

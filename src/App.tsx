@@ -36,8 +36,11 @@ const AdminShowcase = () => (
 
 const queryClient = new QueryClient();
 
+import { ErrorBoundary } from "./components/ErrorBoundary";
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
@@ -78,6 +81,7 @@ const App = () => (
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

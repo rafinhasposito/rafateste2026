@@ -21,11 +21,14 @@ export interface DestinyResultsProps {
   autoUnlocked?: boolean;
   mode?: "passado" | "presente" | "futuro";
   embedded?: boolean;
+  isHouseUnlocked?: (houseNum: number) => boolean;
+  onSelectHouse?: (houseNum: number) => void;
 }
 
 export const DestinyResults: React.FC<DestinyResultsProps> = ({
   house, cities, autoUnlocked = false, mode = "futuro",
   consultationId, userCredits, isAuthenticated, embedded = false,
+  isHouseUnlocked, onSelectHouse
 }) => {
   // Always show content — access gating is handled by Dashboard's isHouseLocked
   const [unlocked] = useState(true);
@@ -70,7 +73,7 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
     );
   }
 
-  const cityName = masterCity.city || masterCity.display_name;
+  const cityName = masterCity.city || masterCity.display_name || "Desconhecido";
   const cityContext = cityName.includes("New York") ? mockDestinyNewYork : null;
   const bgImage = cityContext?.context?.imageUrl || "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2000&auto=format&fit=crop";
 
@@ -191,9 +194,8 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
             
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {Object.values(cityDatabase).map((houseItem) => {
-                // In fallback standalone mode (initial lookup), only the initial house is unlocked.
                 const isCurrentHouse = houseItem.id === house;
-                const isUnlocked = isCurrentHouse || autoUnlocked;
+                const isUnlocked = isHouseUnlocked ? isHouseUnlocked(houseItem.id) : (isCurrentHouse || autoUnlocked);
                 
                 return (
                   <div
@@ -201,9 +203,13 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
                     onClick={() => {
                       if (!isUnlocked) {
                         setShowUnlockModal(true);
+                      } else if (onSelectHouse && !isCurrentHouse) {
+                        onSelectHouse(houseItem.id);
+                        // Scroll to top of results for better UX
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                       }
                     }}
-                    className={`relative p-5 rounded-xl transition-all ${!isUnlocked ? "cursor-pointer opacity-60 hover:opacity-100 hover:border-white/20" : ""} ${
+                    className={`relative p-5 rounded-xl transition-all ${!isCurrentHouse ? "cursor-pointer hover:border-white/20" : ""} ${!isUnlocked ? "opacity-60 hover:opacity-100" : ""} ${
                       isCurrentHouse 
                         ? "bg-[#D4AF37]/10 border border-[#D4AF37]/30" 
                         : "bg-white/[0.02] border border-white/5"

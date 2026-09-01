@@ -119,13 +119,15 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
   const destinations: { city: CityOption; label: string; toneClass: string }[] = [];
 
   if (result) {
-    destinations.push({
-      city: result.city,
-      label: isPast ? "Destino Ativado" : "Destino Principal",
-      toneClass: "text-primary",
-    });
+    if (result.city) {
+      destinations.push({
+        city: result.city,
+        label: isPast ? "Destino Ativado" : "Destino Principal",
+        toneClass: "text-primary",
+      });
+    }
 
-    if (result.options.nacional) {
+    if (result.options?.nacional) {
       destinations.push({
         city: result.options.nacional,
         label: "Opção Nacional",
@@ -133,7 +135,7 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
       });
     }
 
-    if (result.options.acessivel && result.options.acessivel.city !== result.city.city) {
+    if (result.options?.acessivel && (!result.city || result.options.acessivel.city !== result.city.city)) {
       destinations.push({
         city: result.options.acessivel,
         label: "Rota Acessível",
@@ -141,7 +143,7 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
       });
     }
 
-    if (result.options.highticket && result.options.highticket.city !== result.city.city) {
+    if (result.options?.highticket && (!result.city || result.options.highticket.city !== result.city.city)) {
       destinations.push({
         city: result.options.highticket,
         label: "Rota Premium",
