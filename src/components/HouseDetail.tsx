@@ -208,14 +208,14 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
             <Lightbulb className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-primary font-bold mb-2">O que você precisa entender em 10 segundos</p>
-              <p className="text-foreground/90 text-sm leading-relaxed font-medium">{house.entender_10s}</p>
+              <p className="text-foreground/90 text-sm leading-relaxed font-medium">{house.oQueVocePrecisaEntender}</p>
             </div>
           </div>
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-6">
-          {house.tags.map((tag) => (
+          {(house.podeFavorecer || []).map((tag) => (
             <span key={tag} className="text-[10px] px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary uppercase tracking-wider font-medium">
               {tag}
             </span>
@@ -226,7 +226,7 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
           <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-4">Pode Favorecer</p>
           <ul className="space-y-3">
-            {house.favorece.map((item, idx) => (
+            {(house.podeFavorecer || []).map((item, idx) => (
               <li key={idx} className="flex gap-3 items-start text-sm text-foreground/80">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5 opacity-70" />
                 <span>{item}</span>
@@ -237,15 +237,15 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <SectionBlock title="O tema do seu ano">
-            {house.tema_ano}
+            {house.oTema}
           </SectionBlock>
           <SectionBlock title="O que você pode ganhar com isso">
-            {house.ganhar}
+            {house.oQueVocePodeGanhar}
           </SectionBlock>
         </div>
 
         <SectionBlock title="Como isso aparece na vida real">
-          {house.vida_real}
+          {house.comoApareceNaVidaReal}
         </SectionBlock>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -262,20 +262,20 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
             {house.amor}
           </SectionBlock>
           <SectionBlock title="Vida Pessoal">
-            {house.vida_pessoal}
+            {house.vidaPessoal}
           </SectionBlock>
         </div>
 
         <div className="bg-primary/5 border border-primary/15 rounded-xl p-5 mb-4">
           <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold mb-3">Como aproveitar esse ano</p>
-          <p className="text-foreground/80 text-sm leading-relaxed">{house.como_aproveitar}</p>
+          <p className="text-foreground/80 text-sm leading-relaxed">{house.comoAproveitar}</p>
         </div>
 
         <div className="bg-destructive/5 border border-destructive/15 rounded-xl p-5 mb-8 flex gap-3 items-start">
           <AlertTriangle className="w-5 h-5 text-destructive/80 shrink-0 mt-0.5" />
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-destructive font-semibold mb-2">Cuidado com...</p>
-            <p className="text-foreground/80 text-sm leading-relaxed">{house.cuidado}</p>
+            <p className="text-foreground/80 text-sm leading-relaxed">{house.cuidadoCom}</p>
           </div>
         </div>
 
