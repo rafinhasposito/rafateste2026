@@ -10,7 +10,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -27,7 +52,9 @@ export type Database = {
           mode: string
           name: string
           origin: string | null
-          result: Json | null
+          result: Json
+          unlocked_houses: number[]
+          updated_at: string
           user_id: string
           year: string
         }
@@ -40,10 +67,12 @@ export type Database = {
           houses_unlocked?: number
           id?: string
           intent?: string | null
-          mode?: string
+          mode: string
           name: string
           origin?: string | null
-          result?: Json | null
+          result: Json
+          unlocked_houses?: number[]
+          updated_at?: string
           user_id: string
           year: string
         }
@@ -59,11 +88,66 @@ export type Database = {
           mode?: string
           name?: string
           origin?: string | null
-          result?: Json | null
+          result?: Json
+          unlocked_houses?: number[]
+          updated_at?: string
           user_id?: string
           year?: string
         }
         Relationships: []
+      }
+      credit_orders: {
+        Row: {
+          amount: number
+          created_at: string
+          credits_amount: number
+          currency: string
+          id: string
+          mercadopago_payment_id: string | null
+          mercadopago_preference_id: string | null
+          paid_at: string | null
+          pricing_config_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          credits_amount: number
+          currency?: string
+          id?: string
+          mercadopago_payment_id?: string | null
+          mercadopago_preference_id?: string | null
+          paid_at?: string | null
+          pricing_config_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          credits_amount?: number
+          currency?: string
+          id?: string
+          mercadopago_payment_id?: string | null
+          mercadopago_preference_id?: string | null
+          paid_at?: string | null
+          pricing_config_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_orders_pricing_config_id_fkey"
+            columns: ["pricing_config_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_config"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       credit_transactions: {
         Row: {
@@ -105,8 +189,8 @@ export type Database = {
       }
       pricing_config: {
         Row: {
-          active: boolean
           category: string
+          created_at: string
           credits: number
           description: string | null
           key: string
@@ -116,8 +200,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          active?: boolean
           category: string
+          created_at?: string
           credits: number
           description?: string | null
           key: string
@@ -127,8 +211,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          active?: boolean
           category?: string
+          created_at?: string
           credits?: number
           description?: string | null
           key?: string
@@ -195,21 +279,18 @@ export type Database = {
       }
       user_roles: {
         Row: {
-          created_at: string
           id: string
-          role: Database["public"]["Enums"]["app_role"]
+          role: string
           user_id: string
         }
         Insert: {
-          created_at?: string
           id?: string
-          role: Database["public"]["Enums"]["app_role"]
+          role: string
           user_id: string
         }
         Update: {
-          created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: string
           user_id?: string
         }
         Relationships: []
@@ -219,16 +300,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
+      charge_and_save_consultation_v1: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
+          p_birth_place: string
+          p_birthdate: string
+          p_birthtime: string
+          p_consultation_id: string
+          p_goal: number
+          p_intent?: string
+          p_mode: string
+          p_name: string
+          p_origin: string
+          p_result: Json
+          p_year: string
         }
+        Returns: string
+      }
+      charge_credits: {
+        Args: { p_amount: number; p_description: string; p_type: string }
         Returns: boolean
+      }
+      process_mercadopago_payment: {
+        Args: { p_order_id: string; p_payment_id: string }
+        Returns: boolean
+      }
+      unlock_consultation_houses: {
+        Args: { p_consultation_id: string; p_target_house: number }
+        Returns: Json
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -244,12 +346,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -273,11 +375,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -298,11 +400,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -323,11 +425,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -340,11 +442,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -354,9 +456,10 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
-    Enums: {
-      app_role: ["admin", "user"],
-    },
+    Enums: {},
   },
 } as const

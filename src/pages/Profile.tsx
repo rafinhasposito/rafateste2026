@@ -95,17 +95,27 @@ const Profile = () => {
     <>
       <StarryBackground />
 
-      <div className="min-h-[100dvh] px-4 py-16 md:py-24 max-w-4xl mx-auto">
-        <motion.button
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          onClick={() => {
-            if (returnTo) navigate(returnTo);
-            else navigate("/");
-          }}
-          className="flex items-center gap-2 text-white/50 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-[#D4AF37] mb-8 transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> {returnTo ? "Voltar à Consulta" : "Voltar ao Descobrir"}
-        </motion.button>
+      <div className="min-h-[100dvh] px-4 py-16 md:py-24 max-w-4xl mx-auto relative">
+        <div className="flex justify-between items-center mb-8">
+          <motion.button
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            onClick={() => {
+              if (returnTo) navigate(returnTo);
+              else navigate("/");
+            }}
+            className="flex items-center gap-2 text-white/50 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-[#D4AF37] transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> {returnTo ? "Voltar" : "Início"}
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            onClick={signOut}
+            className="flex items-center gap-2 text-red-400/80 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-red-400 transition-colors border border-red-400/20 px-3 py-1.5 rounded-full"
+          >
+            Sair
+          </motion.button>
+        </div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
           <h1 className="font-cinzel text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">

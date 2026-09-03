@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { getCountryFlag } from "@/lib/countryFlags";
+import { ArrowRight } from "lucide-react";
 import { Compass, MapPin, Zap, ShieldAlert, Star, Lock, Eye, Crown } from "lucide-react";
 import { useAlert } from "@/hooks/useAlert";
 import { useNavigate } from "react-router-dom";
 import { ATLAS_DO_DESTINO } from "@/data/atlas";
-import { cityDatabase } from "@/data/houses";
+import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast } from "@/data/houses";
 import { mockDestinyNewYork } from "@/data/destiny";
-import { generateDestinyInsight } from "@/lib/ai/concierge";
+
+function groupCitiesByContinent(cities: any[]) {
+  const groups: Record<string, any[]> = {};
+  for (const c of cities) {
+    const continent = c.continent || c.country || "Outros";
+    if (!groups[continent]) groups[continent] = [];
+    groups[continent].push(c);
+  }
+  return groups;
+}
 
 export interface DestinyResultsProps {
   house: number;
@@ -29,42 +40,22 @@ export interface DestinyResultsProps {
 export const DestinyResults: React.FC<DestinyResultsProps> = ({
   house, cities, autoUnlocked = false, mode = "futuro",
   consultationId, userCredits, isAuthenticated, embedded = false,
-  isHouseUnlocked, onSelectHouse, unlockedCount = 1
+  isHouseUnlocked, onSelectHouse, onUnlock, unlockedCount = 1
 }) => {
   // Always show content — access gating is handled by Dashboard's isHouseLocked
   const [unlocked] = useState(true);
   const { showAlert } = useAlert();
   const navigate = useNavigate();
   const [unlockTarget, setUnlockTarget] = useState<number | null>(null);
-  const [aiInsight, setAiInsight] = useState<string>("");
-  const [loadingInsight, setLoadingInsight] = useState(false);
 
   const atlasData = ATLAS_DO_DESTINO[house] || ATLAS_DO_DESTINO[1];
   const houseDataFull = cityDatabase[house] || cityDatabase[1];
   const allCities = [...(cities.highticket || []), ...(cities.acessivel || []), ...(cities.nacional || [])];
+  const secondaryCities = allCities.slice(1);
+  const continentGroups = groupCitiesByContinent(secondaryCities);
   const masterCity = allCities[0];
+  const egregoraText = mode === "passado" ? fallbackOraclesPast[house] : fallbackOraclesFuture[house];
 
-  useEffect(() => {
-    if (unlocked && masterCity) {
-      const fetchInsight = async () => {
-        setLoadingInsight(true);
-        try {
-          const insight = await generateDestinyInsight({
-            houseNumber: house,
-            element: "Fogo", 
-            cityName: masterCity.city || masterCity.display_name,
-            intent: mode
-          });
-          setAiInsight(insight);
-        } catch (error) {
-          console.error("Erro AI:", error);
-        } finally {
-          setLoadingInsight(false);
-        }
-      };
-      fetchInsight();
-    }
-  }, [unlocked, masterCity, house, mode]);
 
   if (!masterCity) {
     return (
@@ -122,13 +113,13 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
       <div className="max-w-4xl mx-auto px-4 md:px-0">
         
         {/* 2. THE EGREGORE (AI Insight) */}
-        {aiInsight && (
+        {egregoraText && (
           <section className="mb-20 text-center">
             <span className="text-[10px] font-sans uppercase tracking-[0.3em] text-[#D4AF37]/60 block mb-6">
               A Egrégora do Destino
             </span>
             <p className="text-2xl md:text-3xl text-white/90 leading-relaxed font-cinzel italic max-w-3xl mx-auto">
-              "{aiInsight}"
+              "{egregoraText}"
             </p>
           </section>
         )}
@@ -183,6 +174,50 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
           </div>
         </section>
 
+        
+
+        {/* 3.5 DESTINOS SECUNDÁRIOS */}
+        {secondaryCities.length > 0 && (
+          <section className="mb-24">
+            <div className="flex items-center gap-4 mb-10">
+              <h3 className="font-cinzel text-2xl md:text-3xl text-white">Destinos Secundários</h3>
+              <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
+            </div>
+            <p className="text-white/60 font-inter text-sm mb-8">
+              Além do Destino Mestre, estas cidades também ativam a frequência da Casa {house}.
+            </p>
+            
+            <div className="grid gap-8">
+              {Object.entries(continentGroups).map(([continent, citiesList]) => (
+                <div key={continent}>
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]/80 mb-4 pl-1 border-l-2 border-[#D4AF37]/30">
+                    {continent}
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {citiesList.map((c, i) => (
+                      <div key={i} className="bg-white/[0.02] border border-white/10 rounded-xl p-4 hover:border-white/20 transition-all relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-3 opacity-30">
+                           <MapPin className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xl">{getCountryFlag(c.country)}</span>
+                          <span className="text-[9px] text-white/50 uppercase tracking-wider truncate">{c.country}</span>
+                        </div>
+                        <p className="text-white font-semibold text-sm truncate">{c.city || c.display_name}</p>
+                        {c.lat != null && c.lon != null && (
+                          <p className="text-white/30 text-[9px] font-mono mt-1">
+                            {c.lat.toFixed(2)}°, {c.lon.toFixed(2)}°
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* 4. EXPLORAR OUTRAS CASAS */}
         {!embedded && (
           <section className="border-t border-white/10 pt-16">
@@ -193,7 +228,7 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
               <h3 className="font-cinzel text-2xl text-white">As 12 Coordenadas do Ano</h3>
             </div>
             
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-5xl mx-auto">
               {Object.values(cityDatabase).map((houseItem) => {
                 const isCurrentHouse = houseItem.id === house;
                 const isUnlocked = isHouseUnlocked ? isHouseUnlocked(houseItem.id) : (isCurrentHouse || autoUnlocked);
@@ -203,37 +238,38 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
                     key={houseItem.id}
                     onClick={() => {
                       if (!isUnlocked) {
-                        setUnlockTarget(houseItem.id);
+                        if (onUnlock) onUnlock(houseItem.id); else setUnlockTarget(houseItem.id);
                       } else if (onSelectHouse && !isCurrentHouse) {
                         onSelectHouse(houseItem.id);
-                        // Scroll to top of results for better UX
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }
                     }}
-                    className={`relative p-5 rounded-xl transition-all ${!isCurrentHouse ? "cursor-pointer hover:border-white/20" : ""} ${!isUnlocked ? "opacity-60 hover:opacity-100" : ""} ${
+                    className={`relative flex items-center p-3 rounded-lg border transition-all ${!isCurrentHouse ? "cursor-pointer" : ""} ${
                       isCurrentHouse 
-                        ? "bg-[#D4AF37]/10 border border-[#D4AF37]/30" 
-                        : "bg-white/[0.02] border border-white/5"
+                        ? "bg-[#D4AF37]/10 border-[#D4AF37]/40 shadow-[0_0_15px_rgba(212,175,55,0.15)]" 
+                        : "bg-black/40 border-white/10 hover:border-white/30 hover:bg-white/[0.03]"
                     }`}
                   >
-                    {!isUnlocked && (
-                      <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/60 backdrop-blur-[2px] z-10 transition-all hover:bg-black/40">
-                        <div className="text-center">
-                          <Lock className="w-5 h-5 mx-auto mb-2 text-white/50" />
-                          <span className="text-white/40 text-[9px] uppercase tracking-widest font-bold">Bloqueada</span>
-                        </div>
+                    <div className="flex flex-col flex-1 truncate">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={`text-[10px] font-mono font-bold ${isCurrentHouse ? "text-[#D4AF37]" : "text-white/50"}`}>
+                          CASA {String(houseItem.id).padStart(2, "0")}
+                        </span>
                       </div>
-                    )}
-                    <div className="flex justify-between items-center mb-3">
-                      <span className={`text-[10px] font-mono tracking-widest ${isCurrentHouse ? "text-[#D4AF37]" : "text-white/40"}`}>
-                        {String(houseItem.id).padStart(2, "0")}
+                      <span className={`text-xs font-semibold truncate ${isCurrentHouse ? "text-white" : (isUnlocked ? "text-white/90" : "text-white/60")}`}>
+                        {houseItem.label}
                       </span>
-                      {isCurrentHouse && <Star className="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]" />}
                     </div>
-                    <h4 className={`font-cinzel text-sm mb-1 ${isCurrentHouse ? "text-white" : "text-white/70"}`}>
-                      {houseItem.label}
-                    </h4>
-                    <p className="text-[10px] text-white/30 font-sans truncate">{houseItem.intent}</p>
+                    
+                    <div className="shrink-0 ml-2">
+                      {isCurrentHouse ? (
+                        <Eye className="w-4 h-4 text-[#D4AF37]" />
+                      ) : !isUnlocked ? (
+                        <Lock className="w-4 h-4 text-white/30" />
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-white/50 group-hover:text-white" />
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -267,81 +303,31 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
               
               {(() => {
                 const targetHouseData = cityDatabase[unlockTarget];
-                // For UI mock purposes: Base is 29,90 (1 house). Each additional house unlocked cost 14,90.
-                // We know unlockedCount.
-                const alreadyPaid = 29.90 + Math.max(0, unlockedCount - 1) * 14.90;
-                const remainingToComplete = Math.max(0, 99.90 - alreadyPaid);
-                const formatBRL = (val: number) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
                 return (
                   <>
                     <div className="text-center mb-6">
                       <Lock className="w-8 h-8 text-white/40 mx-auto mb-4" />
                       <h3 className="font-cinzel text-xl text-white mb-2">
-                        Desbloquear Casa {unlockTarget} — {targetHouseData?.label}
+                        Casa {unlockTarget} — {targetHouseData?.label}
                       </h3>
                       <p className="text-white/50 text-xs font-inter leading-relaxed max-w-xs mx-auto">
                         Descubra como este destino influencia {targetHouseData?.intent?.toLowerCase()} no seu próximo ciclo.
                       </p>
                     </div>
 
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => {
-                          showAlert("Integração com Mercado Pago em breve.");
-                        }}
-                        className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/30 transition-all flex items-center justify-between group text-left"
-                      >
-                        <div>
-                          <div className="font-cinzel text-sm text-white transition-colors">
-                            Desbloquear esta Casa
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[#D4AF37] font-bold text-sm block">
-                            R$ 14,90
-                          </span>
-                        </div>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          showAlert("Integração com Mercado Pago em breve.");
-                        }}
-                        className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/30 transition-all flex items-center justify-between group text-left"
-                      >
-                        <div>
-                          <div className="font-cinzel text-sm text-white transition-colors">
-                            Escolher +3 Casas
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-[#D4AF37] font-bold text-sm block">
-                            R$ 29,90
-                          </span>
-                        </div>
-                      </button>
-
-                      <div className="mt-6 pt-6 border-t border-white/10">
-                        <button
-                          onClick={() => {
-                            showAlert("Integração com Mercado Pago em breve.");
-                          }}
-                          className="w-full p-5 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 hover:bg-[#D4AF37]/10 transition-all flex flex-col items-center justify-center group text-center"
-                        >
-                          <div className="font-cinzel text-base text-[#D4AF37] font-bold mb-1">
-                            MAPA COMPLETO
-                          </div>
-                          <div className="text-white/60 text-[11px] mb-3">
-                            Todas as 12 áreas da sua Revolução Solar<br/>
-                            <span className="line-through opacity-50">R$ 178,80 individualmente</span> • R$ 99,90 no total
-                          </div>
-                          
-                          <div className="bg-[#D4AF37] text-black px-4 py-2 rounded-lg font-bold text-sm w-full">
-                            Como você já pagou R$ {formatBRL(alreadyPaid)}, complete por R$ {formatBRL(remainingToComplete)}.
-                          </div>
-                        </button>
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 text-center">
+                         <span className="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold">Aviso</span>
+                         <p className="text-white/70 text-sm mt-2">
+                           O módulo de desbloqueio comercial e Mercado Pago será conectado na próxima fase do projeto.
+                         </p>
                       </div>
+                      <button
+                        onClick={() => setUnlockTarget(null)}
+                        className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] transition-all text-sm uppercase tracking-widest text-white/80"
+                      >
+                        Voltar
+                      </button>
                     </div>
                   </>
                 );

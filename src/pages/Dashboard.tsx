@@ -53,6 +53,7 @@ interface ConsultationRow {
   origin: string | null;
   birth_place: string;
   houses_unlocked: number;
+  unlocked_houses: number[];
   result: ApiResult | null;
   created_at: string;
 }
@@ -94,6 +95,8 @@ const getConsultationGoalHouse = (consultation: ConsultationRow | null): number 
 };
 
 const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: number) => {
+  if (consultation.unlocked_houses?.includes(houseNum)) return false;
+
   const unlockedCount = Math.max(consultation.houses_unlocked, 0);
   const goalHouse = getConsultationGoalHouse(consultation);
 
@@ -160,7 +163,7 @@ const Dashboard = () => {
       (h) => !isHouseLockedByConsultation(consultation, h)
     ) ?? null;
     setSelectedHouse(firstUnlocked);
-  }, [consultation?.id, consultation?.goal, consultation?.houses_unlocked, consultation?.result]);
+  }, [consultation?.id, consultation?.goal, consultation?.houses_unlocked, consultation?.unlocked_houses, consultation?.result]);
 
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
@@ -172,50 +175,39 @@ const Dashboard = () => {
     return consultation.result.results[String(houseNum)] || null;
   };
 
-  const handleUnlock = async (amount: number) => {
+  const handleUnlock = async (targetHouse: number) => {
     if (!user || !profile || !consultation || unlocking) return;
 
-    const currentUnlocked = consultation.houses_unlocked;
-    const targetUnlocked = Math.min(currentUnlocked + amount, TOTAL_HOUSES);
-    const creditsNeeded = targetUnlocked - currentUnlocked;
-
-    if (creditsNeeded <= 0) {
-      showAlert("Essas casas já estão desbloqueadas.");
-      return;
-    }
-
-    if ((profile.credits ?? 0) < creditsNeeded) {
-      showAlert(`Você precisa de ${creditsNeeded} crédito${creditsNeeded > 1 ? "s" : ""}.`);
+    if (!isHouseLockedByConsultation(consultation, targetHouse)) {
+      showAlert("Esta casa já está desbloqueada.");
       return;
     }
 
     setUnlocking(true);
 
     try {
-      const { data: success, error: rpcError } = await supabase.rpc("charge_credits", {
-        p_amount: creditsNeeded,
-        p_type: "unlock_houses",
-        p_description: `Desbloqueio de +${creditsNeeded} casa${creditsNeeded > 1 ? "s" : ""}`
+      const { error: rpcError } = await supabase.rpc("unlock_consultation_houses", {
+        p_consultation_id: consultation.id,
+        p_target_house: targetHouse
       });
 
-      if (rpcError || !success) {
-        throw new Error("Failed to charge credits");
-      }
+      if (rpcError) throw rpcError;
 
-      const { error: consultationError } = await supabase
+      const { data: refreshedConsultation, error: fetchError } = await supabase
         .from("consultations")
-        .update({ houses_unlocked: targetUnlocked })
+        .select("*")
         .eq("id", consultation.id)
-        .eq("user_id", user.id);
+        .single();
 
-      if (consultationError) throw consultationError;
+      if (fetchError) throw fetchError;
 
-      setConsultation((prev) => (prev ? { ...prev, houses_unlocked: targetUnlocked } : prev));
+      setConsultation(refreshedConsultation as ConsultationRow);
       await refreshProfile();
-      showAlert(`${creditsNeeded} casa${creditsNeeded > 1 ? "s" : ""} desbloqueada${creditsNeeded > 1 ? "s" : ""} com sucesso.`);
-    } catch (error) {
+      showAlert(`Casa ${targetHouse} desbloqueada com sucesso.`);
+      setSelectedHouse(targetHouse);
+    } catch (error: any) {
       console.error(error);
-      showAlert("Falha ao desbloquear. Tente novamente.");
+      showAlert(error.message || "Falha ao desbloquear. Tente novamente.");
     } finally {
       setUnlocking(false);
     }
@@ -455,6 +447,7 @@ const Dashboard = () => {
                   isAuthenticated={!!user}
                   consultationId={consultation.id}
                   autoUnlocked={true}
+                  onUnlock={(n) => setPendingUnlock(n)}
                   embedded={false} // Use the sleek compact grid from DestinyResults!
                   isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
                   onSelectHouse={(h) => setSelectedHouse(h)}
@@ -466,8 +459,63 @@ const Dashboard = () => {
           })()}
         </AnimatePresence>
 
+
+        {/* Unlock CTA (Restored for QA) */}
+        {lockedCount > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-12 mt-8">
+            <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-8 max-w-xl mx-auto">
+              <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-2">
+                Desbloqueie Mais Casas
+              </h3>
+              <p className="text-muted-foreground text-xs font-light mb-6">
+                {consultation.houses_unlocked} de {TOTAL_HOUSES} casas visíveis · {credits} créditos disponíveis
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                {unlockOptions.map((opt) => {
+                  const canAfford = credits >= opt.cost;
+                  const requiresConfirm = opt.cost >= 2;
+                  return (
+                    <button
+                      key={opt.amount}
+                      onClick={() => {
+                        if (!canAfford) return;
+                        if (requiresConfirm) setPendingUnlock(opt.amount);
+                        else handleUnlock(opt.amount);
+                      }}
+                      disabled={unlocking || !canAfford}
+                      className="px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {unlocking ? "Processando..." : `${opt.label} (${opt.cost} crédito${opt.cost > 1 ? "s" : ""})`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
+
+      <ConfirmCreditAction
+        open={pendingUnlock !== null}
+        onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}
+        onConfirm={() => {
+          const n = pendingUnlock;
+          setPendingUnlock(null);
+          if (n) handleUnlock(n);
+        }}
+        title={`Desbloquear Casa ${pendingUnlock}`}
+        description={
+          pendingUnlock
+            ? `Você está prestes a desbloquear a Casa ${pendingUnlock} desta consulta.`
+            : undefined
+        }
+        credits={1}
+        currentBalance={credits}
+        confirmLabel="Desbloquear agora"
+        loading={unlocking}
+      />
     </>
+
   );
 };
 

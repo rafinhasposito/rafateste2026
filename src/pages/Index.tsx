@@ -100,6 +100,9 @@ const Index = () => {
 
   // --- ONBOARDING FIRST ACCESS LOGIC ---
   useEffect(() => {
+    // PROTEÇÃO P0 AUTH: Aguarda o Supabase ler a URL e extrair os tokens OAuth (senão o navigate apaga o hash)
+    if (loading) return;
+
     if (searchParams.get("resetOnboarding") === "true") {
       localStorage.removeItem("ps_onboarding_completed");
       navigate("/", { replace: true });
@@ -109,7 +112,7 @@ const Index = () => {
     if (!hasCompleted) {
       navigate("/app/onboarding", { replace: true });
     }
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, loading]);
   // -------------------------------------
   const [isScanning, setIsScanning] = useState(false);
   const [searchPath, setSearchPath] = useState<SearchPath>(null);

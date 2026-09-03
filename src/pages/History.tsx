@@ -112,7 +112,7 @@ const History = () => {
             <MapPin className="w-8 h-8 text-white/20 mx-auto mb-4" />
             <h2 className="font-cinzel text-xl text-white mb-2">Nenhum dossiê gerado</h2>
             <p className="text-white/50 text-xs font-inter mb-6">Calcule sua primeira rota estelar para começar sua jornada.</p>
-            <button onClick={() => navigate("/")} className="px-8 py-4 bg-white text-black hover:bg-gray-200 transition-all font-sans text-xs uppercase tracking-widest font-bold">
+            <button data-id={c.id} onClick={() => navigate("/")} className="px-8 py-4 bg-white text-black hover:bg-gray-200 transition-all font-sans text-xs uppercase tracking-widest font-bold">
               Nova Consulta
             </button>
           </div>
@@ -168,7 +168,7 @@ const History = () => {
                     <span className="text-[#D4AF37]/60 text-[10px] font-sans uppercase tracking-widest flex items-center gap-1.5">
                       <Unlock className="w-3 h-3" /> {c.houses_unlocked} Casas Reveladas
                     </span>
-                    <button
+                    <button data-id={c.id}
                       onClick={() => navigate(`/dashboard?id=${c.id}`)}
                       className="w-full md:w-auto px-6 py-3 bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 hover:bg-[#D4AF37]/20 transition-all font-sans text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2"
                     >

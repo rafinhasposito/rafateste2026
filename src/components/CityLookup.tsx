@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Compass, Search } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -8,8 +8,7 @@ import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { chargeConsultation } from "@/lib/credits";
-import { saveConsultation } from "@/lib/consultations";
+import { saveConsultation, chargeAndSaveConsultationV1 } from "@/lib/consultations";
 import DestinyResults from "@/components/DestinyResults";
 import { PremiumButton } from "@/components/shell";
 
@@ -59,6 +58,9 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LookupResult | null>(null);
 
+  const lookupSignatureRef = useRef<string>("");
+  const idempotencyKeyRef = useRef<string>(crypto.randomUUID());
+
   const setLoadingState = (state: boolean) => {
     setLoading(state);
     onLoadingChange?.(state);
@@ -78,27 +80,23 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       return;
     }
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
-    const charge = await chargeConsultation({
-      userId: user.id,
-      currentCredits: profile?.credits ?? 0,
-      isAdmin,
-      description: `Consulta por Cidade — ${city} em ${year}`,
-    });
-    if (!charge.ok) {
-      if (charge.reason === "no_credits") {
-        showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
-        navigate("/credits");
-      } else {
-        showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
-      }
+    
+    // VERIFICAR SALDO ANTES DE CALCULOS PESADOS
+    if (!isAdmin && (profile?.credits ?? 0) < 1) {
+      showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
+      navigate("/credits");
       return;
     }
-    await refreshProfile();
-    if (!isAdmin) showAlert("Consulta iniciada. 1 crédito debitado.");
-
 
     setLoadingState(true);
     setResult(null);
+
+    const currentSignature = `${name}|${birthdate}|${birthtime}|${birthPlace}|${year}|${city}`;
+    if (lookupSignatureRef.current !== currentSignature) {
+      idempotencyKeyRef.current = crypto.randomUUID();
+      lookupSignatureRef.current = currentSignature;
+    }
+    const consultationIdToUse = idempotencyKeyRef.current;
 
     try {
       const [ano, mes, dia] = birthdate.split("-");
@@ -112,9 +110,13 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         target_year: year,
       };
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+
       const auditResp = await fetch(`${API_URL}/audit_past`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           ...basePayload,
           past_city: city.trim(),
@@ -148,6 +150,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         const enrichResp = await fetch(`${API_URL}/find_all_cities`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
           body: JSON.stringify({ ...basePayload, alvoId: houseNum }),
         });
         if (enrichResp.ok) {
@@ -159,6 +162,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       } catch (e) {
         console.warn("[CityLookup] enrich failed (non-fatal)", e);
       }
+      clearTimeout(timeoutId);
 
       // Ensure the target-house entry reflects the user-chosen city
       allResults[String(houseNum)] = {
@@ -170,19 +174,46 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         },
       };
 
-      // Persist consultation (non-blocking on error)
-      const consultationId = await saveConsultation({
-        userId: user.id,
-        name: name.trim(),
-        birthdate,
-        birthtime,
-        birth_place: birthPlace.trim(),
-        year,
-        mode,
-        goal: houseNum,
-        origin: city.trim(),
-        result: { results: allResults, house: houseNum },
-      }) ?? undefined;
+      // ATOMIC CHARGE AND SAVE
+      let consultationId: string | undefined = undefined;
+      
+      if (!isAdmin) {
+        const savedId = await chargeAndSaveConsultationV1({
+          id: consultationIdToUse,
+          userId: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime,
+          birth_place: birthPlace.trim(),
+          year,
+          mode,
+          goal: houseNum,
+          origin: city.trim(),
+          result: { results: allResults, house: houseNum },
+        });
+        
+        if (!savedId) {
+          throw new Error("Falha ao debitar crédito ou salvar consulta.");
+        }
+        consultationId = savedId;
+        await refreshProfile();
+        showAlert("Consulta finalizada. 1 crédito debitado.");
+      } else {
+        const savedId = await saveConsultation({
+          id: consultationIdToUse,
+          userId: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime,
+          birth_place: birthPlace.trim(),
+          year,
+          mode,
+          goal: houseNum,
+          origin: city.trim(),
+          result: { results: allResults, house: houseNum },
+        });
+        if (savedId) consultationId = savedId;
+      }
 
       setResult({
         house: houseNum,
@@ -199,7 +230,11 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       onHouseFound?.(houseNum, city);
     } catch (error) {
       const err = error as Error;
-      showAlert("Falha na consulta: " + err.message);
+      if (err.name === 'AbortError') {
+        showAlert("O servidor demorou muito para responder. Por favor, tente novamente.");
+      } else {
+        showAlert("Falha na consulta: " + err.message);
+      }
     } finally {
       setLoadingState(false);
     }
