@@ -129,23 +129,23 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
 
     if (result.options?.nacional) {
       destinations.push({
-        city: result.options.nacional,
+        city: Array.isArray(result.options.nacional) ? result.options.nacional[0] : result.options.nacional,
         label: "Opção Nacional",
         toneClass: "text-foreground",
       });
     }
 
-    if (result.options?.acessivel && (!result.city || result.options.acessivel.city !== result.city.city)) {
+    if (result.options?.acessivel && (!result.city || (Array.isArray(result.options.acessivel) ? result.options.acessivel[0]?.city : result.options.acessivel.city) !== result.city.city)) {
       destinations.push({
-        city: result.options.acessivel,
+        city: Array.isArray(result.options.acessivel) ? result.options.acessivel[0] : result.options.acessivel,
         label: "Rota Acessível",
         toneClass: "text-muted-foreground",
       });
     }
 
-    if (result.options?.highticket && (!result.city || result.options.highticket.city !== result.city.city)) {
+    if (result.options?.highticket && (!result.city || (Array.isArray(result.options.highticket) ? result.options.highticket[0]?.city : result.options.highticket.city) !== result.city.city)) {
       destinations.push({
-        city: result.options.highticket,
+        city: Array.isArray(result.options.highticket) ? result.options.highticket[0] : result.options.highticket,
         label: "Rota Premium",
         toneClass: "text-primary",
       });
@@ -237,15 +237,15 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <SectionBlock title="O tema do seu ano">
-            {house.oTema}
+            {house.oTema || house.intent}
           </SectionBlock>
           <SectionBlock title="O que você pode ganhar com isso">
-            {house.oQueVocePodeGanhar}
+            {house.oQueVocePodeGanhar || house.translation}
           </SectionBlock>
         </div>
 
         <SectionBlock title="Como isso aparece na vida real">
-          {house.comoApareceNaVidaReal}
+          {house.comoApareceNaVidaReal || house.realLife || house.deepDive}
         </SectionBlock>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -301,16 +301,18 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         )}
 
         {/* Radar */}
-        <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
-          <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.3em] mb-4">
-            Radar de Impacto
-          </h4>
-          <div className="space-y-3">
-            <RadarBar label="Dinheiro" value={house.radar.dinheiro} toneClass="bg-primary" />
-            <RadarBar label="Amor" value={house.radar.amor} toneClass="bg-foreground/70" />
-            <RadarBar label="Saúde" value={house.radar.saude} toneClass="bg-muted-foreground" />
+        {house.radar && (
+          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
+            <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.3em] mb-4">
+              Radar de Impacto
+            </h4>
+            <div className="space-y-3">
+              <RadarBar label="Dinheiro" value={house.radar.dinheiro || 50} toneClass="bg-primary" />
+              <RadarBar label="Amor" value={house.radar.amor || 50} toneClass="bg-foreground/70" />
+              <RadarBar label="Saúde" value={house.radar.saude || 50} toneClass="bg-muted-foreground" />
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </motion.div>
