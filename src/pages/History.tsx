@@ -51,8 +51,10 @@ const History = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("History useEffect. user:", user?.id);
     if (!user) return;
     const load = async () => {
+      console.log("load() called");
       const [consultsRes, txRes] = await Promise.all([
         supabase
           .from("consultations")
@@ -65,9 +67,11 @@ const History = () => {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false }),
       ]);
+      console.log("Supabase response:", consultsRes.error, txRes.error);
       if (consultsRes.data) setConsultations(consultsRes.data as ConsultationRow[]);
       if (txRes.data) setTransactions(txRes.data as TransactionRow[]);
       setLoading(false);
+      console.log("Loading set to false, length:", consultsRes.data?.length);
     };
     load();
   }, [user]);
@@ -112,7 +116,7 @@ const History = () => {
             <MapPin className="w-8 h-8 text-white/20 mx-auto mb-4" />
             <h2 className="font-cinzel text-xl text-white mb-2">Nenhum dossiê gerado</h2>
             <p className="text-white/50 text-xs font-inter mb-6">Calcule sua primeira rota estelar para começar sua jornada.</p>
-            <button data-id={c.id} onClick={() => navigate("/")} className="px-8 py-4 bg-white text-black hover:bg-gray-200 transition-all font-sans text-xs uppercase tracking-widest font-bold">
+            <button onClick={() => navigate("/")} className="px-8 py-4 bg-white text-black hover:bg-gray-200 transition-all font-sans text-xs uppercase tracking-widest font-bold">
               Nova Consulta
             </button>
           </div>
