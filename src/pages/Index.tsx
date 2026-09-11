@@ -8,6 +8,7 @@ import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete
 import CityLookup from "@/components/CityLookup";
 import HouseLookup from "@/components/HouseLookup";
 import IntentLookup from "@/components/IntentLookup";
+import { TemporalSelection } from "@/components/TemporalSelection";
 
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
@@ -246,377 +247,312 @@ const Index = () => {
       <StarryBackground />
       <ScanningOverlay visible={isScanning} mode={mode || "futuro"} year={year} />
 
-      {/* Hero section removida a pedido do usuario para não duplicar onboarding */}
-      <div className="pt-8 md:pt-32 pb-32 md:pb-12 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh]">
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="surface-base p-5 sm:p-6 md:p-12 lg:p-16 relative w-full max-w-5xl"
-          style={activeTheme ? {
-            borderColor: `rgba(${activeTheme.rgb}, 0.15)`,
-            background: "rgba(10, 10, 12, 0.85)",
-          } : {
-            background: "rgba(10, 10, 12, 0.85)",
-          }}
-        >
-          <div
-            className="absolute top-0 left-[10%] right-[10%] h-px"
-            style={{ background: activeTheme
-              ? `linear-gradient(90deg, transparent, rgba(${activeTheme.rgb}, 0.3), transparent)`
-              : 'linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent)'
+      {/* ===== STEP 1: Temporal Selection — FULLSCREEN, outside the container ===== */}
+      {step === 1 && (
+        <AnimatePresence mode="wait">
+          <motion.div key="step1-root" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+            <TemporalSelection onSelectMode={handleSelectMode} />
+          </motion.div>
+        </AnimatePresence>
+      )}
+
+      {/* ===== STEPS 2 + 3: inside the original container ===== */}
+      {step > 1 && (
+        <div className="pt-8 md:pt-32 pb-32 md:pb-12 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh]">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="surface-base p-5 sm:p-6 md:p-12 lg:p-16 relative w-full max-w-5xl"
+            style={activeTheme ? {
+              borderColor: `rgba(${activeTheme.rgb}, 0.15)`,
+              background: "rgba(10, 10, 12, 0.85)",
+            } : {
+              background: "rgba(10, 10, 12, 0.85)",
             }}
-          />
+          >
+            <div
+              className="absolute top-0 left-[10%] right-[10%] h-px"
+              style={{ background: activeTheme
+                ? `linear-gradient(90deg, transparent, rgba(${activeTheme.rgb}, 0.3), transparent)`
+                : 'linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent)'
+              }}
+            />
 
-          <AnimatePresence mode="wait">
-            {/* ===== STEP 1: Temporal Selection ===== */}
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-4">
-                <div className="text-center mb-12">
-                  <span className="inline-block font-inter text-[10px] tracking-[0.3em] text-white/40 uppercase mb-4">
-                    Ponto de Partida
-                  </span>
-                  <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
-                    Seleção Temporal
-                  </h2>
-                  <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
-                    Escolha o período que deseja explorar. Cada linha do tempo revela uma configuração energética única.
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-4 max-w-2xl mx-auto">
-                  {modeOptions.map((opt, idx) => {
-                    const isSelected = mode === opt.id;
-                    const cardColor = modeCardColors[opt.id];
-                    return (
-                      <motion.button
-                        key={opt.id}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        onClick={() => handleSelectMode(opt.id)}
-                        className="w-full relative overflow-hidden rounded-2xl border text-left transition-all duration-300 group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-6 md:p-8"
-                        style={{
-                          borderColor: isSelected ? `rgba(${cardColor.rgb}, 0.4)` : "rgba(255,255,255,0.06)",
-                          background: isSelected ? `rgba(${cardColor.rgb}, 0.08)` : "rgba(255,255,255,0.02)",
-                        }}
-                      >
-                        {/* Glow effect on hover */}
-                        <div 
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                          style={{
-                            background: `radial-gradient(circle at left center, rgba(${cardColor.rgb}, 0.15), transparent 70%)`
-                          }}
-                        />
-
-                        {/* Number & Icon */}
-                        <div className="flex items-center gap-4 shrink-0">
-                          <span
-                            className="font-mono text-2xl font-light"
-                            style={{ color: `rgba(${cardColor.rgb}, 0.5)` }}
-                          >
-                            {String(idx + 1).padStart(2, "0")}
-                          </span>
-                          <div className="w-px h-8 bg-white/10 hidden sm:block" />
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-baseline gap-x-3 mb-1.5">
-                            <h3 className="font-cinzel text-xl text-white">
-                              {opt.title}
-                            </h3>
-                            <span className="font-inter text-[10px] tracking-widest uppercase text-white/40">
-                              {opt.tagline}
-                            </span>
-                          </div>
-                          <p className="font-inter text-[13px] leading-relaxed text-white/50">
-                            {opt.desc}
-                          </p>
-                        </div>
-
-                        {/* Chevron */}
-                        <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-full border border-white/10 items-center justify-center group-hover:border-white/30 transition-colors">
-                          <span className="text-white/40 group-hover:text-white transition-colors">→</span>
-                        </div>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-
-            {/* ===== STEP 2: Method Selection ===== */}
-            {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-4">
-                <div className="text-center mb-12">
-                  {/* Selected mode badge */}
-                  {(() => {
-                    const theme = mode ? modeThemes[mode] : null;
-                    return (
-                      <button onClick={() => setStep(1)} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6 cursor-pointer hover:scale-105 transition-transform"
-                        style={{
-                          borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
-                          background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
-                        }}
-                      >
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
-                          ← {modeOptions.find(m => m.id === mode)?.title}
-                        </span>
-                      </button>
-                    );
-                  })()}
-
-                  <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
-                    Como Deseja Consultar?
-                  </h2>
-                  <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
-                    Escolha um dos três caminhos. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-4 max-w-2xl mx-auto">
-                  {(() => {
-                    const theme = mode ? modeThemes[mode] : null;
-                    return pathOptions.map((opt, idx) => {
-                      const Icon = opt.icon;
+            <AnimatePresence mode="wait">
+              {/* ===== STEP 2: Method Selection ===== */}
+              {step === 2 && (
+                <motion.div key="step2" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-4">
+                  <div className="text-center mb-12">
+                    {/* Selected mode badge */}
+                    {(() => {
+                      const theme = mode ? modeThemes[mode] : null;
                       return (
-                        <motion.button
-                          key={opt.id}
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
-                          onClick={() => handleSelectPath(opt.id)}
-                          className="w-full relative overflow-hidden rounded-2xl border text-left transition-all duration-300 group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-6 md:p-8"
+                        <button onClick={() => setStep(1)} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6 cursor-pointer hover:scale-105 transition-transform"
                           style={{
-                            borderColor: theme ? `rgba(${theme.rgb}, 0.15)` : "rgba(212, 175, 55, 0.15)",
-                            backgroundColor: "rgba(255, 255, 255, 0.02)",
+                            borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
+                            background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
                           }}
                         >
-                          {/* Glow effect on hover */}
-                          <div 
-                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                            style={{
-                              background: theme ? `radial-gradient(circle at left center, rgba(${theme.rgb}, 0.1), transparent 70%)` : `radial-gradient(circle at left center, rgba(212,175,55,0.1), transparent 70%)`
-                            }}
-                          />
-
-                          {/* Icon area */}
-                          <div className="flex items-center gap-4 shrink-0">
-                            <div 
-                              className="w-12 h-12 rounded-full border flex items-center justify-center transition-colors"
-                              style={{ 
-                                borderColor: theme ? `rgba(${theme.rgb}, 0.2)` : 'rgba(212,175,55,0.2)',
-                                background: theme ? `rgba(${theme.rgb}, 0.05)` : 'rgba(212,175,55,0.05)',
-                                color: theme ? `rgb(${theme.rgb})` : "#D4AF37"
-                              }}
-                            >
-                              <Icon className="w-5 h-5 opacity-90" strokeWidth={1.5} />
-                            </div>
-                            <div className="w-px h-8 bg-white/10 hidden sm:block" />
-                          </div>
-                          
-                          {/* Content */}
-                          <div className="flex-1">
-                            <h3 className="font-cinzel text-xl text-white mb-1.5">
-                              {opt.title}
-                            </h3>
-                            <p className="font-inter text-[13px] leading-relaxed text-white/50">
-                              {opt.desc}
-                            </p>
-                          </div>
-
-                          {/* Chevron */}
-                          <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-full border border-white/10 items-center justify-center group-hover:border-white/30 transition-colors">
-                            <span className="text-white/40 group-hover:text-white transition-colors">→</span>
-                          </div>
-                        </motion.button>
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
+                            ← {modeOptions.find(m => m.id === mode)?.title}
+                          </span>
+                        </button>
                       );
-                    });
-                  })()}
-                </div>
-              </motion.div>
-            )}
+                    })()}
 
-            {/* ===== STEP 3: Data Collection + Lookup ===== */}
-            {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
-                {/* Breadcrumb badges */}
-                {(() => {
-                  const theme = mode ? modeThemes[mode] : null;
-                  return (
-                    <div className="flex justify-center gap-2 mb-6">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
-                        style={{
-                          borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
-                          background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
-                        }}
-                      >
-                        {mode && (() => {
-                          const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
-                          return <ModeIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
-                        })()}
-                        <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
-                          {modeOptions.find(m => m.id === mode)?.title}
-                        </span>
-                      </div>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
-                        style={{
-                          borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
-                          background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
-                        }}
-                      >
-                        {searchPath && (() => {
-                          const PathIcon = pathOptions.find(p => p.id === searchPath)?.icon || MapPin;
-                          return <PathIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
-                        })()}
-                        <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
-                          {pathOptions.find(p => p.id === searchPath)?.title}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                <div className="text-center mb-12">
-                  <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
-                    {formTitle}
-                  </h2>
-                  <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
-                    {formSubtitle}
-                  </p>
-                </div>
-
-                {/* Natal Data Grid */}
-                {isNatalProfileComplete(profile) ? (
-                  <div className="flex flex-col md:flex-row items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 md:mb-10 gap-6">
-                    <div className="text-left flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <User className="w-4 h-4 text-[#D4AF37]" />
-                        <span className="text-white font-bold text-sm uppercase tracking-widest">{profile?.full_name}</span>
-                      </div>
-                      <p className="text-white/50 text-xs font-inter leading-relaxed pl-7">
-                        {profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0, 5)}<br/>
-                        {profile?.birth_city}
-                      </p>
-                      <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}${searchPath ? `&path=${searchPath}` : ''}`)}`)} className="text-[#D4AF37] text-[10px] uppercase tracking-widest hover:text-white transition-colors pl-7 mt-2 underline decoration-[#D4AF37]/30 underline-offset-4">
-                        Editar Dados Natais
-                      </button>
-                    </div>
-                    
-                    <div className="w-full md:w-48 bg-black/40 rounded-xl p-4 border border-white/5">
-                      <div className="field-label justify-center mb-3"><span className="label-dot" /> {yearLabel}</div>
-                      <input
-                        type="number"
-                        className="quantum-input w-full text-center text-2xl font-bold text-[#D4AF37] h-12 font-cinzel bg-transparent border-b border-white/20 focus:border-[#D4AF37] outline-none"
-                        value={year}
-                        onChange={(e) => setYear(e.target.value)}
-                        disabled={mode === "presente"}
-                      />
-                    </div>
+                    <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
+                      Como Deseja Consultar?
+                    </h2>
+                    <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
+                      Escolha um dos três caminhos. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
+                    </p>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-10">
-                    <div className="space-y-6 md:space-y-7">
-                      <div>
-                        <div className="field-label"><span className="label-dot" /> Nome Completo</div>
-                        <input type="text" className="quantum-input w-full" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-4">
-                        <div>
-                          <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
-                          <input type="date" className="quantum-input w-full" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+
+                  <div className="flex flex-col gap-4 max-w-2xl mx-auto">
+                    {(() => {
+                      const theme = mode ? modeThemes[mode] : null;
+                      return pathOptions.map((opt, idx) => {
+                        const Icon = opt.icon;
+                        return (
+                          <motion.button
+                            key={opt.id}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            onClick={() => handleSelectPath(opt.id)}
+                            className="w-full relative overflow-hidden rounded-2xl border text-left transition-all duration-300 group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 p-6 md:p-8"
+                            style={{
+                              borderColor: theme ? `rgba(${theme.rgb}, 0.15)` : "rgba(212, 175, 55, 0.15)",
+                              backgroundColor: "rgba(255, 255, 255, 0.02)",
+                            }}
+                          >
+                            {/* Glow effect on hover */}
+                            <div 
+                              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                              style={{
+                                background: theme ? `radial-gradient(circle at left center, rgba(${theme.rgb}, 0.1), transparent 70%)` : `radial-gradient(circle at left center, rgba(212,175,55,0.1), transparent 70%)`
+                              }}
+                            />
+
+                            {/* Icon area */}
+                            <div className="flex items-center gap-4 shrink-0">
+                              <div
+                                className="w-12 h-12 rounded-full border flex items-center justify-center transition-colors"
+                                style={{
+                                  borderColor: theme ? `rgba(${theme.rgb}, 0.2)` : 'rgba(212,175,55,0.2)',
+                                  background: theme ? `rgba(${theme.rgb}, 0.05)` : 'rgba(212,175,55,0.05)',
+                                  color: theme ? `rgb(${theme.rgb})` : "#D4AF37"
+                                }}
+                              >
+                                <Icon className="w-5 h-5 opacity-90" strokeWidth={1.5} />
+                              </div>
+                              <div className="w-px h-8 bg-white/10 hidden sm:block" />
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1">
+                              <h3 className="font-cinzel text-xl text-white mb-1.5">
+                                {opt.title}
+                              </h3>
+                              <p className="font-inter text-[13px] leading-relaxed text-white/50">
+                                {opt.desc}
+                              </p>
+                            </div>
+
+                            {/* Chevron */}
+                            <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-full border border-white/10 items-center justify-center group-hover:border-white/30 transition-colors">
+                              <span className="text-white/40 group-hover:text-white transition-colors">→</span>
+                            </div>
+                          </motion.button>
+                        );
+                      });
+                    })()}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ===== STEP 3: Data Collection + Lookup ===== */}
+              {step === 3 && (
+                <motion.div key="step3" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
+                  {/* Breadcrumb badges */}
+                  {(() => {
+                    const theme = mode ? modeThemes[mode] : null;
+                    return (
+                      <div className="flex justify-center gap-2 mb-6">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
+                          style={{
+                            borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
+                            background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
+                          }}
+                        >
+                          {mode && (() => {
+                            const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
+                            return <ModeIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
+                          })()}
+                          <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
+                            {modeOptions.find(m => m.id === mode)?.title}
+                          </span>
                         </div>
-                        <div>
-                          <div className="field-label"><span className="label-dot" /> Hora Exata</div>
-                          <input type="time" className="quantum-input w-full" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
+                          style={{
+                            borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
+                            background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
+                          }}
+                        >
+                          {searchPath && (() => {
+                            const PathIcon = pathOptions.find(p => p.id === searchPath)?.icon || MapPin;
+                            return <PathIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
+                          })()}
+                          <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
+                            {pathOptions.find(p => p.id === searchPath)?.title}
+                          </span>
                         </div>
                       </div>
-                    </div>
-                    <div className="space-y-6 md:space-y-7">
-                      <div>
-                        <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
-                        <div className="w-full">
-                          <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
+                    );
+                  })()}
+
+                  <div className="text-center mb-12">
+                    <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
+                      {formTitle}
+                    </h2>
+                    <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
+                      {formSubtitle}
+                    </p>
+                  </div>
+
+                  {/* Natal Data Grid */}
+                  {isNatalProfileComplete(profile) ? (
+                    <div className="flex flex-col md:flex-row items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 md:mb-10 gap-6">
+                      <div className="text-left flex-1">
+                        <div className="flex items-center gap-3 mb-1">
+                          <User className="w-4 h-4 text-[#D4AF37]" />
+                          <span className="text-white font-bold text-sm uppercase tracking-widest">{profile?.full_name}</span>
                         </div>
+                        <p className="text-white/50 text-xs font-inter leading-relaxed pl-7">
+                          {profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0, 5)}<br/>
+                          {profile?.birth_city}
+                        </p>
+                        <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}${searchPath ? `&path=${searchPath}` : ''}`)}`)} className="text-[#D4AF37] text-[10px] uppercase tracking-widest hover:text-white transition-colors pl-7 mt-2 underline decoration-[#D4AF37]/30 underline-offset-4">
+                          Editar Dados Natais
+                        </button>
                       </div>
-                      <div>
-                        <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
+
+                      <div className="w-full md:w-48 bg-black/40 rounded-xl p-4 border border-white/5">
+                        <div className="field-label justify-center mb-3"><span className="label-dot" /> {yearLabel}</div>
                         <input
                           type="number"
-                          className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-[#D4AF37] h-14 font-cinzel"
+                          className="quantum-input w-full text-center text-2xl font-bold text-[#D4AF37] h-12 font-cinzel bg-transparent border-b border-white/20 focus:border-[#D4AF37] outline-none"
                           value={year}
                           onChange={(e) => setYear(e.target.value)}
                           disabled={mode === "presente"}
                         />
                       </div>
                     </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-10">
+                      <div className="space-y-6 md:space-y-7">
+                        <div>
+                          <div className="field-label"><span className="label-dot" /> Nome Completo</div>
+                          <input type="text" className="quantum-input w-full" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-4">
+                          <div>
+                            <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
+                            <input type="date" className="quantum-input w-full" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+                          </div>
+                          <div>
+                            <div className="field-label"><span className="label-dot" /> Hora Exata</div>
+                            <input type="time" className="quantum-input w-full" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-6 md:space-y-7">
+                        <div>
+                          <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
+                          <div className="w-full">
+                            <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
+                          <input
+                            type="number"
+                            className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-[#D4AF37] h-14 font-cinzel"
+                            value={year}
+                            onChange={(e) => setYear(e.target.value)}
+                            disabled={mode === "presente"}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Divider */}
+                  <div className="flex items-center gap-4 mb-10">
+                    <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
+                    <div className="w-2 h-2 rounded-full bg-gold/20 border border-gold/30" />
+                    <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
                   </div>
-                )}
 
-                {/* Divider */}
-                <div className="flex items-center gap-4 mb-10">
-                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
-                  <div className="w-2 h-2 rounded-full bg-gold/20 border border-gold/30" />
-                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
-                </div>
+                  {/* Mantra */}
+                  <div className="text-center mb-10">
+                    <AnimatePresence mode="wait">
+                      <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                        className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
+                        "{mantras[mantraIndex]}"
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
 
-                {/* Mantra */}
-                <div className="text-center mb-10">
-                  <AnimatePresence mode="wait">
-                    <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                      className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
-                      "{mantras[mantraIndex]}"
-                    </motion.p>
-                  </AnimatePresence>
-                </div>
-
-                {/* Natal data warning */}
-                {!natalDataReady && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 mb-6 text-center">
-                    <p className="text-destructive text-xs font-semibold">
-                      Preencha todos os dados natais acima (nome, data, hora e cidade de nascimento) antes de continuar.
-                    </p>
-                  </motion.div>
-                )}
-
-                {/* Lookup Component */}
-                <div className="w-full mt-4">
-                  {searchPath === "cidade" && (
-                    <CityLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                  {/* Natal data warning */}
+                  {!natalDataReady && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 mb-6 text-center">
+                      <p className="text-destructive text-xs font-semibold">
+                        Preencha todos os dados natais acima (nome, data, hora e cidade de nascimento) antes de continuar.
+                      </p>
+                    </motion.div>
                   )}
-                  {searchPath === "casa" && (
-                    <HouseLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                  )}
-                  {searchPath === "intencao" && (
-                    <IntentLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
-          <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
-        </motion.div>
+                  {/* Lookup Component */}
+                  <div className="w-full mt-4">
+                    {searchPath === "cidade" && (
+                      <CityLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                    )}
+                    {searchPath === "casa" && (
+                      <HouseLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                    )}
+                    {searchPath === "intencao" && (
+                      <IntentLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {/* Discreet onboarding reset */}
-        <div className="w-full text-center mt-6 mb-2">
-          <Link to="/app/onboarding" className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white/30 pb-0.5">
-            Ver como funciona
-          </Link>
+            <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
+          </motion.div>
+
+          {/* Discreet onboarding reset */}
+          <div className="w-full text-center mt-6 mb-2">
+            <Link to="/app/onboarding" className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white/30 pb-0.5">
+              Ver como funciona
+            </Link>
+          </div>
+
+          {/* Trust badges */}
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+            className="flex flex-wrap justify-center gap-6 md:gap-10 mt-6 px-4 pb-12">
+            {[
+              { text: "Dados 100% Privados" },
+              { text: "Efemérides Suíças (JPL)" },
+              { text: "IA Mestre Astrólogo" },
+            ].map((b, i) => (
+              <div key={i} className="flex items-center gap-2 text-muted-foreground/50">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
+              </div>
+            ))}
+          </motion.div>
         </div>
-
-        {/* Trust badges */}
-        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-6 md:gap-10 mt-6 px-4 pb-12">
-          {[
-            { text: "Dados 100% Privados" },
-            { text: "Efemérides Suíças (JPL)" },
-            { text: "IA Mestre Astrólogo" },
-          ].map((b, i) => (
-            <div key={i} className="flex items-center gap-2 text-muted-foreground/50">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
-            </div>
-          ))}
-        </motion.div>
-      </div>
+      )}
     </>
   );
 };
