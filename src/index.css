@@ -3,6 +3,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@font-face {
+  font-family: 'PS Marcellus';
+  src: url('/fonts/Marcellus-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PS DM Sans';
+  src: url('/fonts/DMSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PS DM Sans';
+  src: url('/fonts/DMSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 
 /* ============================================================
    PROTOCOLO SOLAR — DESIGN SYSTEM v2.0
@@ -19,6 +43,15 @@
 
 @layer base {
   :root {
+    /* ── BRAND KIT V2 (Isolated Tokens) ────────────────── */
+    --ps-void: #02050A;
+    --ps-night: #07101A;
+    --ps-surface: #0C1826;
+    --ps-gold-deep: #8D6914;
+    --ps-gold: #C9A227;
+    --ps-champagne: #E8D59B;
+    --ps-text: #F2F4F7;
+    --ps-muted: #AAB6C4;
     /* ── BASE ──────────────────────────────────────── */
     --background: 240 33% 2%;           /* #030306 Void Black */
     --foreground: 45 40% 96%;           /* #FAF7EE Celestial Ivory */

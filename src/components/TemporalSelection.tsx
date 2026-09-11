@@ -75,7 +75,7 @@ function DesktopScene({ onSelectMode }: Props) {
       <div style={{ height: "400vh" }}>
 
         {/* ── Fixed background scene ── */}
-        <div className="fixed inset-0 bg-[#030306]" style={{ zIndex: 0, top: 56 }}>
+        <div className="fixed inset-0 bg-ps-void" style={{ zIndex: 0, top: 56 }}>
           <motion.img style={{ opacity: bg1Opacity }} src="/temporal-web-01.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
           <motion.img style={{ opacity: bg2Opacity }} src="/temporal-web-02.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
           <motion.img style={{ opacity: bg3Opacity }} src="/temporal-web-03.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
@@ -84,8 +84,8 @@ function DesktopScene({ onSelectMode }: Props) {
 
           {/* Overlays to ensure text legibility */}
           <div className="absolute inset-0 bg-black/15 pointer-events-none" />
-          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#030306]/80 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#030306]/90 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-ps-void/80 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ps-void/90 to-transparent pointer-events-none" />
         </div>
 
         {/* ── Hero — top-left, scroll-animated out ── */}
@@ -95,13 +95,13 @@ function DesktopScene({ onSelectMode }: Props) {
           style2={{ zIndex: 20 }}
         >
           <div className="px-14 pt-10">
-            <span className="block font-inter text-[10px] tracking-[0.35em] text-[#D4AF37]/80 uppercase mb-4">
+            <span className="block font-ps-ui text-[10px] tracking-[0.35em] text-ps-gold/80 uppercase mb-4">
               Ponto de Partida
             </span>
-            <h2 className="font-cinzel text-5xl xl:text-6xl text-white mb-5 tracking-wide drop-shadow-lg leading-tight">
+            <h2 className="font-ps-display text-5xl xl:text-6xl text-white mb-5 tracking-wide drop-shadow-lg leading-tight">
               SELEÇÃO TEMPORAL
             </h2>
-            <p className="font-inter text-white/65 text-sm xl:text-base font-light max-w-xs leading-relaxed drop-shadow-md">
+            <p className="font-ps-ui text-white/65 text-sm xl:text-base font-light max-w-xs leading-relaxed drop-shadow-md">
               Role para explorar o cenário. Cada linha do tempo revela
               uma configuração energética única.
             </p>
@@ -119,7 +119,7 @@ function DesktopScene({ onSelectMode }: Props) {
               <div className="absolute top-[7px] left-[6%] right-[6%] h-[1px] overflow-hidden">
                 <motion.div
                   style={{ scaleX: lineScaleX, transformOrigin: "left" }}
-                  className="w-full h-full bg-gradient-to-r from-[#D4AF37]/15 via-[#D4AF37]/40 to-[#D4AF37]/15"
+                  className="w-full h-full bg-gradient-to-r from-ps-gold/15 via-ps-gold/40 to-ps-gold/15"
                 />
               </div>
 
@@ -132,17 +132,17 @@ function DesktopScene({ onSelectMode }: Props) {
                   whileTap={{ scale: 0.97 }}
                   className="group relative flex flex-col items-center text-center focus:outline-none flex-1"
                 >
-                  <div className="relative z-10 w-[7px] h-[7px] rounded-full border border-[#D4AF37]/50 bg-[#030306] mb-4 transition-all duration-400 group-hover:bg-[#D4AF37] group-hover:shadow-[0_0_18px_rgba(212,175,55,0.9)]" />
-                  <span className="block font-mono text-[9px] text-[#D4AF37]/60 tracking-[0.25em] mb-1.5 transition-colors group-hover:text-[#D4AF37]">
+                  <div className="relative z-10 w-[7px] h-[7px] rounded-full border border-ps-gold/50 bg-ps-void mb-4 transition-all duration-400 group-hover:bg-ps-gold group-hover:shadow-[0_0_18px_rgba(201,162,39,0.9)]" />
+                  <span className="block font-ps-ui text-[9px] text-ps-gold/60 tracking-[0.25em] mb-1.5 transition-colors group-hover:text-ps-gold">
                     {opt.number}
                   </span>
-                  <h3 className="font-cinzel text-lg xl:text-xl tracking-[0.08em] text-white/80 group-hover:text-[#D4AF37] transition-colors duration-400 mb-1 drop-shadow-md">
+                  <h3 className="font-ps-display text-lg xl:text-xl tracking-[0.08em] text-white/80 group-hover:text-ps-gold transition-colors duration-400 mb-1 drop-shadow-md">
                     {opt.title}
                   </h3>
-                  <span className="block font-inter text-[9px] tracking-[0.15em] uppercase text-white/50 group-hover:text-white/80 transition-colors duration-400 mb-1.5">
+                  <span className="block font-ps-ui text-[9px] tracking-[0.15em] uppercase text-white/50 group-hover:text-white/80 transition-colors duration-400 mb-1.5">
                     {opt.tagline}
                   </span>
-                  <p className="font-inter text-[10px] text-white/35 leading-relaxed group-hover:text-white/60 transition-colors duration-400 max-w-[170px]">
+                  <p className="font-ps-ui text-[10px] text-white/35 leading-relaxed group-hover:text-white/60 transition-colors duration-400 max-w-[170px]">
                     {opt.desc}
                   </p>
                 </motion.button>
@@ -159,7 +159,7 @@ function DesktopScene({ onSelectMode }: Props) {
 // ─── Mobile: Vertical Interactive Timeline ─────────────────────────────────────
 function MobileTimeline({ onSelectMode }: Props) {
   return (
-    <div className="relative w-full min-h-[100svh] overflow-hidden flex flex-col bg-[#030306]">
+    <div className="relative w-full min-h-[100svh] overflow-hidden flex flex-col bg-ps-void">
       <div className="absolute inset-0 z-0 select-none">
         <img
           src="/temporal-mobile-bg.webp"
@@ -167,8 +167,8 @@ function MobileTimeline({ onSelectMode }: Props) {
           className="w-full h-full object-cover object-center opacity-90"
           draggable={false}
         />
-        <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#030306]/95 via-[#030306]/60 to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#030306]/85 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-ps-void/95 via-ps-void/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-ps-void/85 to-transparent pointer-events-none" />
       </div>
 
       <div className="relative z-10 flex flex-col w-full min-h-[100svh] pt-16 pb-24 px-6">
@@ -178,13 +178,13 @@ function MobileTimeline({ onSelectMode }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: "easeOut" }}
         >
-          <span className="block font-inter text-[9px] tracking-[0.3em] text-[#D4AF37]/80 uppercase mb-3">
+          <span className="block font-ps-ui text-[9px] tracking-[0.3em] text-ps-gold/80 uppercase mb-3">
             Ponto de Partida
           </span>
-          <h2 className="font-cinzel text-[2rem] text-white mb-3 tracking-wide drop-shadow-md leading-tight">
+          <h2 className="font-ps-display text-[2rem] text-white mb-3 tracking-wide drop-shadow-md leading-tight">
             SELEÇÃO<br />TEMPORAL
           </h2>
-          <p className="font-inter text-white/55 text-xs font-light max-w-[240px] mx-auto leading-relaxed">
+          <p className="font-ps-ui text-white/55 text-xs font-light max-w-[240px] mx-auto leading-relaxed">
             Escolha o período que deseja explorar.
           </p>
         </motion.div>
@@ -192,7 +192,7 @@ function MobileTimeline({ onSelectMode }: Props) {
         <div className="relative flex flex-col gap-0">
           <motion.div
             className="absolute left-[19px] top-4 bottom-4 w-[1px]"
-            style={{ background: "linear-gradient(to bottom, transparent, rgba(212,175,55,0.25), rgba(212,175,55,0.25), transparent)" }}
+            style={{ background: "linear-gradient(to bottom, transparent, rgba(201,162,39,0.25), rgba(201,162,39,0.25), transparent)" }}
             initial={{ scaleY: 0 }}
             animate={{ scaleY: 1 }}
             transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
@@ -205,28 +205,28 @@ function MobileTimeline({ onSelectMode }: Props) {
               className="group relative flex items-start text-left w-full focus:outline-none active:scale-[0.98] transition-transform"
             >
               <div className="relative shrink-0 w-10 h-[76px] flex items-center justify-center">
-                <div className="absolute w-8 h-8 rounded-full border border-[#D4AF37]/0 group-hover:border-[#D4AF37]/30 group-active:border-[#D4AF37]/60 transition-all duration-300 bg-[#D4AF37]/0 group-hover:bg-[#D4AF37]/5 group-active:bg-[#D4AF37]/10" />
-                <div className="relative z-10 w-[7px] h-[7px] rounded-full border border-[#D4AF37]/50 bg-[#030306] group-hover:bg-[#D4AF37]/80 group-active:bg-[#D4AF37] group-hover:shadow-[0_0_12px_rgba(212,175,55,0.8)] transition-all duration-300" />
+                <div className="absolute w-8 h-8 rounded-full border border-ps-gold/0 group-hover:border-ps-gold/30 group-active:border-ps-gold/60 transition-all duration-300 bg-ps-gold/0 group-hover:bg-ps-gold/5 group-active:bg-ps-gold/10" />
+                <div className="relative z-10 w-[7px] h-[7px] rounded-full border border-ps-gold/50 bg-ps-void group-hover:bg-ps-gold/80 group-active:bg-ps-gold group-hover:shadow-[0_0_12px_rgba(201,162,39,0.8)] transition-all duration-300" />
               </div>
 
-              <div className="flex-1 py-3 border-b border-white/5 group-hover:border-[#D4AF37]/20 group-active:border-[#D4AF37]/40 transition-colors duration-300 pr-2">
+              <div className="flex-1 py-3 border-b border-white/5 group-hover:border-ps-gold/20 group-active:border-ps-gold/40 transition-colors duration-300 pr-2">
                 <div className="flex items-center gap-2.5 mb-1.5">
-                  <span className="font-mono text-[9px] text-[#D4AF37]/60 tracking-[0.25em]">
+                  <span className="font-ps-ui text-[9px] text-ps-gold/60 tracking-[0.25em]">
                     {opt.number}
                   </span>
-                  <h3 className="font-cinzel text-[1.15rem] tracking-[0.08em] text-white/90 group-hover:text-white group-active:text-[#D4AF37] transition-colors duration-300 drop-shadow-md">
+                  <h3 className="font-ps-display text-[1.15rem] tracking-[0.08em] text-white/90 group-hover:text-white group-active:text-ps-gold transition-colors duration-300 drop-shadow-md">
                     {opt.title}
                   </h3>
                 </div>
-                <div className="font-inter text-[9px] tracking-[0.15em] uppercase text-[#D4AF37]/60 mb-1.5">
+                <div className="font-ps-ui text-[9px] tracking-[0.15em] uppercase text-ps-gold/60 mb-1.5">
                   {opt.tagline}
                 </div>
-                <p className="font-inter text-[11px] text-white/45 leading-relaxed">
+                <p className="font-ps-ui text-[11px] text-white/45 leading-relaxed">
                   {opt.desc}
                 </p>
               </div>
 
-              <div className="shrink-0 flex items-center justify-center w-8 mt-3 text-white/20 group-hover:text-[#D4AF37]/60 group-active:text-[#D4AF37] transition-colors duration-300 text-sm">
+              <div className="shrink-0 flex items-center justify-center w-8 mt-3 text-white/20 group-hover:text-ps-gold/60 group-active:text-ps-gold transition-colors duration-300 text-sm">
                 →
               </div>
             </motion.button>

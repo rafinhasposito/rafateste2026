@@ -28,6 +28,10 @@ export default {
         "16": "64px",
       },
       fontFamily: {
+        /* BRAND KIT V2 (Isolated Aliases) */
+        "ps-display": ['"PS Marcellus"', 'serif'],
+        "ps-ui": ['"PS DM Sans"', 'sans-serif'],
+
         /* DESIGN SYSTEM v2.0: apenas Cinzel + Inter */
         display: ['Cinzel', 'serif'],
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
@@ -50,13 +54,23 @@ export default {
         "label": "var(--text-label)",
       },
       colors: {
+        /* BRAND KIT V2 (Isolated Aliases) */
+        "ps-void": "var(--ps-void)",
+        "ps-night": "var(--ps-night)",
+        "ps-surface": "var(--ps-surface)",
+        "ps-gold-deep": "var(--ps-gold-deep)",
+        "ps-gold": "var(--ps-gold)",
+        "ps-champagne": "var(--ps-champagne)",
+        "ps-text": "var(--ps-text)",
+        "ps-muted": "var(--ps-muted)",
+
         /* LEGACY TOKENS (To be migrated) */
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        
+
         /* NEW FOUNDATION TOKENS (Phase 1) */
         foundation: {
           bg: "hsl(var(--foundation-bg))",
