@@ -159,78 +159,82 @@ function DesktopScene({ onSelectMode }: Props) {
 // ─── Mobile: Vertical Interactive Timeline ─────────────────────────────────────
 function MobileTimeline({ onSelectMode }: Props) {
   return (
-    <div className="relative w-full min-h-[100svh] overflow-hidden flex flex-col bg-ps-void">
-      <div className="absolute inset-0 z-0 select-none">
+    <div className="relative w-full min-h-[100svh] overflow-y-auto overflow-x-hidden flex flex-col bg-ps-void">
+      {/* Background image — Terra */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <img
-          src="/temporal-mobile-bg.webp"
+          src="/temporal-mobile-bg-v3.png"
           alt=""
-          className="w-full h-full object-cover object-center opacity-90"
+          className="w-full h-[85%] object-cover object-bottom absolute bottom-0"
+          style={{ objectPosition: "center bottom" }}
           draggable={false}
         />
-        <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-ps-void/95 via-ps-void/60 to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-ps-void/85 to-transparent pointer-events-none" />
+        {/* Dark transition from top to bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-ps-void via-ps-void/80 to-transparent pointer-events-none" />
       </div>
 
-      <div className="relative z-10 flex flex-col w-full min-h-[100svh] pt-16 pb-24 px-6">
-        <motion.div
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-        >
-          <span className="block font-ps-ui text-[9px] tracking-[0.3em] text-ps-gold/80 uppercase mb-3">
-            Ponto de Partida
-          </span>
-          <h2 className="font-ps-display text-[2rem] text-white mb-3 tracking-wide drop-shadow-md leading-tight">
-            SELEÇÃO<br />TEMPORAL
-          </h2>
-          <p className="font-ps-ui text-white/55 text-xs font-light max-w-[240px] mx-auto leading-relaxed">
-            Escolha o período que deseja explorar.
-          </p>
-        </motion.div>
-
-        <div className="relative flex flex-col gap-0">
-          <motion.div
-            className="absolute left-[19px] top-4 bottom-4 w-[1px]"
-            style={{ background: "linear-gradient(to bottom, transparent, rgba(201,162,39,0.25), rgba(201,162,39,0.25), transparent)" }}
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{ duration: 1.2, delay: 0.4, ease: "easeOut" }}
+      {/* Content */}
+      <div
+        className="relative z-10 flex flex-col w-full min-h-[100svh] px-5 pb-24"
+        style={{ paddingTop: "max(env(safe-area-inset-top, 16px), 16px)" }}
+      >
+        {/* ── Brand header ── */}
+        <div className="flex justify-center w-full mt-4 mb-10">
+          <img
+            src="/brand/protocolo-solar-logo-horizontal-4096.png"
+            alt="Protocolo Solar"
+            className="w-[250px] max-w-[70vw] h-auto drop-shadow-md"
+            draggable={false}
           />
+        </div>
 
-          {modeOptions.map((opt, i) => (
-            <motion.button
-              key={opt.id}
-              onClick={() => onSelectMode(opt.id)}
-              className="group relative flex items-start text-left w-full focus:outline-none active:scale-[0.98] transition-transform"
+        {/* ── Main Promise ── */}
+        <div className="text-center mb-10">
+          <h1 className="font-ps-display text-[36px] text-ps-champagne mb-4 leading-[1.1] drop-shadow-md max-w-[320px] mx-auto">
+            Descubra onde passar seu próximo aniversário.
+          </h1>
+          <p className="font-ps-ui text-[16px] text-ps-text opacity-90 max-w-[300px] mx-auto leading-relaxed drop-shadow">
+            Sua Revolução Solar revela os destinos mais alinhados ao ciclo que você deseja viver.
+          </p>
+        </div>
+
+        {/* ── Main Action ── */}
+        <div className="w-full max-w-[320px] mx-auto mb-12">
+          <button
+            onClick={() => onSelectMode("futuro")}
+            className="w-full h-[56px] rounded-full bg-ps-gold text-ps-void font-ps-display text-lg tracking-wide flex items-center justify-center hover:bg-ps-gold-deep active:scale-[0.98] transition-all shadow-[0_4px_14px_rgba(201,162,39,0.4)]"
+          >
+            DESCOBRIR MEU DESTINO
+          </button>
+        </div>
+
+        {/* ── Secondary Paths ── */}
+        <div className="w-full max-w-[320px] mx-auto flex-1 flex flex-col justify-end">
+          <h3 className="font-ps-ui text-[11px] text-ps-muted uppercase tracking-[0.2em] text-center mb-5">
+            Explorar Outros Ciclos
+          </h3>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => onSelectMode("presente")}
+              className="w-full min-h-[64px] rounded-xl bg-ps-surface border border-white/5 flex items-center px-5 focus:outline-none active:scale-[0.98] transition-transform"
             >
-              <div className="relative shrink-0 w-10 h-[76px] flex items-center justify-center">
-                <div className="absolute w-8 h-8 rounded-full border border-ps-gold/0 group-hover:border-ps-gold/30 group-active:border-ps-gold/60 transition-all duration-300 bg-ps-gold/0 group-hover:bg-ps-gold/5 group-active:bg-ps-gold/10" />
-                <div className="relative z-10 w-[7px] h-[7px] rounded-full border border-ps-gold/50 bg-ps-void group-hover:bg-ps-gold/80 group-active:bg-ps-gold group-hover:shadow-[0_0_12px_rgba(201,162,39,0.8)] transition-all duration-300" />
+              <div className="flex-1 text-left">
+                <span className="block font-ps-display text-white text-[17px] mb-0.5">Presente</span>
+                <span className="block font-ps-ui text-ps-muted text-[13px]">Entender meu ciclo atual</span>
               </div>
-
-              <div className="flex-1 py-3 border-b border-white/5 group-hover:border-ps-gold/20 group-active:border-ps-gold/40 transition-colors duration-300 pr-2">
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <span className="font-ps-ui text-[9px] text-ps-gold/60 tracking-[0.25em]">
-                    {opt.number}
-                  </span>
-                  <h3 className="font-ps-display text-[1.15rem] tracking-[0.08em] text-white/90 group-hover:text-white group-active:text-ps-gold transition-colors duration-300 drop-shadow-md">
-                    {opt.title}
-                  </h3>
-                </div>
-                <div className="font-ps-ui text-[9px] tracking-[0.15em] uppercase text-ps-gold/60 mb-1.5">
-                  {opt.tagline}
-                </div>
-                <p className="font-ps-ui text-[11px] text-white/45 leading-relaxed">
-                  {opt.desc}
-                </p>
+              <div className="text-ps-gold text-xl opacity-80">→</div>
+            </button>
+            <button
+              onClick={() => onSelectMode("passado")}
+              className="w-full min-h-[64px] rounded-xl bg-ps-surface border border-white/5 flex items-center px-5 focus:outline-none active:scale-[0.98] transition-transform"
+            >
+              <div className="flex-1 text-left">
+                <span className="block font-ps-display text-white text-[17px] mb-0.5">Passado</span>
+                <span className="block font-ps-ui text-ps-muted text-[13px]">Revisar meu ciclo anterior</span>
               </div>
-
-              <div className="shrink-0 flex items-center justify-center w-8 mt-3 text-white/20 group-hover:text-ps-gold/60 group-active:text-ps-gold transition-colors duration-300 text-sm">
-                →
-              </div>
-            </motion.button>
-          ))}
+              <div className="text-ps-gold text-xl opacity-80">→</div>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -97,6 +97,22 @@ const Index = () => {
   const [searchParams] = useSearchParams();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
+
+  // Hide top header from shell when in step 1
+  useEffect(() => {
+    const topHeader = document.querySelector('header');
+    if (topHeader) {
+      if (step === 1) {
+        topHeader.style.display = 'none';
+      } else {
+        topHeader.style.display = '';
+      }
+    }
+    return () => {
+      if (topHeader) topHeader.style.display = '';
+    }
+  }, [step]);
+
   const [mode, setMode] = useState<Mode | null>(null);
 
   // --- ONBOARDING FIRST ACCESS LOGIC ---
