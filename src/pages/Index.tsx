@@ -192,15 +192,25 @@ const Index = () => {
   }, [profile]);
 
   const handleSelectMode = (m: Mode) => {
+    // 1. Se onboarding não foi completado → onboarding primeiro (com modo salvo)
+    const hasOnboarding = localStorage.getItem("ps_onboarding_completed");
+    if (!hasOnboarding) {
+      sessionStorage.setItem("ps_pending_mode", m);
+      navigate("/app/onboarding");
+      return;
+    }
+    // 2. Onboarding completo mas sem login → auth (modo preservado)
     if (!user) {
       sessionStorage.setItem("ps_pending_mode", m);
       navigate("/auth");
       return;
     }
+    // 3. Logado mas sem perfil natal → completar perfil
     if (!isNatalProfileComplete(profile)) {
       navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${m}`)}`);
       return;
     }
+    // 4. Tudo OK → ir direto para o formulário
     setMode(m);
     setSearchPath(null);
     if (m === "presente") setYear(currentYear);

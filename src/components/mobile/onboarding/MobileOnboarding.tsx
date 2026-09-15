@@ -8,17 +8,26 @@ import { Screen5 } from './screens/Screen5';
 import { Screen6 } from './screens/Screen6';
 import { OnboardingNav } from './OnboardingNav';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function MobileOnboarding() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const goNext = () => {
     if (step < 6) {
       setStep(s => s + 1);
     } else {
+      // Marca onboarding como completo
       localStorage.setItem('ps_onboarding_completed', 'true');
-      navigate('/');
+      // Se já está logado → volta para Index (que restaura ps_pending_mode)
+      // Se não está logado → vai para Auth (que redireciona para / após login)
+      if (user) {
+        navigate('/');
+      } else {
+        navigate('/auth');
+      }
     }
   };
 
