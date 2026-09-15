@@ -168,8 +168,8 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       {!result && !loading && (
         <>
           <div className="flex items-center gap-3 mb-2">
-            <Scroll className="w-5 h-5 text-[#D4AF37]" />
-            <h3 className="font-cinzel text-sm md:text-base font-bold text-white uppercase tracking-[0.1em]">
+            <Scroll className="w-5 h-5 text-[#C9A227]" />
+            <h3 className="font-ps-display text-sm md:text-base font-bold text-white uppercase tracking-[0.1em]">
               Manifesto de Intenção
             </h3>
           </div>
@@ -184,19 +184,19 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 onClick={() => handleSelectIntent(house.id)}
-                className="w-full text-left p-4 rounded-xl bg-black/40 hover:bg-black/60 border border-white/5 hover:border-[#D4AF37]/50 transition-all duration-300 group"
+                className="w-full text-left p-4 rounded-xl bg-black/40 hover:bg-black/60 border border-white/5 hover:border-[#C9A227]/50 transition-all duration-300 group"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <h3 className="text-white md:text-sm font-medium mb-1 group-hover:text-[#D4AF37] transition-colors leading-snug">
+                    <h3 className="text-white md:text-sm font-medium mb-1 group-hover:text-[#C9A227] transition-colors leading-snug">
                       {house.intent}
                     </h3>
                     <p className="text-white/40 text-[10px] font-light">
                       {house.realLife}
                     </p>
                   </div>
-                  <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#D4AF37]/10 transition-colors">
-                    <ArrowRight className="w-3 h-3 text-white/30 group-hover:text-[#D4AF37] transition-colors" />
+                  <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#C9A227]/10 transition-colors">
+                    <ArrowRight className="w-3 h-3 text-white/30 group-hover:text-[#C9A227] transition-colors" />
                   </div>
                 </div>
               </motion.button>
@@ -207,8 +207,8 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
 
       {loading && (
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
-          <div className="w-8 h-8 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
-          <p className="text-[#D4AF37] font-cinzel text-sm animate-pulse">Consultando o cosmos...</p>
+          <div className="w-8 h-8 border-2 border-[#C9A227]/30 border-t-[#C9A227] rounded-full animate-spin" />
+          <p className="text-[#C9A227] font-ps-display text-sm animate-pulse">Consultando o cosmos...</p>
         </div>
       )}
 

@@ -25,7 +25,7 @@ const Card = ({ icon: Icon, label, value, hint, accent = "primary" }: { icon: an
       <Icon className={`w-4 h-4 text-${accent}`} />
       <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
     </div>
-    <p className="font-cinzel text-2xl text-foreground font-bold leading-none">{value}</p>
+    <p className="font-ps-display text-2xl text-foreground font-bold leading-none">{value}</p>
     {hint && <p className="text-muted-foreground/60 text-[10px] mt-1.5">{hint}</p>}
   </div>
 );
@@ -132,7 +132,7 @@ const MetricsDashboard = () => {
       </div>
 
       <div className="glass-panel p-5">
-        <h3 className="font-cinzel text-sm uppercase tracking-wider text-foreground mb-4">Cadastros — últimos 30 dias</h3>
+        <h3 className="font-ps-display text-sm uppercase tracking-wider text-foreground mb-4">Cadastros — últimos 30 dias</h3>
         <div style={{ width: "100%", height: 220 }}>
           <ResponsiveContainer>
             <LineChart data={m.signupSeries}>
@@ -148,7 +148,7 @@ const MetricsDashboard = () => {
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="glass-panel p-5">
-          <h3 className="font-cinzel text-sm uppercase tracking-wider text-foreground mb-3">Top 10 — Compradores</h3>
+          <h3 className="font-ps-display text-sm uppercase tracking-wider text-foreground mb-3">Top 10 — Compradores</h3>
           {m.topBuyers.length === 0 ? <p className="text-muted-foreground text-xs">Sem compras ainda.</p> :
             <div className="space-y-1.5">
               {m.topBuyers.map((u, i) => (
@@ -161,7 +161,7 @@ const MetricsDashboard = () => {
             </div>}
         </div>
         <div className="glass-panel p-5">
-          <h3 className="font-cinzel text-sm uppercase tracking-wider text-foreground mb-3">Top 10 — Quem mais gastou</h3>
+          <h3 className="font-ps-display text-sm uppercase tracking-wider text-foreground mb-3">Top 10 — Quem mais gastou</h3>
           {m.topSpenders.length === 0 ? <p className="text-muted-foreground text-xs">Sem gastos ainda.</p> :
             <div className="space-y-1.5">
               {m.topSpenders.map((u, i) => (

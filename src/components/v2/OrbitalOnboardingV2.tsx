@@ -80,7 +80,7 @@ export function OrbitalOnboardingV2({ onComplete }: OrbitalOnboardingV2Props) {
               <h1 className="text-3xl font-sans font-black text-slate-900 tracking-tight mb-2">
                 {steps[step].title}
               </h1>
-              <p className="text-slate-500 font-inter font-medium text-sm">
+              <p className="text-slate-500 font-ps-ui font-medium text-sm">
                 {steps[step].subtitle}
               </p>
             </div>
@@ -100,7 +100,7 @@ export function OrbitalOnboardingV2({ onComplete }: OrbitalOnboardingV2Props) {
                 <button
                   key={suggestion}
                   onClick={() => setDream(suggestion)}
-                  className="px-4 py-2 rounded-full border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition-all font-inter shadow-sm"
+                  className="px-4 py-2 rounded-full border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 transition-all font-ps-ui shadow-sm"
                 >
                   {suggestion}
                 </button>

@@ -53,20 +53,20 @@ export const Screen1 = () => (
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="inline-block font-inter text-[10px] tracking-[0.3em] text-[#D4AF37]/80 uppercase mb-5"
+          className="inline-block font-ps-ui text-[10px] tracking-[0.3em] text-[#C9A227]/80 uppercase mb-5"
         >
           Protocolo Solar · Relocalização
         </motion.span>
 
         {/* Headline */}
-        <h1 className="font-cinzel text-[1.75rem] sm:text-4xl lg:text-6xl xl:text-7xl text-white leading-[1.1] mb-5">
+        <h1 className="font-ps-display text-[1.75rem] sm:text-4xl lg:text-6xl xl:text-7xl text-white leading-[1.1] mb-5">
           Descubra onde passar{' '}
           <br className="hidden sm:block" />
           seu próximo aniversário.
         </h1>
 
         {/* Subcopy */}
-        <p className="font-inter text-white/65 text-[0.8125rem] md:text-base font-light max-w-md mx-auto lg:mx-0 mb-10 leading-relaxed">
+        <p className="font-ps-ui text-white/65 text-[0.8125rem] md:text-base font-light max-w-md mx-auto lg:mx-0 mb-10 leading-relaxed">
           O lugar onde você passa seu aniversário pode mudar a leitura do seu próximo ano — e colocar dinheiro, amor, carreira ou outras áreas da sua vida em maior destaque.
         </p>
 
@@ -83,8 +83,8 @@ export const Screen1 = () => (
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
             >
-              <span className="block font-cinzel text-xl md:text-2xl text-white font-bold">{m.value}</span>
-              <span className="block font-inter text-[8px] md:text-[9px] text-white/35 uppercase tracking-[0.2em] mt-1">{m.label}</span>
+              <span className="block font-ps-display text-xl md:text-2xl text-white font-bold">{m.value}</span>
+              <span className="block font-ps-ui text-[8px] md:text-[9px] text-white/35 uppercase tracking-[0.2em] mt-1">{m.label}</span>
             </motion.div>
           ))}
         </div>

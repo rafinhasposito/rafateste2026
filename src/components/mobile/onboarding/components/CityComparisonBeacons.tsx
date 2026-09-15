@@ -14,27 +14,27 @@ export const CityComparisonBeacons = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="flex flex-col items-center"
         >
-          <div className="w-10 h-10 rounded-full border border-[#D4AF37]/50 bg-[#0A0C14]/90 backdrop-blur-md flex items-center justify-center text-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+          <div className="w-10 h-10 rounded-full border border-[#C9A227]/50 bg-[#0A0C14]/90 backdrop-blur-md flex items-center justify-center text-[#C9A227] shadow-[0_0_15px_rgba(212,175,55,0.15)]">
             <Sun className="w-4 h-4" />
           </div>
 
           <div className="text-center mt-3">
-            <span className="font-cinzel text-[11px] font-bold tracking-[0.2em] text-[#FAF7EE] uppercase block">
+            <span className="font-ps-display text-[11px] font-bold tracking-[0.2em] text-[#FAF7EE] uppercase block">
               SÃO PAULO
             </span>
-            <span className="font-inter text-[9px] tracking-[0.1em] text-[#FAF7EE]/40 block mt-1 uppercase">
+            <span className="font-ps-ui text-[9px] tracking-[0.1em] text-[#FAF7EE]/40 block mt-1 uppercase">
               Brasil
             </span>
           </div>
 
           <div className="relative w-px h-24 md:h-32 mt-3 flex flex-col items-center">
-            <div className="w-full h-full bg-gradient-to-b from-[#D4AF37]/60 via-[#D4AF37]/20 to-transparent" />
+            <div className="w-full h-full bg-gradient-to-b from-[#C9A227]/60 via-[#C9A227]/20 to-transparent" />
             <motion.div
               animate={{ y: [0, 60, 0], opacity: [0.2, 0.8, 0.2] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-0 w-px h-6 bg-[#FAF7EE] shadow-[0_0_8px_#D4AF37]"
+              className="absolute top-0 w-px h-6 bg-[#FAF7EE] shadow-[0_0_8px_#C9A227]"
             />
-            <div className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-[#D4AF37]/50" />
+            <div className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-[#C9A227]/50" />
           </div>
         </motion.div>
 
@@ -50,10 +50,10 @@ export const CityComparisonBeacons = () => {
           </div>
 
           <div className="text-center mt-3">
-            <span className="font-cinzel text-[11px] font-bold tracking-[0.2em] text-[#FAF7EE] uppercase block">
+            <span className="font-ps-display text-[11px] font-bold tracking-[0.2em] text-[#FAF7EE] uppercase block">
               NOVA YORK
             </span>
-            <span className="font-inter text-[9px] tracking-[0.1em] text-[#FAF7EE]/40 block mt-1 uppercase">
+            <span className="font-ps-ui text-[9px] tracking-[0.1em] text-[#FAF7EE]/40 block mt-1 uppercase">
               EUA
             </span>
           </div>

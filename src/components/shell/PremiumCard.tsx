@@ -66,9 +66,9 @@ const variantStyles: Record<PremiumCardVariant, string> = {
   ].join(" "),
 };
 
-// DS: --gold (#D4AF37) como acento de borda/glow
+// DS: --gold (#C9A227) como acento de borda/glow
 const accentStyle =
-  "border-[#D4AF37]/30 shadow-[0_0_24px_rgba(212,175,55,0.12)]";
+  "border-[#C9A227]/30 shadow-[0_0_24px_rgba(212,175,55,0.12)]";
 
 export const PremiumCard: React.FC<PremiumCardProps> = ({
   variant = "glass",

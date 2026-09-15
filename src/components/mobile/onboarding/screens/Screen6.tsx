@@ -35,7 +35,7 @@ export const Screen6 = () => (
         transition={{ duration: 0.6 }}
         className="text-center mb-6"
       >
-        <h2 className="font-cinzel text-2xl sm:text-3xl text-white leading-tight">
+        <h2 className="font-ps-display text-2xl sm:text-3xl text-white leading-tight">
           Agora imagine descobrir o seu.
         </h2>
       </motion.div>
@@ -56,7 +56,7 @@ export const Screen6 = () => (
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#08090F] via-[#08090F]/60 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="font-cinzel text-xl text-white mb-0.5">Tóquio, Japão</h3>
+            <h3 className="font-ps-display text-xl text-white mb-0.5">Tóquio, Japão</h3>
             <p className="font-mono text-[9px] text-white/50 tracking-widest">35.6762° N · 139.6503° E</p>
           </div>
         </div>
@@ -64,12 +64,12 @@ export const Screen6 = () => (
         {/* Main highlight */}
         <div className="px-4 pt-4 pb-3">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-            <p className="font-inter text-[#D4AF37] text-[10px] font-semibold tracking-[0.15em] uppercase">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#C9A227]" />
+            <p className="font-ps-ui text-[#C9A227] text-[10px] font-semibold tracking-[0.15em] uppercase">
               Casa 10 em destaque
             </p>
           </div>
-          <p className="font-inter text-white/80 text-[13px] font-light leading-relaxed">
+          <p className="font-ps-ui text-white/80 text-[13px] font-light leading-relaxed">
             Carreira, visibilidade e construção profissional entre os principais temas do seu próximo ano neste destino.
           </p>
         </div>
@@ -79,12 +79,12 @@ export const Screen6 = () => (
           <div className="border-t border-white/[0.05] pt-4 space-y-3">
             {previewAreas.map((row) => (
               <div key={row.area} className="flex items-start gap-3">
-                <span className={`font-inter text-[9px] uppercase tracking-widest mt-0.5 w-20 shrink-0 ${
-                  row.accent ? 'text-[#D4AF37]/80' : 'text-white/30'
+                <span className={`font-ps-ui text-[9px] uppercase tracking-widest mt-0.5 w-20 shrink-0 ${
+                  row.accent ? 'text-[#C9A227]/80' : 'text-white/30'
                 }`}>
                   {row.area}
                 </span>
-                <p className={`font-inter text-[11px] leading-snug ${
+                <p className={`font-ps-ui text-[11px] leading-snug ${
                   row.accent ? 'text-white' : 'text-white/60'
                 }`}>
                   {row.text}
@@ -97,7 +97,7 @@ export const Screen6 = () => (
         {/* Blurred bottom */}
         <div className="h-10 bg-gradient-to-t from-[#08090F] to-transparent relative flex items-center justify-center">
           <div className="absolute inset-x-4 top-0 border-t border-white/[0.03]" />
-          <p className="font-inter text-white/25 text-[10px]">+ mais áreas analisadas</p>
+          <p className="font-ps-ui text-white/25 text-[10px]">+ mais áreas analisadas</p>
         </div>
       </motion.div>
     </div>

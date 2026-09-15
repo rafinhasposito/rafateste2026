@@ -35,7 +35,7 @@ const variantClasses: Record<PremiumButtonVariant, string> = {
   primary: [
     // DS: gradiente gold — inevitável: Tailwind não interpola múltiplas paradas de cor via var()
     "relative overflow-hidden",
-    "bg-gradient-to-br from-[#C28912] via-[#D4AF37] to-[#F5E09C]",
+    "bg-gradient-to-br from-[#C28912] via-[#C9A227] to-[#F5E09C]",
     "text-[#030306]", // DS: --background (void black)
     "font-bold tracking-[0.16em] uppercase",
     // DS: sombra composta inevitável
@@ -44,7 +44,7 @@ const variantClasses: Record<PremiumButtonVariant, string> = {
     "hover:brightness-105",
     "active:brightness-95 active:scale-[0.98]",
     "disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none",
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] focus-visible:outline-offset-2",
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C9A227] focus-visible:outline-offset-2",
   ].join(" "),
 
   ghost: [
@@ -61,13 +61,13 @@ const variantClasses: Record<PremiumButtonVariant, string> = {
 
   outline: [
     "bg-transparent",
-    "text-[#D4AF37]", // DS: --gold
+    "text-[#C9A227]", // DS: --gold
     "font-medium tracking-[0.12em] uppercase",
-    "border border-[#D4AF37]/35",
-    "hover:bg-[#D4AF37]/[0.06] hover:border-[#D4AF37]/60",
+    "border border-[#C9A227]/35",
+    "hover:bg-[#C9A227]/[0.06] hover:border-[#C9A227]/60",
     "active:scale-[0.98]",
     "disabled:opacity-40 disabled:cursor-not-allowed",
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] focus-visible:outline-offset-2",
+    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C9A227] focus-visible:outline-offset-2",
   ].join(" "),
 };
 

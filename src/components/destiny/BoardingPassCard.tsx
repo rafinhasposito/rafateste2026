@@ -109,7 +109,7 @@ export const BoardingPassCard: React.FC<BoardingPassCardProps> = ({
               >
                 Casa {houseNumber}
               </span>
-              <h4 className="text-base font-cinzel font-bold text-foreground">
+              <h4 className="text-base font-ps-display font-bold text-foreground">
                 {houseTitle}
               </h4>
             </div>
@@ -123,7 +123,7 @@ export const BoardingPassCard: React.FC<BoardingPassCardProps> = ({
 
           {/* Translation quote */}
           <div className="mb-5">
-            <p className="text-base md:text-lg font-cinzel text-foreground/90 leading-snug">
+            <p className="text-base md:text-lg font-ps-display text-foreground/90 leading-snug">
               "{houseData.translation}"
             </p>
           </div>

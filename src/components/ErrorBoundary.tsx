@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-black text-white p-6 font-sans">
           <div className="max-w-md w-full text-center space-y-6">
-            <h2 className="text-2xl font-semibold tracking-wider text-[#D4AF37]">
+            <h2 className="text-2xl font-semibold tracking-wider text-[#C9A227]">
               Conexão Interrompida
             </h2>
             <p className="text-white/70">

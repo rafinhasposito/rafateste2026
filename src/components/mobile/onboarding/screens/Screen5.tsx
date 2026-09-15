@@ -49,7 +49,7 @@ export const Screen5 = () => (
       ))}
     </div>
     {/* Subtle golden glow at center */}
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/[0.05] rounded-full blur-[100px] pointer-events-none" />
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#C9A227]/[0.05] rounded-full blur-[100px] pointer-events-none" />
 
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -57,10 +57,10 @@ export const Screen5 = () => (
       transition={{ duration: 0.7 }}
       className="relative z-10 max-w-sm md:max-w-md w-full text-center mb-8"
     >
-      <h2 className="font-cinzel text-2xl sm:text-3xl text-white mb-2 leading-tight">
+      <h2 className="font-ps-display text-2xl sm:text-3xl text-white mb-2 leading-tight">
         Você escolhe o lugar.<br />Nós fazemos as contas.
       </h2>
-      <p className="font-inter text-white/50 text-xs">
+      <p className="font-ps-ui text-white/50 text-xs">
         Cruzamos os dados exatos para calcular sua nova configuração.
       </p>
     </motion.div>
@@ -77,7 +77,7 @@ export const Screen5 = () => (
             transition={{ delay: 0.1 * (i + 1), duration: 0.45 }}
             className="flex items-center justify-between py-2 border-b border-white/[0.04] last:border-0"
           >
-            <span className="font-inter text-white/40 text-[11px]">{d.label}</span>
+            <span className="font-ps-ui text-white/40 text-[11px]">{d.label}</span>
             <span className="font-mono text-white/80 text-[11px]">{d.value}</span>
           </motion.div>
         ))}
@@ -90,13 +90,13 @@ export const Screen5 = () => (
         transition={{ delay: 0.7, duration: 0.5 }}
         className="flex flex-col items-center py-3"
       >
-        <div className="w-px h-6 bg-gradient-to-b from-white/20 to-[#D4AF37]/50" />
+        <div className="w-px h-6 bg-gradient-to-b from-white/20 to-[#C9A227]/50" />
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-2.5 h-2.5 rounded-full bg-[#D4AF37] border border-[#D4AF37]/60 my-1 shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+          className="w-2.5 h-2.5 rounded-full bg-[#C9A227] border border-[#C9A227]/60 my-1 shadow-[0_0_10px_rgba(212,175,55,0.5)]"
         />
-        <div className="w-px h-6 bg-gradient-to-b from-[#D4AF37]/50 to-[#D4AF37]/10" />
+        <div className="w-px h-6 bg-gradient-to-b from-[#C9A227]/50 to-[#C9A227]/10" />
       </motion.div>
 
       {/* Result */}
@@ -104,13 +104,13 @@ export const Screen5 = () => (
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.6 }}
-        className="text-center p-5 border border-[#D4AF37]/30 bg-gradient-to-b from-[#D4AF37]/10 to-[#D4AF37]/[0.02] rounded-xl backdrop-blur-md shadow-2xl"
+        className="text-center p-5 border border-[#C9A227]/30 bg-gradient-to-b from-[#C9A227]/10 to-[#C9A227]/[0.02] rounded-xl backdrop-blur-md shadow-2xl"
       >
-        <p className="font-mono text-[9px] text-[#D4AF37]/80 uppercase tracking-[0.3em] mb-1.5">Resultado</p>
-        <p className="font-inter text-white text-[15px] font-medium">
+        <p className="font-mono text-[9px] text-[#C9A227]/80 uppercase tracking-[0.3em] mb-1.5">Resultado</p>
+        <p className="font-ps-ui text-white text-[15px] font-medium">
           Revolução Solar em Tóquio
         </p>
-        <p className="font-inter text-white/50 text-[11px] mt-1">
+        <p className="font-ps-ui text-white/50 text-[11px] mt-1">
           Leitura completa dos próximos 12 meses
         </p>
       </motion.div>

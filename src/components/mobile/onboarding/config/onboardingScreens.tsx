@@ -5,7 +5,7 @@ export const onboardingScreens = [
     title: (
       <>
         O CÉU SE MOVE.<br />
-        <span className="text-[#D4AF37]">E O SEU MAPA TAMBÉM.</span>
+        <span className="text-[#C9A227]">E O SEU MAPA TAMBÉM.</span>
       </>
     ),
     subtitle: "O lugar onde você passa o seu aniversário ativa focos diferentes para o seu ano pessoal.",

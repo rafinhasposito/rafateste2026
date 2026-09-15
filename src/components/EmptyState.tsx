@@ -22,7 +22,7 @@ const EmptyState = ({ icon: Icon, title, description, action }: EmptyStateProps)
           aria-hidden="true"
         />
       )}
-      <h2 className="font-cinzel text-lg md:text-xl font-bold text-foreground mb-2 uppercase tracking-wider">
+      <h2 className="font-ps-display text-lg md:text-xl font-bold text-foreground mb-2 uppercase tracking-wider">
         {title}
       </h2>
       {description && (

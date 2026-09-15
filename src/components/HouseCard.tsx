@@ -81,7 +81,7 @@ const HouseCard = ({ houseNum, house, result, locked, isGoal, isSelected, onSele
 
         <div className="flex items-start gap-3 mb-3">
           <div className="flex-1 min-w-0">
-            <p className="text-primary font-cinzel text-[11px] font-bold uppercase tracking-wider">Casa {houseNum}</p>
+            <p className="text-primary font-ps-display text-[11px] font-bold uppercase tracking-wider">Casa {houseNum}</p>
             <p className="text-foreground text-sm font-semibold mt-0.5">{house.label}</p>
             <p className="text-foreground/50 text-[10px] mt-0.5">{archetype} · {sign}</p>
             <p className="text-foreground/50 text-[10px] mt-0.5">{house.regente}</p>

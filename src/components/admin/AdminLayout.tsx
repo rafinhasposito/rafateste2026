@@ -12,12 +12,12 @@ interface AdminLayoutProps {
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description }) => {
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col md:flex-row font-inter">
+    <div className="min-h-[100dvh] bg-background flex flex-col md:flex-row font-ps-ui">
       
       {/* SIDEBAR */}
       <aside className="w-full md:w-64 border-r border-border bg-card/30 hidden md:flex flex-col">
         <div className="p-6">
-          <div className="flex items-center gap-2 font-cinzel font-bold text-xl tracking-wider text-foreground">
+          <div className="flex items-center gap-2 font-ps-display font-bold text-xl tracking-wider text-foreground">
             <div className="w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center">
               PS
             </div>

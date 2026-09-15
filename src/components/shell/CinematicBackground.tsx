@@ -137,7 +137,7 @@ export const CinematicBackground: React.FC<CinematicBackgroundProps> = ({
       {/* ── Camada 3: Glow topo — discovery tem tom quente, functional tem dourado sutil ── */}
       {/*
         DS: radial-gradient inline — inevitável: Tailwind não gera radial-gradient dinâmico.
-        #D4AF37 = --gold. Opacidade 0.08 (discovery) e 0.04 (functional) é a distinção entre modos.
+        #C9A227 = --gold. Opacidade 0.08 (discovery) e 0.04 (functional) é a distinção entre modos.
       */}
       <div
         aria-hidden="true"

@@ -74,7 +74,7 @@ const Auth = () => {
       <>
         <StarryBackground />
         <div className="min-h-[100dvh] flex items-center justify-center">
-          <div className="text-primary font-cinzel text-lg animate-pulse">Verificando sessão...</div>
+          <div className="text-primary font-ps-display text-lg animate-pulse">Verificando sessão...</div>
         </div>
       </>
     );
@@ -93,16 +93,16 @@ const Auth = () => {
           <div className="text-center mb-6">
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/30 flex items-center justify-center mx-auto mb-3 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
               <svg width="36" height="36" viewBox="0 0 52 52" fill="none">
-                <circle cx="26" cy="26" r="22" stroke="#D4AF37" strokeWidth="0.75" strokeOpacity="0.4" strokeDasharray="2 2" />
-                <polygon points="26,8 28.5,23.5 26,22 23.5,23.5" fill="#D4AF37" />
-                <polygon points="26,44 28.5,28.5 26,30 23.5,28.5" fill="#D4AF37" fillOpacity="0.7" />
-                <polygon points="8,26 23.5,23.5 22,26 23.5,28.5" fill="#D4AF37" fillOpacity="0.7" />
-                <polygon points="44,26 28.5,23.5 30,26 28.5,28.5" fill="#D4AF37" fillOpacity="0.7" />
-                <circle cx="26" cy="26" r="3" fill="#D4AF37" />
+                <circle cx="26" cy="26" r="22" stroke="#C9A227" strokeWidth="0.75" strokeOpacity="0.4" strokeDasharray="2 2" />
+                <polygon points="26,8 28.5,23.5 26,22 23.5,23.5" fill="#C9A227" />
+                <polygon points="26,44 28.5,28.5 26,30 23.5,28.5" fill="#C9A227" fillOpacity="0.7" />
+                <polygon points="8,26 23.5,23.5 22,26 23.5,28.5" fill="#C9A227" fillOpacity="0.7" />
+                <polygon points="44,26 28.5,23.5 30,26 28.5,28.5" fill="#C9A227" fillOpacity="0.7" />
+                <circle cx="26" cy="26" r="3" fill="#C9A227" />
               </svg>
             </div>
-            <h1 className="font-cinzel text-xl md:text-2xl font-bold text-foreground uppercase tracking-[0.12em]">Protocolo Solar</h1>
-            <p className="text-[#D4AF37] text-[9px] uppercase tracking-[0.25em] font-medium mt-1">Astrologia de Relocalização</p>
+            <h1 className="font-ps-display text-xl md:text-2xl font-bold text-foreground uppercase tracking-[0.12em]">Protocolo Solar</h1>
+            <p className="text-[#C9A227] text-[9px] uppercase tracking-[0.25em] font-medium mt-1">Astrologia de Relocalização</p>
             <p className="text-muted-foreground text-xs mt-3 leading-relaxed">
               {mode === "signup" 
                 ? "Crie sua conta para salvar seus dados natais e não precisar preenchê-los em cada consulta." 
@@ -132,7 +132,7 @@ const Auth = () => {
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="text-left">
-                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Nome Completo</label>
+                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-1 block">Nome Completo</label>
                 <input
                   type="text" required placeholder="Seu nome completo" value={name} onChange={e => setName(e.target.value)}
                   className="quantum-input w-full"
@@ -140,7 +140,7 @@ const Auth = () => {
               </div>
             )}
             <div className="text-left">
-              <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Email</label>
+              <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-1 block">Email</label>
               <input
                 type="email" required placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)}
                 className="quantum-input w-full"
@@ -148,13 +148,13 @@ const Auth = () => {
             </div>
             {mode !== "forgot" && (
               <div>
-                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-1 block">Senha</label>
+                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-1 block">Senha</label>
                 <input
                   type="password" required placeholder="••••••••" minLength={8} value={password} onChange={e => setPassword(e.target.value)}
                   className="quantum-input w-full"
                 />
                 {mode === "signup" && (
-                  <p className="text-white/40 text-[10px] mt-2 font-inter leading-tight">
+                  <p className="text-white/40 text-[10px] mt-2 font-ps-ui leading-tight">
                     Mínimo de 8 caracteres. Evite senhas comuns. O sistema recusa senhas expostas em vazamentos de dados.
                   </p>
                 )}

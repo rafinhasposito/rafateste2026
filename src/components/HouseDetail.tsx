@@ -169,7 +169,7 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         {/* Header */}
         <div className="flex items-start gap-4 mb-2">
           <div className="flex-1">
-            <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-foreground tracking-wider">
+            <h3 className="font-ps-display text-2xl md:text-3xl font-bold text-foreground tracking-wider">
               {house.name}
             </h3>
             <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -288,7 +288,7 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         {/* Destinations */}
         {destinations.length > 0 && (
           <div className="mb-8 border-t border-foreground/10 pt-8">
-            <h4 className="font-cinzel text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">
+            <h4 className="font-ps-display text-sm font-bold text-primary uppercase tracking-[0.3em] mb-4">
               {destinoLabel}
             </h4>
             <p className="text-foreground/60 text-[11px] mb-4 leading-relaxed">{destinoDesc}</p>
@@ -303,7 +303,7 @@ const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: House
         {/* Radar */}
         {house.radar && (
           <div className="bg-background/30 backdrop-blur-sm rounded-xl p-5 border border-foreground/5 mb-6">
-            <h4 className="font-cinzel text-xs font-bold text-primary uppercase tracking-[0.3em] mb-4">
+            <h4 className="font-ps-display text-xs font-bold text-primary uppercase tracking-[0.3em] mb-4">
               Radar de Impacto
             </h4>
             <div className="space-y-3">

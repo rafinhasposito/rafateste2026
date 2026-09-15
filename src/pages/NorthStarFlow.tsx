@@ -32,7 +32,7 @@ export default function NorthStarFlow() {
   const easeInOut = [0.4, 0, 0.2, 1];
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#000000] font-inter overflow-hidden flex flex-col items-center justify-center text-[#F2F8FB] selection:bg-white/20">
+    <div className="fixed inset-0 w-full h-full bg-[#000000] font-ps-ui overflow-hidden flex flex-col items-center justify-center text-[#F2F8FB] selection:bg-white/20">
       
       {/* 🌌 DEEP SPACE BACKGROUND 🌌 */}
       <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">

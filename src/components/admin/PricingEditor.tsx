@@ -74,7 +74,7 @@ const PricingEditor = () => {
   return (
     <div className="space-y-8">
       <section>
-        <h3 className="font-cinzel text-sm text-foreground uppercase tracking-widest mb-3">Pacotes de Compra</h3>
+        <h3 className="font-ps-display text-sm text-foreground uppercase tracking-widest mb-3">Pacotes de Compra</h3>
         <div className="grid grid-cols-12 gap-3 px-4 mb-2 text-[10px] uppercase tracking-widest text-muted-foreground/60">
           <span className="col-span-3">Nome</span><span className="col-span-5">Descrição</span>
           <span className="col-span-1 text-center">Cr</span><span className="col-span-2 text-center">Preço R$</span><span className="col-span-1" />
@@ -82,7 +82,7 @@ const PricingEditor = () => {
         <div className="space-y-2">{packages.map(i => <Row key={i.key} item={i} showPrice />)}</div>
       </section>
       <section>
-        <h3 className="font-cinzel text-sm text-foreground uppercase tracking-widest mb-3">Custos por Ação</h3>
+        <h3 className="font-ps-display text-sm text-foreground uppercase tracking-widest mb-3">Custos por Ação</h3>
         <div className="grid grid-cols-12 gap-3 px-4 mb-2 text-[10px] uppercase tracking-widest text-muted-foreground/60">
           <span className="col-span-3">Nome</span><span className="col-span-5">Descrição</span>
           <span className="col-span-1 text-center">Cr</span><span className="col-span-2 text-center">Preço</span><span className="col-span-1" />

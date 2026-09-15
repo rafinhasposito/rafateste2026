@@ -12,7 +12,7 @@ export const CelestialMandala = () => {
       <div className="absolute inset-0 rounded-full border border-white/5" />
       
       {/* Inner tech ring */}
-      <div className="absolute w-[200px] h-[200px] rounded-full border border-[#D4AF37]/10 border-dashed" />
+      <div className="absolute w-[200px] h-[200px] rounded-full border border-[#C9A227]/10 border-dashed" />
 
       {/* 12 House Points */}
       <div className="absolute inset-0">
@@ -30,8 +30,8 @@ export const CelestialMandala = () => {
               className="absolute w-8 h-8 -ml-4 -mt-4 flex flex-col items-center justify-center"
               style={{ left: `${x}px`, top: `${y}px` }}
             >
-              <div className="w-1 h-1 rounded-full bg-[#D4AF37]/40 mb-1" />
-              <span className="font-cinzel text-[8px] text-[#FAF7EE]/30">
+              <div className="w-1 h-1 rounded-full bg-[#C9A227]/40 mb-1" />
+              <span className="font-ps-display text-[8px] text-[#FAF7EE]/30">
                 {String(i + 1).padStart(2, '0')}
               </span>
             </motion.div>
@@ -43,9 +43,9 @@ export const CelestialMandala = () => {
       <motion.div
         animate={{ scale: [1, 1.05, 1], opacity: [0.6, 0.8, 0.6] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="w-12 h-12 rounded-full border border-[#D4AF37]/30 flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.15)]"
+        className="w-12 h-12 rounded-full border border-[#C9A227]/30 flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.15)]"
       >
-        <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/80 shadow-[0_0_10px_#D4AF37]" />
+        <div className="w-1.5 h-1.5 rounded-full bg-[#C9A227]/80 shadow-[0_0_10px_#C9A227]" />
       </motion.div>
 
     </div>

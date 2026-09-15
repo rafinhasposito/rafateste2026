@@ -40,10 +40,13 @@ export function DesktopWebChrome() {
         
         {/* Left: Logo */}
         <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-display font-bold text-xl text-brand-primary tracking-wider">
-              PROTOCOLO SOLAR
-            </span>
+          <Link to="/" className="flex items-center">
+            <img
+              src="/brand/protocolo-solar-logo-horizontal-4096.png"
+              alt="Protocolo Solar"
+              className="h-8 w-auto opacity-95 hover:opacity-100 transition-opacity"
+              draggable={false}
+            />
           </Link>
 
           {/* Center-ish: Navigation (Only if logged in) */}

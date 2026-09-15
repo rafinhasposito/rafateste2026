@@ -129,7 +129,7 @@ const CityDetailsModal: React.FC<CityDetailsModalProps> = ({
           <div className="p-6 md:p-8 space-y-6">
             {/* Header */}
             <div className="space-y-2">
-              <h2 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+              <h2 className="font-ps-display text-3xl md:text-4xl font-bold text-foreground tracking-tight">
                 {wiki?.title || cityName}
               </h2>
               <div className="flex items-center gap-3 text-foreground/50">

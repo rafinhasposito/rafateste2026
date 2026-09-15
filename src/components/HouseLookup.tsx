@@ -190,8 +190,8 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       {overrideTargetHouse === undefined && (
         <>
           <div className="flex items-center gap-3 mb-2">
-            <Crown className="w-5 h-5 text-[#D4AF37]" />
-            <h3 className="font-cinzel text-sm md:text-base font-bold text-white uppercase tracking-[0.1em]">
+            <Crown className="w-5 h-5 text-[#C9A227]" />
+            <h3 className="font-ps-display text-sm md:text-base font-bold text-white uppercase tracking-[0.1em]">
               Escolher por Casa Astrológica
             </h3>
           </div>

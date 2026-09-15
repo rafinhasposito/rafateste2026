@@ -53,7 +53,7 @@ const ConfirmCreditAction = ({
             <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-primary" />
             </div>
-            <AlertDialogTitle className="font-cinzel uppercase tracking-wider text-base">
+            <AlertDialogTitle className="font-ps-display uppercase tracking-wider text-base">
               {title}
             </AlertDialogTitle>
           </div>

@@ -243,7 +243,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
   return (
     <div className="space-y-6">
       <div className="flex flex-col mb-12">
-        <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AF37] mb-4">
+        <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-4">
           Defina o Ponto no Mapa
         </label>
         
@@ -258,7 +258,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
                 setResult(null);
               }}
               placeholder="Ex: Nova York, Londres, Jerusalém..."
-              className="w-full text-xl font-cinzel placeholder:font-sans placeholder:text-lg border-b border-white/20 bg-transparent pb-3 pt-2 text-white focus:border-[#D4AF37] focus:ring-0 transition-colors rounded-none"
+              className="w-full text-xl font-ps-display placeholder:font-sans placeholder:text-lg border-b border-white/20 bg-transparent pb-3 pt-2 text-white focus:border-[#C9A227] focus:ring-0 transition-colors rounded-none"
             />
           </div>
           <button
@@ -274,7 +274,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
             {loading ? "Simulando" : "Simular Destino"}
           </button>
         </div>
-        <p className="font-inter text-[10px] text-white/40 mt-3 font-light tracking-wide">
+        <p className="font-ps-ui text-[10px] text-white/40 mt-3 font-light tracking-wide">
           * A consulta exige 1 crédito da sua conta.
         </p>
       </div>

@@ -19,10 +19,10 @@ export const Screen2 = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-10"
         >
-          <h2 className="font-cinzel text-2xl sm:text-3xl text-white mb-2 leading-tight">
+          <h2 className="font-ps-display text-2xl sm:text-3xl text-white mb-2 leading-tight">
             Mesma pessoa.<br />Mesmo aniversário.
           </h2>
-          <p className="font-inter text-white/50 text-xs sm:text-sm">
+          <p className="font-ps-ui text-white/50 text-xs sm:text-sm">
             Toque nos destinos para ver a leitura mudar.
           </p>
         </motion.div>
@@ -46,8 +46,8 @@ export const Screen2 = () => {
             <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=600&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60" alt="Tóquio" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#08090F] via-[#08090F]/40 to-transparent" />
             <div className="relative h-full flex flex-col justify-end p-5">
-              <h3 className="font-cinzel text-xl text-white">Tóquio</h3>
-              <p className="font-inter text-[#D4AF37] text-[11px] font-bold uppercase tracking-widest mt-1">Carreira em destaque</p>
+              <h3 className="font-ps-display text-xl text-white">Tóquio</h3>
+              <p className="font-ps-ui text-[#C9A227] text-[11px] font-bold uppercase tracking-widest mt-1">Carreira em destaque</p>
             </div>
           </motion.div>
 
@@ -66,8 +66,8 @@ export const Screen2 = () => {
             <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=600&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60" alt="Roma" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#08090F] via-[#08090F]/40 to-transparent" />
             <div className="relative h-full flex flex-col justify-end p-5">
-              <h3 className="font-cinzel text-xl text-white">Roma</h3>
-              <p className="font-inter text-[#D4AF37] text-[11px] font-bold uppercase tracking-widest mt-1">Amor em destaque</p>
+              <h3 className="font-ps-display text-xl text-white">Roma</h3>
+              <p className="font-ps-ui text-[#C9A227] text-[11px] font-bold uppercase tracking-widest mt-1">Amor em destaque</p>
             </div>
           </motion.div>
         </div>

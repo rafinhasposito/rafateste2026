@@ -78,10 +78,10 @@ export const Screen3 = () => {
             >
               {/* Header */}
               <div className="text-center mb-6">
-                <h2 className="font-cinzel text-2xl sm:text-3xl text-white mb-2 leading-tight">
+                <h2 className="font-ps-display text-2xl sm:text-3xl text-white mb-2 leading-tight">
                   O que mais importa<br />pra você agora?
                 </h2>
-                <p className="font-inter text-white/40 text-xs">
+                <p className="font-ps-ui text-white/40 text-xs">
                   Escolha até {MAX_PICKS} áreas que quer ver em destaque.
                 </p>
               </div>
@@ -95,7 +95,7 @@ export const Screen3 = () => {
                     animate={{
                       width:  i < selected.length ? 24 : 8,
                       height: 8,
-                      backgroundColor: i < selected.length ? '#D4AF37' : 'rgba(255,255,255,0.1)',
+                      backgroundColor: i < selected.length ? '#C9A227' : 'rgba(255,255,255,0.1)',
                     }}
                     transition={{ duration: 0.3 }}
                   />
@@ -116,23 +116,23 @@ export const Screen3 = () => {
                       className={`
                         flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 text-left
                         ${isSelected
-                          ? 'border-[#D4AF37]/70 bg-[#D4AF37]/10 text-[#D4AF37] scale-105'
+                          ? 'border-[#C9A227]/70 bg-[#C9A227]/10 text-[#C9A227] scale-105'
                           : 'border-white/[0.08] bg-white/[0.02] text-white/70 hover:border-white/20 hover:text-white'
                         }
                       `}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span className={`text-[10px] ${isSelected ? 'text-[#D4AF37]' : 'text-white/30'}`}>
+                      <span className={`text-[10px] ${isSelected ? 'text-[#C9A227]' : 'text-white/30'}`}>
                         {area.symbol}
                       </span>
-                      <span className="font-inter text-[12px] font-medium whitespace-nowrap">
+                      <span className="font-ps-ui text-[12px] font-medium whitespace-nowrap">
                         {area.name}
                       </span>
                       {isSelected && (
                         <motion.span
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="text-[#D4AF37] text-[10px] ml-0.5"
+                          className="text-[#C9A227] text-[10px] ml-0.5"
                         >
                           ✓
                         </motion.span>
@@ -142,7 +142,7 @@ export const Screen3 = () => {
                 })}
               </div>
 
-              <p className="font-inter text-white/20 text-[10px] mt-2">
+              <p className="font-ps-ui text-white/20 text-[10px] mt-2">
                 {selected.length === 0
                   ? 'Toque para selecionar'
                   : selected.length === 1
@@ -163,15 +163,15 @@ export const Screen3 = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-                className="w-12 h-12 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 flex items-center justify-center mb-5"
+                className="w-12 h-12 rounded-full border border-[#C9A227]/40 bg-[#C9A227]/10 flex items-center justify-center mb-5"
               >
-                <span className="text-[#D4AF37] text-xl">✦</span>
+                <span className="text-[#C9A227] text-xl">✦</span>
               </motion.div>
 
-              <h2 className="font-cinzel text-2xl text-white mb-2 leading-tight">
+              <h2 className="font-ps-display text-2xl text-white mb-2 leading-tight">
                 Perfeito.
               </h2>
-              <p className="font-inter text-white/50 text-sm mb-8 max-w-[260px]">
+              <p className="font-ps-ui text-white/50 text-sm mb-8 max-w-[260px]">
                 Uma cidade certa pode colocar exatamente essas áreas em destaque.
               </p>
 
@@ -183,7 +183,7 @@ export const Screen3 = () => {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1, duration: 0.35 }}
-                    className="font-inter text-[#D4AF37] text-[11px] font-semibold uppercase tracking-widest px-5 py-2.5 border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06] rounded-full"
+                    className="font-ps-ui text-[#C9A227] text-[11px] font-semibold uppercase tracking-widest px-5 py-2.5 border border-[#C9A227]/30 bg-[#C9A227]/[0.06] rounded-full"
                   >
                     {name}
                   </motion.span>
@@ -195,7 +195,7 @@ export const Screen3 = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="font-inter text-white/25 text-[10px] tracking-widest uppercase"
+                className="font-ps-ui text-white/25 text-[10px] tracking-widest uppercase"
               >
                 Continue para descobrir como
               </motion.p>

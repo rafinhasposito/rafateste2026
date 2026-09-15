@@ -46,9 +46,9 @@ const Divider: React.FC<{ align: SectionHeaderAlign }> = ({ align }) => (
       .filter(Boolean)
       .join(" ")}
   >
-    <div className="h-px w-6 bg-gradient-to-r from-transparent to-[#D4AF37]/50" />
-    <div className="w-1 h-1 rounded-full bg-[#D4AF37]/70 shadow-[0_0_4px_#D4AF37/50]" />
-    <div className="h-px w-6 bg-gradient-to-l from-transparent to-[#D4AF37]/50" />
+    <div className="h-px w-6 bg-gradient-to-r from-transparent to-[#C9A227]/50" />
+    <div className="w-1 h-1 rounded-full bg-[#C9A227]/70 shadow-[0_0_4px_#C9A227/50]" />
+    <div className="h-px w-6 bg-gradient-to-l from-transparent to-[#C9A227]/50" />
   </div>
 );
 
@@ -83,7 +83,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
             "font-[var(--font-sans)]",
             "text-[0.625rem] font-semibold",
             "tracking-[0.3em] uppercase",
-            "text-[#D4AF37]/80", // DS: --gold com 80% de opacidade
+            "text-[#C9A227]/80", // DS: --gold com 80% de opacidade
             "mb-2",
           ].join(" ")}
         >

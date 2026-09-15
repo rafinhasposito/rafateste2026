@@ -25,10 +25,10 @@ export const OnboardingFooter = ({
       <button
         onClick={onPrev}
         disabled={isFirst}
-        className={`w-11 h-11 rounded-full border border-[#D4AF37]/50 flex items-center justify-center bg-[#030306]/70 backdrop-blur-md text-[#D4AF37] transition-all duration-200 ${
+        className={`w-11 h-11 rounded-full border border-[#C9A227]/50 flex items-center justify-center bg-[#030306]/70 backdrop-blur-md text-[#C9A227] transition-all duration-200 ${
           isFirst
             ? "opacity-0 pointer-events-none"
-            : "opacity-100 hover:scale-105 active:scale-95 hover:border-[#D4AF37] hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]"
+            : "opacity-100 hover:scale-105 active:scale-95 hover:border-[#C9A227] hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]"
         }`}
         aria-label="Tela anterior"
       >
@@ -41,7 +41,7 @@ export const OnboardingFooter = ({
       {/* Botão Avançar */}
       <button
         onClick={onNext}
-        className="w-11 h-11 rounded-full border border-[#D4AF37]/50 flex items-center justify-center bg-[#030306]/70 backdrop-blur-md text-[#D4AF37] transition-all duration-200 opacity-100 hover:scale-105 active:scale-95 hover:border-[#D4AF37] hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]"
+        className="w-11 h-11 rounded-full border border-[#C9A227]/50 flex items-center justify-center bg-[#030306]/70 backdrop-blur-md text-[#C9A227] transition-all duration-200 opacity-100 hover:scale-105 active:scale-95 hover:border-[#C9A227] hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]"
         aria-label="Próxima tela"
       >
         <ChevronRight className="w-5 h-5 -mr-0.5" />

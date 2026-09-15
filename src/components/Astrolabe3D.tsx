@@ -152,7 +152,7 @@ function HtmlOverlays() {
   });
 
   return (
-    <div className="absolute inset-0 pointer-events-none flex flex-col font-inter">
+    <div className="absolute inset-0 pointer-events-none flex flex-col font-ps-ui">
       {/* Scroll Page 1: Top Hero */}
       <div className="h-[100vh] w-full flex flex-col items-center justify-start pt-24 px-6 z-10" ref={titleRef}>
         <div className="w-8 h-8 mb-4">

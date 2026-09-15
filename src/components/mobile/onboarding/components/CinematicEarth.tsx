@@ -65,7 +65,7 @@ export const CinematicEarth = ({ step }: CinematicEarthProps) => {
             <div className="absolute w-64 h-64 rounded-full bg-gradient-to-tr from-amber-500/20 via-blue-500/10 to-transparent filter blur-xl" />
             
             {/* 3D Planet Globe */}
-            <div className="relative w-52 h-52 rounded-full overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.25),inset_-15px_-15px_40px_rgba(0,0,0,0.8),inset_10px_10px_25px_rgba(255,255,255,0.2)] border border-[#D4AF37]/30">
+            <div className="relative w-52 h-52 rounded-full overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.25),inset_-15px_-15px_40px_rgba(0,0,0,0.8),inset_10px_10px_25px_rgba(255,255,255,0.2)] border border-[#C9A227]/30">
               <img
                 src="/target_2.png"
                 alt="Glowing Globe"

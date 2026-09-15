@@ -19,7 +19,7 @@ export const EditorialBlock = ({ title, subtitle, step }: EditorialBlockProps) =
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="flex flex-col items-center w-full max-w-[340px]"
       >
-        <h1 className="font-cinzel font-medium text-[21px] md:text-[23px] leading-[1.25] tracking-[0.05em] uppercase text-[#FAF7EE] drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] whitespace-pre-line">
+        <h1 className="font-ps-display font-medium text-[21px] md:text-[23px] leading-[1.25] tracking-[0.05em] uppercase text-[#FAF7EE] drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] whitespace-pre-line">
           {title}
         </h1>
         

@@ -56,9 +56,9 @@ const UserMenu = () => {
         <div className="absolute right-0 top-full mt-2 w-48 bg-[#0A0C14] border border-gold/20 rounded-2xl p-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl">
           <p className="text-foreground text-xs font-medium px-3 py-2 truncate">{profile?.display_name || profile?.email}</p>
           <div className="h-px bg-border/40 my-1" />
-          <button onClick={() => navigate("/app/onboarding")} className="w-full text-left px-3 py-2 text-[#D4AF37] text-xs hover:bg-gold/10 rounded-xl transition-colors flex items-center justify-between">
+          <button onClick={() => navigate("/app/onboarding")} className="w-full text-left px-3 py-2 text-[#C9A227] text-xs hover:bg-gold/10 rounded-xl transition-colors flex items-center justify-between">
             <span>Ver Onboarding</span>
-            <span className="text-[9px] uppercase tracking-wider text-[#D4AF37]/60">6 telas</span>
+            <span className="text-[9px] uppercase tracking-wider text-[#C9A227]/60">6 telas</span>
           </button>
           <button onClick={() => navigate("/perfil")} className="w-full text-left px-3 py-2 text-foreground text-xs hover:bg-primary/10 rounded-xl transition-colors">
             Meu Perfil

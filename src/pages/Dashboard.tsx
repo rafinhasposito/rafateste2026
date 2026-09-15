@@ -322,7 +322,7 @@ const Dashboard = () => {
                       <SearchIcon className="w-2.5 h-2.5" />
                       {searchType.label}
                     </span>
-                    <span className="text-foreground font-cinzel font-bold text-sm">
+                    <span className="text-foreground font-ps-display font-bold text-sm">
                       Revolução Solar {consultation.year}
                     </span>
                   </div>
@@ -464,7 +464,7 @@ const Dashboard = () => {
         {lockedCount > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-12 mt-8">
             <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-8 max-w-xl mx-auto">
-              <h3 className="font-cinzel text-lg font-bold text-foreground uppercase tracking-wider mb-2">
+              <h3 className="font-ps-display text-lg font-bold text-foreground uppercase tracking-wider mb-2">
                 Desbloqueie Mais Casas
               </h3>
               <p className="text-muted-foreground text-xs font-light mb-6">

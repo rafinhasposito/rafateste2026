@@ -39,30 +39,24 @@ interface Props {
   onSelectMode: (m: Mode) => void;
 }
 
-// ─── Desktop: Full-viewport scene, hero top-left, timeline bottom ─────────────
-// Scrollytelling implementation
+// ─── Desktop: Scrollytelling ──────────────────────────────────────────────────
 function DesktopScene({ onSelectMode }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
 
-  // Hero text fades out on initial scroll
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.15], [0, -40]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.18], [0, -48]);
+  const lineScaleX = useTransform(scrollYProgress, [0, 0.9], [0.25, 1]);
 
-  // Timeline line scales up with scroll
-  const lineScaleX = useTransform(scrollYProgress, [0, 0.9], [0.3, 1]);
-
-  // Crossfade between the 5 web assets based on scroll
   const bg1Opacity = useTransform(scrollYProgress, [0, 0.15, 0.25], [1, 1, 0]);
   const bg2Opacity = useTransform(scrollYProgress, [0.15, 0.25, 0.35, 0.45], [0, 1, 1, 0]);
   const bg3Opacity = useTransform(scrollYProgress, [0.35, 0.45, 0.55, 0.65], [0, 1, 1, 0]);
   const bg4Opacity = useTransform(scrollYProgress, [0.55, 0.65, 0.75, 0.85], [0, 1, 1, 0]);
   const bg5Opacity = useTransform(scrollYProgress, [0.75, 0.85, 1], [0, 1, 1]);
 
-  // Timeline UI opacity: starts a bit dim, highlights based on scroll section
-  const opt1Opacity = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.55, 0.65], [0.6, 0.6, 1, 1, 0.6]);
-  const opt2Opacity = useTransform(scrollYProgress, [0, 0.55, 0.65, 0.75, 0.85], [0.6, 0.6, 1, 1, 0.6]);
-  const opt3Opacity = useTransform(scrollYProgress, [0, 0.75, 0.85, 1], [0.6, 0.6, 1, 1]);
+  const opt1Opacity = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.55, 0.65], [0.55, 0.55, 1, 1, 0.55]);
+  const opt2Opacity = useTransform(scrollYProgress, [0, 0.55, 0.65, 0.75, 0.85], [0.55, 0.55, 1, 1, 0.55]);
+  const opt3Opacity = useTransform(scrollYProgress, [0, 0.75, 0.85, 1], [0.55, 0.55, 1, 1]);
   const optOpacities = [opt1Opacity, opt2Opacity, opt3Opacity];
 
   return (
@@ -71,55 +65,75 @@ function DesktopScene({ onSelectMode }: Props) {
       className="relative w-full h-full overflow-y-scroll"
       style={{ scrollbarWidth: "none" }}
     >
-      {/* Tall scroll area for narrative (400vh allows enough room for 5 states) */}
       <div style={{ height: "400vh" }}>
 
         {/* ── Fixed background scene ── */}
-        <div className="fixed inset-0 bg-ps-void" style={{ zIndex: 0, top: 56 }}>
+        <div className="fixed inset-0 bg-ps-void" style={{ zIndex: 0 }}>
           <motion.img style={{ opacity: bg1Opacity }} src="/temporal-web-01.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
           <motion.img style={{ opacity: bg2Opacity }} src="/temporal-web-02.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
           <motion.img style={{ opacity: bg3Opacity }} src="/temporal-web-03.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
           <motion.img style={{ opacity: bg4Opacity }} src="/temporal-web-04.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
           <motion.img style={{ opacity: bg5Opacity }} src="/temporal-web-05.webp" alt="" className="absolute inset-0 w-full h-full object-cover object-center" draggable={false} />
-
-          {/* Overlays to ensure text legibility */}
-          <div className="absolute inset-0 bg-black/15 pointer-events-none" />
-          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-ps-void/80 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-ps-void/90 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-ps-void/90 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-ps-void to-transparent pointer-events-none" />
         </div>
 
-        {/* ── Hero — top-left, scroll-animated out ── */}
+        {/* ── Hero — top-left, fades on scroll ── */}
         <motion.div
-          style={{ opacity: heroOpacity, y: heroY }}
-          className="fixed left-0 right-0 top-14 pointer-events-none"
-          style2={{ zIndex: 20 }}
+          style={{ opacity: heroOpacity, y: heroY, zIndex: 20 }}
+          className="fixed left-0 right-0"
+          // Positioned below the 56px chrome header
+          // Uses top-[72px] so content never clips behind the nav bar
+          // and safe area inset-top is respected
         >
-          <div className="px-14 pt-10">
-            <span className="block font-ps-ui text-[10px] tracking-[0.35em] text-ps-gold/80 uppercase mb-4">
-              Ponto de Partida
-            </span>
-            <h2 className="font-ps-display text-5xl xl:text-6xl text-white mb-5 tracking-wide drop-shadow-lg leading-tight">
-              SELEÇÃO TEMPORAL
-            </h2>
-            <p className="font-ps-ui text-white/65 text-sm xl:text-base font-light max-w-xs leading-relaxed drop-shadow-md">
-              Role para explorar o cenário. Cada linha do tempo revela
-              uma configuração energética única.
-            </p>
+          <div className="px-14 pt-[72px]">
+            <motion.span
+              className="block font-ps-ui text-[11px] tracking-[0.3em] text-ps-gold/80 uppercase mb-5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              O GPS do seu novo ciclo.
+            </motion.span>
+            <motion.h1
+              className="font-ps-display text-[3.75rem] xl:text-[4.5rem] text-white mb-6 leading-[1.02] drop-shadow-xl max-w-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.8, ease: "easeOut" }}
+            >
+              Descubra onde passar seu próximo aniversário.
+            </motion.h1>
+            <motion.p
+              className="font-ps-ui text-ps-text/70 text-base font-light max-w-sm leading-relaxed drop-shadow-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.7 }}
+            >
+              Sua Revolução Solar revela os destinos mais alinhados
+              ao ciclo que você deseja viver.
+              <br className="hidden xl:block" />
+              Role para explorar o período.
+            </motion.p>
           </div>
         </motion.div>
 
-        {/* ── Timeline — fixed at ~65% height, always visible ── */}
+        {/* ── Timeline — fixed at bottom, always visible ── */}
         <div
           className="fixed left-0 right-0 px-12"
-          style={{ zIndex: 30, top: "calc(56px + 65vh)" }}
+          style={{ zIndex: 30, bottom: "8vh" }}
         >
           <div className="w-full max-w-5xl mx-auto">
+            {/* Scroll hint label */}
+            <p className="font-ps-ui text-[10px] tracking-[0.3em] text-ps-muted/60 uppercase text-center mb-8">
+              Escolha o período
+            </p>
             <div className="relative flex items-start justify-between w-full">
-              {/* Animated line — sits on top of the nodes */}
+              {/* Animated connecting line */}
               <div className="absolute top-[7px] left-[6%] right-[6%] h-[1px] overflow-hidden">
                 <motion.div
                   style={{ scaleX: lineScaleX, transformOrigin: "left" }}
-                  className="w-full h-full bg-gradient-to-r from-ps-gold/15 via-ps-gold/40 to-ps-gold/15"
+                  className="w-full h-full bg-gradient-to-r from-ps-gold/10 via-ps-gold/50 to-ps-gold/10"
                 />
               </div>
 
@@ -128,21 +142,22 @@ function DesktopScene({ onSelectMode }: Props) {
                   key={opt.id}
                   style={{ opacity: optOpacities[i] }}
                   onClick={() => onSelectMode(opt.id)}
-                  whileHover={{ scale: 1.05, y: -4, opacity: 1 }}
+                  whileHover={{ scale: 1.06, y: -5, opacity: 1 }}
                   whileTap={{ scale: 0.97 }}
-                  className="group relative flex flex-col items-center text-center focus:outline-none flex-1"
+                  className="group relative flex flex-col items-center text-center focus:outline-none flex-1 min-h-[48px]"
                 >
-                  <div className="relative z-10 w-[7px] h-[7px] rounded-full border border-ps-gold/50 bg-ps-void mb-4 transition-all duration-400 group-hover:bg-ps-gold group-hover:shadow-[0_0_18px_rgba(201,162,39,0.9)]" />
-                  <span className="block font-ps-ui text-[9px] text-ps-gold/60 tracking-[0.25em] mb-1.5 transition-colors group-hover:text-ps-gold">
+                  {/* Node */}
+                  <div className="relative z-10 w-[8px] h-[8px] rounded-full border border-ps-gold/50 bg-ps-void mb-4 transition-all duration-300 group-hover:bg-ps-gold group-hover:border-ps-gold group-hover:shadow-[0_0_20px_rgba(201,162,39,0.9)]" />
+                  <span className="block font-ps-ui text-[9px] text-ps-gold/60 tracking-[0.3em] mb-1.5 transition-colors group-hover:text-ps-gold">
                     {opt.number}
                   </span>
-                  <h3 className="font-ps-display text-lg xl:text-xl tracking-[0.08em] text-white/80 group-hover:text-ps-gold transition-colors duration-400 mb-1 drop-shadow-md">
+                  <h3 className="font-ps-display text-xl tracking-[0.06em] text-white/85 group-hover:text-ps-gold transition-colors duration-300 mb-1 drop-shadow">
                     {opt.title}
                   </h3>
-                  <span className="block font-ps-ui text-[9px] tracking-[0.15em] uppercase text-white/50 group-hover:text-white/80 transition-colors duration-400 mb-1.5">
+                  <span className="block font-ps-ui text-[9px] tracking-[0.14em] uppercase text-white/50 group-hover:text-white/80 transition-colors duration-300 mb-2">
                     {opt.tagline}
                   </span>
-                  <p className="font-ps-ui text-[10px] text-white/35 leading-relaxed group-hover:text-white/60 transition-colors duration-400 max-w-[170px]">
+                  <p className="font-ps-ui text-[11px] text-ps-muted/60 leading-relaxed group-hover:text-ps-muted/90 transition-colors duration-300 max-w-[160px]">
                     {opt.desc}
                   </p>
                 </motion.button>
@@ -156,85 +171,144 @@ function DesktopScene({ onSelectMode }: Props) {
   );
 }
 
-// ─── Mobile: Vertical Interactive Timeline ─────────────────────────────────────
+// ─── Mobile: Touch-first vertical layout ─────────────────────────────────────
 function MobileTimeline({ onSelectMode }: Props) {
   return (
     <div className="relative w-full min-h-[100svh] overflow-y-auto overflow-x-hidden flex flex-col bg-ps-void">
-      {/* Background image — Terra */}
+      {/* Background — mesmo universo visual do desktop: temporal-web-01.webp */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <img
-          src="/temporal-mobile-bg-v3.png"
+          src="/temporal-web-01.webp"
           alt=""
-          className="w-full h-[85%] object-cover object-bottom absolute bottom-0"
-          style={{ objectPosition: "center bottom" }}
+          onError={(e) => { (e.target as HTMLImageElement).src = "/earth-milkyway.jpg"; }}
+          className="w-full h-full object-cover object-center"
           draggable={false}
+          style={{ filter: "brightness(0.88) contrast(1.08) saturate(1.05)" }}
         />
-        {/* Dark transition from top to bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-ps-void via-ps-void/80 to-transparent pointer-events-none" />
+        {/* Overlay system idêntico ao desktop:
+            - Faixa escura no topo (para o logo respirar)
+            - Centro aberto (a imagem respira)
+            - Faixa escura na base (para o conteúdo ser legível) */}
+        <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+        <div
+          className="absolute inset-x-0 top-0 h-56 pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, rgba(2,5,10,0.90) 0%, rgba(2,5,10,0.40) 60%, transparent 100%)" }}
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(2,5,10,0.98) 0%, rgba(2,5,10,0.85) 35%, rgba(2,5,10,0.50) 65%, transparent 100%)" }}
+        />
       </div>
 
-      {/* Content */}
-      <div
-        className="relative z-10 flex flex-col w-full min-h-[100svh] px-5 pb-24"
-        style={{ paddingTop: "max(env(safe-area-inset-top, 16px), 16px)" }}
-      >
-        {/* ── Brand header ── */}
-        <div className="flex justify-center w-full mt-4 mb-10">
+      {/* Content — ancorado na base, igual ao desktop */}
+      <div className="relative z-10 flex flex-col w-full min-h-[100svh]">
+
+        {/* ── Logo no topo — discreta, posicionada sobre a faixa escura ── */}
+        <motion.div
+          className="flex items-start justify-start px-6 pt-[max(env(safe-area-inset-top,20px),20px)] mt-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
+        >
           <img
             src="/brand/protocolo-solar-logo-horizontal-4096.png"
             alt="Protocolo Solar"
-            className="w-[250px] max-w-[70vw] h-auto drop-shadow-md"
+            className="h-7 w-auto drop-shadow-lg opacity-90"
             draggable={false}
           />
-        </div>
+        </motion.div>
 
-        {/* ── Main Promise ── */}
-        <div className="text-center mb-10">
-          <h1 className="font-ps-display text-[36px] text-ps-champagne mb-4 leading-[1.1] drop-shadow-md max-w-[320px] mx-auto">
+        {/* Spacer — deixa o universo respirar no meio */}
+        <div className="flex-1" />
+
+        {/* ── Conteúdo principal — base da tela, igual ao desktop ── */}
+        <div className="px-6 pb-8" style={{ paddingBottom: "max(env(safe-area-inset-bottom, 32px), 96px)" }}>
+
+          {/* Label — mesmo padrão do desktop */}
+          <motion.span
+            className="block font-ps-ui text-[10px] tracking-[0.32em] text-ps-gold/80 uppercase mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25, duration: 0.6 }}
+          >
+            O GPS do seu novo ciclo.
+          </motion.span>
+
+          {/* Headline — mesmo DNA do desktop, escalonada para mobile */}
+          <motion.h1
+            className="font-ps-display text-white leading-[1.06] mb-5 drop-shadow-xl"
+            style={{ fontSize: "clamp(1.85rem, 8.5vw, 2.6rem)" }}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.85, ease: "easeOut" }}
+          >
             Descubra onde passar seu próximo aniversário.
-          </h1>
-          <p className="font-ps-ui text-[16px] text-ps-text opacity-90 max-w-[300px] mx-auto leading-relaxed drop-shadow">
-            Sua Revolução Solar revela os destinos mais alinhados ao ciclo que você deseja viver.
-          </p>
-        </div>
+          </motion.h1>
 
-        {/* ── Main Action ── */}
-        <div className="w-full max-w-[320px] mx-auto mb-12">
-          <button
+          {/* Subcopy */}
+          <motion.p
+            className="font-ps-ui text-ps-text/65 font-light leading-relaxed mb-8 max-w-sm drop-shadow"
+            style={{ fontSize: "clamp(13px, 3.4vw, 15px)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.7 }}
+          >
+            Sua Revolução Solar revela os destinos mais alinhados ao ciclo que você deseja viver.
+          </motion.p>
+
+          {/* ── CTA principal ── */}
+          <motion.button
             onClick={() => onSelectMode("futuro")}
-            className="w-full h-[56px] rounded-full bg-ps-gold text-ps-void font-ps-display text-lg tracking-wide flex items-center justify-center hover:bg-ps-gold-deep active:scale-[0.98] transition-all shadow-[0_4px_14px_rgba(201,162,39,0.4)]"
+            className="w-full h-[54px] rounded-full font-ps-display tracking-wide flex items-center justify-center active:scale-[0.97] transition-all mb-4"
+            style={{
+              fontSize: "clamp(0.9rem, 4vw, 1rem)",
+              background: "#C9A227",
+              color: "#02050A",
+              boxShadow: "0 4px 24px rgba(201,162,39,0.50)",
+            }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
           >
             DESCOBRIR MEU DESTINO
-          </button>
-        </div>
+          </motion.button>
 
-        {/* ── Secondary Paths ── */}
-        <div className="w-full max-w-[320px] mx-auto flex-1 flex flex-col justify-end">
-          <h3 className="font-ps-ui text-[11px] text-ps-muted uppercase tracking-[0.2em] text-center mb-5">
-            Explorar Outros Ciclos
-          </h3>
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={() => onSelectMode("presente")}
-              className="w-full min-h-[64px] rounded-xl bg-ps-surface border border-white/5 flex items-center px-5 focus:outline-none active:scale-[0.98] transition-transform"
-            >
-              <div className="flex-1 text-left">
-                <span className="block font-ps-display text-white text-[17px] mb-0.5">Presente</span>
-                <span className="block font-ps-ui text-ps-muted text-[13px]">Entender meu ciclo atual</span>
-              </div>
-              <div className="text-ps-gold text-xl opacity-80">→</div>
-            </button>
-            <button
-              onClick={() => onSelectMode("passado")}
-              className="w-full min-h-[64px] rounded-xl bg-ps-surface border border-white/5 flex items-center px-5 focus:outline-none active:scale-[0.98] transition-transform"
-            >
-              <div className="flex-1 text-left">
-                <span className="block font-ps-display text-white text-[17px] mb-0.5">Passado</span>
-                <span className="block font-ps-ui text-ps-muted text-[13px]">Revisar meu ciclo anterior</span>
-              </div>
-              <div className="text-ps-gold text-xl opacity-80">→</div>
-            </button>
-          </div>
+          {/* ── Caminhos secundários — mesma linguagem dos nós do desktop ── */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.65, duration: 0.6 }}
+          >
+            <p className="font-ps-ui text-[10px] text-ps-muted/60 uppercase tracking-[0.28em] text-center mb-3">
+              Explorar outros ciclos
+            </p>
+            <div className="flex gap-3">
+              {[
+                { id: "presente" as Mode, label: "Presente", sub: "Ciclo atual" },
+                { id: "passado" as Mode, label: "Passado", sub: "Ciclo anterior" },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => onSelectMode(opt.id)}
+                  className="flex-1 min-h-[64px] rounded-xl flex flex-col items-start justify-center px-4 focus:outline-none active:scale-[0.97] transition-transform"
+                  style={{
+                    background: "rgba(7,16,26,0.80)",
+                    border: "1px solid rgba(201,162,39,0.15)",
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                  }}
+                >
+                  <span className="block font-ps-display text-white text-[15px] mb-0.5 drop-shadow">
+                    {opt.label}
+                  </span>
+                  <span className="block font-ps-ui text-ps-muted text-[11px]">
+                    {opt.sub}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
         </div>
       </div>
     </div>
@@ -245,15 +319,12 @@ function MobileTimeline({ onSelectMode }: Props) {
 export function TemporalSelection({ onSelectMode }: Props) {
   return (
     <>
-      {/* Desktop (>= 1024px): fixed scene, hero top-left, timeline bottom */}
-      <div
-        className="hidden lg:block"
-        style={{ height: "calc(100vh - 56px)", position: "relative" }}
-      >
+      {/* Desktop (≥ 1024px) */}
+      <div className="hidden lg:block" style={{ height: "calc(100vh - 56px)", position: "relative" }}>
         <DesktopScene onSelectMode={onSelectMode} />
       </div>
 
-      {/* Mobile / Tablet: interactive vertical timeline */}
+      {/* Mobile / Tablet */}
       <div className="lg:hidden">
         <MobileTimeline onSelectMode={onSelectMode} />
       </div>

@@ -98,21 +98,6 @@ const Index = () => {
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  // Hide top header from shell when in step 1
-  useEffect(() => {
-    const topHeader = document.querySelector('header');
-    if (topHeader) {
-      if (step === 1) {
-        topHeader.style.display = 'none';
-      } else {
-        topHeader.style.display = '';
-      }
-    }
-    return () => {
-      if (topHeader) topHeader.style.display = '';
-    }
-  }, [step]);
-
   const [mode, setMode] = useState<Mode | null>(null);
 
   // --- ONBOARDING FIRST ACCESS LOGIC ---
@@ -314,10 +299,10 @@ const Index = () => {
                       );
                     })()}
 
-                    <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
+                    <h2 className="font-ps-display text-3xl md:text-4xl text-white mb-4 leading-tight">
                       Como Deseja Consultar?
                     </h2>
-                    <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
+                    <p className="font-ps-ui text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
                       Escolha um dos três caminhos. Cada um leva ao mesmo resultado: o destino ideal para o seu ciclo.
                     </p>
                   </div>
@@ -354,7 +339,7 @@ const Index = () => {
                                 style={{
                                   borderColor: theme ? `rgba(${theme.rgb}, 0.2)` : 'rgba(212,175,55,0.2)',
                                   background: theme ? `rgba(${theme.rgb}, 0.05)` : 'rgba(212,175,55,0.05)',
-                                  color: theme ? `rgb(${theme.rgb})` : "#D4AF37"
+                                  color: theme ? `rgb(${theme.rgb})` : "#C9A227"
                                 }}
                               >
                                 <Icon className="w-5 h-5 opacity-90" strokeWidth={1.5} />
@@ -364,10 +349,10 @@ const Index = () => {
 
                             {/* Content */}
                             <div className="flex-1">
-                              <h3 className="font-cinzel text-xl text-white mb-1.5">
+                              <h3 className="font-ps-display text-xl text-white mb-1.5">
                                 {opt.title}
                               </h3>
-                              <p className="font-inter text-[13px] leading-relaxed text-white/50">
+                              <p className="font-ps-ui text-[13px] leading-relaxed text-white/50">
                                 {opt.desc}
                               </p>
                             </div>
@@ -425,10 +410,10 @@ const Index = () => {
                   })()}
 
                   <div className="text-center mb-12">
-                    <h2 className="font-cinzel text-3xl md:text-4xl text-white mb-4 leading-tight">
+                    <h2 className="font-ps-display text-3xl md:text-4xl text-white mb-4 leading-tight">
                       {formTitle}
                     </h2>
-                    <p className="font-inter text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
+                    <p className="font-ps-ui text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
                       {formSubtitle}
                     </p>
                   </div>
@@ -438,14 +423,14 @@ const Index = () => {
                     <div className="flex flex-col md:flex-row items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 md:mb-10 gap-6">
                       <div className="text-left flex-1">
                         <div className="flex items-center gap-3 mb-1">
-                          <User className="w-4 h-4 text-[#D4AF37]" />
+                          <User className="w-4 h-4 text-[#C9A227]" />
                           <span className="text-white font-bold text-sm uppercase tracking-widest">{profile?.full_name}</span>
                         </div>
-                        <p className="text-white/50 text-xs font-inter leading-relaxed pl-7">
+                        <p className="text-white/50 text-xs font-ps-ui leading-relaxed pl-7">
                           {profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0, 5)}<br/>
                           {profile?.birth_city}
                         </p>
-                        <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}${searchPath ? `&path=${searchPath}` : ''}`)}`)} className="text-[#D4AF37] text-[10px] uppercase tracking-widest hover:text-white transition-colors pl-7 mt-2 underline decoration-[#D4AF37]/30 underline-offset-4">
+                        <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}${searchPath ? `&path=${searchPath}` : ''}`)}`)} className="text-[#C9A227] text-[10px] uppercase tracking-widest hover:text-white transition-colors pl-7 mt-2 underline decoration-[#C9A227]/30 underline-offset-4">
                           Editar Dados Natais
                         </button>
                       </div>
@@ -454,7 +439,7 @@ const Index = () => {
                         <div className="field-label justify-center mb-3"><span className="label-dot" /> {yearLabel}</div>
                         <input
                           type="number"
-                          className="quantum-input w-full text-center text-2xl font-bold text-[#D4AF37] h-12 font-cinzel bg-transparent border-b border-white/20 focus:border-[#D4AF37] outline-none"
+                          className="quantum-input w-full text-center text-2xl font-bold text-[#C9A227] h-12 font-ps-display bg-transparent border-b border-white/20 focus:border-[#C9A227] outline-none"
                           value={year}
                           onChange={(e) => setYear(e.target.value)}
                           disabled={mode === "presente"}
@@ -490,7 +475,7 @@ const Index = () => {
                           <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
                           <input
                             type="number"
-                            className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-[#D4AF37] h-14 font-cinzel"
+                            className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-[#C9A227] h-14 font-ps-display"
                             value={year}
                             onChange={(e) => setYear(e.target.value)}
                             disabled={mode === "presente"}
@@ -511,7 +496,7 @@ const Index = () => {
                   <div className="text-center mb-10">
                     <AnimatePresence mode="wait">
                       <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                        className="text-gold/80 font-cinzel text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
+                        className="text-gold/80 font-ps-display text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
                         "{mantras[mantraIndex]}"
                       </motion.p>
                     </AnimatePresence>

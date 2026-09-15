@@ -19,7 +19,7 @@ export const MobileAppLayout = ({ children }: MobileAppLayoutProps) => {
   ];
 
   return (
-    <div className="relative min-h-[100dvh] bg-[#0A0B10] text-[#F4F4F6] font-inter overflow-hidden flex flex-col">
+    <div className="relative min-h-[100dvh] bg-[#0A0B10] text-[#F4F4F6] font-ps-ui overflow-hidden flex flex-col">
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-quantum-900/20 via-[#0A0B10] to-[#0A0B10]"></div>

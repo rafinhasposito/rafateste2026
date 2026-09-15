@@ -138,7 +138,7 @@ const ScanningOverlay = ({ visible, mode, year }: ScanningOverlayProps) => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="font-cinzel text-xl md:text-3xl text-foreground tracking-[0.3em] uppercase mb-3 text-center"
+            className="font-ps-display text-xl md:text-3xl text-foreground tracking-[0.3em] uppercase mb-3 text-center"
           >
             {mode === "futuro" ? "Calculando Rota Estelar" : "Resgate da Linha do Tempo"}
           </motion.h2>

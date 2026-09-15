@@ -45,9 +45,9 @@ export function OnboardingNav({
         <div className="w-full max-w-md mx-auto">
           <button
             onClick={onNext}
-            className={`h-12 w-full font-inter text-xs font-bold tracking-[0.15em] uppercase transition-all ${
+            className={`h-12 w-full font-ps-ui text-xs font-bold tracking-[0.15em] uppercase transition-all ${
               isFinal
-                ? 'bg-[#D4AF37] text-black hover:bg-[#c9a832] active:scale-[0.98]'
+                ? 'bg-[#C9A227] text-black hover:bg-[#c9a832] active:scale-[0.98]'
                 : 'bg-white text-black hover:bg-white/90 active:scale-[0.98]'
             }`}
           >

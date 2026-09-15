@@ -50,10 +50,10 @@ export const Screen4 = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className="font-cinzel text-2xl sm:text-4xl text-white mb-1 leading-tight">
+        <h2 className="font-ps-display text-2xl sm:text-4xl text-white mb-1 leading-tight">
           Como você quer começar?
         </h2>
-        <p className="font-inter text-white/35 text-xs sm:text-sm">
+        <p className="font-ps-ui text-white/35 text-xs sm:text-sm">
           Três caminhos. Um resultado.
         </p>
       </motion.div>
@@ -78,9 +78,9 @@ export const Screen4 = () => (
           <div className="relative z-10 h-full flex md:flex-col items-center md:items-start md:justify-end gap-5 md:gap-3 p-6 md:p-8">
             <span className={`font-mono text-3xl md:text-5xl font-bold opacity-20 ${p.accent} shrink-0`}>{p.num}</span>
             <div>
-              <h3 className={`font-cinzel text-lg sm:text-2xl text-white mb-1`}>{p.title}</h3>
-              <p className={`font-inter text-[11px] sm:text-xs font-semibold mb-1 sm:mb-3 ${p.accent}`}>"{p.hook}"</p>
-              <p className="font-inter text-white/40 text-[10px] sm:text-xs font-light leading-relaxed">{p.desc}</p>
+              <h3 className={`font-ps-display text-lg sm:text-2xl text-white mb-1`}>{p.title}</h3>
+              <p className={`font-ps-ui text-[11px] sm:text-xs font-semibold mb-1 sm:mb-3 ${p.accent}`}>"{p.hook}"</p>
+              <p className="font-ps-ui text-white/40 text-[10px] sm:text-xs font-light leading-relaxed">{p.desc}</p>
             </div>
           </div>
         </motion.div>
