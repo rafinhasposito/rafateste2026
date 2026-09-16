@@ -39,7 +39,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
     const searchTerm = resolveSearchTerm(q);
 
     try {
-      const r = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchTerm)}&limit=6`);
+      const r = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchTerm)}&limit=6&lang=en`);
       const d = await r.json();
       if (d.features) {
         const items: SuggestionItem[] = d.features.map((f: CityFeature) => {
