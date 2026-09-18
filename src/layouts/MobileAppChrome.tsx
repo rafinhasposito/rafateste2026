@@ -20,7 +20,7 @@ export function MobileAppChrome() {
     return (
       <header className="fixed top-0 left-0 right-0 z-50 px-5 pt-8 pb-4 flex items-center justify-between pointer-events-none">
         <img
-          src="/brand/protocolo-solar-logo-vertical-2048.png"
+          src="/brand/protocolo-solar-logo-horizontal.svg"
           alt="Protocolo Solar"
           className="w-[140px] h-auto pointer-events-auto opacity-95 drop-shadow-md"
           draggable={false}
@@ -44,9 +44,9 @@ export function MobileAppChrome() {
         ) : (
           /* Main tabs: show logo */
           <img
-          src="/brand/protocolo-solar-logo-vertical-2048.png"
-          alt="Protocolo Solar"
-          className="w-[140px] h-auto pointer-events-auto opacity-95 drop-shadow-sm"
+            src="/brand/protocolo-solar-logo-horizontal.svg"
+            alt="Protocolo Solar"
+            className="w-[140px] h-auto pointer-events-auto opacity-95 drop-shadow-sm"
             draggable={false}
           />
         )}

@@ -37,7 +37,7 @@ function DesktopScene({ onSelectMode }: Props) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.6 }}
           >
-            O GPS do seu novo ciclo
+            O GPS do Seu Novo Ano
           </motion.span>
 
           {/* Headline */}
@@ -48,7 +48,7 @@ function DesktopScene({ onSelectMode }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.85, ease: "easeOut" }}
           >
-            Descubra onde passar seu próximo aniversário.
+            Descubra onde comemorar seu próximo aniversário.
           </motion.h1>
 
           {/* Subcopy */}
@@ -58,13 +58,13 @@ function DesktopScene({ onSelectMode }: Props) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.7 }}
           >
-            Sua Revolução Solar revela os destinos globais mais alinhados ao ciclo que você deseja ativar na sua vida.
+            O sistema calcula a cidade exata no mundo para ativar a mudança que você quer viver nos próximos 12 meses.
           </motion.p>
 
           {/* Main CTA */}
           <motion.button
             onClick={() => onSelectMode("futuro")}
-            className="h-16 px-12 rounded-xl font-ps-display tracking-[0.08em] text-lg hover:scale-105 active:scale-95 transition-all mb-16"
+            className="h-16 px-12 rounded-xl font-ps-display tracking-[0.08em] text-lg hover:scale-105 active:scale-95 transition-all mb-16 flex items-center gap-3"
             style={{
               background: "#C9A227",
               color: "#02050A",
@@ -74,7 +74,7 @@ function DesktopScene({ onSelectMode }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            DESCOBRIR MEU DESTINO
+            <span>🚀</span> DESCOBRIR MEU DESTINO
           </motion.button>
 
           {/* Secondary Paths - Premium Cards */}
@@ -84,12 +84,12 @@ function DesktopScene({ onSelectMode }: Props) {
             transition={{ delay: 0.65, duration: 0.6 }}
           >
             <p className="font-ps-ui text-[11px] text-ps-muted uppercase tracking-[0.3em] mb-4">
-              Explorar outros ciclos
+              Explorar outros momentos
             </p>
             <div className="flex gap-4">
               {[
-                { id: "presente" as Mode, label: "Presente", sub: "Analise seu ciclo atual" },
-                { id: "passado" as Mode, label: "Passado", sub: "Audite o que passou" },
+                { id: "presente" as Mode, label: "📍 Presente (Ano Atual)", sub: "Entenda a energia da cidade onde você está vivendo o seu ano de hoje." },
+                { id: "passado" as Mode, label: "📜 Passado (Anos Anteriores)", sub: "Veja onde você passou seus aniversários passados e entenda por que sua vida tomou aquele rumo." },
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -99,7 +99,7 @@ function DesktopScene({ onSelectMode }: Props) {
                   <span className="block font-ps-display text-[#02050A] text-lg mb-1">
                     {opt.label}
                   </span>
-                  <span className="block font-ps-ui text-[#02050A]/70 text-[11px]">
+                  <span className="block font-ps-ui text-[#02050A]/70 text-[11px] leading-tight">
                     {opt.sub}
                   </span>
                 </button>
@@ -144,7 +144,7 @@ function MobileTimeline({ onSelectMode }: Props) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.6 }}
           >
-            O GPS do seu novo ciclo
+            O GPS do Seu Novo Ano
           </motion.span>
 
           {/* Headline */}
@@ -155,7 +155,7 @@ function MobileTimeline({ onSelectMode }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.85, ease: "easeOut" }}
           >
-            Descubra onde passar seu próximo aniversário.
+            Descubra onde comemorar seu próximo aniversário.
           </motion.h1>
 
           {/* Subcopy */}
@@ -166,13 +166,13 @@ function MobileTimeline({ onSelectMode }: Props) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.7 }}
           >
-            Sua Revolução Solar revela os destinos mais alinhados ao ciclo que você deseja viver.
+            O sistema calcula a cidade exata no mundo para ativar a mudança que você quer viver nos próximos 12 meses.
           </motion.p>
 
           {/* Main CTA */}
           <motion.button
             onClick={() => onSelectMode("futuro")}
-            className="w-full h-14 rounded-xl font-ps-display tracking-wide flex items-center justify-center active:scale-95 transition-all mb-6"
+            className="w-full h-14 rounded-xl font-ps-display tracking-wide flex items-center justify-center gap-2 active:scale-95 transition-all mb-6"
             style={{
               fontSize: "1rem",
               background: "#C9A227",
@@ -183,7 +183,7 @@ function MobileTimeline({ onSelectMode }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            DESCOBRIR MEU DESTINO
+            <span>🚀</span> DESCOBRIR MEU DESTINO
           </motion.button>
 
           {/* Secondary Paths */}
@@ -193,22 +193,22 @@ function MobileTimeline({ onSelectMode }: Props) {
             transition={{ delay: 0.65, duration: 0.6 }}
           >
             <p className="font-ps-ui text-[10px] text-ps-muted/80 uppercase tracking-[0.25em] text-center mb-3">
-              Explorar outros ciclos
+              Explorar outros momentos
             </p>
             <div className="flex gap-3">
               {[
-                { id: "presente" as Mode, label: "Presente", sub: "Ciclo atual" },
-                { id: "passado" as Mode, label: "Passado", sub: "Auditoria" },
+                { id: "presente" as Mode, label: "📍 Presente", sub: "Ano Atual" },
+                { id: "passado" as Mode, label: "📜 Passado", sub: "Anos Anteriores" },
               ].map((opt) => (
                 <button
                   key={opt.id}
                   onClick={() => onSelectMode(opt.id)}
-                  className="flex-1 py-4 rounded-xl flex flex-col items-center justify-center bg-[#E8ECEF] active:bg-white transition-all group shadow-md"
+                  className="flex-1 py-4 px-2 rounded-xl flex flex-col items-center justify-center bg-[#E8ECEF] active:bg-white transition-all group shadow-md"
                 >
                   <span className="block font-ps-display text-[#02050A] text-[15px] mb-1">
                     {opt.label}
                   </span>
-                  <span className="block font-ps-ui text-[#02050A]/70 text-[10px] uppercase tracking-wider">
+                  <span className="block font-ps-ui text-[#02050A]/70 text-[9px] text-center uppercase tracking-wider leading-tight">
                     {opt.sub}
                   </span>
                 </button>
