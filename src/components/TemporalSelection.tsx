@@ -88,8 +88,8 @@ function DesktopScene({ onSelectMode }: Props) {
             </p>
             <div className="flex gap-4">
               {[
-                { id: "presente" as Mode, label: "Presente (Ano Atual)", sub: "Entenda a energia da cidade onde você está vivendo o seu ano de hoje." },
-                { id: "passado" as Mode, label: "Passado (Anos Anteriores)", sub: "Veja onde você passou seus aniversários passados e entenda por que sua vida tomou aquele rumo." },
+                { id: "presente" as Mode, label: "Presente", sub: "A energia do seu ano atual" },
+                { id: "passado" as Mode, label: "Passado", sub: "Auditoria de anos anteriores" },
               ].map((opt) => (
                 <button
                   key={opt.id}
