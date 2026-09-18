@@ -64,7 +64,7 @@ function DesktopScene({ onSelectMode }: Props) {
           {/* Main CTA */}
           <motion.button
             onClick={() => onSelectMode("futuro")}
-            className="h-16 px-12 rounded-xl font-ps-display tracking-[0.08em] text-lg hover:scale-105 active:scale-95 transition-all mb-16 flex items-center gap-3"
+            className="h-16 px-12 rounded-xl font-ps-display tracking-[0.08em] text-lg hover:scale-105 active:scale-95 transition-all mb-16 flex items-center justify-center gap-3"
             style={{
               background: "#C9A227",
               color: "#02050A",
@@ -74,7 +74,7 @@ function DesktopScene({ onSelectMode }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <span>🚀</span> DESCOBRIR MEU DESTINO
+            DESCOBRIR MEU DESTINO
           </motion.button>
 
           {/* Secondary Paths - Premium Cards */}
@@ -88,8 +88,8 @@ function DesktopScene({ onSelectMode }: Props) {
             </p>
             <div className="flex gap-4">
               {[
-                { id: "presente" as Mode, label: "📍 Presente (Ano Atual)", sub: "Entenda a energia da cidade onde você está vivendo o seu ano de hoje." },
-                { id: "passado" as Mode, label: "📜 Passado (Anos Anteriores)", sub: "Veja onde você passou seus aniversários passados e entenda por que sua vida tomou aquele rumo." },
+                { id: "presente" as Mode, label: "Presente (Ano Atual)", sub: "Entenda a energia da cidade onde você está vivendo o seu ano de hoje." },
+                { id: "passado" as Mode, label: "Passado (Anos Anteriores)", sub: "Veja onde você passou seus aniversários passados e entenda por que sua vida tomou aquele rumo." },
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -183,7 +183,7 @@ function MobileTimeline({ onSelectMode }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <span>🚀</span> DESCOBRIR MEU DESTINO
+            DESCOBRIR MEU DESTINO
           </motion.button>
 
           {/* Secondary Paths */}
@@ -197,8 +197,8 @@ function MobileTimeline({ onSelectMode }: Props) {
             </p>
             <div className="flex gap-3">
               {[
-                { id: "presente" as Mode, label: "📍 Presente", sub: "Ano Atual" },
-                { id: "passado" as Mode, label: "📜 Passado", sub: "Anos Anteriores" },
+                { id: "presente" as Mode, label: "Presente", sub: "Ano Atual" },
+                { id: "passado" as Mode, label: "Passado", sub: "Anos Anteriores" },
               ].map((opt) => (
                 <button
                   key={opt.id}

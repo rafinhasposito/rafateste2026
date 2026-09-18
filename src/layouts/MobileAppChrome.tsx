@@ -22,7 +22,7 @@ export function MobileAppChrome() {
         <img
           src="/brand/protocolo-solar-logo-horizontal.svg"
           alt="Protocolo Solar"
-          className="w-[140px] h-auto pointer-events-auto opacity-95 drop-shadow-md"
+          className="w-[240px] h-auto pointer-events-auto opacity-95 drop-shadow-md"
           draggable={false}
         />
       </header>
@@ -46,7 +46,7 @@ export function MobileAppChrome() {
           <img
             src="/brand/protocolo-solar-logo-horizontal.svg"
             alt="Protocolo Solar"
-            className="w-[140px] h-auto pointer-events-auto opacity-95 drop-shadow-sm"
+            className="w-[240px] h-auto pointer-events-auto opacity-95 drop-shadow-sm"
             draggable={false}
           />
         )}
