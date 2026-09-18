@@ -5,8 +5,16 @@ import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { TERMS_VERSION, PRIVACY_VERSION, TERMS_TEXT, PRIVACY_TEXT } from "@/constants/legal";
 
 type Mode = "signin" | "signup" | "forgot";
+
+async function sha256(message: string) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
 
 const Auth = () => {
   const { user, loading } = useAuth();
@@ -16,16 +24,49 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate("/", { replace: true });
+    if (!loading && user) {
+      // Process pending acceptance if arriving from OAuth redirect
+      const processPendingTerms = async () => {
+        if (localStorage.getItem("pending_terms_acceptance") === "true") {
+          localStorage.removeItem("pending_terms_acceptance");
+          try {
+            const termsHash = await sha256(TERMS_TEXT);
+            const privacyHash = await sha256(PRIVACY_TEXT);
+            await supabase.functions.invoke("record-terms-acceptance", {
+              body: {
+                user_id: user.id,
+                terms_version: TERMS_VERSION,
+                privacy_version: PRIVACY_VERSION,
+                terms_hash: termsHash,
+                privacy_hash: privacyHash,
+              },
+            });
+          } catch (e) {
+            console.error("Failed to record terms acceptance:", e);
+          }
+        }
+        navigate("/", { replace: true });
+      };
+      processPendingTerms();
+    }
   }, [user, loading, navigate]);
 
   const handleGoogleLogin = async () => {
+    if (!acceptedTerms) {
+      toast.error("Você precisa aceitar os Termos de Uso e a Política de Privacidade para continuar.");
+      return;
+    }
+
+    // Store intent so useEffect processes it upon redirect back
+    localStorage.setItem("pending_terms_acceptance", "true");
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/auth`,
       }
     });
     if (error) toast.error("Erro no login com Google");
@@ -33,17 +74,37 @@ const Auth = () => {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!acceptedTerms) {
+      toast.error("Você precisa aceitar os Termos e a Privacidade.");
+      return;
+    }
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}/auth`,
             data: { full_name: name || email.split("@")[0] },
           },
         });
         if (error) throw error;
+
+        // Explicitly record acceptance for email signup right now
+        if (data?.user?.id) {
+          const termsHash = await sha256(TERMS_TEXT);
+          const privacyHash = await sha256(PRIVACY_TEXT);
+          await supabase.functions.invoke("record-terms-acceptance", {
+            body: {
+              user_id: data.user.id,
+              terms_version: TERMS_VERSION,
+              privacy_version: PRIVACY_VERSION,
+              terms_hash: termsHash,
+              privacy_hash: privacyHash,
+            },
+          });
+        }
+
         toast.success("Conta criada! Verifique seu email para confirmar.");
       } else if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -81,7 +142,7 @@ const Auth = () => {
 
   return (
     <div className="relative min-h-[100dvh] w-full flex flex-col items-center justify-center bg-[#030306] overflow-hidden selection:bg-white/20">
-      
+
       {/* Abstract Background (Same as Screen 5/6) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-[#030306] via-[#080A14] to-[#030306]" />
@@ -105,19 +166,19 @@ const Auth = () => {
       >
         {/* Brand & Hook */}
         <div className="text-center mb-10 w-full">
-          <img 
-            src="/brand/protocolo-solar-logo-vertical.svg" 
-            alt="Protocolo Solar" 
-            className="h-[350px] mx-auto mb-8 object-contain opacity-90" 
+          <img
+            src="/brand/protocolo-solar-logo-vertical.svg"
+            alt="Protocolo Solar"
+            className="h-[350px] mx-auto mb-8 object-contain opacity-90"
           />
           <h2 className="font-ps-display text-3xl md:text-4xl text-white leading-[1.1] drop-shadow-md mb-3">
             {mode === "signup" ? "O Universo aguarda." : mode === "forgot" ? "Recupere o Acesso." : "Bem-vindo de volta."}
           </h2>
           <p className="font-ps-ui text-white/50 text-xs tracking-wide">
-            {mode === "signup" 
-              ? "Crie sua conta para acessar seu mapa." 
-              : mode === "forgot" 
-              ? "Enviaremos as coordenadas de recuperação." 
+            {mode === "signup"
+              ? "Crie sua conta para acessar seu mapa."
+              : mode === "forgot"
+              ? "Enviaremos as coordenadas de recuperação."
               : "Acesse para consultar seu relatório estratégico."}
           </p>
         </div>
@@ -167,9 +228,30 @@ const Auth = () => {
             </div>
           )}
 
+          {/* Terms Checkbox */}
+          <div className="flex items-start gap-3 mt-6 mb-2 px-1">
+            <div className="relative flex items-center justify-center w-5 h-5 flex-shrink-0 mt-0.5">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="peer absolute w-full h-full opacity-0 cursor-pointer z-10"
+              />
+              <div className="w-4 h-4 border border-white/30 rounded-sm bg-white/5 peer-checked:bg-[#C9A227] peer-checked:border-[#C9A227] transition-all flex items-center justify-center">
+                <svg className={`w-3 h-3 text-[#02050A] pointer-events-none transition-opacity ${acceptedTerms ? 'opacity-100' : 'opacity-0'}`} viewBox="0 0 14 14" fill="none">
+                  <path d="M3 7.5L5.5 10L11 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
+            <label htmlFor="terms" className="text-white/50 text-[11px] font-ps-ui leading-relaxed select-none cursor-pointer">
+              Li e concordo com os <a href="/termos" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#C9A227] transition-colors underline decoration-white/20 underline-offset-4">Termos de Uso</a> e a <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#C9A227] transition-colors underline decoration-white/20 underline-offset-4">Política de Privacidade</a>
+            </label>
+          </div>
+
           <button
-            type="submit" disabled={busy}
-            className="w-full h-14 mt-6 bg-white text-black hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-50 disabled:pointer-events-none transition-all duration-300 font-ps-ui text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-3 rounded-xl"
+            type="submit" disabled={busy || !acceptedTerms}
+            className="w-full h-14 mt-4 bg-white text-black hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.15)] disabled:opacity-30 disabled:hover:scale-100 disabled:shadow-none transition-all duration-300 font-ps-ui text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-3 rounded-xl"
           >
             {busy ? (
               <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />

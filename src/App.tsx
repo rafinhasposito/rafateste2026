@@ -23,6 +23,9 @@ import SolarGameV2 from "./pages/SolarGameV2";
 import NorthStarFlow from "./pages/NorthStarFlow";
 import AppleScrollExplosion from "./pages/AppleScrollExplosion";
 import ConceptsShowcase from "./pages/ConceptsShowcase";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+
 // OrbitalOnboarding removido para unificação visual
 import MobileOnboarding from "./components/mobile/onboarding/MobileOnboarding";
 import { AdminLayout } from "./components/admin/AdminLayout";
@@ -63,6 +66,8 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/credits" element={<Credits />} />
               <Route path="/app/onboarding" element={<MobileOnboarding />} />
+              <Route path="/termos" element={<Terms />} />
+              <Route path="/privacidade" element={<Privacy />} />
             </Route>
 
             {/* 3. Intact Routes (Admin & Legacy/Prototypes - Outside Consumer Shell) */}
