@@ -108,7 +108,7 @@ const Auth = () => {
           <img 
             src="/brand/protocolo-solar-logo-vertical.svg" 
             alt="Protocolo Solar" 
-            className="h-40 md:h-48 mx-auto mb-8 object-contain opacity-90" 
+            className="h-48 md:h-60 mx-auto mb-8 object-contain opacity-90" 
           />
           <h2 className="font-ps-display text-3xl md:text-4xl text-white leading-[1.1] drop-shadow-md mb-3">
             {mode === "signup" ? "O Universo aguarda." : mode === "forgot" ? "Recupere o Acesso." : "Bem-vindo de volta."}
