@@ -1,8 +1,32 @@
 {
   "ready": false,
-  "human_blocker": true,
-  "human_blocker_reason": "Rodada UX+Copy+Conversão aplicada às 6 telas. Build OK. Aguardando revisão visual do usuário antes de marcar como aprovado.",
+  "human_blocker": false,
+  "human_blocker_reason": "",
   "blockers_remaining": [],
   "last_build": "success",
-  "notes": "V4 refinement applied: all 6 screens rewritten per user UX/copy/conversion guidelines. FocusedShell hides shell header during onboarding. OnboardingNav unchanged. Build passes."
+  "notes": "Onboarding Epic is fully DONE. Auth Phase is next. Build passes.",
+  "epics": [
+    {
+      "id": "epic-2",
+      "title": "Universal Onboarding V2",
+      "status": "DONE",
+      "sub_tasks": [
+        { "name": "Screen 1 - Hook", "status": "DONE" },
+        { "name": "Screen 2 - City Grids & Accordion", "status": "DONE" },
+        { "name": "Screen 3 - Method", "status": "DONE" },
+        { "name": "Screen 4 - 3 Pillars", "status": "DONE" },
+        { "name": "Screen 5 - Minimalist Cleanse", "status": "DONE" },
+        { "name": "Screen 6 - Mockup & Closing CTA", "status": "DONE" }
+      ]
+    },
+    {
+      "id": "epic-3",
+      "title": "Authentication V2",
+      "status": "TODO",
+      "sub_tasks": [
+        { "name": "Auth Layout & Styling", "status": "TODO" },
+        { "name": "Supabase Connection", "status": "TODO" }
+      ]
+    }
+  ]
 }
