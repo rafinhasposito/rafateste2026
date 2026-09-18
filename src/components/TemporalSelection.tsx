@@ -117,14 +117,16 @@ function MobileTimeline({ onSelectMode }: Props) {
   return (
     <div className="relative w-full min-h-[100svh] overflow-y-auto overflow-x-hidden flex flex-col bg-ps-void">
       <div className="absolute inset-0 z-0 pointer-events-none fixed">
-        <img
-          src="/temporal-web-01.webp"
-          alt=""
-          onError={(e) => { (e.target as HTMLImageElement).src = "/earth-milkyway.jpg"; }}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
           className="w-full h-full object-cover object-center"
-          draggable={false}
           style={{ filter: "brightness(0.85) contrast(1.1) saturate(1.1)" }}
-        />
+        >
+          <source src="/bg-earth-web.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-black/20 pointer-events-none" />
         <div
           className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none"
