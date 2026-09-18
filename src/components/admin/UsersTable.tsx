@@ -1,105 +1,280 @@
-import React from "react";
-import { MoreVertical, Download, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Search, Coins, X, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-export const UsersTable = () => {
-  const users = [
-    { name: "Florence Shaw", email: "florence@exemplo.com", role: "Admin", lastActive: "Mar 4, 2024", dateAdded: "Jul 4, 2022", avatar: "FS" },
-    { name: "Amélie Laurent", email: "amelie@exemplo.com", role: "Admin", lastActive: "Mar 4, 2024", dateAdded: "Jul 4, 2022", avatar: "AL" },
-    { name: "Ammar Foley", email: "ammar@exemplo.com", role: "User", lastActive: "Mar 2, 2024", dateAdded: "Jul 4, 2022", avatar: "AF" },
-    { name: "Caitlyn King", email: "caitlyn@exemplo.com", role: "User", lastActive: "Mar 6, 2024", dateAdded: "Jul 4, 2022", avatar: "CK" },
-    { name: "Sienna Hewitt", email: "sienna@exemplo.com", role: "User", lastActive: "Mar 8, 2024", dateAdded: "Jul 4, 2022", avatar: "SH" },
-  ];
+interface Profile {
+  user_id: string;
+  email: string | null;
+  display_name: string | null;
+  full_name: string | null;
+  credits: number;
+  created_at: string;
+}
+
+const UsersTable = () => {
+  const [users, setUsers] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [targetUser, setTargetUser] = useState<Profile | null>(null);
+  const [amount, setAmount] = useState<string>("");
+  const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("user_id, email, display_name, full_name, credits, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) {
+      toast.error("Erro ao carregar usuários");
+      console.error(error);
+    } else {
+      setUsers(data || []);
+    }
+    setLoading(false);
+  };
+
+  const openModal = (user: Profile) => {
+    setTargetUser(user);
+    setAmount("");
+    setReason("");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setTargetUser(null);
+  };
+
+  const handleSubmitAdjustment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!targetUser) return;
+
+    const numAmount = parseInt(amount, 10);
+    if (isNaN(numAmount) || numAmount === 0) {
+      toast.error("A quantidade deve ser diferente de zero.");
+      return;
+    }
+    if (!reason.trim()) {
+      toast.error("O motivo é obrigatório.");
+      return;
+    }
+
+    setSubmitting(true);
+    const { error } = await supabase.rpc("admin_adjust_credits", {
+      p_target_user_id: targetUser.user_id,
+      p_amount: numAmount,
+      p_reason: reason.trim()
+    });
+
+    setSubmitting(false);
+
+    if (error) {
+      toast.error(error.message || "Erro ao ajustar créditos.");
+      console.error(error);
+    } else {
+      toast.success("Créditos ajustados com sucesso!");
+      // Otimistic update
+      setUsers(prev => prev.map(u =>
+        u.user_id === targetUser.user_id
+          ? { ...u, credits: u.credits + numAmount }
+          : u
+      ));
+      closeModal();
+    }
+  };
+
+  const filteredUsers = users.filter(u => {
+    const term = searchQuery.toLowerCase();
+    const name = (u.full_name || u.display_name || "").toLowerCase();
+    const email = (u.email || "").toLowerCase();
+    return name.includes(term) || email.includes(term);
+  });
 
   return (
-    <div className="glass-panel border border-border rounded-xl overflow-hidden shadow-lg">
-      <div className="p-5 border-b border-border flex items-center justify-between bg-card/50">
-        <div className="flex items-center gap-4">
-          <h2 className="text-lg font-medium text-foreground">Todos os usuários</h2>
-          <span className="px-2.5 py-0.5 rounded-full bg-secondary text-xs font-medium text-foreground">44</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-secondary transition-colors">
-            Filtros
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-white/90 transition-colors">
-            <Plus size={16} /> Add user
-          </button>
+    <div className="space-y-6">
+      {/* Search Header */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <h2 className="font-ps-display text-xl text-foreground uppercase tracking-wider">Gestão de Usuários</h2>
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Buscar por nome ou email..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full bg-background/50 border border-border text-foreground px-10 py-2.5 rounded-xl focus:outline-none focus:border-primary/50 font-ps-ui text-sm placeholder:text-muted-foreground/50 transition-colors"
+          />
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm whitespace-nowrap">
-          <thead className="bg-secondary/30 text-muted-foreground border-b border-border">
-            <tr>
-              <th className="px-6 py-3 font-medium">User name</th>
-              <th className="px-6 py-3 font-medium">Access</th>
-              <th className="px-6 py-3 font-medium">Status</th>
-              <th className="px-6 py-3 font-medium">Last active</th>
-              <th className="px-6 py-3 font-medium">Date added</th>
-              <th className="px-6 py-3 font-medium w-10"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {users.map((user, idx) => (
-              <tr key={idx} className="table-row-hover transition-colors group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-semibold text-primary text-xs">
-                      {user.avatar}
+      {/* Users List */}
+      <div className="border border-border rounded-xl bg-card/20 overflow-hidden">
+        {loading ? (
+          <div className="p-12 text-center text-muted-foreground font-ps-ui animate-pulse">Carregando base de usuários...</div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground font-ps-ui">Nenhum usuário encontrado.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            {/* Desktop Table (hidden on small screens) */}
+            <table className="w-full text-left hidden md:table font-ps-ui text-sm">
+              <thead className="bg-muted/30 text-muted-foreground border-b border-border uppercase tracking-widest text-[10px]">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Usuário</th>
+                  <th className="px-6 py-4 font-medium">Data de Cadastro</th>
+                  <th className="px-6 py-4 font-medium text-right">Saldo Atual</th>
+                  <th className="px-6 py-4 font-medium text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {filteredUsers.map(user => (
+                  <tr key={user.user_id} className="hover:bg-muted/10 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                          <User size={18} />
+                        </div>
+                        <div>
+                          <div className="font-bold text-foreground">{user.full_name || user.display_name || "Sem Nome"}</div>
+                          <div className="text-muted-foreground text-xs">{user.email || "Sem e-mail"}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground/80">
+                      {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <span className={`font-bold ${user.credits > 0 ? "text-[#C9A227]" : "text-muted-foreground"}`}>
+                        {user.credits} cr
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => openModal(user)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-3 py-1.5 border border-primary/30 text-primary hover:bg-primary/10 rounded-lg text-xs uppercase tracking-widest font-bold"
+                      >
+                        <Coins size={14} /> Ajustar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Mobile List (hidden on md+ screens) */}
+            <div className="flex flex-col md:hidden divide-y divide-border/50 font-ps-ui">
+              {filteredUsers.map(user => (
+                <div key={user.user_id} className="p-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-start">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-foreground truncate">{user.full_name || user.display_name || "Sem Nome"}</div>
+                      <div className="text-muted-foreground text-xs truncate">{user.email || "Sem e-mail"}</div>
                     </div>
-                    <div>
-                      <div className="font-medium text-foreground">{user.name}</div>
-                      <div className="text-muted-foreground text-xs">{user.email}</div>
+                    <div className="text-right shrink-0 ml-4">
+                      <div className={`font-bold ${user.credits > 0 ? "text-[#C9A227]" : "text-muted-foreground"}`}>
+                        {user.credits} cr
+                      </div>
+                      <div className="text-muted-foreground/50 text-[10px]">
+                        {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                      </div>
                     </div>
                   </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-medium border ${
-                    user.role === 'Admin' 
-                      ? 'bg-green-500/10 text-green-400 border-green-500/20' 
-                      : 'bg-secondary text-foreground border-border'
-                  }`}>
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    <span className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium text-blue-400 bg-blue-500/10 cursor-pointer">
-                      Data Export
-                    </span>
-                    <span className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium text-purple-400 bg-purple-500/10 cursor-pointer">
-                      Data Import
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-muted-foreground">{user.lastActive}</td>
-                <td className="px-6 py-4 text-muted-foreground">{user.dateAdded}</td>
-                <td className="px-6 py-4 text-right">
-                  <button className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                    <MoreVertical size={16} />
+                  <button
+                    onClick={() => openModal(user)}
+                    className="w-full flex justify-center items-center gap-2 py-2.5 border border-border bg-background text-foreground hover:bg-muted/50 rounded-lg text-xs uppercase tracking-widest font-bold mt-1"
+                  >
+                    <Coins size={14} /> Ajustar Créditos
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-      
-      <div className="p-4 border-t border-border flex items-center justify-between bg-card/30">
-        <button className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-secondary transition-colors disabled:opacity-50">
-          Previous
-        </button>
-        <div className="flex gap-1 text-sm">
-          {[1, 2, 3, 4, 5, 6].map(page => (
-            <button key={page} className={`w-8 h-8 flex items-center justify-center rounded-lg ${page === 1 ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:bg-secondary/50'}`}>
-              {page}
-            </button>
-          ))}
-        </div>
-        <button className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-secondary transition-colors">
-          Next
-        </button>
-      </div>
+
+      {/* Adjustment Modal */}
+      <AnimatePresence>
+        {isModalOpen && targetUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-[#030306]/80 backdrop-blur-sm"
+              onClick={closeModal}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-[#0A0A0F] border border-white/10 rounded-2xl shadow-2xl p-6 overflow-hidden"
+            >
+              <button onClick={closeModal} className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+
+              <h3 className="font-ps-display text-xl uppercase tracking-wider text-white mb-1">Ajuste de Crédito</h3>
+              <p className="text-white/50 text-sm font-ps-ui mb-6">
+                Para: <strong className="text-white font-medium">{targetUser.email}</strong>
+              </p>
+
+              <form onSubmit={handleSubmitAdjustment} className="space-y-4 font-ps-ui">
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-white/50 mb-2">Quantidade (±)</label>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={e => setAmount(e.target.value)}
+                    placeholder="Ex: 5 ou -5"
+                    className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#C9A227]/50 focus:bg-white/10 transition-colors"
+                  />
+                  <p className="text-[10px] text-white/30 mt-1.5 ml-1">
+                    Use números positivos para adicionar e negativos para estornar.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-white/50 mb-2">Motivo / Justificativa</label>
+                  <input
+                    type="text"
+                    value={reason}
+                    onChange={e => setReason(e.target.value)}
+                    placeholder="Obrigatório para auditoria..."
+                    className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-[#C9A227]/50 focus:bg-white/10 transition-colors"
+                  />
+                </div>
+
+                <div className="pt-4 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="flex-1 py-3.5 border border-white/10 text-white hover:bg-white/5 rounded-xl text-xs uppercase tracking-[0.1em] font-bold transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 py-3.5 bg-white text-black hover:bg-white/90 rounded-xl text-xs uppercase tracking-[0.1em] font-bold disabled:opacity-50 transition-colors"
+                  >
+                    {submitting ? "Processando..." : "Confirmar"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
