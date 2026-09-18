@@ -28,7 +28,7 @@ export function ConsumerShell() {
       */}
       <main 
         className={`relative z-10 w-full h-full min-h-[100dvh] flex flex-col
-          ${isDesktop ? "pt-14 pb-0" : "pt-0 pb-16"}
+          ${isDesktop ? "pt-20 pb-0" : "pt-0 pb-16"}
         `}
       >
         <Outlet />

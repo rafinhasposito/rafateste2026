@@ -18,11 +18,11 @@ export function MobileAppChrome() {
   // If not logged in, show minimal top header with logo
   if (!session) {
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 p-4 flex items-center justify-between pointer-events-none">
+      <header className="fixed top-0 left-0 right-0 z-50 px-5 pt-8 pb-4 flex items-center justify-between pointer-events-none">
         <img
-          src="/brand/protocolo-solar-logo-horizontal-4096.png"
+          src="/brand/protocolo-solar-logo-vertical-2048.png"
           alt="Protocolo Solar"
-          className="h-7 w-auto pointer-events-auto opacity-90"
+          className="w-[140px] h-auto pointer-events-auto opacity-95 drop-shadow-md"
           draggable={false}
         />
       </header>
@@ -32,7 +32,7 @@ export function MobileAppChrome() {
   return (
     <>
       {/* Top Header — Contextual */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center p-4 bg-gradient-to-b from-[#02050A]/90 to-transparent pointer-events-none">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center px-5 pt-8 pb-4 bg-gradient-to-b from-[#02050A]/90 to-transparent pointer-events-none">
         {!showBottomBar ? (
           /* Sub-page: show Back button */
           <button
@@ -44,9 +44,9 @@ export function MobileAppChrome() {
         ) : (
           /* Main tabs: show logo */
           <img
-            src="/brand/protocolo-solar-logo-horizontal-4096.png"
-            alt="Protocolo Solar"
-            className="h-7 w-auto pointer-events-auto opacity-90"
+          src="/brand/protocolo-solar-logo-vertical-2048.png"
+          alt="Protocolo Solar"
+          className="w-[140px] h-auto pointer-events-auto opacity-95 drop-shadow-sm"
             draggable={false}
           />
         )}

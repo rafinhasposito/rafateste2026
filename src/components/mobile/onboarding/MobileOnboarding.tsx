@@ -50,7 +50,7 @@ export default function MobileOnboarding() {
           {step === 3 && <Screen3 />}
           {step === 4 && <Screen4 />}
           {step === 5 && <Screen5 />}
-          {step === 6 && <Screen6 />}
+          {step === 6 && <Screen6 onComplete={goNext} />}
         </motion.div>
       </AnimatePresence>
 

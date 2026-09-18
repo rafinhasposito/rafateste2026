@@ -1,0 +1,12 @@
+:root {
+  --ps-void: #02050A;
+  --ps-night: #07101A;
+  --ps-surface: #0C1826;
+  --ps-gold-deep: #8D6914;
+  --ps-gold: #C9A227;
+  --ps-champagne: #E8D59B;
+  --ps-text: #F2F4F7;
+  --ps-muted: #AAB6C4;
+  --ps-display: "Marcellus", serif;
+  --ps-ui: "DM Sans", sans-serif;
+}

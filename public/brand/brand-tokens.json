@@ -1,0 +1,18 @@
+{
+  "name": "Protocolo Solar",
+  "tagline": "O GPS do seu novo ciclo.",
+  "fonts": {
+    "display": "Marcellus",
+    "ui": "DM Sans"
+  },
+  "colors": {
+    "void": "#02050A",
+    "night": "#07101A",
+    "surface": "#0C1826",
+    "goldDeep": "#8D6914",
+    "gold": "#C9A227",
+    "champagne": "#E8D59B",
+    "text": "#F2F4F7",
+    "muted": "#AAB6C4"
+  }
+}

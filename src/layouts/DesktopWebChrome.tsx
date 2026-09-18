@@ -28,7 +28,7 @@ export function DesktopWebChrome() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 h-14 z-50"
+      className="fixed top-0 left-0 right-0 h-20 z-50"
       style={{
         background: "rgba(3,3,6,0.85)",
         backdropFilter: "blur(20px) saturate(1.2)",
@@ -44,7 +44,7 @@ export function DesktopWebChrome() {
             <img
               src="/brand/protocolo-solar-logo-horizontal-4096.png"
               alt="Protocolo Solar"
-              className="h-8 w-auto opacity-95 hover:opacity-100 transition-opacity"
+              className="w-[320px] h-auto opacity-95 hover:opacity-100 transition-opacity drop-shadow-md"
               draggable={false}
             />
           </Link>

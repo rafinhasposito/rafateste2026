@@ -88,22 +88,18 @@ const Auth = () => {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel glass-panel-glow p-8 md:p-12 max-w-[480px] w-full border border-gold/20 shadow-[0_0_50px_rgba(0,0,0,0.8)]"
+          className="bg-ps-surface p-8 md:p-12 max-w-[480px] w-full border border-ps-gold/20 shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-2xl"
         >
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gold-dark/20 to-transparent border border-gold/30 flex items-center justify-center mx-auto mb-3 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
-              <svg width="36" height="36" viewBox="0 0 52 52" fill="none">
-                <circle cx="26" cy="26" r="22" stroke="#C9A227" strokeWidth="0.75" strokeOpacity="0.4" strokeDasharray="2 2" />
-                <polygon points="26,8 28.5,23.5 26,22 23.5,23.5" fill="#C9A227" />
-                <polygon points="26,44 28.5,28.5 26,30 23.5,28.5" fill="#C9A227" fillOpacity="0.7" />
-                <polygon points="8,26 23.5,23.5 22,26 23.5,28.5" fill="#C9A227" fillOpacity="0.7" />
-                <polygon points="44,26 28.5,23.5 30,26 28.5,28.5" fill="#C9A227" fillOpacity="0.7" />
-                <circle cx="26" cy="26" r="3" fill="#C9A227" />
-              </svg>
-            </div>
-            <h1 className="font-ps-display text-xl md:text-2xl font-bold text-foreground uppercase tracking-[0.12em]">Protocolo Solar</h1>
-            <p className="text-[#C9A227] text-[9px] uppercase tracking-[0.25em] font-medium mt-1">Astrologia de Relocalização</p>
-            <p className="text-muted-foreground text-xs mt-3 leading-relaxed">
+            <img 
+              src="/brand/protocolo-solar-logo-horizontal-4096.png" 
+              alt="Protocolo Solar" 
+              className="h-10 mx-auto mb-4 object-contain" 
+            />
+            <p className="text-ps-muted text-[10px] uppercase tracking-[0.25em] font-ps-ui font-medium">
+              O GPS do seu novo ciclo
+            </p>
+            <p className="text-ps-muted text-xs mt-4 leading-relaxed font-ps-ui">
               {mode === "signup" 
                 ? "Crie sua conta para salvar seus dados natais e não precisar preenchê-los em cada consulta." 
                 : mode === "forgot" ? "Recupere sua senha" : "Acesse seu mapa cósmico e recupere seus dados."}
@@ -112,7 +108,7 @@ const Auth = () => {
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full py-3 px-5 rounded-2xl bg-[#FAF7EE] text-[#030306] font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-3 hover:opacity-90 transition-opacity mb-4 shadow-md"
+            className="w-full py-3.5 px-5 rounded-xl bg-white text-black font-ps-ui font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-3 hover:opacity-90 transition-opacity mb-4 shadow-md"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -123,38 +119,38 @@ const Auth = () => {
             Continuar com Google
           </button>
 
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-border/60" />
-            <span className="text-muted-foreground text-[10px] uppercase tracking-widest">ou</span>
-            <div className="flex-1 h-px bg-border/60" />
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-ps-gold/20" />
+            <span className="text-ps-muted text-[10px] uppercase tracking-widest font-ps-ui">ou</span>
+            <div className="flex-1 h-px bg-ps-gold/20" />
           </div>
 
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="text-left">
-                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-1 block">Nome Completo</label>
+                <label className="font-ps-ui text-[10px] font-semibold uppercase tracking-[0.2em] text-ps-gold mb-2 block">Nome Completo</label>
                 <input
                   type="text" required placeholder="Seu nome completo" value={name} onChange={e => setName(e.target.value)}
-                  className="quantum-input w-full"
+                  className="w-full bg-ps-night border border-ps-gold/30 text-ps-text p-3.5 rounded-xl focus:outline-none focus:border-ps-gold transition-colors font-ps-ui text-sm placeholder:text-ps-muted"
                 />
               </div>
             )}
             <div className="text-left">
-              <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-1 block">Email</label>
+              <label className="font-ps-ui text-[10px] font-semibold uppercase tracking-[0.2em] text-ps-gold mb-2 block">Email</label>
               <input
                 type="email" required placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)}
-                className="quantum-input w-full"
+                className="w-full bg-ps-night border border-ps-gold/30 text-ps-text p-3.5 rounded-xl focus:outline-none focus:border-ps-gold transition-colors font-ps-ui text-sm placeholder:text-ps-muted"
               />
             </div>
             {mode !== "forgot" && (
-              <div>
-                <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-1 block">Senha</label>
+              <div className="text-left">
+                <label className="font-ps-ui text-[10px] font-semibold uppercase tracking-[0.2em] text-ps-gold mb-2 block">Senha</label>
                 <input
                   type="password" required placeholder="••••••••" minLength={8} value={password} onChange={e => setPassword(e.target.value)}
-                  className="quantum-input w-full"
+                  className="w-full bg-ps-night border border-ps-gold/30 text-ps-text p-3.5 rounded-xl focus:outline-none focus:border-ps-gold transition-colors font-ps-ui text-sm placeholder:text-ps-muted"
                 />
                 {mode === "signup" && (
-                  <p className="text-white/40 text-[10px] mt-2 font-ps-ui leading-tight">
+                  <p className="text-ps-muted/60 text-[10px] mt-2 font-ps-ui leading-tight">
                     Mínimo de 8 caracteres. Evite senhas comuns. O sistema recusa senhas expostas em vazamentos de dados.
                   </p>
                 )}
@@ -162,24 +158,22 @@ const Auth = () => {
             )}
             <button
               type="submit" disabled={busy}
-              className="w-full h-14 mt-6 bg-white text-black hover:bg-gray-200 disabled:bg-white/10 disabled:text-white/30 transition-all font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2"
+              className="w-full h-14 mt-8 bg-ps-gold text-ps-night hover:opacity-90 shadow-[0_4px_24px_rgba(201,162,39,0.50)] disabled:opacity-50 transition-all font-ps-ui text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2 rounded-xl"
             >
               {busy ? (
-                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-ps-night/30 border-t-ps-night rounded-full animate-spin" />
               ) : null}
               {busy ? "Processando..." : mode === "signup" ? "Criar conta estelar" : mode === "forgot" ? "Enviar link" : "Entrar no Protocolo"}
             </button>
           </form>
 
-          {/* Botão de Bypass para Testes Locais removido na versão premium/lançamento para evitar ruído. */}
-
-          <div className="flex justify-between mt-5 text-xs">
+          <div className="flex justify-between mt-6 text-xs font-ps-ui">
             {mode !== "signin" ? (
-              <button onClick={() => setMode("signin")} className="text-muted-foreground hover:text-primary transition-colors">← Voltar ao login</button>
+              <button onClick={() => setMode("signin")} className="text-ps-muted hover:text-ps-text transition-colors">← Voltar ao login</button>
             ) : (
               <>
-                <button onClick={() => setMode("signup")} className="text-muted-foreground hover:text-primary transition-colors">Criar conta</button>
-                <button onClick={() => setMode("forgot")} className="text-muted-foreground hover:text-primary transition-colors">Esqueci a senha</button>
+                <button onClick={() => setMode("signup")} className="text-ps-muted hover:text-ps-text transition-colors">Criar conta</button>
+                <button onClick={() => setMode("forgot")} className="text-ps-muted hover:text-ps-text transition-colors">Esqueci a senha</button>
               </>
             )}
           </div>

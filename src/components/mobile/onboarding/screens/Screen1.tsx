@@ -25,7 +25,7 @@ export const Screen1 = () => (
           poster="/assets/earth-blue.jpg"
           className="absolute inset-0 w-full h-full object-cover object-center md:hidden"
         >
-          <source src="/assets/video-mobile.mp4" type="video/mp4" />
+          <source src="/assets/vecteezy-earth.mp4" type="video/mp4" />
         </video>
         {/* Desktop Video */}
         <video
@@ -33,7 +33,7 @@ export const Screen1 = () => (
           poster="/assets/earth-blue.jpg"
           className="absolute inset-0 w-full h-full object-cover object-center hidden md:block"
         >
-          <source src="/assets/video-desktop.mp4" type="video/mp4" />
+          <source src="/assets/vecteezy-earth.mp4" type="video/mp4" />
         </video>
       </div>
     </div>
