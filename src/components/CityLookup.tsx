@@ -215,18 +215,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         if (savedId) consultationId = savedId;
       }
 
-      setResult({
-        house: houseNum,
-        houseName: houseData.label,
-        houseData,
-        cities: {
-          highticket: [masterCity],
-          acessivel: [],
-          nacional: [],
-        },
-        allResults,
-        consultationId,
-      });
+      if (consultationId) navigate("/dashboard?id=" + consultationId);
       onHouseFound?.(houseNum, city);
     } catch (error) {
       const err = error as Error;
@@ -280,20 +269,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       </div>
 
 
-      <AnimatePresence>
-        {result && (
-          <DestinyResults
-            house={result.house}
-            houseName={result.houseName}
-            houseData={result.houseData}
-            cities={result.cities}
-            allResults={result.allResults}
-            consultationId={result.consultationId}
-            userCredits={profile?.credits ?? 0}
-            isAuthenticated={!!user}
-          />
-        )}
-      </AnimatePresence>
+      
     </div>
   );
 };

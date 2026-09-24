@@ -1,0 +1,151 @@
+244:               <h3 className="text-white/90 text-3xl md:text-5xl font-ps-display font-bold mb-6 text-center relative z-10">Para Quem É A Casa {P.house}?</h3>
+245-               <p className="text-white/50 text-center mb-10 text-lg relative z-10">Esta viagem de aniversário é exatamente para você que:</p>
+246-
+247-               <ul className="space-y-6 max-w-3xl mx-auto mb-16 relative z-10">
+248-                  <li className="flex items-start gap-4">
+249-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
+250-                    <p className="text-white/80 text-lg leading-relaxed">Cansou de carregar a vida sozinho no esforço individual e entendeu que o seu sucesso depende do ecossistema certo.</p>
+251-                  </li>
+252-                  <li className="flex items-start gap-4">
+253-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
+254-                    <p className="text-white/80 text-lg leading-relaxed">Quer parar de bater em portas fechadas e precisa de aliados ou mentores influentes abrindo caminhos para você.</p>
+255-                  </li>
+256-                  <li className="flex items-start gap-4">
+257-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
+258-                    <p className="text-white/80 text-lg leading-relaxed">Busca um ano leve, onde o seu nome circula através de indicações, convites e pertencimento a uma egrégora forte.</p>
+259-                  </li>
+260-               </ul>
+261-
+262-               {/* A GRANDE DIVISÃO DA PERSONALIZAÇÃO */}
+263-               <div className="mt-20 pt-16 border-t border-white/5 relative z-10 flex flex-col items-center">
+264-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#3b82f6] mb-8">
+265-                    <Sparkles className="w-3 h-3" />
+266-                    <span>Seu Resultado Personalizado</span>
+267-                  </div>
+268-                  
+269-                  <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O foco é <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-600">{P.intention}</span>.</h3>
+270-                  <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
+271-                    O algoritmo escolheu a Casa {P.house} milimetricamente porque ela é a grande chave para destravar esse objetivo específico no seu próximo ano.
+272-                  </p>
+273-
+274-                  {/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
+275-                  <div className="w-full mt-10">
+276-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+277-                      {/* Lista de Acordeões */}
+278-                      <div className="md:col-span-5 space-y-3">
+279-                        {LIFE_AREAS.map((area) => {
+280-                          const isUnlocked = area.id.toLowerCase() === P.intention.toLowerCase() || area.unlocked;
+281-                          const isOpen = openArea === area.id;
+282-                          return (
+283-                            <motion.button
+284-                              key={area.id}
+285-                              onClick={() => setOpenArea(isOpen ? "" : area.id)}
+286-                              initial="closed"
+287-                              animate={isOpen ? "open" : "closed"}
+288-                              whileHover="hovered"
+289-                              className={`w-full text-left rounded-3xl border transition-colors duration-500 overflow-hidden ${isOpen ? (isUnlocked ? 'bg-rose-500/10 border-rose-500/20 shadow-[0_0_40px_rgba(244,63,94,0.1)]' : 'bg-white/[0.04] border-white/10 shadow-[0_0_60px_rgba(255,255,255,0.05)]') : 'bg-black/40 border-white/5'}`}
+290-                            >
+291-                              <div className="flex items-center gap-4 px-6 py-5">
+292-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${isUnlocked ? 'bg-rose-500/20 border-rose-500/30' : 'bg-white/5 border-white/10'}`}>
+293-                                  {isUnlocked ? <area.icon className="w-5 h-5 text-rose-400" /> : <Lock className="w-4 h-4 text-white/30" />}
+294-                                </div>
+295-                                <div className="flex-1 text-left">
+296-                                  <div className="flex items-center gap-2 mb-1">
+297-                                    <span className={`block text-base font-medium ${isOpen ? 'text-white' : 'text-white/70'}`}>{area.label}</span>
+298-                                  </div>
+299-                                  
+300-                                  {/* SCORE EMBAIXO DO TEXTO (Mais grossa e animada no hover/select) */}
+301-                                  <div className="flex items-center gap-4 mt-2.5">
+302-                                    <div className="flex-1 max-w-[220px] h-3.5 bg-white/[0.05] rounded-full overflow-hidden">
+303-                                      <motion.div 
+304-                                        className="h-full rounded-full" 
+305-                                        variants={{
+306-                                          closed: { width: '0%' },
+307-                                          hovered: { width: `${area.score}%` },
+308-                                          open: { width: `${area.score}%` }
+309-                                        }}
+310-                                        transition={{ duration: 0.8, ease: "easeOut" }}
+311-                                        style={{ backgroundColor: area.color }} 
+312-                                      />
+313-                                    </div>
+314-                                    <AnimatePresence>
+315-                                      {isOpen && (
+316-                                        <motion.span 
+317-                                          initial={{ opacity: 0, x: -10 }}
+318-                                          animate={{ opacity: 1, x: 0 }}
+319-                                          exit={{ opacity: 0, x: -10 }}
+320-                                          transition={{ duration: 0.3 }}
+321-                                          className="text-[10px] font-bold font-ps-display tracking-widest uppercase" 
+322-                                          style={{ color: area.color }}
+323-                                        >
+324-                                          {area.score}% MATCH
+325-                                        </motion.span>
+326-                                      )}
+327-                                    </AnimatePresence>
+328-                                  </div>
+329-                                </div>
+330-
+331-                                {isUnlocked
+332-                                  ? <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180 text-rose-400' : 'text-white/30'}`} />
+333-                                  : <ChevronRight className="w-5 h-5 text-white/20" />
+334-                                }
+335-                              </div>
+336-
+337-                              <AnimatePresence>
+338-                                {isOpen && (
+339-                                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}>
+340-                                    <div className="px-6 pb-6 pt-2">
+341-                                      {isUnlocked ? (
+342-                                        <>
+343-                                          {/* Mobile: Mostra o texto completo pois não há painel lateral */}
+344-                                          <div className="md:hidden">
+345-                                            <p className="text-white/80 text-sm font-light leading-relaxed">{area.full}</p>
+346-                                          </div>
+347-                                          {/* Desktop: Mostra só o resumo e botão, pois o texto completo já está no painel ao lado */}
+348-                                          <div className="hidden md:block">
+349-                                            <p className="text-white/50 text-sm font-light leading-relaxed mb-4">{area.teaser}</p>
+350-                                            <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-4 flex items-center justify-center gap-3 mt-4 shadow-[0_0_20px_rgba(244,63,94,0.05)] cursor-default">
+351-                                              <Sparkles className="w-4 h-4 text-rose-400 shrink-0" />
+352-                                              <span className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Acesso Livre — Seu Foco Atual</span>
+353-                                            </div>
+354-                                          </div>
+355-                                        </>
+356-                                      ) : (
+357-                                        <div>
+358-                                          <p className="text-white/50 text-sm font-light leading-relaxed mb-4">{area.teaser}</p>
+359-                                          
+360-                                          <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-4 flex items-center justify-center gap-3 hover:bg-white/10 transition-colors mt-4 shadow-[0_0_20px_rgba(255,255,255,0.02)]">
+361-                                            <Lock className="w-4 h-4 text-white/60 shrink-0" />
+362-                                            <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Desbloquear análise — 1 crédito</span>
+363-                                          </div>
+364-                                        </div>
+365-                                      )}
+366-                                    </div>
+367-                                  </motion.div>
+368-                                )}
+369-                              </AnimatePresence>
+370-                            </motion.button>
+371-                          );
+372-                        })}
+373-                      </div>
+374-
+375-                      {/* Painel Sticky Lateral (Desktop) */}
+376-                      <div className="md:col-span-7 hidden md:block">
+377-                        <div className="sticky top-10 bg-black/40 rounded-[32px] border border-white/5 overflow-hidden min-h-[600px] relative flex flex-col justify-end">
+378-                          <div className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity transition-all duration-1000" style={{ backgroundImage: "url('/apple-mock/apple_intelligence__bkgdcn4e0kj6_large.png')" }} />
+379-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-[#0B1426]/60 to-transparent" />
+380-
+381-                          <div className="relative z-10 p-12 max-w-2xl">
+382-                            {LIFE_AREAS.filter(a => a.id === openArea).map(area => {
+383-                              const isUnlocked = area.id.toLowerCase() === P.intention.toLowerCase() || area.unlocked;
+384-                              return (
+385-                                <motion.div key={area.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+386-                                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border ${isUnlocked ? 'bg-rose-500/20 border-rose-500/30' : 'bg-white/5 border-white/10'}`}>
+387-                                    <area.icon className={`w-8 h-8 ${isUnlocked ? 'text-rose-400' : 'text-white/30'}`} />
+388-                                  </div>
+389-                                  <h3 className="font-ps-display text-4xl font-bold tracking-tight mb-4">{area.label}</h3>
+390-                                  {isUnlocked ? (
+391-                                    <p className="text-white/80 text-lg font-light leading-relaxed">{area.full}</p>
+392-                                  ) : (
+393-                                    <div>
+394-                                      <p className="text-white/50 text-lg font-light leading-relaxed mb-8">{area.teaser}</p>

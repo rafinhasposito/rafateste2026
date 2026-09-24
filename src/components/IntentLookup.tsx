@@ -151,7 +151,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         result: { results: allResults, house: houseId },
       }) ?? undefined;
 
-      setResult({ house: houseId, houseName: houseData.label, houseData, cities, allResults, consultationId });
+      if (consultationId) navigate("/dashboard?id=" + consultationId);
       onHouseFound?.(houseId);
     } catch (error) {
       const err = error as Error;
@@ -212,28 +212,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         </div>
       )}
 
-      <AnimatePresence>
-        {result && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <button 
-              onClick={() => { setResult(null); setSelectedHouse(null); }}
-              className="mb-6 flex items-center gap-2 text-white/40 hover:text-white text-xs uppercase tracking-widest transition-colors"
-            >
-              ← Trocar Intenção
-            </button>
-            <DestinyResults
-              house={result.house}
-              houseName={result.houseName}
-              houseData={result.houseData}
-              cities={result.cities}
-              allResults={result.allResults}
-              consultationId={result.consultationId}
-              userCredits={profile?.credits ?? 0}
-              isAuthenticated={!!user}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      
     </div>
   );
 };

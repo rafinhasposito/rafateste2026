@@ -4,19 +4,37 @@
   "human_blocker_reason": "",
   "blockers_remaining": [],
   "last_build": "success",
-  "notes": "Onboarding Epic is fully DONE. Auth Phase is next. Build passes.",
+  "notes": "Onboarding Epic is fully DONE. Auth Phase is next. Build passes. | DestinyResults UI & Protocol Card APPROVED by User.",
   "epics": [
     {
       "id": "epic-2",
       "title": "Universal Onboarding V2",
       "status": "DONE",
       "sub_tasks": [
-        { "name": "Screen 1 - Hook", "status": "DONE" },
-        { "name": "Screen 2 - City Grids & Accordion", "status": "DONE" },
-        { "name": "Screen 3 - Method", "status": "DONE" },
-        { "name": "Screen 4 - 3 Pillars", "status": "DONE" },
-        { "name": "Screen 5 - Minimalist Cleanse", "status": "DONE" },
-        { "name": "Screen 6 - Mockup & Closing CTA", "status": "DONE" }
+        {
+          "name": "Screen 1 - Hook",
+          "status": "DONE"
+        },
+        {
+          "name": "Screen 2 - City Grids & Accordion",
+          "status": "DONE"
+        },
+        {
+          "name": "Screen 3 - Method",
+          "status": "DONE"
+        },
+        {
+          "name": "Screen 4 - 3 Pillars",
+          "status": "DONE"
+        },
+        {
+          "name": "Screen 5 - Minimalist Cleanse",
+          "status": "DONE"
+        },
+        {
+          "name": "Screen 6 - Mockup & Closing CTA",
+          "status": "DONE"
+        }
       ]
     },
     {
@@ -24,8 +42,14 @@
       "title": "Authentication V2",
       "status": "TODO",
       "sub_tasks": [
-        { "name": "Auth Layout & Styling", "status": "TODO" },
-        { "name": "Supabase Connection", "status": "TODO" }
+        {
+          "name": "Auth Layout & Styling",
+          "status": "TODO"
+        },
+        {
+          "name": "Supabase Connection",
+          "status": "TODO"
+        }
       ]
     }
   ]

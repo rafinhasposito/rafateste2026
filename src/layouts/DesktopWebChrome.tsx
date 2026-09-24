@@ -50,22 +50,30 @@ export function DesktopWebChrome() {
           </Link>
 
           {/* Center-ish: Navigation (Only if logged in) */}
-          {session && (
-            <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-6">
               <Link 
-                to="/" 
-                className="text-sm font-sans font-medium text-foundation-muted-fg hover:text-foundation-fg transition-colors"
+                to="/tecnologia" 
+                className="text-sm font-sans font-medium text-brand-primary/80 hover:text-brand-primary transition-colors flex items-center gap-1"
               >
-                Nova Consulta
+                Como Funciona
               </Link>
-              <Link 
-                to="/history" 
-                className="text-sm font-sans font-medium text-foundation-muted-fg hover:text-foundation-fg transition-colors"
-              >
-                Consultas Anteriores
-              </Link>
+              {session && (
+                <>
+                  <Link 
+                    to="/" 
+                    className="text-sm font-sans font-medium text-foundation-muted-fg hover:text-foundation-fg transition-colors"
+                  >
+                    Nova Consulta
+                  </Link>
+                  <Link 
+                    to="/history" 
+                    className="text-sm font-sans font-medium text-foundation-muted-fg hover:text-foundation-fg transition-colors"
+                  >
+                    Consultas Anteriores
+                  </Link>
+                </>
+              )}
             </nav>
-          )}
         </div>
 
         {/* Right: Actions */}

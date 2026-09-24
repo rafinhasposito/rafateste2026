@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { BackButton } from '@/components/ui/BackButton';
 import { motion } from "framer-motion";
 import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
@@ -97,16 +98,7 @@ const Profile = () => {
 
       <div className="min-h-[100dvh] px-4 py-16 md:py-24 max-w-4xl mx-auto relative">
         <div className="flex justify-between items-center mb-8">
-          <motion.button
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            onClick={() => {
-              if (returnTo) navigate(returnTo);
-              else navigate("/");
-            }}
-            className="flex items-center gap-2 text-white/50 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-[#C9A227] transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> {returnTo ? "Voltar" : "Início"}
-          </motion.button>
+          <BackButton label={returnTo ? "Voltar" : "Início"} to={returnTo || "/"} />
 
           <motion.button
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}

@@ -279,4 +279,5 @@ const UsersTable = () => {
   );
 };
 
+export { UsersTable };
 export default UsersTable;

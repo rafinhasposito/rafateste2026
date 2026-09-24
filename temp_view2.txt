@@ -1,0 +1,83 @@
+244:               <h3 className="text-white/90 text-3xl md:text-5xl font-ps-display font-bold mb-6 text-center relative z-10">Para Quem É A Casa {P.house}?</h3>
+245-               <p className="text-white/50 text-center mb-10 text-lg relative z-10">Esta viagem de aniversário é exatamente para você que:</p>
+246-
+247-               <ul className="space-y-6 max-w-3xl mx-auto mb-16 relative z-10">
+248-                  <li className="flex items-start gap-4">
+249-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
+250-                    <p className="text-white/80 text-lg leading-relaxed">Cansou de carregar a vida sozinho no esforço individual e entendeu que o seu sucesso depende do ecossistema certo.</p>
+251-                  </li>
+252-                  <li className="flex items-start gap-4">
+253-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
+254-                    <p className="text-white/80 text-lg leading-relaxed">Quer parar de bater em portas fechadas e precisa de aliados ou mentores influentes abrindo caminhos para você.</p>
+255-                  </li>
+256-                  <li className="flex items-start gap-4">
+257-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
+258-                    <p className="text-white/80 text-lg leading-relaxed">Busca um ano leve, onde o seu nome circula através de indicações, convites e pertencimento a uma egrégora forte.</p>
+259-                  </li>
+260-               </ul>
+261-
+262-               {/* A GRANDE DIVISÃO DA PERSONALIZAÇÃO */}
+263-               <div className="mt-20 pt-16 border-t border-white/5 relative z-10 flex flex-col items-center">
+264-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#3b82f6] mb-8">
+265-                    <Sparkles className="w-3 h-3" />
+266-                    <span>Seu Resultado Personalizado</span>
+267-                  </div>
+268-                  
+269-                  <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O foco é <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-600">{P.intention}</span>.</h3>
+270-                  <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
+271-                    O algoritmo escolheu a Casa {P.house} milimetricamente porque ela é a grande chave para destravar esse objetivo específico no seu próximo ano.
+272-                  </p>
+273-
+274-                  {/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
+275-                  <div className="w-full mt-10">
+276-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+277-                      {/* Lista de Acordeões */}
+278-                      <div className="md:col-span-5 space-y-3">
+279-                        {LIFE_AREAS.map((area) => {
+280-                          const isUnlocked = area.id.toLowerCase() === P.intention.toLowerCase() || area.unlocked;
+281-                          const isOpen = openArea === area.id;
+282-                          return (
+283-                            <motion.button
+284-                              key={area.id}
+--
+656:      {/* A seção VIDA COMPLETA foi movida para cima, dentro de 'Para Quem É' */}
+657-
+658-      {/* ══════════════════════════════════════════════════
+659-         8. RADAR 360°
+660-         ══════════════════════════════════════════════════ */}
+661-      <section className="py-20 md:py-28 border-t border-white/[0.02]">
+662-        <div className="max-w-[1000px] mx-auto px-6">
+663-          <Reveal className="text-center mb-16">
+664-            <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tight mb-4">Radar 360°.</h2>
+665-            <p className="text-white/40 text-lg font-light">A visão geral das 8 dimensões do seu ano.</p>
+666-          </Reveal>
+667-
+668-          <div className="space-y-6">
+669-            {DIMS.map((d, i) => (
+670-              <Reveal key={i} delay={i * 0.06} className="flex items-center gap-5">
+671-                <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center shrink-0">
+672-                  <d.icon className="w-4 h-4" style={{ color: d.color }} />
+673-                </div>
+674-                <span className="text-sm font-semibold w-24 shrink-0 text-white/80">{d.label}</span>
+675-                <div className="flex-1 h-2 bg-white/[0.02] rounded-full overflow-hidden">
+676-                  <motion.div initial={{ width: 0 }} whileInView={{ width: `${d.val}%` }} transition={{ duration: 1.5, ease: "easeOut", delay: i * 0.08 }} viewport={{ once: true }} className="h-full rounded-full" style={{ backgroundColor: d.color }} />
+677-                </div>
+678-                <span className="text-sm font-bold font-mono w-12 text-right" style={{ color: d.color }}><CountUp target={d.val} suffix="%" /></span>
+679-              </Reveal>
+680-            ))}
+681-          </div>
+682-        </div>
+683-      </section>
+684-
+685-      {/* ══════════════════════════════════════════════════
+686-         9. CRONOGRAMA
+687-         ══════════════════════════════════════════════════ */}
+688-      <section className="py-20 md:py-32">
+689-        <div className="max-w-[1400px] mx-auto px-6 mb-12 flex justify-between items-end">
+690-          <Reveal>
+691-            <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tight mb-2">Linha do tempo.</h2>
+692-            <p className="text-white/50 text-xl font-light">As 3 fases do seu {P.year}.</p>
+693-          </Reveal>
+694-          <div className="hidden md:flex gap-3">
+695-            <button onClick={() => scrollCar(-420)} className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center hover:bg-white/10 transition"><ChevronLeft className="w-4 h-4" /></button>
+696-            <button onClick={() => scrollCar(420)} className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center hover:bg-white/10 transition"><ChevronRight className="w-4 h-4" /></button>

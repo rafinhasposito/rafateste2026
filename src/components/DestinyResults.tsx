@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getCountryFlag } from "@/lib/countryFlags";
-import { ArrowRight } from "lucide-react";
-import { Compass, MapPin, Zap, ShieldAlert, Star, Lock, Eye, Crown } from "lucide-react";
+import { 
+  ArrowRight, MapPin, Zap, ShieldAlert, Lock, Eye, PlayCircle, 
+  Download, Clock, Target, CheckCircle2, BookOpen, 
+  Wallet, Heart, Briefcase, Activity, User, Users, Map, Sparkles, 
+  FileText, Calendar, Compass, Hash
+} from "lucide-react";
 import { useAlert } from "@/hooks/useAlert";
 import { useNavigate } from "react-router-dom";
 import { ATLAS_DO_DESTINO } from "@/data/atlas";
-import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast } from "@/data/houses";
-import { mockDestinyNewYork } from "@/data/destiny";
+import { cityDatabase } from "@/data/houses";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 function groupCitiesByContinent(cities: any[]) {
   const groups: Record<string, any[]> = {};
@@ -30,23 +40,25 @@ export interface DestinyResultsProps {
   isAuthenticated?: boolean;
   consultationId?: string;
   autoUnlocked?: boolean;
-  mode?: "passado" | "presente" | "futuro";
   embedded?: boolean;
-  isHouseUnlocked?: (houseNum: number) => boolean;
-  onSelectHouse?: (houseNum: number) => void;
+  isHouseUnlocked?: (house: number) => boolean;
+  onSelectHouse?: (house: number) => void;
+  mode?: "passado" | "presente" | "futuro";
+  searchPath?: "cidade" | "casa" | "intencao" | null;
   unlockedCount?: number;
 }
 
 export const DestinyResults: React.FC<DestinyResultsProps> = ({
-  house, cities, autoUnlocked = false, mode = "futuro",
+  house, cities, autoUnlocked = false, mode = "futuro", searchPath,
   consultationId, userCredits, isAuthenticated, embedded = false,
   isHouseUnlocked, onSelectHouse, onUnlock, unlockedCount = 1
 }) => {
-  // Always show content — access gating is handled by Dashboard's isHouseLocked
-  const [unlocked] = useState(true);
+  const { profile } = useAuth();
   const { showAlert } = useAlert();
   const navigate = useNavigate();
-  const [unlockTarget, setUnlockTarget] = useState<number | null>(null);
+
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [wikiImage, setWikiImage] = useState<string | null>(null);
 
   const atlasData = ATLAS_DO_DESTINO[house] || ATLAS_DO_DESTINO[1];
   const houseDataFull = cityDatabase[house] || cityDatabase[1];
@@ -54,163 +66,478 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
   const secondaryCities = allCities.slice(1);
   const continentGroups = groupCitiesByContinent(secondaryCities);
   const masterCity = allCities[0];
-  const egregoraText = mode === "passado" ? fallbackOraclesPast[house] : fallbackOraclesFuture[house];
+  
+  const currentYear = new Date().getFullYear();
+  const targetYear = mode === "futuro" ? currentYear + 1 : currentYear;
+  const userName = profile?.full_name?.split(" ")[0] || "Viajante";
+  const userFullName = profile?.full_name || "Usuário Solar";
+  const returnDate = profile?.birth_date ? `${profile.birth_date.split("-")[2]}/${profile.birth_date.split("-")[1]}/${targetYear}` : "15/03/2026";
+  const returnTime = profile?.birth_time ? String(profile.birth_time).slice(0, 5) : "18:42";
 
+  useEffect(() => {
+    if (!masterCity) return;
+    setVideoFailed(false);
+    setWikiImage(null);
+    const name = masterCity.city || masterCity.display_name || "";
+    if (!name) return;
+
+    const fetchWiki = async () => {
+      try {
+        const ptRes = await fetch(`https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`);
+        if (ptRes.ok) {
+          const data = await ptRes.json();
+          if (data.type !== "disambiguation" && (data.originalimage?.source || data.thumbnail?.source)) {
+            setWikiImage(data.originalimage?.source || data.thumbnail?.source);
+          }
+        }
+      } catch (e) {
+        console.error("Wiki fetch error", e);
+      }
+    };
+    fetchWiki();
+  }, [masterCity]);
 
   if (!masterCity) {
     return (
-      <div className="w-full mt-12 p-8 text-center border border-white/10 rounded-2xl">
-        <p className="text-white/60 text-sm font-ps-ui">Nenhuma cidade calculada para esta Casa.</p>
+      <div className="w-full mt-12 p-8 text-center border border-primary/10 bg-primary/5 rounded-2xl backdrop-blur-sm">
+        <p className="text-foreground/60 text-sm font-ps-ui">Nenhuma cidade calculada para esta Casa.</p>
       </div>
     );
   }
 
   const cityName = masterCity.city || masterCity.display_name || "Desconhecido";
-  const cityContext = cityName.includes("New York") ? mockDestinyNewYork : null;
-  const bgImage = cityContext?.context?.imageUrl || "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2000&auto=format&fit=crop";
+  const safeCityName = typeof cityName === 'string' ? cityName : String(cityName || "desconhecido");
+  const videoName = safeCityName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "_");
+  const fallbackImage = "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2000&auto=format&fit=crop";
+  const lat = masterCity.lat ? masterCity.lat.toFixed(2) : "0.00";
+  const lon = masterCity.lon ? masterCity.lon.toFixed(2) : "0.00";
+  const matchScore = masterCity.score || 98;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full mt-12 pb-24">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full mt-2 pb-16">
 
-      {/* 1. HERO - DESTINO PRINCIPAL */}
-      <section className="relative w-full h-[70vh] min-h-[500px] rounded-[2rem] overflow-hidden mb-16 flex flex-col justify-end">
-        <img src={bgImage} alt={cityName} className="absolute inset-0 w-full h-full object-cover opacity-60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/60 to-transparent" />
+      {/* 1. PROTOCOLO SOLAR - REFINED TICKET */}
+      <div className="max-w-4xl mx-auto mb-10 px-4 md:px-0">
+        <div className="w-full bg-gradient-to-br from-[#08090F] to-[#030305] rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-primary/30 font-mono relative">
+          
+          {/* Parte de Cima: METADADOS DO SISTEMA */}
+          <div className="p-6 md:p-10 flex flex-col items-center text-center relative z-10">
+            <div className="flex items-center gap-2 text-[10px] md:text-xs uppercase font-bold text-primary/60 tracking-[0.3em] mb-4">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span>Protocolo Solar</span>
+            </div>
+            
+            <h2 className="text-4xl md:text-6xl font-ps-display text-primary font-bold tracking-widest drop-shadow-md mb-8 uppercase">
+              CASA {house} <span className="text-white/30 mx-2">-</span> {mode}
+            </h2>
 
-        <div className="relative z-10 p-8 md:p-14 w-full max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-[10px] uppercase tracking-[0.3em] font-semibold text-[#C9A227]">
-                  A Coordenada de Ativação
-                </span>
-                <div className="h-px w-12 bg-[#C9A227]/50" />
+            {/* As 4 Caixinhas (Exigência do Usuário) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full max-w-3xl mx-auto">
+              <div className="bg-background/60 border border-primary/10 rounded-xl p-3 md:p-4 flex flex-col items-center justify-center shadow-inner">
+                 <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Vetor</span>
+                 <span className="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">{searchPath ? searchPath.toUpperCase() : 'CASA'}</span>
               </div>
-              <h2 className="font-ps-display text-5xl md:text-7xl font-bold text-white mb-2 leading-none">
-                {cityName}
-              </h2>
-              <div className="flex items-center gap-4 text-white/50 font-mono text-xs tracking-widest uppercase mt-4">
-                <span>{masterCity.country}</span>
-                <span>·</span>
-                <span>{masterCity.lat ? masterCity.lat.toFixed(4) : "40.7128"}°, {masterCity.lon ? masterCity.lon.toFixed(4) : "-74.0060"}°</span>
-                <span>·</span>
-                <span className="text-[#C9A227]">{masterCity.score || 98}% MATCH</span>
+              <div className="bg-primary/10 border border-primary/30 rounded-xl p-3 md:p-4 flex flex-col items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.05)]">
+                 <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-primary/80 mb-1">Custo</span>
+                 <span className="text-[10px] md:text-xs font-bold text-primary uppercase tracking-wider">1 Crédito</span>
+              </div>
+              <div className="bg-background/60 border border-primary/10 rounded-xl p-3 md:p-4 flex flex-col items-center justify-center shadow-inner">
+                 <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Match</span>
+                 <span className="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">{matchScore}%</span>
+              </div>
+              <div className="bg-background/60 border border-primary/10 rounded-xl p-3 md:p-4 flex flex-col items-center justify-center shadow-inner">
+                 <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">ID (Hash)</span>
+                 <span className="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider font-mono">#{consultationId?.split('-')[0].toUpperCase() || 'RS-9928X'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Divisória Serrilhada */}
+          <div className="relative w-full h-8 flex items-center justify-between px-[-10px]">
+            <div className="absolute left-[-15px] w-8 h-8 bg-background rounded-full border-r border-primary/30 z-20"></div>
+            <div className="w-full border-t-2 border-dashed border-primary/20 absolute top-1/2 left-0 z-10"></div>
+            <div className="absolute right-[-15px] w-8 h-8 bg-background rounded-full border-l border-primary/30 z-20"></div>
+          </div>
+
+          {/* Parte de Baixo: DADOS DO VIAJANTE */}
+          <div className="p-6 md:p-10 bg-[#050505]/60 relative z-10">
+            
+            {/* Rota (Alinhamento Perfeito com Grid) */}
+            <div className="grid grid-cols-[1fr_80px_1fr] md:grid-cols-[1fr_120px_1fr] items-center w-full gap-2 md:gap-4 mb-8">
+              
+              {/* Origem (Esquerda) */}
+              <div className="text-right overflow-hidden flex flex-col items-end">
+                <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Origem Natal</p>
+                <p className="text-sm md:text-2xl font-ps-display text-white truncate w-full max-w-[200px] md:max-w-xs">{profile?.birth_city?.split(',')[0] || "Base"}</p>
+              </div>
+
+              {/* Centro (Ícone e Linha) */}
+              <div className="flex flex-col items-center justify-center w-full px-2">
+                 <Compass className="w-5 h-5 md:w-6 md:h-6 text-primary mb-2 opacity-80" />
+                 <div className="w-full h-px bg-primary/40 relative">
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary/50"></div>
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary/50"></div>
+                 </div>
+                 <span className="text-[7px] md:text-[8px] uppercase tracking-[0.2em] text-primary mt-2">Salto de Rota</span>
+              </div>
+
+              {/* Destino (Direita) */}
+              <div className="text-left overflow-hidden flex flex-col items-start">
+                <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-primary mb-1">Destino Ideal</p>
+                <p className="text-sm md:text-2xl font-ps-display text-white truncate w-full max-w-[200px] md:max-w-xs">{cityName}</p>
               </div>
             </div>
 
-            {/* Target House Badge inside Hero */}
-            <div className="border border-white/10 bg-black/40 backdrop-blur-md p-6 rounded-2xl md:w-80 shrink-0">
-               <span className="text-[10px] font-bold uppercase tracking-widest text-[#C9A227] block mb-2">
-                 Casa {house} em Destaque
-               </span>
-               <h3 className="font-ps-display text-2xl text-white mb-2">{atlasData.title}</h3>
-               <p className="font-ps-ui text-xs text-white/60">"{houseDataFull.translation}"</p>
+            {/* Dados Pessoais (Bloco Sólido Integrado) */}
+            <div className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-white/10 text-center shadow-lg">
+              <div className="py-2 md:py-0 md:px-4 flex flex-col items-center justify-center">
+                <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Viajante</p>
+                <p className="text-[11px] md:text-xs text-white/90 font-semibold">{userFullName}</p>
+              </div>
+              <div className="py-2 md:py-0 md:px-4 flex flex-col items-center justify-center">
+                <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Data da Viagem</p>
+                <p className="text-[11px] md:text-xs text-white/90 font-semibold">{returnDate}</p>
+              </div>
+              <div className="py-2 md:py-0 md:px-4 flex flex-col items-center justify-center">
+                <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Hora Exata</p>
+                <p className="text-[11px] md:text-xs text-white/90 font-semibold">{returnTime} (UTC)</p>
+              </div>
             </div>
+
+          </div>
+        </div>
+      </div>
+
+{/* 2. HERO - CINEMATOGRÁFICO, FOCO NA CASA E BRILHANTE */}
+      <section className="relative w-full max-w-[1400px] mx-auto h-[60vh] min-h-[500px] rounded-3xl overflow-hidden mb-12 flex flex-col justify-end group border border-primary/20 shadow-2xl">
+        
+        {!videoFailed ? (
+          <video 
+            src={`/assets/cities/${videoName}.mp4`} 
+            autoPlay loop muted playsInline
+            onError={() => setVideoFailed(true)}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[30s] ease-linear group-hover:scale-105" 
+          />
+        ) : wikiImage ? (
+          <img 
+            src={wikiImage} alt={cityName} 
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[30s] ease-linear group-hover:scale-105" 
+          />
+        ) : (
+          <img 
+            src={fallbackImage} alt={cityName} 
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[30s] ease-linear group-hover:scale-105" 
+          />
+        )}
+        
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020205] via-[#020205]/40 to-transparent pointer-events-none h-2/3 mt-auto" />
+
+        <div className="relative z-10 p-6 md:p-12 w-full max-w-5xl mx-auto flex flex-col justify-end h-full">
+          
+          <div className="flex flex-col items-start mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 border border-primary bg-primary/20 text-primary text-xs md:text-sm font-bold uppercase tracking-[0.3em] rounded-full backdrop-blur-md shadow-[0_0_20px_hsl(var(--primary)/0.4)]">
+              <Sparkles className="w-4 h-4" /> Ativação da Casa {house}
+            </span>
+            
+            <h2 className="font-ps-display text-5xl md:text-7xl lg:text-8xl text-white mb-2 tracking-tight drop-shadow-2xl">
+              {cityName}
+            </h2>
+            
+            <div className="flex items-center gap-3 text-white/90 font-mono text-sm tracking-widest uppercase mb-6 drop-shadow-lg bg-black/20 px-3 py-1 rounded-lg backdrop-blur-sm">
+              <span className="text-xl -mt-1">{getCountryFlag(masterCity.country)}</span>
+              <span className="font-semibold">{masterCity.country}</span>
+            </div>
+          </div>
+
+          {/* STORYTELLING HOOK */}
+          <div className="max-w-2xl border-l-4 border-primary pl-6 py-2 bg-gradient-to-r from-black/40 to-transparent backdrop-blur-sm rounded-r-2xl">
+             <p className="font-ps-ui text-base md:text-lg text-white/90 leading-relaxed font-light drop-shadow-md">
+               <strong className="font-bold text-white">{userName}, o seu {targetYear} começa exatamente aqui.</strong><br/>
+               O mapa revela que o seu próximo ciclo é regido pela energia da <strong>Casa {house}</strong>. Para destravar {houseDataFull.label || "essa frequência"} com precisão máxima, o universo pede que você ancore o seu Sol neste exato destino.
+             </p>
           </div>
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 md:px-0">
 
-        {/* 2. THE EGREGORE (AI Insight) */}
-        {egregoraText && (
-          <section className="mb-20 text-center">
-            <span className="text-[10px] font-sans uppercase tracking-[0.3em] text-[#C9A227]/60 block mb-6">
-              A Egrégora do Destino
-            </span>
-            <p className="text-2xl md:text-3xl text-white/90 leading-relaxed font-ps-display italic max-w-3xl mx-auto">
-              "{egregoraText}"
-            </p>
-          </section>
-        )}
+        {/* 3. A CIÊNCIA ENVELOPADA EM HISTÓRIA */}
+        <section className="mb-16 bg-primary/5 border border-primary/20 rounded-3xl p-8 backdrop-blur-md shadow-xl text-center md:text-left">
+           <p className="font-ps-ui text-lg text-foreground/80 leading-relaxed font-light">
+             No dia <strong className="text-primary">{returnDate}</strong>, exatamente às <strong className="text-primary">{returnTime}</strong>, o seu Sol retorna à posição exata do seu nascimento. Ao passar este momento milimétrico nas coordenadas <strong>[{lat}° N, {lon}° E]</strong>, a rotação da Terra forçará a ativação magnética da sua Casa {house} para os próximos 365 dias, consolidando <strong className="text-foreground">{matchScore}% de compatibilidade</strong> com a sua intenção.
+           </p>
+        </section>
 
-        {/* 3. DOSSIÊ (Editorial Layout) */}
-        <section className="mb-24">
-          <div className="flex items-center gap-4 mb-12">
-            <h3 className="font-ps-display text-3xl md:text-4xl text-white">Dossiê Estratégico</h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
+        {/* 4. O DIAGNÓSTICO E IMPACTO NA VIDA REAL */}
+        <section className="mb-16">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <div className="bg-background/40 border border-primary/10 rounded-3xl p-8 backdrop-blur-sm hover:border-primary/30 transition-colors">
+                 <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                      <Target className="w-5 h-5 text-primary" />
+                    </div>
+                    <h3 className="font-ps-display text-2xl text-foreground">Para Quem É</h3>
+                 </div>
+                 <p className="text-base font-ps-ui text-foreground/80 leading-relaxed font-light">
+                    {houseDataFull.forWho || houseDataFull.idealPara || "Mapeado para quem precisa de uma virada radical de foco, assumindo o controle do próprio destino neste novo ciclo de vida."}
+                 </p>
+              </div>
+
+              <div className="bg-background/40 border border-primary/10 rounded-3xl p-8 backdrop-blur-sm hover:border-primary/30 transition-colors">
+                 <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-primary" />
+                    </div>
+                    <h3 className="font-ps-display text-2xl text-foreground">Na Vida Real</h3>
+                 </div>
+                 <p className="text-base font-ps-ui text-foreground/80 leading-relaxed font-light">
+                    {houseDataFull.realLifeImpact || houseDataFull.comoApareceNaVidaReal || "A teoria acaba aqui. Na prática, você sentirá a mudança na forma de tomar decisões, no ritmo do seu dia a dia e nas oportunidades que passam a cruzar o seu caminho."}
+                 </p>
+              </div>
+
+           </div>
+        </section>
+
+        {/* 5. A JORNADA: AS 8 ÁREAS DA VIDA */}
+        <section className="mb-16">
+           <div className="text-center mb-10">
+              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary/70 block mb-3">
+                Mapeamento 360º
+              </span>
+              <h3 className="font-ps-display text-3xl md:text-4xl text-foreground">As 8 Dimensões do seu Ano</h3>
+              <p className="font-ps-ui text-foreground/60 text-sm mt-4 max-w-lg mx-auto">
+                Descubra em detalhes como ancorar o seu Sol em {cityName} transformará cada pilar da sua vida pelos próximos 12 meses.
+              </p>
+           </div>
+           
+           <Accordion type="single" collapsible className="w-full bg-background/40 border border-primary/10 rounded-3xl p-3 backdrop-blur-md shadow-xl">
+              
+              <AccordionItem value="identidade" className="border-b border-primary/10 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <User className="w-5 h-5 text-primary" /> Identidade & Autoconhecimento
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.areasDaVida?.['Identidade'] || "Como essa revolução moldará suas atitudes diárias, sua coragem para se impor e a imagem magnética que você projeta no mundo ao seu redor."}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="dinheiro" className="border-b border-primary/10 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <Wallet className="w-5 h-5 text-primary" /> Finanças & Patrimônio
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.dinheiro || "O impacto prático nas suas fontes de receita. A capacidade de gerar riqueza tangível e a reorganização da sua segurança material ao longo do ciclo."}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="trabalho" className="border-b border-primary/10 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <Briefcase className="w-5 h-5 text-primary" /> Trabalho & Carreira
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.trabalho || "O cenário do seu ambiente profissional. Aumento de produtividade, novas parcerias de negócios e a abertura de portas que antes pareciam fechadas."}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="amor" className="border-b border-primary/10 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <Heart className="w-5 h-5 text-primary" /> Amor & Afeto
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.amor || "As frequências afetivas do ano. A atração de pessoas alinhadas com o seu novo momento e o amadurecimento das suas dinâmicas emocionais."}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="saude" className="border-b border-primary/10 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <Activity className="w-5 h-5 text-primary" /> Saúde & Vitalidade
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.vidaPessoal || "O nível da sua bateria interna. Como essa coordenada afeta a sua disposição física e a força para estruturar novos hábitos de cuidado corporal."}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="networking" className="border-b border-primary/10 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <Users className="w-5 h-5 text-primary" /> Networking & Alianças
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.areasDaVida?.['Social'] || "A sua capacidade de se conectar com pessoas estratégicas, atrair mentores, clientes influentes e consolidar sua presença social no mercado."}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="rotina" className="border-b border-primary/10 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <Map className="w-5 h-5 text-primary" /> Rotina & Cotidiano
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.comoAproveitar || "A forma prática como seus dias serão desenhados. Eliminação da sobrecarga mental e estruturação de uma agenda focada no que realmente importa."}
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="espiritualidade" className="border-b-0 px-4">
+                <AccordionTrigger className="text-foreground hover:no-underline py-5 opacity-90 hover:opacity-100">
+                   <span className="font-ps-display text-lg tracking-wide flex items-center gap-3">
+                     <Sparkles className="w-5 h-5 text-primary" /> Espiritualidade & Energia
+                   </span>
+                </AccordionTrigger>
+                <AccordionContent className="text-foreground/80 font-ps-ui text-base leading-relaxed pb-6 font-light px-2">
+                   {houseDataFull.areasDaVida?.['Espiritual'] || "A força da sua intuição. O alinhamento com os seus propósitos mais profundos e o fechamento necessário de velhos ciclos emocionais."}
+                </AccordionContent>
+              </AccordionItem>
+           </Accordion>
+        </section>
+
+        {/* 6. O PLANO TÁTICO (RITUAL & MANTRA) */}
+        <section className="mb-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+           <div className="md:col-span-2 bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-3xl p-8 md:p-10 relative overflow-hidden backdrop-blur-sm shadow-2xl">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+                 <Clock className="w-40 h-40 text-primary" />
+              </div>
+              <h4 className="font-sans text-[10px] uppercase tracking-[0.2em] text-primary mb-3 font-bold">O Guia de Ancoragem</h4>
+              <h3 className="font-ps-display text-3xl text-foreground mb-4 drop-shadow-md">O Ritual das 24 Horas</h3>
+              <p className="font-ps-ui text-foreground/90 leading-relaxed mb-8 font-light relative z-10 text-lg">
+                 {houseDataFull.ritual24h || "Reserve o dia do seu aniversário para mentalizar as mudanças deste ciclo e desconectar de ruídos externos. Execute o que a energia da cidade pede logo nas primeiras horas."}
+              </p>
+              
+              <div className="border-t border-primary/20 pt-8 relative z-10">
+                 <span className="text-[10px] uppercase tracking-[0.2em] text-primary/70 block mb-3 font-bold flex items-center gap-2">
+                    <Compass className="w-3 h-3" /> Mantra do Ciclo
+                 </span>
+                 <p className="font-ps-display text-2xl md:text-3xl text-primary italic drop-shadow-lg leading-tight">
+                    "{houseDataFull.mantra || "Eu assumo o controle da minha realidade e ativo a mudança."}"
+                 </p>
+              </div>
+           </div>
+
+           <div className="bg-background/40 border border-primary/10 rounded-3xl p-8 backdrop-blur-sm flex flex-col justify-center">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                   <Calendar className="w-5 h-5 text-primary" />
+                 </div>
+                 <h3 className="font-ps-display text-2xl text-foreground">Timeline</h3>
+              </div>
+              <div className="space-y-6">
+                 <div>
+                    <span className="text-[10px] uppercase tracking-widest text-primary font-bold block mb-1">Mês 1-3</span>
+                    <p className="text-sm font-ps-ui text-foreground/70 font-light">Adaptação, desconstrução de hábitos antigos e novos inícios.</p>
+                 </div>
+                 <div>
+                    <span className="text-[10px] uppercase tracking-widest text-primary/80 font-bold block mb-1">Mês 4-8</span>
+                    <p className="text-sm font-ps-ui text-foreground/70 font-light">Pico de energia. Momento ideal para agir e focar em resultados tangíveis.</p>
+                 </div>
+                 <div>
+                    <span className="text-[10px] uppercase tracking-widest text-primary/60 font-bold block mb-1">Mês 9-12</span>
+                    <p className="text-sm font-ps-ui text-foreground/70 font-light">Consolidação e colheita do que foi plantado. Preparação para o próximo ciclo.</p>
+                 </div>
+              </div>
+           </div>
+        </section>
+
+        {/* 7. MASTERCLASS VIP */}
+        <section className="mb-20">
+          <div className="flex items-center gap-4 mb-8">
+            <h3 className="font-ps-display text-2xl md:text-3xl text-foreground">Masterclass VIP</h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-primary/20 to-transparent" />
           </div>
 
-          <div className="space-y-16">
-
-            {/* O Segredo */}
-            <div>
-              <span className="text-[10px] uppercase tracking-widest text-white/40 block mb-4">O Segredo deste Ano</span>
-              <p className="font-ps-ui text-xl md:text-2xl font-light text-white leading-relaxed">
-                {houseDataFull.oSegredo}
-              </p>
+          <div className="bg-background/50 border border-primary/10 rounded-3xl p-4 md:p-8 shadow-2xl backdrop-blur-xl">
+            <div className="w-full aspect-video bg-black/40 rounded-2xl border border-primary/10 relative overflow-hidden group cursor-pointer flex items-center justify-center mb-6 shadow-inner">
+               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
+               <div className="flex flex-col items-center relative z-10">
+                  <div className="w-16 h-16 rounded-full bg-background/60 backdrop-blur-md flex items-center justify-center mb-4 border border-primary/30 group-hover:scale-110 transition-transform shadow-[0_0_30px_hsl(var(--primary)/0.3)]">
+                     <PlayCircle className="w-8 h-8 text-primary ml-1" />
+                  </div>
+                  <span className="text-foreground/90 text-xs font-ps-ui uppercase tracking-widest font-semibold drop-shadow-md">Desbloquear Masterclass</span>
+               </div>
             </div>
 
-            {/* Áreas da vida */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-              {Object.entries(houseDataFull.areasDaVida || {}).map(([key, text]) => (
-                <div key={key}>
-                  <h4 className="font-sans text-[10px] uppercase tracking-widest text-[#C9A227] mb-3">{key}</h4>
-                  <p className="font-ps-ui text-sm text-white/60 leading-relaxed">{text as string}</p>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <button className="flex items-center justify-between p-5 rounded-2xl border border-primary/10 bg-primary/5 hover:bg-primary/10 transition-colors group">
+                  <div className="text-left">
+                     <h4 className="text-foreground font-ps-display tracking-wide mb-1">Guia de Revolução</h4>
+                     <span className="text-[10px] text-primary uppercase tracking-widest font-bold">Baixar PDF</span>
+                  </div>
+                  <Download className="w-5 h-5 text-primary/50 group-hover:text-primary transition-colors" />
+               </button>
+
+               <button className="flex items-center justify-between p-5 rounded-2xl border border-primary/10 bg-primary/5 hover:bg-primary/10 transition-colors group">
+                  <div className="text-left">
+                     <h4 className="text-foreground font-ps-display tracking-wide mb-1">Ritual das 24 Horas</h4>
+                     <span className="text-[10px] text-primary uppercase tracking-widest font-bold">Baixar PDF</span>
+                  </div>
+                  <Download className="w-5 h-5 text-primary/50 group-hover:text-primary transition-colors" />
+               </button>
             </div>
-
-            <div className="w-full h-px bg-white/10" />
-
-            {/* Como Aproveitar & Cuidados */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div>
-                 <div className="flex items-center gap-3 mb-4">
-                   <Zap className="w-4 h-4 text-[#C9A227]" />
-                   <h4 className="font-sans text-[10px] uppercase tracking-widest text-white">Como Aproveitar</h4>
-                 </div>
-                 <p className="font-ps-ui text-sm text-white/60 leading-relaxed">{houseDataFull.comoAproveitar}</p>
-              </div>
-              <div>
-                 <div className="flex items-center gap-3 mb-4">
-                   <ShieldAlert className="w-4 h-4 text-destructive" />
-                   <h4 className="font-sans text-[10px] uppercase tracking-widest text-white">Onde Pisar com Cuidado</h4>
-                 </div>
-                 <p className="font-ps-ui text-sm text-white/60 leading-relaxed">{houseDataFull.ondePisarComCuidado}</p>
-              </div>
-            </div>
-
           </div>
         </section>
 
-
-
-        {/* 3.5 DESTINOS SECUNDÁRIOS */}
+        {/* 8. DESTINOS SECUNDÁRIOS COM % DE MATCH */}
         {secondaryCities.length > 0 && (
-          <section className="mb-24">
-            <div className="flex items-center gap-4 mb-10">
-              <h3 className="font-ps-display text-2xl md:text-3xl text-white">Destinos Secundários</h3>
-              <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
+          <section className="mb-20">
+            <div className="flex items-center gap-4 mb-6">
+              <h3 className="font-ps-display text-2xl md:text-3xl text-foreground">Rotas Alternativas</h3>
+              <div className="flex-1 h-px bg-gradient-to-r from-primary/20 to-transparent" />
             </div>
-            <p className="text-white/60 font-ps-ui text-sm mb-8">
-              Além do Destino Mestre, estas cidades também ativam a frequência da Casa {house}.
+            <p className="text-foreground/70 font-ps-ui text-base mb-10 font-light max-w-2xl">
+              Se o seu Destino Mestre não for viável, o algoritmo separou estas coordenadas secundárias que também ativam a energia da Casa {house}, preservando alta compatibilidade.
             </p>
 
             <div className="grid gap-8">
               {Object.entries(continentGroups).map(([continent, citiesList]) => (
                 <div key={continent}>
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#C9A227]/80 mb-4 pl-1 border-l-2 border-[#C9A227]/30">
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-5 pl-2 border-l-2 border-primary/50">
                     {continent}
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {citiesList.map((c, i) => (
-                      <div key={i} className="bg-white/[0.02] border border-white/10 rounded-xl p-4 hover:border-white/20 transition-all relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-3 opacity-30">
-                           <MapPin className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xl">{getCountryFlag(c.country)}</span>
-                          <span className="text-[9px] text-white/50 uppercase tracking-wider truncate">{c.country}</span>
-                        </div>
-                        <p className="text-white font-semibold text-sm truncate">{c.city || c.display_name}</p>
-                        {c.lat != null && c.lon != null && (
-                          <p className="text-white/30 text-[9px] font-mono mt-1">
-                            {c.lat.toFixed(2)}°, {c.lon.toFixed(2)}°
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                    {citiesList.map((c, i) => {
+                       const localScore = c.score || Math.max(85, matchScore - (i + 1) * 3);
+                       return (
+                         <div key={i} className="bg-background/40 border border-primary/10 rounded-2xl p-5 hover:border-primary/40 transition-all relative overflow-hidden backdrop-blur-sm group flex flex-col justify-between h-full">
+                           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity">
+                              <MapPin className="w-6 h-6 text-primary" />
+                           </div>
+                           
+                           <div>
+                             <div className="flex items-center justify-between mb-3 relative z-10">
+                               <div className="flex items-center gap-2">
+                                 <span className="text-2xl drop-shadow-md">{getCountryFlag(c.country)}</span>
+                                 <span className="text-[9px] text-foreground/50 uppercase tracking-widest font-semibold">{c.country}</span>
+                               </div>
+                             </div>
+                             
+                             <p className="text-foreground font-ps-display text-lg leading-tight relative z-10 drop-shadow-sm mb-1">{c.city || c.display_name}</p>
+                             
+                             {c.lat != null && c.lon != null && (
+                               <p className="text-foreground/40 text-[10px] font-mono relative z-10 mb-4">
+                                 {c.lat.toFixed(2)}°, {c.lon.toFixed(2)}°
+                               </p>
+                             )}
+                           </div>
+
+                           <div className="mt-auto pt-3 border-t border-primary/10 relative z-10">
+                              <span className="inline-block px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-md font-mono tracking-wider">
+                                {localScore}% MATCH
+                              </span>
+                           </div>
+                         </div>
+                       );
+                    })}
                   </div>
                 </div>
               ))}
@@ -218,14 +545,14 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
           </section>
         )}
 
-        {/* 4. EXPLORAR OUTRAS CASAS */}
+        {/* 10. VISÃO COMPLETA (GRADE DE 12 CASAS) */}
         {!embedded && (
-          <section className="border-t border-white/10 pt-16">
+          <section className="border-t border-primary/20 pt-16 mt-8 mb-8">
             <div className="text-center mb-10">
-              <span className="text-[10px] uppercase tracking-[0.3em] font-semibold text-white/40 block mb-3">
-                Visão Completa
+              <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary/50 block mb-3">
+                A Jornada Completa
               </span>
-              <h3 className="font-ps-display text-2xl text-white">As 12 Coordenadas do Ano</h3>
+              <h3 className="font-ps-display text-3xl text-foreground">O Mapa das 12 Coordenadas</h3>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-5xl mx-auto">
@@ -238,105 +565,52 @@ export const DestinyResults: React.FC<DestinyResultsProps> = ({
                     key={houseItem.id}
                     onClick={() => {
                       if (!isUnlocked) {
-                        if (onUnlock) onUnlock(houseItem.id); else setUnlockTarget(houseItem.id);
+                        if (onUnlock) onUnlock(houseItem.id);
                       } else if (onSelectHouse && !isCurrentHouse) {
                         onSelectHouse(houseItem.id);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }
                     }}
-                    className={`relative flex items-center p-3 rounded-lg border transition-all ${!isCurrentHouse ? "cursor-pointer" : ""} ${
+                    className={`relative flex items-center p-4 rounded-xl border transition-all ${!isCurrentHouse ? "cursor-pointer" : ""} ${
                       isCurrentHouse
-                        ? "bg-[#C9A227]/10 border-[#C9A227]/40 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
-                        : "bg-black/40 border-white/10 hover:border-white/30 hover:bg-white/[0.03]"
+                        ? "bg-primary/20 border-primary shadow-[0_0_20px_hsl(var(--primary)/0.2)]"
+                        : "bg-background/40 border-primary/10 hover:border-primary/40 hover:bg-primary/5 backdrop-blur-sm"
                     }`}
                   >
                     <div className="flex flex-col flex-1 truncate">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className={`text-[10px] font-mono font-bold ${isCurrentHouse ? "text-[#C9A227]" : "text-white/50"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[10px] font-mono font-bold tracking-widest ${isCurrentHouse ? "text-primary drop-shadow-sm" : "text-muted-foreground"}`}>
                           CASA {String(houseItem.id).padStart(2, "0")}
                         </span>
                       </div>
-                      <span className={`text-xs font-semibold truncate ${isCurrentHouse ? "text-white" : (isUnlocked ? "text-white/90" : "text-white/60")}`}>
+                      <span className={`text-sm font-ps-display truncate ${isCurrentHouse ? "text-foreground" : (isUnlocked ? "text-foreground/90" : "text-muted-foreground")}`}>
                         {houseItem.label}
                       </span>
+                      {houseItem.tag && (
+                        <span className={`text-[8px] uppercase tracking-widest mt-0.5 font-semibold truncate ${isCurrentHouse ? "text-primary/70" : "text-muted-foreground/50"}`}>
+                          {houseItem.tag}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="shrink-0 ml-2">
+                    <div className="shrink-0 ml-3">
                       {isCurrentHouse ? (
-                        <Eye className="w-4 h-4 text-[#C9A227]" />
+                        <CheckCircle2 className="w-5 h-5 text-primary drop-shadow-md" />
                       ) : !isUnlocked ? (
-                        <Lock className="w-4 h-4 text-white/30" />
+                        <Lock className="w-4 h-4 text-muted-foreground/40" />
                       ) : (
-                        <ArrowRight className="w-4 h-4 text-white/50 group-hover:text-white" />
+                        <ArrowRight className="w-4 h-4 text-primary/50 group-hover:text-primary transition-colors" />
                       )}
                     </div>
                   </div>
                 );
               })}
             </div>
-
-            <div className="text-center mt-8">
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest block mb-2">
-                {unlockedCount} DE 12 CASAS REVELADAS
-              </span>
-              <p className="text-white/40 text-xs font-ps-ui">
-                Clique em qualquer Casa para explorar aquela área do seu próximo ano.
-              </p>
-            </div>
           </section>
-        )}
-
-        {/* Modal de Desbloqueio */}
-        {unlockTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-[#0a0a0f] border border-white/10 rounded-2xl p-6 md:p-8 max-w-md w-full relative"
-            >
-              <button
-                onClick={() => setUnlockTarget(null)}
-                className="absolute top-4 right-4 text-white/40 hover:text-white"
-              >
-                ✕
-              </button>
-
-              {(() => {
-                const targetHouseData = cityDatabase[unlockTarget];
-                return (
-                  <>
-                    <div className="text-center mb-6">
-                      <Lock className="w-8 h-8 text-white/40 mx-auto mb-4" />
-                      <h3 className="font-ps-display text-xl text-white mb-2">
-                        Casa {unlockTarget} — {targetHouseData?.label}
-                      </h3>
-                      <p className="text-white/50 text-xs font-ps-ui leading-relaxed max-w-xs mx-auto">
-                        Descubra como este destino influencia {targetHouseData?.intent?.toLowerCase()} no seu próximo ciclo.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="p-4 rounded-xl border border-[#C9A227]/20 bg-[#C9A227]/5 text-center">
-                         <span className="text-[10px] uppercase tracking-widest text-[#C9A227] font-bold">Aviso</span>
-                         <p className="text-white/70 text-sm mt-2">
-                           O módulo de desbloqueio comercial e Mercado Pago será conectado na próxima fase do projeto.
-                         </p>
-                      </div>
-                      <button
-                        onClick={() => setUnlockTarget(null)}
-                        className="w-full p-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] transition-all text-sm uppercase tracking-widest text-white/80"
-                      >
-                        Voltar
-                      </button>
-                    </div>
-                  </>
-                );
-              })()}
-            </motion.div>
-          </div>
         )}
       </div>
     </motion.div>
   );
 };
+
 export default DestinyResults;

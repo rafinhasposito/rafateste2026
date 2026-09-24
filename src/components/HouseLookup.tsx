@@ -167,14 +167,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         result: { results: allResults, house: target },
       }) ?? undefined;
 
-      setResult({
-        house: target ?? 1, // Fallback visual se for geral, mas a dashboard cuida disso
-        houseName: houseData?.label || (target ? `Casa ${target}` : "Visão Geral"),
-        houseData,
-        cities,
-        allResults,
-        consultationId,
-      });
+      if (consultationId) navigate("/dashboard?id=" + consultationId);
       if (target) onHouseSelected?.(target);
     } catch (error) {
       const err = error as Error;
@@ -216,20 +209,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         {loading ? "Calculando rotas..." : "Revelar cidades ideais (1 crédito)"}
       </PremiumButton>
 
-      <AnimatePresence>
-        {result && (
-          <DestinyResults
-            house={result.house}
-            houseName={result.houseName}
-            houseData={result.houseData}
-            cities={result.cities}
-            allResults={result.allResults}
-            consultationId={result.consultationId}
-            userCredits={profile?.credits ?? 0}
-            isAuthenticated={!!user}
-          />
-        )}
-      </AnimatePresence>
+      
     </div>
   );
 };

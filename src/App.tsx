@@ -11,6 +11,8 @@ import { FocusedShell } from "./layouts/FocusedShell";
 
 // Pages
 import Index from "./pages/Index";
+import AppleResultPrototype from "./pages/AppleResultPrototype";
+import HouseTrailer from "./pages/HouseTrailer";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Credits from "./pages/Credits";
@@ -25,6 +27,7 @@ import AppleScrollExplosion from "./pages/AppleScrollExplosion";
 import ConceptsShowcase from "./pages/ConceptsShowcase";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import Technology from "./pages/Technology";
 
 // OrbitalOnboarding removido para unificação visual
 import MobileOnboarding from "./components/mobile/onboarding/MobileOnboarding";
@@ -48,7 +51,12 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <Routes>
             <Route path="/concepts" element={<ConceptsShowcase />} />
             
@@ -58,6 +66,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/history" element={<History />} />
               <Route path="/perfil" element={<Profile />} />
+              <Route path="/tecnologia" element={<Technology />} />
             </Route>
 
             {/* 2. Focused Shell (Immersive Flows) */}
@@ -80,6 +89,8 @@ const App = () => (
             <Route path="/apple-3d" element={<AppleScrollExplosion />} />
             <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
+            <Route path="/v2-apple" element={<AppleResultPrototype />} />
+          <Route path="/trailer" element={<HouseTrailer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

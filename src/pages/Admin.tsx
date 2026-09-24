@@ -35,7 +35,7 @@ const Admin = () => {
         <div className="min-h-[100dvh] flex flex-col items-center justify-center px-4 gap-4">
           <h1 className="font-ps-display text-2xl text-foreground uppercase tracking-wider">Acesso restrito</h1>
           <p className="text-muted-foreground text-sm text-center max-w-md">Esta área é apenas para administradores.</p>
-          <button onClick={() => navigate("/")} className="px-4 py-2 rounded-xl border border-border text-muted-foreground text-xs uppercase tracking-widest">← Voltar</button>
+          <BackButton label="Voltar" to="/" />
         </div>
       </>
     );
@@ -53,7 +53,7 @@ const Admin = () => {
       <StarryBackground />
       <div className="min-h-[100dvh] px-4 py-12 max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary mb-6 inline-block">← Voltar</button>
+          <BackButton label="Voltar" to="/" className="mb-6" />
           <h1 className="font-ps-display text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider mb-2">Painel Admin</h1>
           <p className="text-muted-foreground text-sm mb-8">Gerencie preços, usuários e transações da plataforma.</p>
 

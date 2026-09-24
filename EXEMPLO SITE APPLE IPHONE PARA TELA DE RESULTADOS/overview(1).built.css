@@ -1,0 +1,73 @@
+/* Local Overrides */
+
+/* disclaimer */
+.tv-disclaimer {
+	font-size: 12px;
+	line-height: 16px;
+	text-align: center;
+	font-weight: 600;
+	color: #959495;
+}
+.tv-disclaimer a {
+	color: #959495;
+}
+
+/* value props */
+#shop-with-a-specialist .utility-modal-block .utility-modal-block-ctas,
+#shop-with-a-specialist-modal-alt
+	.utility-modal-block
+	.utility-modal-block-ctas {
+	display: block;
+}
+
+/* gallery media */
+@media (max-width: 734px) {
+	#highlights\ gallery-item-5
+		> div
+		> div.caption-container.large-pin-top-center
+		> div
+		> p.caption.caption-sosumi.typography-media-card-gallery-caption-sosumi {
+		width: 230px;
+	}
+}
+
+/* PRICING */
+
+@media only screen and (min-width: 1069px) {
+	section.section-media-hero.media-layout-background
+		.marquee.links-platter
+		.marquee-detail
+		.detail-group {
+		max-width: 360px;
+	}
+}
+
+@media only screen and (max-width: 1068px) and (min-width: 393px) {
+	section.section-media-hero.media-layout-background
+		> .marquee-platter-theme-dark
+		.marquee.links-platter
+		.marquee-detail
+		.detail-copy {
+		max-width: 200px;
+	}
+}
+
+@media only screen and (min-width: 445px) {
+	.product-tile .product-tile-price {
+		max-width: 230px;
+	}
+}
+
+@media only screen and (max-width: 444px) {
+	.product-tile .product-tile-price {
+		max-width: 80px;
+	}
+}
+
+.localnav-container
+	.content-expand-wrap
+	.product-action
+	.product-cta
+	.pricing:has([data-toggle="acmi"]) {
+	max-width: 200px;
+}

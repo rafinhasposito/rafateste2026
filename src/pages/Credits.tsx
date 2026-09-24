@@ -1,3 +1,4 @@
+import { BackButton } from '@/components/ui/BackButton';
 import { motion } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import { useAuth } from "@/hooks/useAuth";
@@ -73,12 +74,7 @@ const Credits = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center justify-center gap-2 text-white/50 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-[#C9A227] mb-8 transition-colors mx-auto"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao Descobrir
-          </button>
+          <BackButton label="Descobrir" to="/" className="mb-8 mx-auto" />
           <h1 className="font-ps-display text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-widest">
             Créditos de Acesso
           </h1>

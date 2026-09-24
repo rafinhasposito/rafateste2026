@@ -104,7 +104,7 @@ const SectionBlock = ({ title, children, highlight = false }: { title: string, c
   </div>
 );
 
-const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose }: HouseDetailProps) => {
+const HouseDetail = ({ house, result, mode, isGoal, originCity, onClose, searchPath }: HouseDetailProps) => {
   const bgGradient = houseColors[house.id];
   const archetype = getHouseArchetype(house.name);
   const sign = houseSigns[house.id];

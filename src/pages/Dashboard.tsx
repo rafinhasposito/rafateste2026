@@ -205,6 +205,7 @@ const Dashboard = () => {
       await refreshProfile();
       showAlert(`Casa ${targetHouse} desbloqueada com sucesso.`);
       setSelectedHouse(targetHouse);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: any) {
       console.error(error);
       showAlert(error.message || "Falha ao desbloquear. Tente novamente.");
@@ -289,7 +290,7 @@ const Dashboard = () => {
         </div>
 
         {/* Header — Consultation Summary Card (mirrors History) */}
-        {(() => {
+        {!selectedHouse && (() => {
           const isPast = currentMode === "passado";
           const accent = extractAccentColor(goalHouse);
           const searchType = inferSearchType(consultation);
@@ -362,7 +363,7 @@ const Dashboard = () => {
         })()}
 
         {/* Oracle Text */}
-        {oracleText && (
+        {!selectedHouse && oracleText && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -393,6 +394,7 @@ const Dashboard = () => {
                   isGoal={goalHouse === selectedHouse}
                   originCity={consultation.origin}
                   onClose={() => setSelectedHouse(null)}
+                  searchPath={inferSearchType(consultation).label}
                 />
               );
             }
@@ -460,39 +462,6 @@ const Dashboard = () => {
         </AnimatePresence>
 
 
-        {/* Unlock CTA (Restored for QA) */}
-        {lockedCount > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center mb-12 mt-8">
-            <div className="rounded-2xl border border-primary/15 bg-primary/5 backdrop-blur-sm p-8 max-w-xl mx-auto">
-              <h3 className="font-ps-display text-lg font-bold text-foreground uppercase tracking-wider mb-2">
-                Desbloqueie Mais Casas
-              </h3>
-              <p className="text-muted-foreground text-xs font-light mb-6">
-                {consultation.houses_unlocked} de {TOTAL_HOUSES} casas visíveis · {credits} créditos disponíveis
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                {unlockOptions.map((opt) => {
-                  const canAfford = credits >= opt.cost;
-                  const requiresConfirm = opt.cost >= 2;
-                  return (
-                    <button
-                      key={opt.amount}
-                      onClick={() => {
-                        if (!canAfford) return;
-                        if (requiresConfirm) setPendingUnlock(opt.amount);
-                        else handleUnlock(opt.amount);
-                      }}
-                      disabled={unlocking || !canAfford}
-                      className="px-5 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs uppercase tracking-[0.14em] hover:shadow-[0_0_30px_hsl(var(--gold)/0.3)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {unlocking ? "Processando..." : `${opt.label} (${opt.cost} crédito${opt.cost > 1 ? "s" : ""})`}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
 
       <ConfirmCreditAction

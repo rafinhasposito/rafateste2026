@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from '@/components/ui/BackButton';
 import { motion } from "framer-motion";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
@@ -267,7 +268,7 @@ const Auth = () => {
         {/* Footer Links */}
         <div className="flex justify-center gap-4 mt-8 text-[11px] font-ps-ui tracking-widest uppercase">
           {mode !== "signin" ? (
-            <button onClick={() => setMode("signin")} className="text-white/40 hover:text-white transition-colors">← Voltar ao login</button>
+            <BackButton label="Voltar ao login" onClick={() => setMode("signin")} />
           ) : (
             <>
               <button onClick={() => setMode("signup")} className="text-white/40 hover:text-white transition-colors">Criar Conta</button>
