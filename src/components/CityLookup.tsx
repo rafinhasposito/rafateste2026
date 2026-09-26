@@ -232,6 +232,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
   return (
     <div className="space-y-6">
       <div className="flex flex-col mb-12">
+         <p className="font-ps-ui text-white/50 text-sm italic mb-6">"A posição geográfica dita a frequência do seu ano."</p>
         <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-4">
           Defina o Ponto no Mapa
         </label>
