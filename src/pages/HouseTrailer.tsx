@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Briefcase, DollarSign, Leaf, Users, Calendar, Sparkles, Crown, MapPin, ChevronLeft, ChevronDown, ChevronRight, Target, Lock, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { houseThemes } from "@/data/houseThemes";
 
 const P = {
   name: "Rafael",
@@ -26,18 +27,35 @@ export default function HouseTrailer() {
   const [hoveredArea, setHoveredArea] = useState<string | null>(null);
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [selectedIntention, setSelectedIntention] = useState<string | null>(null);
+  const [currentHouse, setCurrentHouse] = useState(P.house); // For Debugging
 
-  
+  const theme = houseThemes[currentHouse] || houseThemes[11];
 
   const handleSelectIntention = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedIntention(id);
   };
 
+  // Cores dinâmicas injetadas via color-mix para garantir um fundo rico que herda a cor da casa
+  const bgBase = `color-mix(in srgb, ${theme.themeColor} 12%, #000000)`;
+  const navBg = `color-mix(in srgb, ${theme.themeColor} 10%, rgba(0,0,0,0.6))`;
+  const heroGradient = `linear-gradient(to bottom, transparent, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.8)) 60%, ${bgBase} 100%)`;
+
   return (
-    <div className="min-h-screen bg-[#0B1426] text-white font-sans overflow-x-hidden selection:bg-[#3b82f6]/30 pb-32">
+    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-32 relative transition-colors duration-1000" style={{ backgroundColor: bgBase }}>
+
+      {/* DEBUG SWITCHER (TEMPORÁRIO) */}
+      <div className="fixed bottom-6 right-6 z-[200] bg-black/80 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex flex-col items-center gap-2">
+        <span className="text-[9px] uppercase tracking-widest text-white/50">Testar Casas</span>
+        <div className="grid grid-cols-4 gap-2">
+          {[1,2,3,4,5,6,7,8,9,10,11,12].map(h => (
+            <button key={h} onClick={() => setCurrentHouse(h)} className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${currentHouse === h ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}>{h}</button>
+          ))}
+        </div>
+      </div>
+
       {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-[100] bg-[#0B1426]/50 backdrop-blur-xl border-b border-white/[0.04] px-6 h-14 flex items-center justify-between text-sm">
+      <nav className="fixed top-0 w-full z-[100] backdrop-blur-xl border-b border-white/[0.04] px-6 h-14 flex items-center justify-between text-sm transition-colors duration-1000" style={{ backgroundColor: navBg }}>
         <div className="flex items-center gap-4">
           <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition">
             <ChevronLeft className="w-4 h-4 text-white/70" />
@@ -49,20 +67,24 @@ export default function HouseTrailer() {
       {/* HERO E VÍDEO (EXATAMENTE COMO NO FINAL) */}
       <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-center pt-24 pb-20">
         <div className="w-[100vw] absolute left-1/2 -translate-x-1/2 top-0 h-[100vh] z-0 pointer-events-none" style={{ maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%)", WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%)" }}>
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover mix-blend-screen opacity-30" style={{ filter: "hue-rotate(0deg)" }}>
+          
+          {/* TINT OVERLAY PARA O VÍDEO */}
+          <div className="absolute inset-0 z-10 mix-blend-color transition-colors duration-1000" style={{ backgroundColor: theme.themeColor }} />
+          
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover mix-blend-screen opacity-20 grayscale">
             <source src="/videos/teste-fundo.mp4" type="video/mp4" />
           </video>
         </div>
-        <motion.div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0B1426]/80 to-[#0B1426] z-10 pointer-events-none" />
+        <motion.div className="absolute inset-0 z-10 pointer-events-none transition-colors duration-1000" style={{ background: heroGradient }} />
 
         <motion.div className="relative z-20 flex flex-col items-center text-center px-6 max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: "easeOut" }}>
-            <h1 className="text-[140px] md:text-[220px] font-ps-display font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/30 uppercase" style={{ filter: 'drop-shadow(0px 20px 40px rgba(255,255,255,0.15))' }}>
-              Casa {P.house}
+            <h1 className="text-[140px] md:text-[220px] font-ps-display font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/30 uppercase" style={{ filter: `drop-shadow(0px 20px 40px ${theme.themeColor}33)` }}>
+              Casa {currentHouse}
             </h1>
           </motion.div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-xl md:text-3xl font-ps-display font-light tracking-tight text-white/80 mt-[-10px] md:mt-[-20px]">
-            Redes, Aliados &amp; Projetos de Futuro
+            {theme.subtitle}
           </motion.h2>
         </motion.div>
 
@@ -74,41 +96,52 @@ export default function HouseTrailer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-[#3b82f6] text-[10px] font-bold uppercase tracking-[0.3em] block mb-10 text-center"
+            style={{ color: theme.themeColor }}
+            className="text-[10px] font-bold uppercase tracking-[0.3em] block mb-10 text-center"
           >
             A Energia do Ano
           </motion.span>
 
-          {/* Headline — palavra por palavra */}
+          {/* Headline — palavra por palavra (usando o primeiro parágrafo real com coloração na parte final) */}
           <p className="text-3xl md:text-5xl font-light text-white/90 leading-tight mb-20 text-center">
-            {['A','energia','deste','ano','convida','você','a','sair','do','esforço','individual','e','construir','através','da'].map((word, i) => (
-              <motion.span key={i} initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} transition={{ duration: 0.5, delay: 0.2 + i * 0.04, ease: [0.16,1,0.3,1] }} className="inline-block mr-[0.25em]">{word}</motion.span>
-            ))}{' '}
-            {['força','do','coletivo,','das','amizades','e','das','alianças','certas.'].map((word, i) => (
-              <motion.span key={i} initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} transition={{ duration: 0.5, delay: 0.2 + (15+i) * 0.04, ease: [0.16,1,0.3,1] }} className="inline-block mr-[0.25em] text-[#3b82f6] font-medium">{word}</motion.span>
-            ))}
+            {theme.energyIntro.split(' ').map((word, i, arr) => {
+              const splitIndex = Math.floor(arr.length * 0.55); // Colore os últimos 45% da frase
+              const isColored = i >= splitIndex;
+              return (
+                <motion.span 
+                  key={i} 
+                  initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }} 
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} 
+                  transition={{ duration: 0.5, delay: 0.2 + i * 0.04, ease: [0.16,1,0.3,1] }} 
+                  style={isColored ? { color: theme.themeColor } : {}}
+                  className={`inline-block mr-[0.25em] ${isColored ? 'font-medium' : ''}`}
+                >
+                  {word}
+                </motion.span>
+              );
+            })}
           </p>
 
-          {/* 3 statements empilhados */}
+          {/* Statements empilhados (Demais parágrafos do NotebookLM) */}
           <div className="flex flex-col divide-y divide-white/[0.06]">
-            {[
-              { n: '01', title: 'Pertencimento e visão de futuro', sub: 'Pessoas, grupos, comunidades e novas conexões desempenham um papel vital nos seus objetivos práticos.' },
-              { n: '02', title: 'A força do coletivo', sub: 'Carregar tudo sozinho tem limite. O ecossistema certo acelera o que o esforço individual nunca conseguiria.' },
-              { n: '03', title: 'Aliados que abrem caminhos', sub: 'Mentores, parceiros e redes certas transformam convites e indicações no motor invisível do seu crescimento.' },
-            ].map(({ n, title, sub }, i) => (
+            {theme.energyPoints.map((point, i) => (
               <motion.div
-                key={n}
+                key={i}
                 initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.8, delay: 0.9 + i * 0.18, ease: [0.16,1,0.3,1] }}
                 className="flex items-start gap-8 py-8 group"
               >
-                <span className="font-ps-display text-5xl md:text-6xl font-bold text-white/[0.07] group-hover:text-[#3b82f6]/40 transition-colors duration-500 leading-none shrink-0 w-16 text-right">
-                  {n}
+                <span className="font-ps-display text-5xl md:text-6xl font-bold text-white/[0.07] transition-colors duration-500 leading-none shrink-0 w-16 text-right group-hover:opacity-60" style={{ color: theme.themeColor }}>
+                  0{i+1}
                 </span>
-                <div className="flex-1">
-                  <h4 className="text-xl md:text-2xl font-ps-display font-bold text-white/90 mb-2 group-hover:text-white transition-colors duration-300">{title}</h4>
-                  <p className="text-white/40 text-sm md:text-base font-light leading-relaxed">{sub}</p>
+                <div className="flex-1 mt-1">
+                  <h4 className="text-xl md:text-2xl font-ps-display font-bold text-white/90 mb-2 group-hover:text-white transition-colors duration-300">
+                    {point.title}
+                  </h4>
+                  <p className="text-white/40 text-sm md:text-base font-light leading-relaxed group-hover:text-white/80 transition-colors duration-300">
+                    {point.text}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -117,53 +150,40 @@ export default function HouseTrailer() {
         </motion.div>
       </section>
 
-        {/* PARA QUEM É A CASA 11 & ACCORDION (O layout Apple) */}
+      {/* PARA QUEM É A CASA X & ACCORDION (O layout Apple) */}
       <section className="relative z-20 max-w-[1200px] mx-auto px-6 mt-10">
         
-        {/* PARA QUEM É A CASA 11? */}
-        <motion.div className="w-full bg-[#0d172a]/80 backdrop-blur-3xl border border-white/[0.05] rounded-[28px] p-8 md:p-12 mb-20 shadow-[0_0_80px_rgba(0,0,0,0.5)] flex flex-col items-center relative overflow-hidden mt-20">
-          <motion.div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        {/* PARA QUEM É A CASA X? */}
+        <motion.div className="w-full backdrop-blur-3xl border border-white/[0.05] rounded-[28px] p-8 md:p-12 mb-20 shadow-[0_0_80px_rgba(0,0,0,0.5)] flex flex-col items-center relative overflow-hidden mt-20 transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${theme.themeColor} 18%, rgba(0,0,0,0.8))` }}>
+          <motion.div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] transition-all duration-500" style={{ backgroundImage: `linear-gradient(to right, transparent, ${theme.themeColor}80, transparent)` }} />
           
           <div className="mt-4 flex flex-col items-center">
-            <span className="text-[#3b82f6] text-[10px] font-bold uppercase tracking-[0.3em] mb-3">Para Quem É A Casa {P.house}?</span>
+            <span style={{ color: theme.themeColor }} className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3 transition-colors duration-500">Para Quem É A Casa {currentHouse}?</span>
             <h3 className="font-ps-display text-2xl md:text-3xl font-bold mb-2 text-center">Esta viagem é para você que...</h3>
             <p className="text-white/40 text-xs font-light mb-10 text-center">Identifique-se com ao menos um dos cenários abaixo.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 w-full max-w-3xl mt-12">
-            {[
-              { 
-                avatar: P.gender === 'M' ? "homem_jovem.png" : "mulher_oriental.png", 
-                text: `Cansou de carregar tudo sozinh${P.gender === 'M' ? 'o' : 'a'} e entendeu que o seu crescimento depende do ecossistema certo.` 
-              },
-              { 
-                avatar: P.gender === 'M' ? "homem_adulto.png" : "mulher_moderna.png", 
-                text: "Busca abrir caminhos com mentores e pessoas que acreditam genuinamente nas suas ideias." 
-              },
-              { 
-                avatar: P.gender === 'M' ? "homem_nerd.png" : "mulher_negra.png",    
-                text: "Quer que seu nome e projetos circulem através de convites, indicações e pertencimento." 
-              },
-            ].map(({ text, avatar }, i) => (
+            {theme.personas.map(({ text, avatarM, avatarF }, i) => (
               <motion.div
                 key={i}
-                whileHover={{ borderColor: 'rgba(59,130,246,0.3)', backgroundColor: 'rgba(59,130,246,0.04)' }}
+                whileHover={{ borderColor: `${theme.themeColor}4d`, backgroundColor: `${theme.themeColor}0a` }}
                 transition={{ duration: 0.2 }}
                 className="relative flex flex-col items-center text-center gap-2 p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] cursor-default group"
               >
                 {/* Efeitos visuais do card restritos as bordas */}
                 <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
                   {/* Linha de destaque no topo */}
-                  <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-[#3b82f6]/50 to-transparent group-hover:via-[#3b82f6]/90 transition-all duration-300" />
+                  <div className="absolute top-0 left-6 right-6 h-px transition-all duration-300" style={{ backgroundImage: `linear-gradient(to right, transparent, ${theme.themeColor}80, transparent)` }} />
                   {/* Glow sutil no topo no hover */}
-                  <div className="absolute top-0 left-0 right-0 h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 100%)' }} />
+                  <div className="absolute top-0 left-0 right-0 h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `radial-gradient(ellipse at 50% 0%, ${theme.themeColor}26 0%, transparent 100%)` }} />
                 </div>
 
                 {/* Memoji centralizado dentro do card */}
                 <div className="relative z-20 w-32 h-32 mb-4">
-                  <div className="absolute inset-0 bg-[#3b82f6]/5 rounded-full blur-[20px] group-hover:bg-[#3b82f6]/20 transition-colors duration-300" />
+                  <div className="absolute inset-0 rounded-full blur-[20px] transition-colors duration-300" style={{ backgroundColor: `${theme.themeColor}0d` }} />
                   <img 
-                    src={`/memojis/${avatar}`} 
+                    src={`/memojis/${P.gender === 'M' ? avatarM : avatarF}`} 
                     alt={`Persona`} 
                     className="w-full h-full object-contain drop-shadow-xl transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-2 relative z-10"
                   />
@@ -177,7 +197,7 @@ export default function HouseTrailer() {
 
         {/* SELEÇÃO DO FOCO EM FORMATO ACCORDION APPLE */}
         <motion.div className="mt-20 pt-16 border-t border-white/5 relative z-10 flex flex-col items-center w-full">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#3b82f6] mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest mb-8" style={{ color: theme.themeColor }}>
               <Target className="w-3 h-3" />
               <span>Passo Necessário</span>
             </div>
@@ -334,7 +354,7 @@ export default function HouseTrailer() {
                               {/* Background colorido */}
                               <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${area.color} 0%, transparent 80%)` }} />
                               <div className="absolute inset-0 mix-blend-color opacity-60 pointer-events-none" style={{ backgroundColor: area.color }} />
-                              <div className="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-[#0B1426]/70 to-transparent pointer-events-none" />
+                              <div className="absolute inset-0 pointer-events-none transition-colors duration-1000" style={{ background: `linear-gradient(to top, ${bgBase}, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.7)) 50%, transparent)` }} />
 
                               {/* Conteúdo */}
                               <div className="relative z-10 p-6 flex flex-col">
@@ -371,7 +391,7 @@ export default function HouseTrailer() {
                 layout
                 onMouseEnter={() => setIsPanelHovered(true)}
                 onMouseLeave={() => setIsPanelHovered(false)}
-                className="flex-1 h-[600px] lg:h-full relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] bg-[#0B1426] z-10"
+                className="flex-1 h-[600px] lg:h-full relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: bgBase }}
               >
                 <AnimatePresence mode="wait">
                   {LIFE_AREAS.filter(a => a.id === (hoveredArea || "amor")).map((activeArea) => (
@@ -387,7 +407,7 @@ export default function HouseTrailer() {
                       <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${activeArea.color} 0%, transparent 80%)` }} />
                       <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-60 pointer-events-none" src="/videos/aura-loop.mp4" />
                       <div className="absolute inset-0 mix-blend-color opacity-80 pointer-events-none" style={{ backgroundColor: activeArea.color }} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-[#0B1426]/80 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 pointer-events-none transition-colors duration-1000" style={{ background: `linear-gradient(to top, ${bgBase}, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.8)) 50%, transparent)` }} />
                       
                       {/* CONTEÚDO PRINCIPAL */}
                       <div className="relative z-10 p-8 md:p-12 w-full flex flex-col justify-end h-full">
@@ -446,7 +466,7 @@ export default function HouseTrailer() {
               className="fixed bottom-0 left-0 w-full z-50 p-4 md:p-6 pointer-events-none"
             >
               <div className="max-w-4xl mx-auto pointer-events-auto">
-                <div className="bg-[#0B1426]/90 backdrop-blur-xl border border-white/10 p-4 md:p-6 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/10 p-4 md:p-6 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row items-center justify-between gap-6" style={{ backgroundColor: navBg }}>
                   
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>

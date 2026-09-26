@@ -4,7 +4,7 @@
   "human_blocker_reason": "",
   "blockers_remaining": [],
   "last_build": "success",
-  "notes": "Onboarding Epic is fully DONE. Auth Phase is next. Build passes. | DestinyResults UI & Protocol Card APPROVED by User.",
+  "notes": "Onboarding Epic is fully DONE. HouseTrailer dynamic UI DONE. Auth Phase is next. Build passes. | DestinyResults UI & Protocol Card APPROVED by User.",
   "epics": [
     {
       "id": "epic-2",
@@ -33,6 +33,10 @@
         },
         {
           "name": "Screen 6 - Mockup & Closing CTA",
+          "status": "DONE"
+        },
+        {
+          "name": "HouseTrailer dynamic logic",
           "status": "DONE"
         }
       ]
