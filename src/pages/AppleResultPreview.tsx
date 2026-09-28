@@ -122,7 +122,8 @@ export default function AppleResultPreview() {
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
   const [isPanelHovered, setIsPanelHovered] = useState(false);
-  const sortedAreas = [...LIFE_AREAS].sort((a,b) => b.score - a.score);
+  const [areas, setAreas] = useState(LIFE_AREAS);
+  const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
   const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
   
   // DEBUG HELPER
@@ -146,7 +147,7 @@ export default function AppleResultPreview() {
   const textBlur = useTransform(casaProgress, [0, 1], ["blur(16px)", "blur(0px)"]);
 
   return (
-    <div className="min-h-screen bg-[#02160F] text-[#f5f5f7] overflow-x-hidden font-sans bg-gradient-to-b from-[#02160F] via-[#042A1D] to-[#02160F]">
+    <div className="min-h-screen text-[#f5f5f7] overflow-x-hidden font-sans transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${currentActiveData?.color || '#10b981'} 6%, #03100B)` }}>
       
       {/* ── NAVBAR PADRÃO (RESPONSIVA) ── */}
       <div className="hidden lg:block">
@@ -162,7 +163,7 @@ export default function AppleResultPreview() {
       <section ref={heroRef} className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
         {/* Vídeo em full brightness */}
         <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#02160F] z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#03100B] z-10" />
           <video autoPlay muted loop playsInline className="w-full h-full object-cover">
             <source src="/assets/ny.mp4" type="video/mp4" />
           </video>
@@ -174,7 +175,7 @@ export default function AppleResultPreview() {
         </div>
 
         {/* Degradê na base para proteger a transição */}
-        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-[#02160F] to-transparent pointer-events-none z-10" />
+        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-[#03100B] to-transparent pointer-events-none z-10" />
       </section>
 
       {/* ══════════════════════════════════════════════════
@@ -229,7 +230,7 @@ export default function AppleResultPreview() {
 
                   {/* ======================= BOARDING PASS SOLAR (HIGH-END) ======================= */}
                   <div className="w-full max-w-4xl mx-auto mb-20">
-                     <div className="bg-[#02160F]/80 border border-[#10b981]/30 rounded-[32px] overflow-hidden shadow-[0_30px_80px_rgba(16,185,129,0.15)] backdrop-blur-xl flex flex-col">
+                     <div className="bg-black/40 border border-[#10b981]/30 rounded-[32px] overflow-hidden shadow-[0_30px_80px_rgba(16,185,129,0.15)] backdrop-blur-xl flex flex-col">
                        {/* Header */}
                        <div 
                          onClick={() => setIsBoardingPassOpen(!isBoardingPassOpen)}
@@ -618,6 +619,7 @@ export default function AppleResultPreview() {
                                 <span className="text-white/50 text-sm font-medium">Conteúdo personalizado bloqueado</span>
                               </div>
                               <button
+                                onClick={() => setAreas(areas.map(a => a.id === activeArea.id ? { ...a, unlocked: true } : a))}
                                 className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
                               >
                                 <CreditCard className="w-4 h-4 shrink-0" />
@@ -661,7 +663,7 @@ export default function AppleResultPreview() {
                              hidden: { opacity: 0, y: 30 },
                              visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
                            }}
-                           className="bg-[#02160F]/80 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
+                           className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
                         >
                            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
                            <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
@@ -669,8 +671,8 @@ export default function AppleResultPreview() {
                            <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
                              <ArrowUpRight className="w-7 h-7" style={{ color: currentActiveData.color }} />
                            </div>
-                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 group-hover:text-[#10b981]">Aumento de Ganhos</h3>
-                           <p className="text-white/60 text-base leading-[1.8] font-light">Foco no aumento real de faturamento, novos clientes e atração de recursos reais. O dinheiro na Casa 2 não vem de sorte, vem da coragem de faturar e expandir os horizontes.</p>
+                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 ">{currentActiveData.id === "amor" ? "Reciprocidade" : "Aumento de Ganhos"}</h3>
+                           <p className="text-white/60 text-base leading-[1.8] font-light">{currentActiveData.id === "amor" ? "Foco total na qualidade da sua companhia. É o ciclo para atrair pessoas que queiram construir junto, parar de investir energia em relações rasas e materializar uma parceria de peso." : "Foco no aumento real de faturamento, novos clientes e atração de recursos reais. O dinheiro na Casa 2 não vem de sorte, vem da coragem de faturar e expandir os horizontes."}</p>
                         </motion.div>
 
                         {/* Pilar 2 */}
@@ -679,7 +681,7 @@ export default function AppleResultPreview() {
                              hidden: { opacity: 0, y: 30 },
                              visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
                            }}
-                           className="bg-[#02160F]/80 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
+                           className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
                         >
                            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
                            <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
@@ -687,8 +689,8 @@ export default function AppleResultPreview() {
                            <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
                              <Crown className="w-7 h-7" style={{ color: currentActiveData.color }} />
                            </div>
-                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 group-hover:text-[#10b981]">Valorização do Trabalho</h3>
-                           <p className="text-white/60 text-base leading-[1.8] font-light">Foco irrestrito na autoconfiança. É o momento exato de acabar com os descontos emocionais e auditar todos os seus serviços para cobrar o valor justo.</p>
+                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 ">{currentActiveData.id === "amor" ? "Valorização Pessoal" : "Valorização do Trabalho"}</h3>
+                           <p className="text-white/60 text-base leading-[1.8] font-light">{currentActiveData.id === "amor" ? "Foco irrestrito no seu amor próprio. Acabar com as concessões e limites emocionais ultrapassados. Quem dita as regras do seu valor é você." : "Foco irrestrito na autoconfiança. É o momento exato de acabar com os descontos emocionais e auditar todos os seus serviços para cobrar o valor justo."}</p>
                         </motion.div>
 
                         {/* Pilar 3 */}
@@ -697,7 +699,7 @@ export default function AppleResultPreview() {
                              hidden: { opacity: 0, y: 30 },
                              visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
                            }}
-                           className="bg-[#02160F]/80 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
+                           className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
                         >
                            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
                            <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
@@ -705,8 +707,8 @@ export default function AppleResultPreview() {
                            <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
                              <Shield className="w-7 h-7" style={{ color: currentActiveData.color }} />
                            </div>
-                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 group-hover:text-[#10b981]">Estabilidade & Segurança</h3>
-                           <p className="text-white/60 text-base leading-[1.8] font-light">Foco prático em organização de caixa, corte de vazamentos invisíveis e reserva inteligente. Proteger o lucro é tão fundamental quanto fazê-lo acontecer.</p>
+                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 ">{currentActiveData.id === "amor" ? "Construção de Futuro" : "Estabilidade & Segurança"}</h3>
+                           <p className="text-white/60 text-base leading-[1.8] font-light">{currentActiveData.id === "amor" ? "Foco em planos de longo prazo. O romance deixa de ser apenas atração física e se torna uma base sólida para a vida familiar e realizações materiais conjuntas." : "Foco prático em organização de caixa, corte de vazamentos invisíveis e reserva inteligente. Proteger o lucro é tão fundamental quanto fazê-lo acontecer."}</p>
                         </motion.div>
                       </motion.div>
                     </div>
