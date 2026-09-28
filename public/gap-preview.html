@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview: Transição do Hero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0B1426; color: white; margin: 0; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+        .font-ps-display { font-family: ui-serif, Georgia, serif; }
+        
+        /* Utility styles for mockups */
+        .mock-video {
+            background-image: linear-gradient(to bottom, transparent, #0B1426), url('https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .scroll-section {
+            min-height: 150vh;
+            border-bottom: 2px dashed rgba(255,255,255,0.2);
+            position: relative;
+        }
+        
+        .opt-title {
+            position: fixed; top: 20px; left: 20px; z-index: 100;
+            background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5);
+            padding: 10px 20px; border-radius: 8px; backdrop-filter: blur(10px);
+        }
+
+        /* OPÇÃO 1: Sobreposição (Negative Margin) */
+        .opt1-video { height: 80vh; }
+        .opt1-content { margin-top: -15vh; position: relative; z-index: 10; padding-top: 50px; }
+
+        /* OPÇÃO 2: Sticky Reveal (Apple Style) */
+        .opt2-container { height: 200vh; position: relative; }
+        .opt2-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        .opt2-video { position: absolute; inset: 0; z-index: 1; transition: opacity 0.3s ease; }
+        .opt2-content { position: relative; z-index: 2; transform: scale(1.5); opacity: 0; filter: blur(10px); transition: all 0.3s ease; margin-top: 20vh; }
+
+        /* OPÇÃO 3: Jornada / Linha Guia */
+        .opt3-video { height: 100vh; }
+        .opt3-gap { height: 30vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .opt3-line { width: 1px; height: 0%; background: linear-gradient(to bottom, rgba(59,130,246,0), rgba(59,130,246,1)); transition: height 0.5s ease; }
+        .opt3-content { transform: scale(1.2); opacity: 0.5; filter: blur(5px); transition: all 0.5s ease; }
+
+        .nav-buttons { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; gap: 10px; }
+        .nav-btn { background: #3b82f6; color: white; px: 4; py: 2; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: bold; font-size: 14px; text-decoration: none;}
+        .nav-btn:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <div class="nav-buttons">
+        <a href="#opcao1" class="nav-btn">Opção 1</a>
+        <a href="#opcao2" class="nav-btn">Opção 2</a>
+        <a href="#opcao3" class="nav-btn">Opção 3</a>
+    </div>
+
+    <!-- OPÇÃO 1: SOBREPOSIÇÃO -->
+    <div id="opcao1" class="scroll-section">
+        <div class="opt-title">Ideia 1: Sobreposição (Negative Margin) - O texto "invade" o final do vídeo.</div>
+        <div class="mock-video opt1-video w-full relative">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-transparent to-transparent"></div>
+        </div>
+        
+        <div class="opt1-content text-center flex flex-col items-center">
+            <div class="inline-flex items-center gap-2 px-5 py-2.5 border border-white/10 bg-white/5 backdrop-blur-xl rounded-full text-[10px] uppercase font-bold tracking-[0.3em] text-white/70 mb-8">
+                <span>✦</span><span>Rafael, o seu próximo aniversário...</span>
+            </div>
+            
+            <!-- Simulando o scale -->
+            <h2 class="font-ps-display text-[12vw] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#3b82f6] to-blue-200">
+                NOVA IORQUE
+            </h2>
+            
+            <div class="flex items-center gap-2 px-6 py-3 rounded-full border border-[#3b82f6]/30 bg-[#3b82f6]/10 text-[#3b82f6] text-sm uppercase tracking-widest font-semibold mb-8">
+                Foco Escolhido: Amor
+            </div>
+            <p class="text-white/50 max-w-lg">Note como não há buraco negro. O texto sobrepõe suavemente a base do vídeo.</p>
+        </div>
+    </div>
+
+    <!-- OPÇÃO 2: STICKY REVEAL (Estilo Apple) -->
+    <div id="opcao2" class="scroll-section opt2-container">
+        <div class="opt-title">Ideia 2: Sticky Reveal (Estilo Apple) - O vídeo trava, escurece, e o texto surge por cima.</div>
+        <div class="opt2-sticky">
+            <div class="mock-video opt2-video" id="opt2Video"></div>
+            <div class="absolute inset-0 bg-[#0B1426] opacity-0 z-[1]" id="opt2Overlay"></div>
+            
+            <div class="opt2-content text-center flex flex-col items-center" id="opt2Content">
+                <div class="inline-flex items-center gap-2 px-5 py-2.5 border border-white/10 bg-white/5 backdrop-blur-xl rounded-full text-[10px] uppercase font-bold tracking-[0.3em] text-white/70 mb-8">
+                    <span>✦</span><span>Rafael, o seu próximo aniversário...</span>
+                </div>
+                
+                <h2 class="font-ps-display text-[15vw] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#3b82f6] to-blue-200">
+                    NOVA IORQUE
+                </h2>
+                
+                <div class="flex items-center gap-2 px-6 py-3 rounded-full border border-[#3b82f6]/30 bg-[#3b82f6]/10 text-[#3b82f6] text-sm uppercase tracking-widest font-semibold mb-8">
+                    Foco Escolhido: Amor
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPÇÃO 3: SCROLL JOURNEY (A Linha Guia) -->
+    <div id="opcao3" class="scroll-section" style="min-height: 100vh;">
+        <div class="opt-title">Ideia 3: A Jornada de Coordenadas - Transformamos o "vazio" numa animação de imersão.</div>
+        <div class="mock-video opt3-video relative">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-transparent to-transparent"></div>
+        </div>
+        
+        <div class="opt3-gap" id="opt3Gap">
+            <span class="text-[#3b82f6] text-xs font-mono mb-4 opacity-50">CALCULANDO COORDENADAS MAGNÉTICAS...</span>
+            <div class="opt3-line" id="opt3Line"></div>
+            <span class="text-white/30 text-xs font-mono mt-4">40° 42' 46" N | 74° 0' 21" W</span>
+        </div>
+
+        <div class="opt3-content text-center flex flex-col items-center mt-12 mb-32" id="opt3Content">
+            <div class="inline-flex items-center gap-2 px-5 py-2.5 border border-white/10 bg-white/5 backdrop-blur-xl rounded-full text-[10px] uppercase font-bold tracking-[0.3em] text-white/70 mb-8">
+                <span>✦</span><span>Destino Encontrado</span>
+            </div>
+            
+            <h2 class="font-ps-display text-[12vw] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#3b82f6] to-blue-200">
+                NOVA IORQUE
+            </h2>
+            
+            <div class="flex items-center gap-2 px-6 py-3 rounded-full border border-[#3b82f6]/30 bg-[#3b82f6]/10 text-[#3b82f6] text-sm uppercase tracking-widest font-semibold mb-8">
+                Foco Escolhido: Amor
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica simples de Scroll para simular as animações
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            
+            // Opção 2 Logic
+            const opt2 = document.getElementById('opcao2');
+            const opt2Rect = opt2.getBoundingClientRect();
+            if (opt2Rect.top < 0 && opt2Rect.bottom > window.innerHeight) {
+                const progress = Math.min(1, Math.abs(opt2Rect.top) / (window.innerHeight * 0.5));
+                
+                // Escurece o vídeo
+                document.getElementById('opt2Overlay').style.opacity = progress * 0.8;
+                
+                // Scale, Blur e Opacity do texto
+                const content = document.getElementById('opt2Content');
+                content.style.opacity = progress;
+                content.style.transform = `scale(${1.5 - (progress * 0.5)})`;
+                content.style.filter = `blur(${10 - (progress * 10)}px)`;
+            }
+
+            // Opção 3 Logic
+            const opt3 = document.getElementById('opcao3');
+            const opt3Rect = opt3.getBoundingClientRect();
+            if (opt3Rect.top < window.innerHeight) {
+                const lineProgress = Math.max(0, Math.min(1, (window.innerHeight - opt3Rect.top) / 400));
+                document.getElementById('opt3Line').style.height = `${lineProgress * 150}px`;
+                
+                const textProgress = Math.max(0, Math.min(1, ((window.innerHeight - opt3Rect.top) - 300) / 300));
+                const opt3Content = document.getElementById('opt3Content');
+                opt3Content.style.opacity = 0.5 + (textProgress * 0.5);
+                opt3Content.style.transform = `scale(${1.2 - (textProgress * 0.2)})`;
+                opt3Content.style.filter = `blur(${5 - (textProgress * 5)}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
