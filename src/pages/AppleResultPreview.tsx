@@ -657,59 +657,25 @@ export default function AppleResultPreview() {
                         }}
                         className="grid grid-cols-1 md:grid-cols-3 gap-6"
                       >
-                        {/* Pilar 1 */}
-                        <motion.div 
-                           variants={{
-                             hidden: { opacity: 0, y: 30 },
-                             visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
-                           }}
-                           className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
-                        >
-                           <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
-                           <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
-                           
-                           <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
-                             <ArrowUpRight className="w-7 h-7" style={{ color: currentActiveData.color }} />
-                           </div>
-                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 ">{currentActiveData.id === "amor" ? "Reciprocidade" : "Aumento de Ganhos"}</h3>
-                           <p className="text-white/60 text-base leading-[1.8] font-light">{currentActiveData.id === "amor" ? "Foco total na qualidade da sua companhia. É o ciclo para atrair pessoas que queiram construir junto, parar de investir energia em relações rasas e materializar uma parceria de peso." : "Foco no aumento real de faturamento, novos clientes e atração de recursos reais. O dinheiro na Casa 2 não vem de sorte, vem da coragem de faturar e expandir os horizontes."}</p>
-                        </motion.div>
-
-                        {/* Pilar 2 */}
-                        <motion.div 
-                           variants={{
-                             hidden: { opacity: 0, y: 30 },
-                             visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
-                           }}
-                           className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
-                        >
-                           <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
-                           <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
-                           
-                           <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
-                             <Crown className="w-7 h-7" style={{ color: currentActiveData.color }} />
-                           </div>
-                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 ">{currentActiveData.id === "amor" ? "Valorização Pessoal" : "Valorização do Trabalho"}</h3>
-                           <p className="text-white/60 text-base leading-[1.8] font-light">{currentActiveData.id === "amor" ? "Foco irrestrito no seu amor próprio. Acabar com as concessões e limites emocionais ultrapassados. Quem dita as regras do seu valor é você." : "Foco irrestrito na autoconfiança. É o momento exato de acabar com os descontos emocionais e auditar todos os seus serviços para cobrar o valor justo."}</p>
-                        </motion.div>
-
-                        {/* Pilar 3 */}
-                        <motion.div 
-                           variants={{
-                             hidden: { opacity: 0, y: 30 },
-                             visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
-                           }}
-                           className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
-                        >
-                           <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
-                           <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
-                           
-                           <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
-                             <Shield className="w-7 h-7" style={{ color: currentActiveData.color }} />
-                           </div>
-                           <h3 className="text-2xl font-bold text-white mb-4 tracking-tight transition-colors duration-500 ">{currentActiveData.id === "amor" ? "Construção de Futuro" : "Estabilidade & Segurança"}</h3>
-                           <p className="text-white/60 text-base leading-[1.8] font-light">{currentActiveData.id === "amor" ? "Foco em planos de longo prazo. O romance deixa de ser apenas atração física e se torna uma base sólida para a vida familiar e realizações materiais conjuntas." : "Foco prático em organização de caixa, corte de vazamentos invisíveis e reserva inteligente. Proteger o lucro é tão fundamental quanto fazê-lo acontecer."}</p>
-                        </motion.div>
+                        {currentActiveData.pillars?.map((pilar, index) => (
+                          <motion.div 
+                             key={index}
+                             variants={{
+                               hidden: { opacity: 0, y: 30 },
+                               visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+                             }}
+                             className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
+                          >
+                             <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
+                             <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
+                             
+                             <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
+                               <pilar.icon className="w-7 h-7" style={{ color: currentActiveData.color }} />
+                             </div>
+                             <h3 className="text-2xl font-bold mb-4 tracking-tight transition-colors duration-500 text-white hover-color-magic" style={{ '--hover-color': currentActiveData.color } as React.CSSProperties}>{pilar.title}</h3>
+                             <p className="text-white/60 text-base leading-[1.8] font-light">{pilar.text}</p>
+                          </motion.div>
+                        ))}
                       </motion.div>
                     </div>
                   )}
