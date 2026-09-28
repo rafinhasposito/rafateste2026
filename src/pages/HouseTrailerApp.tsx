@@ -33,8 +33,18 @@ export default function HouseTrailerApp() {
   const [currentHouse, setCurrentHouse] = useState(urlHouse ? parseInt(urlHouse) : P.house);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    // Força o scroll para o topo imediatamente e sem animação
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // Fallback: se o React Router atrasar a montagem, garante o scroll após o render
+    const timeout = setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }, 50);
+
+    return () => clearTimeout(timeout);
+  }, [currentHouse, urlHouse]);
 
   const theme = houseThemes[currentHouse] || houseThemes[11];
 

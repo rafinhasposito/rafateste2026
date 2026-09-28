@@ -24,7 +24,7 @@ const GoalCards = ({ selectedGoal, onSelect, mode = "futuro" }: GoalCardsProps) 
     // Animação de expansão majestosa e depois direciona para o CLONE integrado ao App
     setTimeout(() => {
       navigate(`/app/trailer?house=${id}&mode=${mode}`);
-    }, 800); // aumentei o tempo para a expansão ser sentida
+    }, 1500); // Aumentei o tempo de 800ms para 1.5s para respirar
   };
 
   return (
@@ -47,13 +47,13 @@ const GoalCards = ({ selectedGoal, onSelect, mode = "futuro" }: GoalCardsProps) 
               scale: isExpanding ? 1.05 : 1,
               zIndex: isExpanding ? 50 : 1
             }}
-            transition={{ duration: isExpanding ? 0.8 : 0.5, delay: isExpanding ? 0 : index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: isExpanding ? 1.2 : 0.5, delay: isExpanding ? 0 : index * 0.05, ease: [0.22, 1, 0.36, 1] }}
             whileHover={!expandingHouse ? { scale: 1.03 } : {}}
             whileTap={!expandingHouse ? { scale: 0.97 } : {}}
             onClick={() => handleHouseClick(house.id)}
-            className={`group relative w-full text-left p-6 md:p-8 transition-all duration-700 flex flex-col justify-center border overflow-hidden ${
+            className={`group w-full text-left p-6 md:p-8 transition-all duration-700 flex flex-col justify-center border overflow-hidden ${
               isSelected || isExpanding ? "bg-[#030303] backdrop-blur-3xl shadow-[0_0_80px_rgba(0,0,0,0.8)]" : "bg-white/[0.03] backdrop-blur-md border-white/5 hover:bg-white/[0.06] hover:border-white/15"
-            } ${isExpanding ? "fixed inset-0 z-50 rounded-none md:rounded-none m-0" : "rounded-[2rem]"}`}
+            } ${isExpanding ? "fixed inset-0 z-50 rounded-none md:rounded-none m-0" : "relative rounded-[2rem]"}`}
             style={{
               borderColor: isSelected || isExpanding ? themeHex : undefined,
               boxShadow: isSelected || isExpanding ? `0 0 80px ${themeHex}40, inset 0 0 50px ${themeHex}20` : 'none',

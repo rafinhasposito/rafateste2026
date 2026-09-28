@@ -264,18 +264,16 @@ const Index = () => {
       <ScanningOverlay visible={isScanning} mode={mode || "futuro"} year={year} />
 
       {/* ===== STEP 1: Temporal Selection — FULLSCREEN, outside the container ===== */}
-      {step === 1 && (
-        <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait">
+        {step === 1 && (
           <motion.div key="step1-root" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <TemporalSelection onSelectMode={handleSelectMode} />
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
 
-      {/* ===== STEP 2: Method Selection ===== */}
-      {step === 2 && (
-        <AnimatePresence mode="wait">
-          <motion.div key="step2-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="pt-20 md:pt-24 pb-32 md:pb-12 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
+        {/* ===== STEP 2: Method Selection ===== */}
+        {step === 2 && (
+          <motion.div key="step2-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-20 md:pt-24 pb-32 md:pb-12 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
             
             {/* Cinematic Animated Background (Vídeo Dinâmico) */}
             {(() => {
@@ -383,13 +381,11 @@ const Index = () => {
               </div>
             </div>
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
 
-      {/* ===== STEP 3 ===== */}
-      {step === 3 && (
-        <AnimatePresence mode="wait">
-          <motion.div key="step3-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
+        {/* ===== STEP 3 ===== */}
+        {step === 3 && (
+          <motion.div key="step3-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 15 }} transition={{ duration: 0.3 }}
             className="pb-32 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
 
             {/* ── Fundo Premium Luxuoso (Ouro/Prata/Esmeralda) ── */}
@@ -517,8 +513,8 @@ const Index = () => {
 
             </div>
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Trust badges — visible on steps 2 and 3 */}
       {(step === 2 || step === 3) && (
