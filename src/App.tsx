@@ -13,6 +13,7 @@ import { FocusedShell } from "./layouts/FocusedShell";
 import Index from "./pages/Index";
 import AppleResultPrototype from "./pages/AppleResultPrototype";
 import HouseTrailer from "./pages/HouseTrailer";
+import HouseTrailerApp from "./pages/HouseTrailerApp";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Credits from "./pages/Credits";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/history" element={<History />} />
               <Route path="/perfil" element={<Profile />} />
               <Route path="/tecnologia" element={<Technology />} />
+              <Route path="/app/trailer" element={<HouseTrailerApp />} />
             </Route>
 
             {/* 2. Focused Shell (Immersive Flows) */}
@@ -90,7 +92,7 @@ const App = () => (
             <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
             <Route path="/v2-apple" element={<AppleResultPrototype />} />
-          <Route path="/trailer" element={<HouseTrailer />} />
+            <Route path="/trailer" element={<HouseTrailer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

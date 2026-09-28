@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, User } from "lucide-react";
+import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, User, Edit2 } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -244,11 +244,16 @@ const Index = () => {
     mode === "presente" ? "Análise do Ciclo Atual" :
     "Calibração Estelar";
 
-  const formSubtitle =
-    mode === "passado"
-      ? "Insira os dados do ano que deseja auditar e descubra o que o Universo havia preparado para você."
+  const formSubtitle = isNatalProfileComplete(profile)
+    ? searchPath === "cidade"
+      ? "Seus dados de nascimento já estão ancorados no sistema. Qual cidade você deseja simular para o seu próximo aniversário?"
+      : searchPath === "casa"
+      ? "Seus dados natais estão prontos. Escolha o objetivo astrológico que deseja focar neste ano."
+      : "Seus dados natais estão prontos. Escolha a sua intenção principal para o próximo ciclo."
+    : mode === "passado"
+      ? "Insira suas coordenadas natais e o ano que deseja auditar para descobrir o que o Universo havia preparado para você."
       : mode === "presente"
-      ? "Insira suas coordenadas natais para analisar a configuração energética deste ciclo."
+      ? "Insira suas coordenadas natais para analisar a configuração energética do seu ano atual."
       : "Insira suas coordenadas natais para que o algoritmo astrofísico calcule a rota exata da sua prosperidade.";
 
   const activeTheme = mode ? modeThemes[mode] : null;
@@ -381,255 +386,155 @@ const Index = () => {
         </AnimatePresence>
       )}
 
-      {/* ===== STEP 3: Data Collection + Lookup ===== */}
+      {/* ===== STEP 3 ===== */}
       {step === 3 && (
-        <div className="pt-8 md:pt-32 pb-32 md:pb-12 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh]">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="surface-base p-5 sm:p-6 md:p-12 lg:p-16 relative w-full max-w-5xl"
-            style={activeTheme ? {
-              borderColor: `rgba(${activeTheme.rgb}, 0.15)`,
-              background: "rgba(10, 10, 12, 0.85)",
-            } : {
-              background: "rgba(10, 10, 12, 0.85)",
-            }}
-          >
-            <div
-              className="absolute top-0 left-[10%] right-[10%] h-px"
-              style={{ background: activeTheme
-                ? `linear-gradient(90deg, transparent, rgba(${activeTheme.rgb}, 0.3), transparent)`
-                : 'linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent)'
-              }}
-            />
+        <AnimatePresence mode="wait">
+          <motion.div key="step3-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
+            className="pb-32 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
 
-              {/* ===== STEP 3: Data Collection + Lookup ===== */}
-              {step === 3 && (
-                <motion.div key="step3" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}>
-                  {/* Breadcrumb badges */}
-                  {(() => {
-                    const theme = mode ? modeThemes[mode] : null;
-                    return (
-                      <div className="flex justify-center gap-2 mb-6">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
-                          style={{
-                            borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
-                            background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
-                          }}
-                        >
-                          {mode && (() => {
-                            const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Rocket;
-                            return <ModeIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
-                          })()}
-                          <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
-                            {modeOptions.find(m => m.id === mode)?.title}
-                          </span>
-                        </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border"
-                          style={{
-                            borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : undefined,
-                            background: theme ? `rgba(${theme.rgb}, 0.08)` : undefined,
-                          }}
-                        >
-                          {searchPath && (() => {
-                            const PathIcon = pathOptions.find(p => p.id === searchPath)?.icon || MapPin;
-                            return <PathIcon className="w-3 h-3" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }} />;
-                          })()}
-                          <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: theme ? `rgb(${theme.rgb})` : undefined }}>
-                            {pathOptions.find(p => p.id === searchPath)?.title}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })()}
+            {/* ── Fundo Premium Luxuoso (Ouro/Prata/Esmeralda) ── */}
+            {(() => {
+              const theme = mode ? modeThemes[mode] : null;
+              if (!theme) return null;
+              return (
+                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                  {/* Luz principal: Um gradiente suntuoso e rico cobrindo a tela toda */}
+                  <div className="absolute inset-0 transition-colors duration-1000 mix-blend-screen opacity-60"
+                    style={{ background: `radial-gradient(ellipse at 50% -20%, rgba(${theme.rgb}, 0.5) 0%, rgba(${theme.rgb}, 0.1) 50%, transparent 100%)` }} />
+                  
+                  {/* Glow volumétrico centralizado para criar profundidade luxuosa (semelhante ao brilho do vídeo) */}
+                  <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[120vw] max-w-[1200px] h-[80vh] opacity-30 blur-[150px] rounded-full transition-colors duration-1000"
+                    style={{ backgroundColor: `rgb(${theme.rgb})` }} />
 
-                  <div className="text-center mb-12">
-                    <h2 className="font-ps-display text-3xl md:text-4xl text-white mb-4 leading-tight">
-                      {formTitle}
-                    </h2>
-                    <p className="font-ps-ui text-white/50 text-sm md:text-base font-light max-w-md mx-auto leading-relaxed">
-                      {formSubtitle}
-                    </p>
-                  </div>
+                  {/* Vinheta suave nas bordas para manter contraste de leitura */}
+                  <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, rgba(3,3,6,0.8) 100%)' }} />
+                </div>
+              );
+            })()}
 
-                  {/* Natal Data Grid - Boarding Pass Estelar */}
-                  {isNatalProfileComplete(profile) ? (
-                    <div className="flex flex-col md:flex-row items-stretch backdrop-blur-2xl rounded-[24px] mb-12 relative overflow-hidden border"
-                      style={{ 
-                        backgroundColor: activeTheme ? `color-mix(in srgb, rgb(${activeTheme.rgb}) 5%, rgba(10,10,12,0.8))` : 'rgba(10,10,12,0.8)',
-                        borderColor: activeTheme ? `color-mix(in srgb, rgb(${activeTheme.rgb}) 30%, transparent)` : 'rgba(255,255,255,0.08)'
-                      }}>
-                      
-                      <div className="absolute top-0 inset-x-0 h-[1px] opacity-40" style={{ background: activeTheme ? `linear-gradient(90deg, transparent, rgba(${activeTheme.rgb}, 1), transparent)` : 'linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)' }} />
+            <div className="w-full max-w-4xl mx-auto flex flex-col items-center relative z-10 pt-6 md:pt-10">
 
-                      {/* Left: Passenger Info */}
-                      <div className="flex-1 p-8 relative">
-                        <div className="flex justify-between items-start mb-6">
-                          <div>
-                            <p className="text-[9px] text-white/40 uppercase tracking-[0.3em] font-bold mb-1">Passageiro</p>
-                            <p className="font-ps-display text-white text-2xl tracking-wide">{profile?.full_name}</p>
-                          </div>
-                          <User className="w-5 h-5 opacity-50" style={{ color: activeTheme ? `rgb(${activeTheme.rgb})` : '#C9A227' }} />
-                        </div>
+              {/* ── Nav Row — Voltar ── */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
+                className="w-full flex justify-start mb-8 md:mb-12">
+                <button onClick={() => setStep(2)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl transition-all duration-300 text-white/70 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold">
+                  <ChevronLeft className="w-4 h-4" /> Voltar
+                </button>
+              </motion.div>
 
-                        <div className="grid grid-cols-2 gap-6">
-                          <div>
-                            <p className="text-[8px] text-white/40 uppercase tracking-[0.3em] font-bold mb-1">Coordenadas (Origem)</p>
-                            <p className="font-ps-ui text-white/80 text-sm">{profile?.birth_city}</p>
-                          </div>
-                          <div>
-                            <p className="text-[8px] text-white/40 uppercase tracking-[0.3em] font-bold mb-1">Ponto Zero (Tempo)</p>
-                            <p className="font-ps-ui text-white/80 text-sm">
-                              {profile?.birth_date?.split('-').reverse().join('/')} <span className="text-white/40 ml-1">{profile?.birth_time?.slice(0, 5)}</span>
-                            </p>
-                          </div>
-                        </div>
-
-                        <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}${searchPath ? `&path=${searchPath}` : ''}`)}`)} 
-                          className="mt-6 text-[9px] uppercase tracking-[0.2em] hover:text-white transition-colors underline underline-offset-4 font-semibold"
-                          style={{ color: activeTheme ? `rgb(${activeTheme.rgb})` : '#C9A227', textDecorationColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.3)` : 'rgba(201,162,39,0.3)' }}>
-                          Atualizar Registro
-                        </button>
-                      </div>
-
-                      {/* Boarding Pass Tear Line */}
-                      <div className="hidden md:flex flex-col justify-center items-center relative w-1">
-                        <div className="absolute inset-y-0 w-[1px] border-l-2 border-dashed border-white/10" />
-                        <div className="w-4 h-4 rounded-full bg-[#030303] absolute -top-2 border-b border-white/10" />
-                        <div className="w-4 h-4 rounded-full bg-[#030303] absolute -bottom-2 border-t border-white/10" />
-                      </div>
-
-                      <div className="md:hidden flex flex-row justify-center items-center relative h-1 w-full">
-                        <div className="absolute inset-x-0 h-[1px] border-t-2 border-dashed border-white/10" />
-                        <div className="w-4 h-4 rounded-full bg-[#030303] absolute -left-2 border-r border-white/10" />
-                        <div className="w-4 h-4 rounded-full bg-[#030303] absolute -right-2 border-l border-white/10" />
-                      </div>
-
-                      {/* Right: Destination/Year */}
-                      <div className="w-full md:w-64 p-8 flex flex-col items-center justify-center relative bg-white/[0.02]"
-                        style={{ background: activeTheme ? `radial-gradient(circle at center, rgba(${activeTheme.rgb}, 0.05) 0%, transparent 100%)` : 'transparent' }}>
-                        
-                        <div className="text-[9px] uppercase tracking-[0.3em] font-bold mb-3 text-center" style={{ color: activeTheme ? `rgba(${activeTheme.rgb}, 0.8)` : '#C9A227' }}>
-                          Ciclo de Destino
-                        </div>
-                        
-                        <input
-                          type="number"
-                          className="w-full text-center text-5xl font-ps-display bg-transparent border-none outline-none font-bold tracking-tight"
-                          style={{ color: activeTheme ? `rgb(${activeTheme.rgb})` : '#C9A227', textShadow: activeTheme ? `0 0 40px rgba(${activeTheme.rgb}, 0.4)` : 'none' }}
-                          value={year}
-                          onChange={(e) => setYear(e.target.value)}
-                          disabled={mode === "presente"}
-                        />
-                        
-                        {mode === "presente" && <span className="text-[8px] uppercase tracking-[0.2em] font-bold text-white/30 mt-3 border border-white/10 rounded-full px-3 py-1">Fixo (Ano Atual)</span>}
-                        {mode !== "presente" && <span className="text-[8px] uppercase tracking-[0.2em] font-bold text-white/30 mt-3">Editável</span>}
-                      </div>
+              {/* ── Dados Natais — Apple Glass Card ── */}
+              {isNatalProfileComplete(profile) && (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-6 px-8 py-5 rounded-3xl border mb-16 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+                  style={{
+                    borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.15)` : 'rgba(255,255,255,0.08)',
+                    background: activeTheme ? `color-mix(in srgb, rgb(${activeTheme.rgb}) 4%, rgba(10,10,12,0.6))` : 'rgba(10,10,12,0.6)'
+                  }}>
+                  <div className="flex flex-wrap gap-10">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/40">Passageiro</span>
+                      <span className="font-ps-display text-white/90 text-lg tracking-wide">{profile?.full_name}</span>
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-8 md:mb-10">
-                      <div className="space-y-6 md:space-y-7">
-                        <div>
-                          <div className="field-label"><span className="label-dot" /> Nome Completo</div>
-                          <input type="text" className="quantum-input w-full" placeholder="Seu nome e sobrenome" value={name} onChange={(e) => setName(e.target.value)} />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-4">
-                          <div>
-                            <div className="field-label field-label-muted"><span className="label-dot" /> Data de Nascimento</div>
-                            <input type="date" className="quantum-input w-full" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
-                          </div>
-                          <div>
-                            <div className="field-label"><span className="label-dot" /> Hora Exata</div>
-                            <input type="time" className="quantum-input w-full" value={birthtime} onChange={(e) => setBirthtime(e.target.value)} />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-6 md:space-y-7">
-                        <div>
-                          <div className="field-label field-label-muted"><span className="label-dot" /> Cidade de Nascimento</div>
-                          <div className="w-full">
-                            <CityAutocomplete value={birthPlace} onChange={(v, valid) => { setBirthPlace(v); setBirthPlaceValid(valid); }} placeholder="Digite e selecione da lista" invalid={submitted && !birthPlaceValid} />
-                          </div>
-                        </div>
-                        <div>
-                          <div className="field-label"><span className="label-dot" /> {yearLabel}</div>
-                          <input
-                            type="number"
-                            className="quantum-input w-full text-center text-xl md:text-2xl font-bold text-[#C9A227] h-14 font-ps-display"
-                            value={year}
-                            onChange={(e) => setYear(e.target.value)}
-                            disabled={mode === "presente"}
-                          />
-                        </div>
-                      </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/40">Origem</span>
+                      <span className="font-ps-ui text-white/70 text-sm">{profile?.birth_city}</span>
                     </div>
-                  )}
-
-                  {/* Divider */}
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
-                    <div className="w-2 h-2 rounded-full bg-gold/20 border border-gold/30" />
-                    <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gold/10 to-transparent" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/40">Momento</span>
+                      <span className="font-ps-ui text-white/70 text-sm">{profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}</span>
+                    </div>
                   </div>
-
-                  {/* Mantra */}
-                  <div className="text-center mb-10">
-                    <AnimatePresence mode="wait">
-                      <motion.p key={mantraIndex} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                        className="text-gold/80 font-ps-display text-[11px] md:text-sm tracking-[0.15em] uppercase italic">
-                        "{mantras[mantraIndex]}"
-                      </motion.p>
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Natal data warning */}
-                  {!natalDataReady && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                      className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 mb-6 text-center">
-                      <p className="text-destructive text-xs font-semibold">
-                        Preencha todos os dados natais acima (nome, data, hora e cidade de nascimento) antes de continuar.
-                      </p>
-                    </motion.div>
-                  )}
-
-                  {/* Lookup Component */}
-                  <div className="w-full mt-4">
-                    {searchPath === "cidade" && (
-                      <CityLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                    )}
-                    {searchPath === "casa" && (
-                      <HouseLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                    )}
-                    {searchPath === "intencao" && (
-                      <IntentLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
-                    )}
-                  </div>
+                  <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
+                    className="text-[10px] uppercase tracking-[0.2em] font-bold hover:scale-105 transition-transform"
+                    style={{ color: activeTheme ? `rgb(${activeTheme.rgb})` : '#fff' }}>
+                    Editar
+                  </button>
                 </motion.div>
               )}
 
-            <div className="absolute bottom-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-gold/15 to-transparent" />
-          </motion.div>
+              {/* ── ANO HERO — Design Apple Vision Pro ── */}
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+                className="flex flex-col items-center mb-12 relative w-full">
+                <span className="text-[10px] uppercase tracking-[0.5em] font-bold mb-4 opacity-80"
+                  style={{ color: activeTheme ? `rgb(${activeTheme.rgb})` : '#C9A227' }}>
+                  Ano do Destino
+                </span>
+                <div className="relative flex justify-center w-full">
+                  <input
+                    type="number"
+                    className="text-center text-8xl md:text-[140px] font-ps-display bg-transparent border-none outline-none font-bold tracking-tighter leading-none w-full"
+                    style={{
+                      color: activeTheme ? `rgb(${activeTheme.rgb})` : '#C9A227',
+                      textShadow: activeTheme ? `0 0 80px rgba(${activeTheme.rgb}, 0.5)` : 'none',
+                      caretColor: 'transparent'
+                    }}
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    disabled={mode === "presente"}
+                  />
+                  {mode === "presente" && (
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+                      <span className="text-[9px] uppercase tracking-widest text-white/60">Ciclo Atual Fixado</span>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
 
-          {/* Discreet onboarding reset */}
-          <div className="w-full text-center mt-6 mb-2">
-            <Link to="/app/onboarding" className="text-[10px] uppercase tracking-widest text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white/30 pb-0.5">
-              Ver como funciona
-            </Link>
-          </div>
+              {/* ── Pergunta ── */}
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                className="w-full text-center mb-12 max-w-3xl">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-ps-display text-white leading-tight tracking-tight drop-shadow-2xl">
+                  {searchPath === 'cidade' ? 'Onde você vai passar o seu aniversário?'
+                    : searchPath === 'casa' ? 'Qual energia você quer ativar?'
+                    : 'O que você quer destravar no seu ano?'}
+                </h1>
+              </motion.div>
 
-          {/* Trust badges */}
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-6 md:gap-10 mt-6 px-4 pb-12">
-            {[
-              { text: "Dados 100% Privados" },
-              { text: "Efemérides Suíças (JPL)" },
-              { text: "IA Mestre Astrólogo" },
-            ].map((b, i) => (
-              <div key={i} className="flex items-center gap-2 text-muted-foreground/50">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
-              </div>
-            ))}
+              {/* ── Campo de busca — Full width ── */}
+              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
+                className="w-full max-w-2xl">
+                {searchPath === "cidade" && (
+                  <CityLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                )}
+                {searchPath === "casa" && (
+                  <HouseLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                )}
+                {searchPath === "intencao" && (
+                  <IntentLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
+                )}
+              </motion.div>
+
+              {/* Perfil incompleto */}
+              {!isNatalProfileComplete(profile) && (
+                <div className="mt-8 w-full max-w-2xl rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-center">
+                  <p className="text-destructive text-xs font-semibold mb-2">Seus dados natais estão incompletos.</p>
+                  <button onClick={() => navigate('/perfil')} className="text-[10px] uppercase tracking-widest text-white/50 hover:text-white underline">
+                    Completar Perfil
+                  </button>
+                </div>
+              )}
+
+            </div>
           </motion.div>
-        </div>
+        </AnimatePresence>
+      )}
+
+      {/* Trust badges — visible on steps 2 and 3 */}
+      {(step === 2 || step === 3) && (
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+          className="fixed bottom-4 left-0 right-0 flex flex-wrap justify-center gap-6 md:gap-10 px-4 z-20 pointer-events-none">
+          {[
+            { text: "Dados 100% Privados" },
+            { text: "Efemérides Suíças (JPL)" },
+            { text: "IA Mestre Astrólogo" },
+          ].map((b, i) => (
+            <div key={i} className="flex items-center gap-2 text-muted-foreground/50">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
+            </div>
+          ))}
+        </motion.div>
       )}
     </>
   );

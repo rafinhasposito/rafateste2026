@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Crown, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cityDatabase } from "@/data/houses";
@@ -181,33 +181,65 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
   return (
     <div className="space-y-6">
       {overrideTargetHouse === undefined && (
-        <>
-          <div className="flex items-center gap-3 mb-2">
-            <Crown className="w-5 h-5 text-[#C9A227]" />
-            <h3 className="font-ps-display text-sm md:text-base font-bold text-white uppercase tracking-[0.1em]">
-              Escolher por Casa Astrológica
-            </h3>
-          </div>
-          <p className="text-white/60 text-xs font-light">
-            Selecione a área da vida que deseja ativar em {year}. O sistema retornará as cidades ideais para ancorar o Sol nessa casa.
+        <div className="flex flex-col items-center text-center mb-8">
+          <p className="text-white/50 text-sm md:text-base font-light max-w-lg">
+            Cada área do grid abaixo corresponde a um foco diferente para o seu ano de {year}. Selecione a energia que você mais precisa atrair.
           </p>
-          <GoalCards selectedGoal={selectedHouse} onSelect={handleSelect} />
-        </>
+        </div>
       )}
 
-      <PremiumButton
-        variant="primary"
-        onClick={handleLookup}
-        disabled={loading || (overrideTargetHouse === undefined && !selectedHouse)}
-        className="w-full h-12 mt-4"
-      >
-        {loading ? (
-          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-        ) : (
-          <Search className="w-4 h-4 mr-2" />
+      {overrideTargetHouse === undefined && (
+        <GoalCards selectedGoal={selectedHouse} onSelect={handleSelect} mode={mode} />
+      )}
+
+      <AnimatePresence>
+        {selectedHouse && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: 10, height: 0 }}
+            className="flex flex-col items-center w-full mt-6 overflow-hidden"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between w-full p-4 md:p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl md:rounded-3xl backdrop-blur-md gap-6">
+              
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
+                  style={{ backgroundColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}15`, borderColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}30` }}>
+                  <Crown className="w-5 h-5" style={{ color: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15' }} />
+                </div>
+                <div className="text-left">
+                  <h4 className="text-white font-ps-display text-lg md:text-xl font-bold">Foco Definido</h4>
+                  <p className="text-white/60 text-xs md:text-sm">Agora veja as cidades que combinam com você.</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
+                <button
+                  onClick={handleLookup}
+                  disabled={loading}
+                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[10px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-black shadow-lg"
+                  style={{
+                    backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15',
+                    boxShadow: `0 0 30px ${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}40`,
+                  }}
+                >
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <Search className="w-4 h-4" />
+                  )}
+                  {loading ? "Calculando..." : "Revelar Cidades"}
+                </button>
+                <p className="font-ps-ui text-[8px] uppercase tracking-[0.2em] text-white/40 font-semibold flex items-center justify-center">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15' }} />
+                  Custo da Operação: 1 Crédito
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
         )}
-        {loading ? "Calculando rotas..." : "Revelar cidades ideais (1 crédito)"}
-      </PremiumButton>
+      </AnimatePresence>
 
       
     </div>

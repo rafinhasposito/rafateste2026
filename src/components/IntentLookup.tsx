@@ -62,15 +62,19 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
     onLoadingChange?.(state);
   };
 
-  const handleSelectIntent = async (houseId: number) => {
+  const handleSelectIntent = (houseId: number) => {
+    setSelectedHouse(houseId);
+  };
+
+  const handleConfirmIntent = async () => {
+    if (!selectedHouse) return;
     if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
     if (birthtime === "00:00" || birthtime === "00:00:00") {
       showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora real de nascimento (ex: 07:30, 14:15).");
       return;
     }
     
-    setSelectedHouse(houseId);
-    const houseData = cityDatabase[houseId];
+    const houseData = cityDatabase[selectedHouse];
     if (!houseData) return;
 
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
@@ -78,7 +82,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       userId: user.id,
       currentCredits: profile?.credits ?? 0,
       isAdmin,
-      description: `Consulta por Intenção — Casa ${houseId} (${houseData.label}) em ${year}`,
+      description: `Consulta por Intenção — Casa ${selectedHouse} (${houseData.label}) em ${year}`,
     });
     if (!charge.ok) {
       if (charge.reason === "no_credits") {
@@ -108,7 +112,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
           dob: dataFormatada,
           time: birthtime,
           target_year: year,
-          alvoId: houseId,
+          alvoId: selectedHouse,
           intent: houseData.intent,
         }),
       });
@@ -116,7 +120,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
 
-      const houseResult = data.results?.[String(houseId)];
+      const houseResult = data.results?.[String(selectedHouse)];
       const rawOptions = houseResult?.options || {};
 
       const toArray = (v: any): CityOption[] => {
@@ -146,13 +150,13 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         birth_place: birthPlace.trim(),
         year,
         mode,
-        goal: houseId,
+        goal: selectedHouse,
         intent: houseData.intent,
-        result: { results: allResults, house: houseId },
+        result: { results: allResults, house: selectedHouse },
       }) ?? undefined;
 
       if (consultationId) navigate("/dashboard?id=" + consultationId);
-      onHouseFound?.(houseId);
+      onHouseFound?.(selectedHouse);
     } catch (error) {
       const err = error as Error;
       showAlert("Falha na consulta: " + err.message);
@@ -163,52 +167,103 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
   };
 
 
+  const hexColor = mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15';
+
   return (
     <div className="space-y-6">
       {!result && !loading && (
-        <>
-          <div className="flex items-center gap-3 mb-2">
-            <Scroll className="w-5 h-5 text-[#C9A227]" />
-            <h3 className="font-ps-display text-sm md:text-base font-bold text-white uppercase tracking-[0.1em]">
-              Manifesto de Intenção
-            </h3>
-          </div>
-          <p className="text-white/60 text-xs font-light mb-6">
-            O que você gostaria que fosse diferente no seu próximo ano? Escolha o seu desejo principal e a nossa engine fará os cálculos para encontrar o destino exato.
-          </p>
-
-          <div className="flex flex-col gap-3 md:gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-            {Object.values(cityDatabase).map((house) => (
+        <div className="flex flex-col gap-4 pb-12">
+          {Object.values(cityDatabase).map((house, index) => {
+            const isSelected = selectedHouse === house.id;
+            return (
               <motion.button
                 key={house.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 onClick={() => handleSelectIntent(house.id)}
-                className="w-full text-left p-4 rounded-xl bg-black/40 hover:bg-black/60 border border-white/5 hover:border-[#C9A227]/50 transition-all duration-300 group"
+                className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 group flex items-start justify-between gap-4 ${
+                  isSelected ? "bg-white/[0.05]" : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05]"
+                }`}
+                style={{
+                  borderColor: isSelected ? `${hexColor}40` : undefined,
+                  boxShadow: isSelected ? `0 0 20px ${hexColor}10` : 'none',
+                }}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-white md:text-sm font-medium mb-1 group-hover:text-[#C9A227] transition-colors leading-snug">
-                      {house.intent}
-                    </h3>
-                    <p className="text-white/40 text-[10px] font-light">
-                      {house.realLife}
-                    </p>
-                  </div>
-                  <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#C9A227]/10 transition-colors">
-                    <ArrowRight className="w-3 h-3 text-white/30 group-hover:text-[#C9A227] transition-colors" />
-                  </div>
+                <div className="flex-1">
+                  <h3 className="md:text-sm font-medium mb-1 transition-colors leading-snug group-hover:opacity-100"
+                      style={{ color: isSelected ? hexColor : 'white' }}>
+                    {house.intent}
+                  </h3>
+                  <p className="text-white/50 text-[11px] font-light">
+                    {house.realLife}
+                  </p>
+                </div>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-all"
+                     style={{ 
+                       backgroundColor: isSelected ? `${hexColor}15` : 'rgba(255,255,255,0.02)',
+                       borderColor: isSelected ? `${hexColor}30` : 'rgba(255,255,255,0.1)',
+                     }}>
+                  <ArrowRight className="w-4 h-4 transition-colors" style={{ color: isSelected ? hexColor : 'rgba(255,255,255,0.3)' }} />
                 </div>
               </motion.button>
-            ))}
-          </div>
-        </>
+            );
+          })}
+        </div>
       )}
+
+      {/* Progressive Disclosure: Card de Confirmação no Estilo Apple (igual aos outros) */}
+      <AnimatePresence>
+        {selectedHouse && !loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: 10, height: 0 }}
+            className="flex flex-col items-center w-full mt-6 overflow-hidden"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between w-full p-4 md:p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl md:rounded-3xl backdrop-blur-md gap-6">
+              
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
+                  style={{ backgroundColor: `${hexColor}15`, borderColor: `${hexColor}30` }}>
+                  <Sparkles className="w-5 h-5" style={{ color: hexColor }} />
+                </div>
+                <div className="text-left">
+                  <h4 className="text-white font-ps-display text-lg md:text-xl font-bold">Foco Definido</h4>
+                  <p className="text-white/60 text-xs md:text-sm">Agora veja as cidades que combinam com você.</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
+                <button
+                  onClick={handleConfirmIntent}
+                  disabled={loading}
+                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[10px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-black shadow-lg"
+                  style={{
+                    backgroundColor: hexColor,
+                    boxShadow: `0 0 30px ${hexColor}40`,
+                  }}
+                >
+                  <Search className="w-4 h-4" />
+                  Revelar Cidades
+                </button>
+                <p className="font-ps-ui text-[8px] uppercase tracking-[0.2em] text-white/40 font-semibold flex items-center justify-center">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: hexColor }} />
+                  Custo da Operação: 1 Crédito
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {loading && (
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
-          <div className="w-8 h-8 border-2 border-[#C9A227]/30 border-t-[#C9A227] rounded-full animate-spin" />
-          <p className="text-[#C9A227] font-ps-display text-sm animate-pulse">Consultando o cosmos...</p>
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <p className="text-white/60 font-ps-display text-sm animate-pulse">Cruzando dados natais...</p>
         </div>
       )}
 

@@ -171,7 +171,7 @@ export const houseThemes: Record<number, HouseTheme> = {
   "5": {
     "id": 5,
     "name": "Casa 5",
-    "themeColor": "#EAB308",
+    "themeColor": "#F97316",
     "subtitle": "A energia do Romance, do Prazer e do Brilho Pessoal",
     "personas": [
       {
@@ -247,7 +247,7 @@ export const houseThemes: Record<number, HouseTheme> = {
   "7": {
     "id": 7,
     "name": "Casa 7",
-    "themeColor": "#F43F5E",
+    "themeColor": "#EC4899",
     "subtitle": "A energia do Casamento, do Compromisso e das Parcerias",
     "personas": [
       {
@@ -285,7 +285,7 @@ export const houseThemes: Record<number, HouseTheme> = {
   "8": {
     "id": 8,
     "name": "Casa 8",
-    "themeColor": "#881337",
+    "themeColor": "#A21CAF",
     "subtitle": "A energia da Transformação, do Poder e da Intimidade",
     "personas": [
       {
@@ -361,7 +361,7 @@ export const houseThemes: Record<number, HouseTheme> = {
   "10": {
     "id": 10,
     "name": "Casa 10",
-    "themeColor": "#334155",
+    "themeColor": "#64748B",
     "subtitle": "A energia da Fama, do Sucesso e do Reconhecimento",
     "personas": [
       {

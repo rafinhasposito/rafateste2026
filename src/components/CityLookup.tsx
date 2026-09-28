@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Compass, Search } from "lucide-react";
+import { Compass, Search, MapPin, Globe } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import { API_URL } from "@/lib/astro";
 import { cityDatabase } from "@/data/houses";
@@ -230,47 +230,86 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col mb-12">
-         <p className="font-ps-ui text-white/50 text-sm italic mb-6">"A posição geográfica dita a frequência do seu ano."</p>
-        <label className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-4">
-          Defina o Ponto no Mapa
-        </label>
+    <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+      {/* Apple Spotlight Search Bar */}
+      <p className="font-ps-ui text-white/50 text-base md:text-lg italic mb-8 text-center drop-shadow-md">"A posição geográfica dita a frequência do seu ano."</p>
+      <div className="w-full relative group mb-8 mt-0">
+        {/* Glow de fundo da barra de busca */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition duration-1000 group-focus-within:opacity-100" />
         
-        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
-          <div className="flex-1 relative">
-            <CityAutocomplete
-              value={city}
-              onChange={(v, valid, coords) => {
-                setCity(v);
-                setCityValid(valid);
-                setCityCoords(coords ?? null);
-                setResult(null);
-              }}
-              placeholder="Ex: Nova York, Londres, Jerusalém..."
-              className="w-full text-xl font-ps-display placeholder:font-sans placeholder:text-lg border-b border-white/20 bg-transparent pb-3 pt-2 text-white focus:border-[#C9A227] focus:ring-0 transition-colors rounded-none"
-            />
-          </div>
-          <button
-            onClick={handleLookup}
-            disabled={loading || !cityValid}
-            className="shrink-0 h-14 px-8 bg-white text-black hover:bg-gray-200 disabled:bg-white/10 disabled:text-white/30 transition-all font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-            ) : (
-              <Search className="w-4 h-4" />
+        <div className="relative flex flex-col items-center bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[32px] p-2 transition-all duration-500 focus-within:border-white/30 focus-within:bg-white/[0.05] shadow-2xl">
+          
+          <div className="w-full flex items-center px-6 py-4">
+            <Search className="w-6 h-6 text-white/40 mr-4 shrink-0" />
+            <div className="flex-1">
+              <CityAutocomplete
+                value={city}
+                onChange={(v, valid, coords) => {
+                  setCity(v);
+                  setCityValid(valid);
+                  setCityCoords(coords ?? null);
+                  setResult(null);
+                }}
+                placeholder="Digite a cidade de destino..."
+                className="w-full text-2xl md:text-3xl font-ps-display placeholder:font-ps-display placeholder:font-light placeholder:text-white/20 bg-transparent border-none outline-none text-white focus:ring-0 px-0 h-auto"
+              />
+            </div>
+            {cityValid && (
+              <div className="w-2 h-2 rounded-full bg-[#10B981] ml-4 shrink-0 shadow-[0_0_10px_#10B981]" />
             )}
-            {loading ? "Simulando" : "Simular Destino"}
-          </button>
+          </div>
         </div>
-        <p className="font-ps-ui text-[10px] text-white/40 mt-3 font-light tracking-wide">
-          * A consulta exige 1 crédito da sua conta.
-        </p>
       </div>
 
+      {/* Progressive Disclosure: Botão só aparece quando a cidade é válida */}
+      <AnimatePresence>
+        {cityValid && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: 10, height: 0 }}
+            className="flex flex-col items-center w-full mt-6 overflow-hidden"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between w-full p-4 md:p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl md:rounded-3xl backdrop-blur-md gap-6">
+              
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
+                  style={{ backgroundColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}15`, borderColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}30` }}>
+                  <MapPin className="w-5 h-5" style={{ color: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15' }} />
+                </div>
+                <div className="text-left">
+                  <h4 className="text-white font-ps-display text-lg md:text-xl font-bold">Destino Selecionado</h4>
+                  <p className="text-white/60 text-xs md:text-sm">Confirme para traçar sua rota astrofísica.</p>
+                </div>
+              </div>
 
-      
+              <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
+                <button
+                  onClick={handleLookup}
+                  disabled={loading}
+                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[10px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-black shadow-lg"
+                  style={{
+                    backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15',
+                    boxShadow: `0 0 30px ${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}40`,
+                  }}
+                >
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <Globe className="w-4 h-4" />
+                  )}
+                  {loading ? "Calculando Rota..." : "Confirmar Destino"}
+                </button>
+                <p className="font-ps-ui text-[8px] uppercase tracking-[0.2em] text-white/40 font-semibold flex items-center justify-center">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15' }} />
+                  Custo da Operação: 1 Crédito
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
