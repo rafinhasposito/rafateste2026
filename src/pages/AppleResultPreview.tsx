@@ -765,23 +765,20 @@ export default function AppleResultPreview() {
                             {
                               id: 'essencia',
                               label: 'Sua Essência',
-                              title: 'Sol em Leão: O Seu Magnetismo Natural',
-                              text: `Como leonino, seu valor pessoal está diretamente ligado à sua autonomia. Na área de ${currentActiveData.label}, a energia desta cidade potencializa seu magnetismo para atrair resultados com velocidade.`,
-                              icon: Sun
+                              title: 'Sol em Leão',
+                              text: `O seu magnetismo natural e a sua autonomia são os seus maiores ativos. Na área de ${currentActiveData.label}, a energia desta cidade entra em ressonância com a sua essência para atrair resultados com velocidade absoluta.`
                             },
                             {
                               id: 'metodo',
                               label: 'Seu Método',
-                              title: 'Asc. em Virgem: Seu Modo de Execução',
-                              text: 'Traz a mente analítica a seu favor. O universo facilita que você organize processos com disciplina, método impecável e visão de longo prazo.',
-                              icon: ArrowUpCircle
+                              title: 'Ascendente em Virgem',
+                              text: 'A mente analítica trabalha a seu favor. O universo facilita que você organize o caos e execute processos com disciplina, método impecável e visão cirúrgica de longo prazo.'
                             },
                             {
                               id: 'fase',
                               label: 'Fase Atual',
-                              title: 'Maturidade (41 Anos): Seu Momento de Vida',
-                              text: 'A ambição cede lugar à sabedoria prática. O objetivo agora não é a ostentação superficial, mas a construção definitiva de um porto seguro e estabilidade real.',
-                              icon: Hourglass
+                              title: 'Maturidade (41 Anos)',
+                              text: 'A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real.'
                             }
                           ];
                           
@@ -797,18 +794,17 @@ export default function AppleResultPreview() {
                                     <button
                                       key={item.id}
                                       onClick={() => setActiveDnaTab(item.id)}
-                                      className={`relative px-5 md:px-8 py-3.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider transition-colors duration-300 z-10 ${isActive ? 'text-black' : 'text-white/60 hover:text-white'}`}
+                                      className={`relative px-6 md:px-10 py-4 rounded-full text-xs md:text-sm font-bold uppercase tracking-widest transition-colors duration-300 z-10 ${isActive ? 'text-black' : 'text-white/60 hover:text-white'}`}
                                     >
                                       {isActive && (
                                         <motion.div
                                           layoutId="activeTabIndicator"
                                           className="absolute inset-0 rounded-full -z-10"
-                                          style={{ backgroundColor: currentActiveData.color, boxShadow: `0 0 20px ${currentActiveData.color}60` }}
+                                          style={{ backgroundColor: currentActiveData.color, boxShadow: `0 0 30px ${currentActiveData.color}40` }}
                                           transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                         />
                                       )}
-                                      <span className="flex items-center gap-2">
-                                        {/* Apenas mostrar label para limpar */}
+                                      <span className="relative z-20">
                                         {item.label}
                                       </span>
                                     </button>
@@ -816,28 +812,24 @@ export default function AppleResultPreview() {
                                 })}
                               </div>
 
-                              {/* The Content Area */}
-                              <div className="w-full max-w-4xl min-h-[300px] relative">
+                              {/* The Content Area - Editorial Style */}
+                              <div className="w-full max-w-4xl min-h-[280px] relative">
                                 <AnimatePresence mode="wait">
                                   <motion.div
                                     key={activeDnaObj.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="absolute inset-0 bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 md:gap-12 shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+                                    initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                                    className="absolute inset-0 bg-black/30 backdrop-blur-2xl border border-white/5 rounded-[40px] p-10 md:p-16 flex flex-col items-center justify-center text-center shadow-[0_30px_60px_rgba(0,0,0,0.5)] overflow-hidden"
                                   >
-                                    <div 
-                                      className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-[2rem] flex items-center justify-center shadow-2xl relative"
-                                      style={{ backgroundColor: `${currentActiveData.color}15`, border: `1px solid ${currentActiveData.color}30` }}
-                                    >
-                                      <div className="absolute inset-0 blur-xl opacity-40 rounded-[2rem]" style={{ backgroundColor: currentActiveData.color }}></div>
-                                      <activeDnaObj.icon className="w-12 h-12 md:w-16 md:h-16 relative z-10" style={{ color: currentActiveData.color }} strokeWidth={1.5} />
-                                    </div>
+                                    {/* Subtle Ambient Glow */}
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[60%] opacity-20 pointer-events-none rounded-full blur-[100px]" style={{ backgroundColor: currentActiveData.color }} />
                                     
-                                    <div className="text-center md:text-left">
-                                      <h4 className="text-2xl md:text-4xl font-bold text-white mb-4 tracking-tight">{activeDnaObj.title}</h4>
-                                      <p className="text-white/60 text-base md:text-xl leading-relaxed font-light">{activeDnaObj.text}</p>
+                                    <div className="relative z-10 max-w-3xl flex flex-col items-center">
+                                      <h4 className="font-ps-display text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-tight">{activeDnaObj.title}</h4>
+                                      <div className="w-12 h-px mb-8 opacity-40" style={{ backgroundColor: currentActiveData.color }} />
+                                      <p className="text-white/70 text-lg md:text-2xl leading-relaxed font-light">{activeDnaObj.text}</p>
                                     </div>
                                   </motion.div>
                                 </AnimatePresence>
