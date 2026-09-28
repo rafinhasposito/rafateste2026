@@ -12,15 +12,31 @@ const P = {
 };
 
 const LIFE_AREAS = [
-  { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", score: 98, teaser: "A escolha perfeita para quem quer viver um romance leve e sem cobranças. Favorece encontros que nascem naturalmente da amizade, da convivência em grupo e de sonhos em comum." },
-  { id: "trabalho", icon: Briefcase, label: "Trabalho e Carreira", color: "#10b981", score: 98, teaser: "Desenhado sob medida para quem busca crescer sem precisar fazer tudo sozinho. O terreno é fértil para impulsionar seus projetos através de alianças e apoios do seu mercado." },
-  { id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#f59e0b", score: 98, teaser: "A rota certa para quem precisa faturar aproveitando conexões e novos públicos. A energia estimula oportunidades financeiras que tendem a fluir por indicações e projetos colaborativos." },
-  { id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", score: 98, teaser: "Recomendado para quem quer renovar a disposição física de forma motivadora. Convida você a criar constância em novos ambientes, esportes ao ar livre e atividades coletivas." },
-  { id: "networking", icon: Users, label: "Networking e Conexões", color: "#3b82f6", score: 98, teaser: "O caminho ideal para abrir portas em círculos seletos e ativos. Facilita o acesso a mentores e aliados que apoiam e recomendam genuinamente suas ideias." },
-  { id: "rotina", icon: Calendar, label: "Rotina e Produtividade", color: "#a855f7", score: 98, teaser: "Excelente para quem quer organizar o cotidiano com leveza e colaboração. Ajuda a otimizar o dia a dia dividindo tarefas, usando tecnologia e contando com o suporte de equipe." },
-  { id: "espiritual", icon: Sparkles, label: "Espiritual e Propósito", color: "#818cf8", score: 98, teaser: "Para você que busca dar um significado maior aos seus projetos. Tende a despertar uma realização profunda ao colocar seus talentos a serviço de uma causa ou ecossistema." },
-  { id: "identidade", icon: Crown, label: "Identidade e Imagem", color: "#c9a227", score: 98, teaser: "A estratégia certa se você quer ganhar destaque, relevância e simpatia pública. Ativa uma presença acolhedora e inspiradora que encoraja você a se posicionar como referência na sua tribo." },
+  { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", teaser: "A escolha perfeita para quem quer viver um romance leve e sem cobranças. Favorece encontros que nascem naturalmente da amizade, da convivência em grupo e de sonhos em comum." },
+  { id: "trabalho", icon: Briefcase, label: "Trabalho e Carreira", color: "#10b981", teaser: "Desenhado sob medida para quem busca crescer sem precisar fazer tudo sozinho. O terreno é fértil para impulsionar seus projetos através de alianças e apoios do seu mercado." },
+  { id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#f59e0b", teaser: "A rota certa para quem precisa faturar aproveitando conexões e novos públicos. A energia estimula oportunidades financeiras que tendem a fluir por indicações e projetos colaborativos." },
+  { id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", teaser: "Recomendado para quem quer renovar a disposição física de forma motivadora. Convida você a criar constância em novos ambientes, esportes ao ar livre e atividades coletivas." },
+  { id: "networking", icon: Users, label: "Networking e Conexões", color: "#3b82f6", teaser: "O caminho ideal para abrir portas em círculos seletos e ativos. Facilita o acesso a mentores e aliados que apoiam e recomendam genuinamente suas ideias." },
+  { id: "rotina", icon: Calendar, label: "Rotina e Produtividade", color: "#a855f7", teaser: "Excelente para quem quer organizar o cotidiano com leveza e colaboração. Ajuda a otimizar o dia a dia dividindo tarefas, usando tecnologia e contando com o suporte de equipe." },
+  { id: "espiritual", icon: Sparkles, label: "Espiritual e Propósito", color: "#818cf8", teaser: "Para você que busca dar um significado maior aos seus projetos. Tende a despertar uma realização profunda ao colocar seus talentos a serviço de uma causa ou ecossistema." },
+  { id: "identidade", icon: Crown, label: "Identidade e Imagem", color: "#c9a227", teaser: "A estratégia certa se você quer ganhar destaque, relevância e simpatia pública. Ativa uma presença acolhedora e inspiradora que encoraja você a se posicionar como referência na sua tribo." },
 ];
+
+// Matriz de Afinidade Astrológica: Define o Match % de cada Foco baseado na Casa
+const AFFINITY_MATRIX: Record<number, Record<string, number>> = {
+  1: { amor: 72, trabalho: 85, dinheiro: 75, saude: 92, networking: 68, rotina: 70, espiritual: 65, identidade: 98 },
+  2: { amor: 62, trabalho: 88, dinheiro: 98, saude: 52, networking: 65, rotina: 72, espiritual: 55, identidade: 80 },
+  3: { amor: 65, trabalho: 92, dinheiro: 80, saude: 58, networking: 88, rotina: 85, espiritual: 60, identidade: 72 },
+  4: { amor: 82, trabalho: 60, dinheiro: 78, saude: 72, networking: 50, rotina: 75, espiritual: 88, identidade: 65 },
+  5: { amor: 98, trabalho: 82, dinheiro: 75, saude: 78, networking: 70, rotina: 60, espiritual: 65, identidade: 92 },
+  6: { amor: 50, trabalho: 88, dinheiro: 78, saude: 98, networking: 60, rotina: 95, espiritual: 55, identidade: 65 },
+  7: { amor: 98, trabalho: 86, dinheiro: 75, saude: 55, networking: 92, rotina: 60, espiritual: 65, identidade: 72 },
+  8: { amor: 88, trabalho: 80, dinheiro: 92, saude: 70, networking: 65, rotina: 55, espiritual: 85, identidade: 78 },
+  9: { amor: 72, trabalho: 88, dinheiro: 75, saude: 70, networking: 82, rotina: 58, espiritual: 98, identidade: 80 },
+  10: { amor: 58, trabalho: 98, dinheiro: 88, saude: 55, networking: 80, rotina: 72, espiritual: 68, identidade: 95 },
+  11: { amor: 72, trabalho: 90, dinheiro: 85, saude: 62, networking: 98, rotina: 68, espiritual: 78, identidade: 80 },
+  12: { amor: 70, trabalho: 60, dinheiro: 65, saude: 88, networking: 50, rotina: 80, espiritual: 98, identidade: 75 },
+};
 
 export default function HouseTrailerApp() {
   const navigate = useNavigate();
@@ -47,6 +63,12 @@ export default function HouseTrailerApp() {
   }, [currentHouse, urlHouse]);
 
   const theme = houseThemes[currentHouse] || houseThemes[11];
+  
+  // Ordena as áreas de vida pelo Match % baseado na casa atual
+  const sortedAreas = [...LIFE_AREAS].map(area => ({
+    ...area,
+    score: AFFINITY_MATRIX[currentHouse]?.[area.id] || 50
+  })).sort((a, b) => b.score - a.score);
 
   const handleSelectIntention = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -214,8 +236,8 @@ export default function HouseTrailerApp() {
                 transition={{ duration: 0.4, type: 'spring', bounce: 0.15 }}
                 className="hidden lg:flex shrink-0 flex-col gap-2 items-stretch h-full overflow-hidden"
               >
-                {LIFE_AREAS.map((area) => {
-                  const currentActive = hoveredArea || "amor";
+                {sortedAreas.map((area) => {
+                  const currentActive = hoveredArea || sortedAreas[0].id;
                   const isActive = currentActive === area.id;
 
                   return (
@@ -284,8 +306,8 @@ export default function HouseTrailerApp() {
 
               {/* MOBILE: ACCORDION — tap item → barra anima + painel expande inline */}
               <div className="w-full lg:hidden flex flex-col gap-3">
-                {LIFE_AREAS.map((area) => {
-                  const currentActive = hoveredArea || "amor";
+                {sortedAreas.map((area) => {
+                  const currentActive = hoveredArea || sortedAreas[0].id;
                   const isActive = currentActive === area.id;
 
                   return (
@@ -392,7 +414,7 @@ export default function HouseTrailerApp() {
                 className="flex-1 h-[600px] lg:h-full relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: bgBase }}
               >
                 <AnimatePresence mode="wait">
-                  {LIFE_AREAS.filter(a => a.id === (hoveredArea || "amor")).map((activeArea) => (
+                  {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
                     <motion.div
                       key={activeArea.id}
                       initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
