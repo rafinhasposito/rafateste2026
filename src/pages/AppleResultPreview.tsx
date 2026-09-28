@@ -751,92 +751,72 @@ export default function AppleResultPreview() {
                         ))}
                       </motion.div>
 
-                      {/* BLOCO 3: O SEU DNA DE ATIVAÇÃO (Segmented Control) */}
-                      <div className="w-full mt-32">
-                        <div className="flex flex-col items-center mb-16 text-center">
-                          <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tight mb-4">O Seu DNA de Ativação</h2>
-                          <p className="text-white/60 text-lg max-w-2xl font-light">
-                            Descubra como a sua assinatura astrológica única direciona a conquista desta área.
-                          </p>
+                      {/* BLOCO 3: O SEU DNA DE ATIVAÇÃO (Borderless Apple Narrative) */}
+                      <div className="w-full mt-40">
+                        
+                        <div className="flex flex-col gap-32 md:gap-40 w-full relative">
+                          
+                          {/* Elemento 1: Essência (Left Aligned) */}
+                          <motion.div 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="flex flex-col items-start text-left max-w-3xl relative z-10"
+                          >
+                            <span className="font-mono uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                              01. Sua Essência
+                            </span>
+                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                              Sol em Leão.
+                            </h3>
+                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                              O seu magnetismo natural e a sua autonomia são os seus maiores ativos. Na área de <strong className="text-white font-medium">{currentActiveData.label}</strong>, a energia desta cidade entra em ressonância com a sua essência para atrair resultados com velocidade absoluta.
+                            </p>
+                          </motion.div>
+
+                          {/* Elemento 2: Método (Right Aligned) */}
+                          <motion.div 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="flex flex-col items-start md:items-end text-left md:text-right max-w-3xl self-end relative z-10"
+                          >
+                            <span className="font-mono uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                              02. Seu Método
+                            </span>
+                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                              Ascendente <br className="hidden md:block" />em Virgem.
+                            </h3>
+                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                              A mente analítica trabalha a seu favor. O universo facilita que você organize o caos e execute processos com disciplina, método impecável e visão cirúrgica de longo prazo.
+                            </p>
+                          </motion.div>
+
+                          {/* Elemento 3: Fase Atual (Center Aligned) */}
+                          <motion.div 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="flex flex-col items-start md:items-center text-left md:text-center max-w-4xl self-center relative z-10 mt-10"
+                          >
+                            <span className="font-mono uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                              03. Fase Atual
+                            </span>
+                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                              Maturidade.
+                            </h3>
+                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                              A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real.
+                            </p>
+                          </motion.div>
+
+                          {/* Fundo Atmosférico abstrato para amarrar os textos */}
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] opacity-10 pointer-events-none blur-[150px] -z-10" style={{ backgroundColor: currentActiveData.color }} />
                         </div>
 
-                        {(() => {
-                          const dnaData = [
-                            {
-                              id: 'essencia',
-                              label: 'Sua Essência',
-                              title: 'Sol em Leão',
-                              text: `O seu magnetismo natural e a sua autonomia são os seus maiores ativos. Na área de ${currentActiveData.label}, a energia desta cidade entra em ressonância com a sua essência para atrair resultados com velocidade absoluta.`
-                            },
-                            {
-                              id: 'metodo',
-                              label: 'Seu Método',
-                              title: 'Ascendente em Virgem',
-                              text: 'A mente analítica trabalha a seu favor. O universo facilita que você organize o caos e execute processos com disciplina, método impecável e visão cirúrgica de longo prazo.'
-                            },
-                            {
-                              id: 'fase',
-                              label: 'Fase Atual',
-                              title: 'Maturidade (41 Anos)',
-                              text: 'A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real.'
-                            }
-                          ];
-                          
-                          const activeDnaObj = dnaData.find(d => d.id === activeDnaTab) || dnaData[0];
-
-                          return (
-                            <div className="flex flex-col items-center w-full">
-                              {/* The Pill Control */}
-                              <div className="bg-black/50 backdrop-blur-xl p-1.5 rounded-full flex gap-1 mb-12 border border-white/10 shadow-lg">
-                                {dnaData.map(item => {
-                                  const isActive = activeDnaTab === item.id;
-                                  return (
-                                    <button
-                                      key={item.id}
-                                      onClick={() => setActiveDnaTab(item.id)}
-                                      className={`relative px-6 md:px-10 py-4 rounded-full text-xs md:text-sm font-bold uppercase tracking-widest transition-colors duration-300 z-10 ${isActive ? 'text-black' : 'text-white/60 hover:text-white'}`}
-                                    >
-                                      {isActive && (
-                                        <motion.div
-                                          layoutId="activeTabIndicator"
-                                          className="absolute inset-0 rounded-full -z-10"
-                                          style={{ backgroundColor: currentActiveData.color, boxShadow: `0 0 30px ${currentActiveData.color}40` }}
-                                          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                        />
-                                      )}
-                                      <span className="relative z-20">
-                                        {item.label}
-                                      </span>
-                                    </button>
-                                  );
-                                })}
-                              </div>
-
-                              {/* The Content Area - Editorial Style */}
-                              <div className="w-full max-w-4xl min-h-[280px] relative">
-                                <AnimatePresence mode="wait">
-                                  <motion.div
-                                    key={activeDnaObj.id}
-                                    initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.98, y: -10 }}
-                                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                                    className="absolute inset-0 bg-black/30 backdrop-blur-2xl border border-white/5 rounded-[40px] p-10 md:p-16 flex flex-col items-center justify-center text-center shadow-[0_30px_60px_rgba(0,0,0,0.5)] overflow-hidden"
-                                  >
-                                    {/* Subtle Ambient Glow */}
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[60%] opacity-20 pointer-events-none rounded-full blur-[100px]" style={{ backgroundColor: currentActiveData.color }} />
-                                    
-                                    <div className="relative z-10 max-w-3xl flex flex-col items-center">
-                                      <h4 className="font-ps-display text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-tight">{activeDnaObj.title}</h4>
-                                      <div className="w-12 h-px mb-8 opacity-40" style={{ backgroundColor: currentActiveData.color }} />
-                                      <p className="text-white/70 text-lg md:text-2xl leading-relaxed font-light">{activeDnaObj.text}</p>
-                                    </div>
-                                  </motion.div>
-                                </AnimatePresence>
-                              </div>
-                            </div>
-                          );
-                        })()}
                       </div>
 
                     </div>
