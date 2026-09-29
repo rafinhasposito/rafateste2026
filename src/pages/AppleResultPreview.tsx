@@ -86,6 +86,9 @@ const LIFE_AREAS = [
   { 
     id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#10b981", score: 98, unlocked: true, 
     teaser: "O magnetismo deste destino destrava a sua capacidade de atrair e materializar recursos.", 
+    city: "Tóquio, Japão",
+    cityDesc: "Uma metrópole onde a eficiência cirúrgica encontra o caos vibrante. Tóquio pulsa com uma energia de disciplina e hiperprodutividade, criando o terreno magnético exato para quem precisa transformar metas dispersas em lucro previsível.",
+    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1994&auto=format&fit=crop",
     dna: {
       essencia: "O seu magnetismo natural e a sua autonomia são os seus maiores ativos. Na área de Dinheiro e Recursos, a energia desta cidade entra em ressonância com a sua essência para atrair resultados com velocidade absoluta.",
       metodo: "A mente analítica trabalha a seu favor. O universo facilita que você organize o caos e execute processos com disciplina, método impecável e visão cirúrgica de longo prazo.",
@@ -107,6 +110,9 @@ const LIFE_AREAS = [
   { 
     id: "trabalho", icon: Briefcase, label: "Trabalho e Carreira", color: "#3b82f6", score: 88, unlocked: false, 
     teaser: "A força deste destino impulsiona suas metas profissionais rumo ao topo.", 
+    city: "Nova York, EUA",
+    cityDesc: "O epicentro financeiro do mundo. A energia inesgotável desta ilha não aceita mediocridade, forçando você a assumir a autoridade da sua própria carreira e colocar suas ideias nos maiores palcos disponíveis.",
+    image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop",
     dna: {
       essencia: "O seu brilho pessoal exige protagonismo. No Trabalho, a vibração desta cidade garante que o seu magnetismo abra portas que diplomas sozinhos não abririam.",
       metodo: "A sua necessidade de excelência encontra o terreno fértil. O destino recompensa a sua capacidade de estruturar equipes, otimizar rotinas e liderar pelo exemplo prático.",
@@ -128,6 +134,9 @@ const LIFE_AREAS = [
   { 
     id: "identidade", icon: Crown, label: "Identidade e Imagem", color: "#c9a227", score: 80, unlocked: false, 
     teaser: "A vibração da cidade transforma a sua marca pessoal em sinônimo de excelência.", 
+    city: "Milão, Itália",
+    cityDesc: "Berço da estética impecável. O magnetismo de Milão exige que você abandone qualquer versão encolhida de si mesmo, atraindo oportunidades baseadas inteiramente na confiança do seu posicionamento.",
+    image: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2020&auto=format&fit=crop",
     dna: {
       essencia: "Você nasceu para ser visto. Nesta cidade, a sua identidade se fortalece, e o universo te empurra para o centro do palco sem que você precise forçar a barra.",
       metodo: "A sua imagem passa a transmitir uma precisão cirúrgica. As pessoas confiam em você porque o seu brilho vem acompanhado de extrema competência e atenção aos detalhes.",
@@ -149,6 +158,9 @@ const LIFE_AREAS = [
   { 
     id: "rotina", icon: Calendar, label: "Rotina e Produtividade", color: "#a855f7", score: 72, unlocked: false, 
     teaser: "O universo organiza o seu tempo para transformar disciplina na sua maior alavanca.", 
+    city: "Zurique, Suíça",
+    cityDesc: "A capital mundial da precisão. Esta cidade não tolera desperdício, calibrando o seu tempo e foco para que você produza o dobro do resultado exigindo metade do esforço físico.",
+    image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=2070&auto=format&fit=crop",
     dna: {
       essencia: "Até mesmo o seu dia a dia precisa ter a sua assinatura de criatividade. Aqui, a rotina não apaga o seu brilho, mas serve como combustível para você focar no que importa.",
       metodo: "O seu Ascendente está em casa. A energia local transforma o seu preciosismo em alta produtividade, ajudando a criar sistemas que funcionam quase no piloto automático.",
@@ -170,6 +182,9 @@ const LIFE_AREAS = [
   { 
     id: "networking", icon: Users, label: "Networking e Conexões", color: "#14b8a6", score: 65, unlocked: false, 
     teaser: "O magnetismo deste destino aproxima pessoas que abrem portas restritas do seu mercado.", 
+    city: "Singapura",
+    cityDesc: "Um hub global de inovação. A frequência deste destino aproxima aliados de elite e mentores cruciais, abrindo portas de mesas fechadas sem que você precise pedir permissão.",
+    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format&fit=crop",
     dna: {
       essencia: "Você naturalmente atrai as pessoas, mas aqui o seu magnetismo filtra quem realmente importa. A energia afasta sugadores e aproxima parceiros estratégicos.",
       metodo: "A sua rede de contatos ganha um filtro de utilidade mútua. O universo facilita alianças onde os dois lados entregam excelência, sem espaço para promessas vazias.",
@@ -191,6 +206,9 @@ const LIFE_AREAS = [
   { 
     id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", score: 62, unlocked: false, 
     teaser: "A energia pede estabilidade e transforma o romance em uma base forte para o futuro.", 
+    city: "Roma, Itália",
+    cityDesc: "A cidade eterna. A vibração deste destino afasta paixões rasas e convida à fundação de laços profundos. É um terreno magnético para estabilizar romances e torná-los fortalezas.",
+    image: "https://images.unsplash.com/photo-1516483638261-f40889eba30e?q=80&w=1980&auto=format&fit=crop",
     dna: {
       essencia: "O seu Leão pede admiração mútua. No Amor, o destino afasta relações em que você precise se diminuir e atrai parcerias onde o seu brilho é celebrado e protegido.",
       metodo: "O romantismo encontra a praticidade. O universo favorece parceiros que trazem ordem, cuidado diário e que saibam construir uma vida a dois sem dramas desnecessários.",
@@ -212,6 +230,9 @@ const LIFE_AREAS = [
   { 
     id: "espiritual", icon: Sparkles, label: "Espiritual e Propósito", color: "#6366f1", score: 55, unlocked: false, 
     teaser: "O universo conecta a sua essência com a capacidade de gerar valor no mundo material.", 
+    city: "Quioto, Japão",
+    cityDesc: "O epicentro do silêncio focado. Uma energia milenar que silencia o ruído externo e sintoniza você com a sua intuição mais profunda, traduzindo insights em passos firmes.",
+    image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop",
     dna: {
       essencia: "A sua luz interna ganha um propósito maior. O destino te lembra que o seu poder pessoal tem a missão de iluminar não só o seu caminho, mas o das pessoas ao redor.",
       metodo: "A espiritualidade deixa de ser mística e passa a ser prática. O universo alinha a sua intuição com ações calculadas, transformando insight em resultados concretos.",
@@ -233,6 +254,9 @@ const LIFE_AREAS = [
   { 
     id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", score: 52, unlocked: false, 
     teaser: "A força deste destino pede um corpo firme para suportar o peso das suas ambições.", 
+    city: "Vancouver, Canadá",
+    cityDesc: "Natureza implacável e ar puro. Este destino acelera o seu metabolismo e convida ao biohacking natural, purificando a sua vitalidade para suportar o topo da sua carreira.",
+    image: "https://images.unsplash.com/photo-1559511260-66a654ae982a?q=80&w=2118&auto=format&fit=crop",
     dna: {
       essencia: "A sua vitalidade é naturalmente alta, mas aqui ela é direcionada para a manutenção da máquina. A energia foca em preservar o seu corpo para aguentar o teto do sucesso.",
       metodo: "O Virgem assume o controle absoluto da sua biologia. O universo favorece protocolos de biohacking, rotinas de sono e uma alimentação milimetricamente ajustada.",
@@ -251,6 +275,7 @@ const LIFE_AREAS = [
       { phase: "Fase 3: Fortaleza Imunológica", period: "Meses 9 a 12", text: "A sensação é de corpo blindado. O metabolismo entra no seu auge de performance e estabilidade, garantindo que a sua saúde consiga bancar integralmente a altura das suas ambições." }
     ]
   }
+];
 ];
 
 export default function AppleResultPreview() {
@@ -891,58 +916,52 @@ export default function AppleResultPreview() {
 
                       </div>
 
-                      {/* BLOCO 4: O RITUAL (TICKET TÁTIL APPLE WALLET) */}
-                      <div className="w-full mt-40 max-w-2xl mx-auto mb-20 relative z-10">
-                        <div className="text-center mb-16">
-                          <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tighter mb-4 text-white">Estar na Cidade.</h2>
-                          <p className="text-white/50 text-lg font-light">Como plugar sua biologia na energia do destino nas primeiras 24 horas.</p>
-                        </div>
+                      {/* BLOCO 4: O RITUAL E A CIDADE (PAINEL SPLIT APPLE) */}
+                      <div className="w-full mt-40 max-w-[1400px] mx-auto mb-32 h-auto md:h-[700px] relative rounded-[40px] overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row justify-end">
                         
-                        <div className="w-full bg-black rounded-[40px] border border-white/10 relative overflow-hidden flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                          {/* Topo do Ticket */}
-                          <div className="h-32 relative flex items-center px-10 border-b border-white/10 overflow-hidden">
-                            <div className="absolute inset-0 opacity-20" style={{ backgroundColor: currentActiveData.color }}></div>
-                            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[40px]" style={{ backgroundColor: currentActiveData.color }}></div>
-                            <div className="relative z-10 flex items-center justify-between w-full">
-                              <div>
-                                <span className="font-mono text-xs tracking-widest text-white/70 uppercase">O Guia de Ancoragem</span>
-                                <h3 className="text-3xl font-bold text-white mt-1">Ritual 24H</h3>
-                              </div>
-                              <Plane className="w-8 h-8 text-white/50" />
+                        {/* Imagem de Fundo Completa com Fade */}
+                        <motion.div 
+                          initial={{ scale: 1.1 }}
+                          whileInView={{ scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1.5, ease: "easeOut" }}
+                          className="absolute inset-0 w-full md:w-[70%] left-0 h-[400px] md:h-full"
+                        >
+                          <img src={currentActiveData.image} alt={currentActiveData.city} className="w-full h-full object-cover opacity-90" />
+                          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#03100B]/80 via-transparent to-[#03100B] hidden md:block"></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#03100B] via-transparent to-transparent md:hidden"></div>
+                        </motion.div>
+
+                        {/* Painel Lateral Direito */}
+                        <div className="relative z-10 w-full md:w-[45%] h-full bg-[#03100B]/70 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-white/10 p-8 md:p-14 flex flex-col justify-center">
+                          
+                          <div className="mb-10">
+                            {/* A Pill de Localização solicitada pelo usuário (Maior) */}
+                            <div className="flex items-center gap-3 mb-8 px-6 py-3 bg-black/60 rounded-full border border-white/10 w-fit backdrop-blur-md">
+                                <MapPin className="w-5 h-5" style={{ color: currentActiveData.color }} />
+                                <span className="font-mono text-sm md:text-base tracking-widest uppercase text-white font-medium">{currentActiveData.city}</span>
                             </div>
+                            
+                            <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
+                              {currentActiveData.cityDesc}
+                            </p>
                           </div>
 
-                          {/* Corpo do Ticket */}
-                          <div className="p-10 pb-16 flex flex-col relative">
-                            {/* Linha pontilhada */}
-                            <div className="absolute top-0 left-0 w-full flex justify-between -mt-[16px]">
-                              <div className="w-8 h-8 rounded-full bg-[#03100B] border-r border-b border-white/10 -ml-4"></div>
-                              <div className="flex-1 border-t-2 border-dashed border-white/10 mt-[15px] mx-2"></div>
-                              <div className="w-8 h-8 rounded-full bg-[#03100B] border-l border-b border-white/10 -mr-4"></div>
-                            </div>
+                          <div className="bg-white/5 rounded-3xl p-8 border border-white/10 relative overflow-hidden group shadow-xl">
+                            <div className="absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-opacity group-hover:opacity-30" style={{ backgroundColor: currentActiveData.color }}></div>
+                            
+                            <span className="font-mono text-xs tracking-[0.2em] uppercase text-white/50 block mb-4" style={{ color: currentActiveData.color }}>O Ritual de 24 Horas</span>
+                            <p className="text-white/90 text-lg md:text-xl font-light leading-relaxed relative z-10 mb-6">
+                              {currentActiveData.ritual}
+                            </p>
 
-                            <div className="mt-8">
-                              <span className="font-mono text-[10px] tracking-widest text-white/40 uppercase block mb-6">Ação Prática</span>
-                              <p className="text-white/90 text-2xl font-light leading-relaxed">
-                                {currentActiveData.ritual}
-                              </p>
-                            </div>
+                            <div className="w-full h-px bg-white/10 mb-6"></div>
 
-                            <div className="mt-12 bg-white/5 rounded-2xl p-6 border border-white/5">
-                              <span className="font-mono text-[10px] tracking-widest text-white/40 uppercase block mb-3">O Mantra de Ativação</span>
-                              <p className="text-white/80 text-lg font-serif italic">
-                                "{currentActiveData.mantra}"
-                              </p>
-                            </div>
-
-                            <div className="mt-12 flex items-end justify-between border-t border-white/5 pt-8">
-                              <div>
-                                <span className="font-mono text-[10px] tracking-widest text-white/30 uppercase block mb-2">Protocolo Desbloqueado</span>
-                                <Fingerprint className="w-10 h-10 text-white/20" />
-                              </div>
-                              <QrCode className="w-16 h-16" style={{ color: currentActiveData.color }} />
-                            </div>
+                            <p className="text-white/60 text-base md:text-lg font-serif italic relative z-10">
+                              "{currentActiveData.mantra}"
+                            </p>
                           </div>
+
                         </div>
                       </div>
 
