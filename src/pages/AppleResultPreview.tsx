@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { DesktopWebChrome } from "@/layouts/DesktopWebChrome";
 import { MobileAppChrome } from "@/layouts/MobileAppChrome";
-import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, Eye, Clock, Hourglass, BookOpen, Plane, Hash, CreditCard, Compass, Plus } from "lucide-react";
+import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, Eye, Clock, Hourglass, BookOpen, Plane, QrCode, Fingerprint, Hash, CreditCard, Compass, Plus } from "lucide-react";
 
 /* ══════════════════════════════════════════════════
    ANIMATION COMPONENTS
@@ -251,7 +251,6 @@ const LIFE_AREAS = [
       { phase: "Fase 3: Fortaleza Imunológica", period: "Meses 9 a 12", text: "A sensação é de corpo blindado. O metabolismo entra no seu auge de performance e estabilidade, garantindo que a sua saúde consiga bancar integralmente a altura das suas ambições." }
     ]
   }
-];
 ];
 
 export default function AppleResultPreview() {
