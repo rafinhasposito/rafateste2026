@@ -197,11 +197,6 @@ const LIFE_AREAS = [
   }
 ];
 
-const TIMELINE = [
-  { phase: "Fase 1", months: "Mês 1 a 3", title: "Mapeamento e Auditoria", desc: "Faça uma limpa saudável nas despesas desnecessárias, organize a sua estrutura de precificação e teste novas fontes de receita.", img: "/apple-mock/audio_mix__cv5tvd3y13ee_large.jpg" },
-  { phase: "Fase 2", months: "Mês 4 a 8", title: "Aceleração Financeira", desc: "A fase mais forte e magnética para fechar negócios, atrair capital, precificar alto e materializar as sementes que você plantou.", img: "/apple-mock/app_actions__budci8e25k76_large.jpg", highlight: true },
-  { phase: "Fase 3", months: "Mês 9 a 12", title: "Consolidação do Status", desc: "Hora de converter o faturamento em patrimônio seguro, blindar o que você construiu e elevar o seu padrão e conforto de vida.", img: "/apple-mock/photographic_styles__ef8cg39z0q2q_large.jpg" },
-];
 
 const DIMS = [
   { icon: DollarSign, label: "Dinheiro", val: 98, color: "#f59e0b" },
@@ -228,6 +223,7 @@ export default function AppleResultPreview() {
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
+  const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
   const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
   const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
   
@@ -849,6 +845,61 @@ export default function AppleResultPreview() {
                           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] opacity-10 pointer-events-none blur-[150px] -z-10" style={{ backgroundColor: currentActiveData.color }} />
                         </div>
 
+                      </div>
+
+                      {/* BLOCO 4: A LINHA DO TEMPO (ACCORDION) */}
+                      <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
+                        <div className="text-center mb-24">
+                          <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Seu Ano em 3 Fases.</h2>
+                          <p className="text-white/60 text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                            Como o seu foco em <strong className="text-white font-medium">{currentActiveData.label}</strong> se desdobra ao longo dos próximos 12 meses nesta cidade.
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col border-t border-white/10">
+                          {currentActiveData.timeline?.map((phase, index) => {
+                            const isOpen = openTimelinePhase === index;
+                            return (
+                              <div key={index} className="border-b border-white/10 flex flex-col group">
+                                <button 
+                                  onClick={() => setOpenTimelinePhase(isOpen ? null : index)}
+                                  className="w-full py-10 md:py-14 flex flex-col md:flex-row md:items-center justify-between text-left transition-colors duration-500 hover:bg-white/[0.02]"
+                                >
+                                  <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-16 w-full px-4 md:px-8">
+                                    <span 
+                                      className="font-mono text-sm tracking-[0.2em] uppercase transition-colors duration-500 w-40 shrink-0" 
+                                      style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.4)' }}
+                                    >
+                                      {phase.period}
+                                    </span>
+                                    <h3 className={`font-ps-display text-3xl md:text-5xl font-bold tracking-tight transition-colors duration-500 ${isOpen ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`}>
+                                      {phase.phase}
+                                    </h3>
+                                  </div>
+                                  <div className="hidden md:flex shrink-0 ml-4 mr-8 w-12 h-12 items-center justify-center rounded-full border transition-all duration-500" style={{ borderColor: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.1)', backgroundColor: isOpen ? `${currentActiveData.color}10` : 'transparent' }}>
+                                     <Plus className={`w-5 h-5 transition-transform duration-500 ${isOpen ? 'rotate-45' : ''}`} style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.4)' }} />
+                                  </div>
+                                </button>
+
+                                <AnimatePresence>
+                                  {isOpen && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="pb-14 px-4 md:pl-[14rem] md:pr-12">
+                                         <p className="text-white/70 text-lg md:text-2xl leading-relaxed font-light">{phase.text}</p>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            )
+                          })}
+                        </div>
                       </div>
 
                     </div>
