@@ -298,6 +298,9 @@ export default function AppleResultPreview() {
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [targetLockedArea, setTargetLockedArea] = useState<{label: string, color: string, id: string} | null>(null);
+  const userCredits = 9561;
   const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
   const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
   
@@ -621,7 +624,14 @@ export default function AppleResultPreview() {
                     <div key={area.id} className="flex flex-col">
                       {/* Cabeçalho do item (sempre visível) */}
                       <button
-                        onClick={() => setHoveredArea(isActive ? null : area.id)}
+                        onClick={() => {
+                        if (!area.unlocked) {
+                          setTargetLockedArea({ label: area.label, color: area.color, id: area.id });
+                          setIsPaywallOpen(true);
+                        } else {
+                          setHoveredArea(isActive ? null : area.id);
+                        }
+                      }}
                         className="relative flex items-center gap-4 p-4 rounded-2xl border overflow-hidden text-left transition-all duration-300"
                         style={{
                           backgroundColor: isActive ? `${area.color}18` : `${area.color}08`,
@@ -794,7 +804,10 @@ export default function AppleResultPreview() {
                                 <span className="text-white/50 text-sm font-medium">Conteúdo personalizado bloqueado</span>
                               </div>
                               <button
-                                onClick={() => setAreas(areas.map(a => a.id === activeArea.id ? { ...a, unlocked: true } : a))}
+                                onClick={() => {
+                                  setTargetLockedArea({ label: activeArea.label, color: activeArea.color, id: activeArea.id });
+                                  setIsPaywallOpen(true);
+                                }}
                                 className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
                               >
                                 <CreditCard className="w-4 h-4 shrink-0" />
@@ -953,16 +966,44 @@ export default function AppleResultPreview() {
                           </div>
 
                           {/* Caixa do Ritual (shrink-0 garante que não seja espremida) */}
-                          <div className="bg-white/5 rounded-3xl p-8 border border-white/10 relative overflow-hidden group shrink-0">
+                          <div className="bg-white/5 rounded-3xl p-8 border border-white/10 relative overflow-hidden group shrink-0 mt-6">
                             <div className="absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-opacity group-hover:opacity-30" style={{ backgroundColor: currentActiveData?.color || '#10b981' }}></div>
                             
-                            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>O Ritual de 24 Horas</span>
-                            
-                            <p className="text-white/90 text-lg md:text-xl font-light leading-relaxed relative z-10 mb-6">
-                              {currentActiveData?.ritual}
-                            </p>
+                            <div className="relative z-10 flex flex-col gap-6">
+                              <div>
+                                <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 block mb-2" style={{ color: currentActiveData?.color || '#10b981' }}>O Tema do Ano</span>
+                                <p className="text-white/90 text-xl md:text-2xl font-ps-display font-medium leading-tight">
+                                  Estruturação, Valor e Segurança.
+                                </p>
+                              </div>
 
-                            
+                              <div>
+                                <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 block mb-2" style={{ color: currentActiveData?.color || '#10b981' }}>O Segredo Deste Ano</span>
+                                <p className="text-white/80 text-lg font-light leading-relaxed">
+                                  A verdadeira riqueza deste ciclo não virá do esforço bruto, mas da sua capacidade de reter o que ganha e parar de dar descontos emocionais no seu valor.
+                                </p>
+                              </div>
+
+                              <div className="w-full h-px bg-white/10 my-2"></div>
+
+                              <div>
+                                <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>Os Gestos que Ancoram (24h)</span>
+                                <ul className="space-y-4">
+                                  <li className="flex items-start gap-3">
+                                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5 border border-white/20">
+                                      <span className="text-[10px] font-mono text-white/70">1</span>
+                                    </div>
+                                    <p className="text-white/80 text-base font-light leading-relaxed">Carregue uma moeda de ouro ou pirita no bolso durante todo o dia para aterrar a energia material.</p>
+                                  </li>
+                                  <li className="flex items-start gap-3">
+                                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5 border border-white/20">
+                                      <span className="text-[10px] font-mono text-white/70">2</span>
+                                    </div>
+                                    <p className="text-white/80 text-base font-light leading-relaxed">Escreva em papel dourado as 3 metas financeiras que deseja materializar neste ciclo.</p>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
                           </div>
 
                         </div>
@@ -1093,6 +1134,23 @@ export default function AppleResultPreview() {
 
       
       <style dangerouslySetInnerHTML={{__html: `.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}} />
+      <UnlockPremiumModal 
+        isOpen={isPaywallOpen} 
+        onClose={() => setIsPaywallOpen(false)} 
+        targetAreaLabel={targetLockedArea?.label} 
+        targetAreaColor={targetLockedArea?.color} 
+        userCredits={userCredits}
+        onUnlock={(option) => {
+          if (option === 'single' && targetLockedArea) {
+            setAreas(areas.map(a => a.id === targetLockedArea.id ? { ...a, unlocked: true } : a));
+            setHoveredArea(targetLockedArea.id);
+          } else if (option === 'all') {
+            setAreas(areas.map(a => ({ ...a, unlocked: true })));
+            if (targetLockedArea) setHoveredArea(targetLockedArea.id);
+          }
+          setIsPaywallOpen(false);
+        }}
+      />
     </div>
   );
 }
