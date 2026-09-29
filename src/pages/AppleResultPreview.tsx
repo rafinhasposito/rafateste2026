@@ -91,7 +91,8 @@ const LIFE_AREAS = [
       metodo: "A mente analítica trabalha a seu favor. O universo facilita que você organize o caos e execute processos com disciplina, método impecável e visão cirúrgica de longo prazo.",
       fase: "A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real."
     },
-    ritual: "Compre um item simbólico de alto valor percebido (mesmo que pequeno) usando dinheiro físico. Durante a transação, afirme mentalmente que aquele é o último investimento do seu ciclo de escassez.",
+    ritual: "Compre um item simbólico de alto valor (mesmo que pequeno) usando dinheiro físico. Este objeto será o seu amuleto. Durante a transação, afirme mentalmente que aquele é o último investimento do seu antigo ciclo de escassez.",
+    mantra: "Eu comando a minha autonomia. O dinheiro flui até mim não por sorte, mas como consequência inevitável da minha excelência.",
     pillars: [
       { icon: ArrowUpRight, title: "Aumento de Ganhos", text: "A energia favorece o faturamento e atrai novos clientes. O universo aqui não entrega por sorte, mas recompensa a sua coragem de faturar e expandir horizontes." },
       { icon: Crown, title: "Valorização do Trabalho", text: "A vibração do lugar convida à autoconfiança extrema. O cenário é perfeito para acabar com os descontos emocionais e cobrar o valor justo pelo seu talento." },
@@ -111,7 +112,8 @@ const LIFE_AREAS = [
       metodo: "A sua necessidade de excelência encontra o terreno fértil. O destino recompensa a sua capacidade de estruturar equipes, otimizar rotinas e liderar pelo exemplo prático.",
       fase: "O foco agora é consolidação. Não se trata mais de provar o seu valor para o mercado, mas de assumir a autoridade que você já construiu e colher os frutos financeiros disso."
     },
-    ritual: "Vá ao centro financeiro ou bairro de negócios da cidade. Caminhe observando o fluxo e mande uma mensagem estratégica para alguém de alto nível do seu mercado, plantando uma semente sem pedir nada em troca.",
+    ritual: "Vá ao centro financeiro da cidade. Caminhe observando o fluxo de negócios. Envie uma mensagem estratégica para alguém de alto nível do seu mercado, plantando uma semente e se colocando à disposição, sem pedir nada em troca.",
+    mantra: "Eu ocupo o meu espaço por direito. A minha autoridade é inquestionável e o meu trabalho gera um impacto irreplicável.",
     pillars: [
       { icon: ArrowUpRight, title: "Ascensão Acelerada", text: "O alinhamento abre caminho para que saltos de negócio apareçam com naturalidade. A sua autoridade ganha um palco iluminado diante dos tomadores de decisão." },
       { icon: Crown, title: "Liderança Incontestável", text: "A energia atrai pessoas buscando a sua direção. O cenário é propício para assumir o protagonismo da sua equipe ou mercado sem pedir licença pelo seu brilho." },
@@ -131,7 +133,8 @@ const LIFE_AREAS = [
       metodo: "A sua imagem passa a transmitir uma precisão cirúrgica. As pessoas confiam em você porque o seu brilho vem acompanhado de extrema competência e atenção aos detalhes.",
       fase: "A necessidade de aprovação externa desaparece. Você entra num ciclo onde a sua marca pessoal é pautada por quem você realmente é, e não pelo que esperam de você."
     },
-    ritual: "Vista ou compre uma peça de roupa que a sua versão antiga teria medo de usar. Caminhe pelas ruas da cidade habitando essa nova pele, sem justificar o seu estilo ou a sua presença para absolutamente ninguém.",
+    ritual: "Tire um momento exclusivo para você. Faça algo que melhore a sua autoestima e compre uma roupa nova que marque esse ciclo. Caminhe pelas ruas habitando essa pele, sem justificar seu brilho para ninguém.",
+    mantra: "Eu assumo o comando das minhas escolhas. A minha presença fala por si e eu não me diminuo para caber em expectativas alheias.",
     pillars: [
       { icon: ArrowUpRight, title: "Autoconfiança Magnética", text: "A sensação ao pisar neste destino é de clareza absoluta de quem você é. A energia afasta a dúvida e garante que você entre em qualquer sala sabendo o seu valor." },
       { icon: Crown, title: "Posicionamento Premium", text: "O universo alinha a sua imagem ao alto valor. O magnetismo é tão forte que as pessoas costumam ler o seu sucesso antes mesmo de você abrir a boca." },
@@ -152,6 +155,7 @@ const LIFE_AREAS = [
       fase: "O tempo se tornou seu recurso mais caro. A fase atual exige que você corte tudo aquilo que não traz retorno, blindando sua agenda contra distrações inúteis."
     },
     ritual: "Desligue todos os alarmes e não abra as redes sociais nas primeiras 4 horas do seu dia. O luxo absoluto do seu primeiro dia de Revolução Solar deve ser dominar o próprio tempo.",
+    mantra: "Meu tempo é a minha moeda mais valiosa. A disciplina não me prende, ela é a base exata da minha liberdade absoluta.",
     pillars: [
       { icon: ArrowUpRight, title: "Alta Performance Real", text: "O alinhamento dissolve a procrastinação. A energia favorece um estado de foco profundo, permitindo que você produza em 4 horas o que costumava levar 10." },
       { icon: Crown, title: "Automação do Caos", text: "O universo pede eficiência extrema. A vibração da cidade facilita a delegação de tarefas, libertando o seu tempo para decisões que realmente movem o ponteiro." },
@@ -171,7 +175,8 @@ const LIFE_AREAS = [
       metodo: "A sua rede de contatos ganha um filtro de utilidade mútua. O universo facilita alianças onde os dois lados entregam excelência, sem espaço para promessas vazias.",
       fase: "Você não quer mais 'fazer amigos por fazer'. A maturidade pede círculos de influência focados em crescimento, suporte mútuo e expansão de impérios."
     },
-    ritual: "Mande mensagem para 3 pessoas que te inspiram ou com quem você quer criar laços de alto nível. Depois, sente-se no lobby de um hotel ou café elegante da cidade apenas para observar e pertencer àquele ambiente.",
+    ritual: "Mande mensagem para 3 pessoas que te inspiram ou com quem você quer criar laços de alto nível. Depois, sente-se no lobby de um hotel elegante da cidade apenas para observar e pertencer àquele ambiente.",
+    mantra: "Eu atraio pessoas que elevam o meu nível. Eu sento em mesas onde a colaboração de elite substitui a competição rasa.",
     pillars: [
       { icon: ArrowUpRight, title: "Acesso a Mesas Fechadas", text: "A vibração atrai encontros mágicos. Convites para ambientes exclusivos costumam surgir, colocando você a um aperto de mãos dos maiores contratos." },
       { icon: Crown, title: "Parcerias de Elite", text: "O destino eleva a sua frequência social. A energia atrai apenas associações com quem puxa o seu nível para cima, afastando relações que sugam o seu tempo." },
@@ -192,6 +197,7 @@ const LIFE_AREAS = [
       fase: "A fase de montanha-russa emocional já passou. O que você busca e atrai agora é paz, previsibilidade e alguém para ser o seu porto seguro nas conquistas da vida."
     },
     ritual: "Trate a si mesmo como você gostaria que o parceiro ideal te tratasse hoje. Reserve a melhor mesa, compre um presente para si e habite o estado de merecimento absoluto. O universo reflete o seu próprio padrão.",
+    mantra: "Eu aceito receber amor na exata medida da minha dedicação. Eu me torno magnético quando honro o meu próprio valor.",
     pillars: [
       { icon: ArrowUpRight, title: "Magnetismo Real", text: "O destino foca na atração de parcerias maduras. A energia é ideal para encontrar quem queira construir junto, cortando o desgaste com relações rasas." },
       { icon: Crown, title: "Valorização Pessoal", text: "A sensação de amor próprio se torna o seu maior escudo. O universo pede o fim das concessões excessivas, garantindo que você dite as regras do seu valor." },
@@ -211,7 +217,8 @@ const LIFE_AREAS = [
       metodo: "A espiritualidade deixa de ser mística e passa a ser prática. O universo alinha a sua intuição com ações calculadas, transformando insight em resultados concretos.",
       fase: "Você entende que o verdadeiro sucesso precisa ter alma. A maturidade espiritual foca em alinhar a sua ambição material com a sua paz de espírito diária."
     },
-    ritual: "Faça uma caminhada silenciosa de 30 minutos por um parque ou templo, sem fones de ouvido. Faça uma doação financeira anônima, por menor que seja, para ancorar a energia do fluxo universal da abundância.",
+    ritual: "Faça uma caminhada silenciosa de 30 minutos por um parque ou templo, sem fones de ouvido. Faça uma doação financeira anônima para ancorar a energia de abundância do universo.",
+    mantra: "Eu confio na inteligência invisível que orquestra os meus passos. A minha paz de espírito é o meu maior ativo.",
     pillars: [
       { icon: ArrowUpRight, title: "Intuição Afiada", text: "O destino aguça o seu sexto sentido de forma inegável. A sensação é de saber o caminho exato antes mesmo que a mente lógica consiga tentar explicar." },
       { icon: Crown, title: "Clareza de Propósito", text: "A vibração da cidade dissipa qualquer crise existencial. O universo te acorda com a certeza do porquê você faz o que faz, unindo carreira e alma." },
@@ -231,7 +238,8 @@ const LIFE_AREAS = [
       metodo: "O Virgem assume o controle absoluto da sua biologia. O universo favorece protocolos de biohacking, rotinas de sono e uma alimentação milimetricamente ajustada.",
       fase: "O corpo já não aceita abusos como antes. O seu momento de vida exige que o autocuidado seja tratado com a mesma prioridade e respeito que a sua conta bancária."
     },
-    ritual: "Comece o dia com um choque biológico (um banho muito gelado ou um treino intenso). Depois, faça a sua primeira refeição no melhor e mais limpo restaurante que encontrar, tratando o alimento como combustível premium.",
+    ritual: "Comece o dia com um choque biológico (um banho gelado ou um treino intenso). Depois, faça a sua primeira refeição no melhor e mais limpo restaurante que encontrar, tratando o alimento como combustível premium.",
+    mantra: "Meu corpo é o templo inegociável das minhas ambições. Eu invisto na minha biologia para que ela sustente a minha mente.",
     pillars: [
       { icon: ArrowUpRight, title: "Energia Inesgotável", text: "O magnetismo local impulsiona o seu vigor. A sensação de cansaço crônico cede espaço para uma energia limpa, acompanhando o ritmo da sua ambição mental." },
       { icon: Crown, title: "Longevidade e Vigor", text: "A vibração faz com que o seu corpo responda instantaneamente aos bons tratos. O universo recompensa seus novos hábitos com uma aparência de saúde radiante." },
@@ -243,6 +251,7 @@ const LIFE_AREAS = [
       { phase: "Fase 3: Fortaleza Imunológica", period: "Meses 9 a 12", text: "A sensação é de corpo blindado. O metabolismo entra no seu auge de performance e estabilidade, garantindo que a sua saúde consiga bancar integralmente a altura das suas ambições." }
     ]
   }
+];
 ];
 
 export default function AppleResultPreview() {
@@ -883,7 +892,62 @@ export default function AppleResultPreview() {
 
                       </div>
 
-                      {/* BLOCO 4: A LINHA DO TEMPO (ACCORDION) */}
+                      {/* BLOCO 4: O RITUAL (TICKET TÁTIL APPLE WALLET) */}
+                      <div className="w-full mt-40 max-w-2xl mx-auto mb-20 relative z-10">
+                        <div className="text-center mb-16">
+                          <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tighter mb-4 text-white">Estar na Cidade.</h2>
+                          <p className="text-white/50 text-lg font-light">Como plugar sua biologia na energia do destino nas primeiras 24 horas.</p>
+                        </div>
+                        
+                        <div className="w-full bg-black rounded-[40px] border border-white/10 relative overflow-hidden flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                          {/* Topo do Ticket */}
+                          <div className="h-32 relative flex items-center px-10 border-b border-white/10 overflow-hidden">
+                            <div className="absolute inset-0 opacity-20" style={{ backgroundColor: currentActiveData.color }}></div>
+                            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[40px]" style={{ backgroundColor: currentActiveData.color }}></div>
+                            <div className="relative z-10 flex items-center justify-between w-full">
+                              <div>
+                                <span className="font-mono text-xs tracking-widest text-white/70 uppercase">O Guia de Ancoragem</span>
+                                <h3 className="text-3xl font-bold text-white mt-1">Ritual 24H</h3>
+                              </div>
+                              <Plane className="w-8 h-8 text-white/50" />
+                            </div>
+                          </div>
+
+                          {/* Corpo do Ticket */}
+                          <div className="p-10 pb-16 flex flex-col relative">
+                            {/* Linha pontilhada */}
+                            <div className="absolute top-0 left-0 w-full flex justify-between -mt-[16px]">
+                              <div className="w-8 h-8 rounded-full bg-[#03100B] border-r border-b border-white/10 -ml-4"></div>
+                              <div className="flex-1 border-t-2 border-dashed border-white/10 mt-[15px] mx-2"></div>
+                              <div className="w-8 h-8 rounded-full bg-[#03100B] border-l border-b border-white/10 -mr-4"></div>
+                            </div>
+
+                            <div className="mt-8">
+                              <span className="font-mono text-[10px] tracking-widest text-white/40 uppercase block mb-6">Ação Prática</span>
+                              <p className="text-white/90 text-2xl font-light leading-relaxed">
+                                {currentActiveData.ritual}
+                              </p>
+                            </div>
+
+                            <div className="mt-12 bg-white/5 rounded-2xl p-6 border border-white/5">
+                              <span className="font-mono text-[10px] tracking-widest text-white/40 uppercase block mb-3">O Mantra de Ativação</span>
+                              <p className="text-white/80 text-lg font-serif italic">
+                                "{currentActiveData.mantra}"
+                              </p>
+                            </div>
+
+                            <div className="mt-12 flex items-end justify-between border-t border-white/5 pt-8">
+                              <div>
+                                <span className="font-mono text-[10px] tracking-widest text-white/30 uppercase block mb-2">Protocolo Desbloqueado</span>
+                                <Fingerprint className="w-10 h-10 text-white/20" />
+                              </div>
+                              <QrCode className="w-16 h-16" style={{ color: currentActiveData.color }} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
                       <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
                         <div className="text-center mb-24">
                           <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Seu Ano em 3 Fases.</h2>
