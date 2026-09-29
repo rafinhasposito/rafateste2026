@@ -13,6 +13,8 @@ import { FocusedShell } from "./layouts/FocusedShell";
 import Index from "./pages/Index";
 import AppleResultPrototype from "./pages/AppleResultPrototype";
 import AppleResultPreview from "./pages/AppleResultPreview";
+import AppleResultPreviewV3 from "./pages/AppleResultPreviewV3";
+import AppleResultPreviewV4 from "./pages/AppleResultPreviewV4";
 import HouseTrailer from "./pages/HouseTrailer";
 import HouseTrailerApp from "./pages/HouseTrailerApp";
 import Auth from "./pages/Auth";
@@ -103,6 +105,8 @@ const App = () => (
 
             <Route path="/v2-apple" element={<AppleResultPrototype />} />
             <Route path="/v2-preview" element={<AppleResultPreview />} />
+            <Route path="/v4-preview" element={<AppleResultPreviewV4 />} />
+        <Route path="/v3-preview" element={<AppleResultPreviewV3 />} />
             <Route path="/bloco3" element={<Block3Sandbox />} />
             <Route path="/bloco4" element={<Block4Sandbox />} />
             <Route path="/ritual" element={<RitualSandbox />} />
