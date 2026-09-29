@@ -929,7 +929,7 @@ export default function AppleResultPreview() {
                           style={{ y: parallaxY }}
                           className="absolute -inset-[20%] w-[140%] h-[140%] left-0 z-0"
                         >
-                          <img src={currentActiveData.image} alt={currentActiveData.city} className="w-full h-full object-cover opacity-90" />
+                          <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop" alt="Nova York, EUA" className="w-full h-full object-cover opacity-90" />
                         </motion.div>
                         
                         {/* Overlay Gradient for readability on the left */}
@@ -942,11 +942,11 @@ export default function AppleResultPreview() {
                             {/* Selo de Localização (Maior) */}
                             <div className="flex items-center gap-3 mb-8 px-6 py-3 bg-black/60 rounded-full border border-white/10 w-fit backdrop-blur-md shadow-lg">
                                 <MapPin className="w-5 h-5" style={{ color: currentActiveData.color }} />
-                                <span className="font-mono text-sm md:text-base tracking-widest uppercase text-white font-semibold">{currentActiveData.city}</span>
+                                <span className="font-mono text-sm md:text-base tracking-widest uppercase text-white font-semibold">Nova York, EUA</span>
                             </div>
                             
                             <p className="text-white/90 text-xl font-light leading-relaxed">
-                              {currentActiveData.cityDesc}
+                              A energia inesgotável desta ilha não aceita mediocridade, forçando você a assumir a autoridade da sua própria vida e colocar suas ideias nos maiores palcos disponíveis. Um epicentro de vibração alta que acelera manifestações materiais.
                             </p>
                           </div>
 
