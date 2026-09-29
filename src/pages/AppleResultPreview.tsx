@@ -1,8 +1,5 @@
 import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
-import { cityDatabase } from "@/data/houses";
-import UnlockPremiumModal from "@/components/UnlockPremiumModal";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DesktopWebChrome } from "@/layouts/DesktopWebChrome";
 import { MobileAppChrome } from "@/layouts/MobileAppChrome";
 import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, ShieldAlert, Eye, Clock, Hourglass, BookOpen, Plane, QrCode, Fingerprint, Hash, CreditCard, Compass, Plus } from "lucide-react";
@@ -294,21 +291,6 @@ export default function AppleResultPreview() {
 
   const carRef = useRef<HTMLDivElement>(null);
   const scrollCar = (d: number) => carRef.current?.scrollBy({ left: d, behavior: "smooth" });
-  const houseData = cityDatabase[P.house] || cityDatabase[2];
-  const citiesObj = {
-    nacional: [
-      { city: "São Paulo", country: "Brasil", score: 96, lat: -23.55, lon: -46.63 },
-      { city: "Florianópolis", country: "Brasil", score: 93, lat: -27.59, lon: -48.55 },
-    ],
-    acessivel: [
-      { city: "Santiago", country: "Chile", score: 94, lat: -33.45, lon: -70.67 },
-      { city: "Buenos Aires", country: "Argentina", score: 92, lat: -34.60, lon: -58.38 },
-    ],
-    highticket: [
-      { city: "Dubai", country: "Emirados Árabes", score: 98, lat: 25.20, lon: 55.27 },
-      { city: "Tóquio", country: "Japão", score: 97, lat: 35.68, lon: 139.69 },
-    ],
-  };
   const [openArea, setOpenArea] = useState<string>("dinheiro");
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
@@ -316,9 +298,6 @@ export default function AppleResultPreview() {
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
-  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-  const [targetLockedArea, setTargetLockedArea] = useState<{label: string, color: string, id: string} | null>(null);
-  const userCredits = 9561;
   const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
   const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
   
@@ -590,261 +569,522 @@ export default function AppleResultPreview() {
                </div>
             </div>
                   
+{/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
+                  <div className="w-full mt-10 flex flex-col lg:flex-row gap-6 min-h-[700px] text-left">
+                                  {/* COLUNA ESQUERDA: SIDEBAR — expandida por padrão, encolhe pra ícones quando mouse vai pro painel */}
+              <div
+                className="hidden lg:flex w-[72px] shrink-0 flex-col gap-2 items-stretch min-h-[700px]"
+              >
+                {sortedAreas.map((area) => {
+                  const currentActive = hoveredArea || sortedAreas[0].id;
+                  const isActive = currentActive === area.id;
 
-                  {/* --- DOSSIÊ ASTROLÓGICO REAL --- */}
-                  <div className="w-full mt-24 mb-16 animate-in fade-in slide-in-from-bottom-10 duration-1000">
-                      <div className="flex items-center gap-4 mb-12">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center border bg-[#10b981]/10 border-[#10b981]/30">
-                          <Target className="w-5 h-5 text-[#10b981]" />
+                  return (
+                    <div
+                      key={area.id}
+                      onClick={() => setHoveredArea(area.id)}
+                      className="relative flex-1 rounded-2xl border flex items-center justify-center cursor-pointer group transition-all duration-300"
+                      style={{
+                        backgroundColor: isActive ? `${area.color}18` : `${area.color}08`,
+                        borderColor: isActive ? `${area.color}44` : 'rgba(255,255,255,0.05)',
+                        boxShadow: isActive ? `0 0 20px ${area.color}20` : 'none',
+                      }}
+                    >
+                      {/* Aura sutil para o item ativo */}
+                      {isActive && (
+                        <div
+                          className="absolute inset-0 pointer-events-none opacity-10 rounded-2xl"
+                          style={{ background: `linear-gradient(135deg, ${area.color} 0%, transparent 70%)` }}
+                        />
+                      )}
+                      <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-110 z-10"
+                          style={{
+                            backgroundColor: isActive ? `${area.color}33` : `${area.color}15`,
+                            borderColor: isActive ? `${area.color}55` : `${area.color}30`,
+                          }}
+                      >
+                          <area.icon className="w-4 h-4" style={{ color: isActive ? area.color : `${area.color}80` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* MOBILE: ACCORDION — tap item → barra anima + painel expande inline */}
+              <div className="w-full lg:hidden flex flex-col gap-3">
+                {sortedAreas.map((area) => {
+                  const currentActive = hoveredArea || sortedAreas[0].id;
+                  const isActive = currentActive === area.id;
+
+                  return (
+                    <div key={area.id} className="flex flex-col">
+                      {/* Cabeçalho do item (sempre visível) */}
+                      <button
+                        onClick={() => setHoveredArea(isActive ? null : area.id)}
+                        className="relative flex items-center gap-4 p-4 rounded-2xl border overflow-hidden text-left transition-all duration-300"
+                        style={{
+                          backgroundColor: isActive ? `${area.color}18` : `${area.color}08`,
+                          borderColor: isActive ? `${area.color}44` : 'rgba(255,255,255,0.06)',
+                          boxShadow: isActive ? `0 0 20px ${area.color}20` : 'none',
+                        }}
+                      >
+                        {isActive && (
+                          <div className="absolute inset-0 pointer-events-none opacity-10" style={{ background: `linear-gradient(135deg, ${area.color} 0%, transparent 70%)` }} />
+                        )}
+
+                        <div
+                          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300"
+                          style={{ backgroundColor: isActive ? `${area.color}33` : `${area.color}15`, borderColor: isActive ? `${area.color}55` : `${area.color}30` }}
+                        >
+                          <area.icon className="w-5 h-5" style={{ color: isActive ? area.color : `${area.color}80` }} />
                         </div>
-                        <h2 className="font-ps-display text-3xl md:text-5xl font-bold tracking-tight text-white">O Seu Dossiê</h2>
+
+                        <div className="flex-1 min-w-0 relative z-10">
+                          <span className={`block font-ps-display text-base font-bold mb-2 transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/70'}`}>
+                            {area.label}
+                          </span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
+                              <motion.div
+                                className="h-full rounded-full"
+                                animate={{ width: isActive ? `${area.score}%` : '0%' }}
+                                transition={{ duration: 0.8, type: 'spring', bounce: 0.25, delay: isActive ? 0.05 : 0 }}
+                                style={{ backgroundColor: area.color }}
+                              />
+                            </div>
+                            <motion.span
+                              animate={{ opacity: isActive ? 1 : 0 }}
+                              transition={{ duration: 0.3, delay: isActive ? 0.7 : 0 }}
+                              className="text-[10px] font-bold tracking-widest shrink-0 text-white"
+                            >
+                              {area.score}%
+                            </motion.span>
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* Painel expandido (aparece só quando ativo) */}
+                      <AnimatePresence>
+                        {isActive && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.4, ease: 'easeInOut' }}
+                            className="overflow-hidden"
+                          >
+                            <div
+                              className="relative mt-2 rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)]"
+                              style={{ minHeight: 320 }}
+                            >
+                              {/* Background colorido */}
+                              <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${area.color} 0%, transparent 80%)` }} />
+                              <div className="absolute inset-0 mix-blend-color opacity-60 pointer-events-none" style={{ backgroundColor: area.color }} />
+                              <div className="absolute inset-0 pointer-events-none transition-colors duration-1000" style={{ background: `linear-gradient(to top, ${`color-mix(in srgb, ${area.color || '#10b981'} 12%, #000000)`}, color-mix(in srgb, ${area.color || '#10b981'} 12%, rgba(0,0,0,0.7)) 50%, transparent)` }} />
+
+                              {/* Conteúdo */}
+                              <div className="relative z-10 p-6 flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 bg-black/20" style={{ borderColor: `${area.color}55` }}>
+                                    <area.icon className="w-4 h-4" style={{ color: area.color }} />
+                                  </div>
+                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">{area.label}</span>
+                                </div>
+
+                                {area.unlocked ? (
+                                  <>
+                                    <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
+                                    <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
+                                    <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.full}</p>
+                                    <div
+                                      className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2"
+                                      style={{ backgroundColor: area.color, color: '#fff', boxShadow: `0 0 30px ${area.color}40` }}
+                                    >
+                                      <Sparkles className="w-4 h-4" />
+                                      Foco Ativado ✓
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <h3 className="font-ps-display text-3xl font-bold text-white/20 leading-tight mb-4 select-none" style={{ filter: 'blur(4px)' }}>{area.label}</h3>
+                                    <div className="w-12 h-px mb-4 opacity-20" style={{ backgroundColor: `${area.color}80` }} />
+                                    <p className="text-white/10 text-sm font-light leading-relaxed mb-6 select-none" style={{ filter: 'blur(6px)' }}>{area.full}</p>
+                                    <button className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
+                                      <CreditCard className="w-4 h-4" />
+                                      Desbloquear com 1 Crédito
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+
+
+              {/* COLUNA DIREITA: O PAINEL GIGANTE (Travado) */}
+              <div
+                className="flex-1 h-[600px] lg:min-h-[700px] relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${currentActiveData?.color || '#10b981'} 12%, #000000)` }}
+              >
+                <AnimatePresence mode="wait">
+                  {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
+                    <motion.div
+                      key={activeArea.id}
+                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="absolute inset-0 w-full h-full flex flex-col justify-end"
+                    >
+                      {/* BACKGROUNDS PREMIUM */}
+                      <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${activeArea.color} 0%, transparent 80%)` }} />
+                      <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-60 pointer-events-none" src="/videos/aura-loop.mp4" />
+                      <div className="absolute inset-0 mix-blend-color opacity-80 pointer-events-none" style={{ backgroundColor: activeArea.color }} />
+                      <div className="absolute inset-0 pointer-events-none transition-colors duration-1000" style={{ background: `linear-gradient(to top, ${`color-mix(in srgb, ${activeArea?.color || '#10b981'} 12%, #000000)`}, color-mix(in srgb, ${activeArea?.color || '#10b981'} 12%, rgba(0,0,0,0.8)) 50%, transparent)` }} />
+                      
+                      {/* CONTEÚDO — muda conforme desbloqueio */}
+                      <div className="relative z-10 p-8 md:p-12 w-full flex flex-col justify-end h-full">
+                        
+                        {/* Ícone + label sempre visível */}
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 bg-black/20 backdrop-blur-md" style={{ borderColor: `${activeArea.color}55` }}>
+                            <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
+                          </div>
+                          <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
+                            {activeArea.label}
+                          </span>
+                        </div>
+
+                        {activeArea.unlocked ? (
+                          <>
+                            {/* DESBLOQUEADO — conteúdo completo */}
+                            <h3 className="font-ps-display text-5xl md:text-7xl font-bold tracking-tight text-white leading-none drop-shadow-xl mb-6">
+                              {activeArea.label}
+                            </h3>
+                            <div className="w-16 h-px mb-6" style={{ backgroundColor: `${activeArea.color}80` }} />
+                            <p className="text-white/75 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl drop-shadow-md">
+                              {activeArea.full}
+                            </p>
+                            <div
+                              className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3"
+                              style={{ backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` }}
+                            >
+                              <Sparkles className="w-4 h-4 shrink-0" />
+                              Foco Ativado ✓
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* TRANCADO — preview embaçado + botão de crédito */}
+                            <h3 className="font-ps-display text-5xl md:text-7xl font-bold tracking-tight text-white leading-none drop-shadow-xl mb-6">
+                              {activeArea.label}
+                            </h3>
+                            <div className="w-16 h-px mb-6 opacity-20" style={{ backgroundColor: `${activeArea.color}80` }} />
+                            <p className="text-white/10 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl select-none" style={{ filter: 'blur(8px)' }}>
+                              {activeArea.full}
+                            </p>
+                            <div className="flex flex-col items-center md:items-start gap-4">
+                              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3">
+                                <Lock className="w-4 h-4 text-white/40" />
+                                <span className="text-white/50 text-sm font-medium">Conteúdo personalizado bloqueado</span>
+                              </div>
+                              <button
+                                onClick={() => setAreas(areas.map(a => a.id === activeArea.id ? { ...a, unlocked: true } : a))}
+                                className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
+                              >
+                                <CreditCard className="w-4 h-4 shrink-0" />
+                                Desbloquear com 1 Crédito
+                              </button>
+                            </div>
+                          </>
+                        )}
+                        
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+                  </div>
+                  
+                  {/* ÁREA DE CONTEÚDO DESBLOQUEADO (DOSSIÊ) */}
+                  {currentActiveData?.unlocked && (
+                    <div className="w-full mt-24 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+                      <div className="flex items-center gap-4 mb-12">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center border" style={{ backgroundColor: `${currentActiveData.color}15`, borderColor: `${currentActiveData.color}30` }}>
+                          <Target className="w-5 h-5" style={{ color: currentActiveData.color }} />
+                        </div>
+                        <h2 className="font-ps-display text-3xl md:text-5xl font-bold tracking-tight">Os 3 Pilares da Ativação</h2>
                       </div>
                       
-                      <div className="flex flex-col gap-12 md:gap-24 text-left">
-                          
-                          {/* O Que Você Precisa Entender */}
-                          {houseData?.oQueVocePrecisaEntender && (
-                            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl mx-auto md:mx-0">
-                              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#10b981] block mb-4">A Dinâmica</span>
-                              <h3 className="text-2xl md:text-4xl font-bold text-white mb-6 tracking-tight font-ps-display">O Que Você Precisa Entender</h3>
-                              <p className="text-white/70 text-lg md:text-xl font-light leading-relaxed">
-                                {houseData.oQueVocePrecisaEntender}
-                              </p>
-                            </motion.div>
-                          )}
-
-                          {/* Como Aparece na Vida Real */}
-                          {houseData?.comoApareceNaVidaReal && (
-                            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl self-end text-left md:text-right mx-auto md:mx-0">
-                              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#10b981] block mb-4">Impacto Prático</span>
-                              <h3 className="text-2xl md:text-4xl font-bold text-white mb-6 tracking-tight font-ps-display">Como Aparece na Vida Real</h3>
-                              <p className="text-white/70 text-lg md:text-xl font-light leading-relaxed">
-                                {houseData.comoApareceNaVidaReal}
-                              </p>
-                            </motion.div>
-                          )}
-                          
-                          {/* O Tema, O Segredo, O Ritual (Bento Grid) */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                             {/* O Tema */}
-                             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="bg-white/5 rounded-[32px] p-8 md:p-12 border border-white/10 relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-opacity group-hover:opacity-30 bg-[#10b981]"></div>
-                                <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#10b981] block mb-4">O Tema do Ano</span>
-                                <p className="text-white/90 text-2xl md:text-3xl font-ps-display font-medium leading-tight mb-8">
-                                  {houseData?.oTema || "Consolidação e Crescimento"}
-                                </p>
-                                <div className="w-full h-px bg-white/10 my-6"></div>
-                                <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#10b981] block mb-4">O Segredo</span>
-                                <p className="text-white/70 text-lg font-light leading-relaxed">
-                                  {houseData?.oSegredo}
-                                </p>
-                             </motion.div>
-                             
-                             {/* O Ritual */}
-                             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="bg-black/60 rounded-[32px] p-8 md:p-12 border border-[#10b981]/20 relative overflow-hidden group backdrop-blur-md">
-                                <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 blur-3xl bg-[#10b981]"></div>
-                                <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#10b981] block mb-4">O Gesto que Ancora (24h)</span>
-                                <div className="flex items-start gap-4">
-                                  <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-[#10b981] shadow-[0_0_10px_#10b981]"></div>
-                                  <p className="text-white/80 text-xl font-light leading-relaxed">
-                                    {houseData?.ritual24h || "Explore o fluxo da cidade e estabeleça uma intenção clara nas primeiras horas."}
-                                  </p>
-                                </div>
-                             </motion.div>
-                          </div>
-
-                          {/* Fases do Ano */}
-                          {(houseData?.fase1 || houseData?.fase2 || houseData?.fase3) && (
-                            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="w-full mt-12">
-                              <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#10b981] block mb-8 text-center md:text-left">A Linha do Tempo</span>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {[
-                                  { title: "Fase 1 (Mês 1 a 4)", text: houseData.fase1 },
-                                  { title: "Fase 2 (Mês 5 a 8)", text: houseData.fase2 },
-                                  { title: "Fase 3 (Mês 9 a 12)", text: houseData.fase3 }
-                                ].filter(f => f.text).map((fase, i) => (
-                                  <div key={i} className="border-l border-[#10b981]/30 pl-6 relative">
-                                    <div className="absolute top-0 -left-[5px] w-2 h-2 rounded-full bg-[#10b981]"></div>
-                                    <h4 className="text-white font-bold mb-3">{fase.title}</h4>
-                                    <p className="text-white/60 text-sm font-light leading-relaxed">{fase.text}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-
-                      </div>
-                  </div>
-
-                  {/* --- AS 8 DIMENSÕES DO SEU ANO (ACCORDION SAGRADO) --- */}
-                  <div className="w-full max-w-4xl mx-auto mt-32 mb-16 px-4 md:px-0 text-left">
-                    <div className="text-center mb-12">
-                      <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#10b981] mb-6">
-                        <Sparkles className="w-3 h-3" /> Visão Panorâmica
-                      </span>
-                      <h3 className="font-ps-display text-4xl md:text-5xl font-bold text-white mb-4">As 8 Dimensões do seu Ano</h3>
-                      <p className="text-white/50 text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed">
-                        Descubra como ancorar o seu Sol nesta Casa afetará diretamente cada pilar da sua vida nos próximos 12 meses.
-                      </p>
-                    </div>
-
-                    <Accordion type="single" collapsible className="w-full bg-black/40 border border-[#10b981]/20 rounded-3xl p-4 md:p-6 backdrop-blur-xl shadow-[0_30px_80px_rgba(16,185,129,0.1)]">
-                      {[
-                        { id: "dinheiro", label: "Finanças & Patrimônio", icon: CircleDollarSign, text: houseData?.dinheiro },
-                        { id: "trabalho", label: "Trabalho & Carreira", icon: Briefcase, text: houseData?.trabalho },
-                        { id: "amor", label: "Amor & Relacionamentos", icon: Heart, text: houseData?.amor },
-                        { id: "vidaPessoal", label: "Vida Pessoal & Saúde", icon: Sparkles, text: houseData?.vidaPessoal },
-                        { id: "saude", label: "Saúde & Vitalidade", icon: Heart, text: houseData?.saude },
-                        { id: "viagens", label: "Viagens & Estudos", icon: Plane, text: houseData?.areasDaVida?.['Viagens'] },
-                        { id: "lar", label: "Lar & Família", icon: Landmark, text: houseData?.areasDaVida?.['Lar'] }
-                      ].filter(x => x.text).map((dim, i) => (
-                        <AccordionItem value={dim.id} key={dim.id} className="border-b border-[#10b981]/10 px-2 md:px-4 last:border-0">
-                          <AccordionTrigger className="text-white hover:no-underline py-6 opacity-90 hover:opacity-100 group">
-                            <span className="font-ps-display text-lg md:text-xl tracking-wide flex items-center gap-4 text-left">
-                              <div className="w-10 h-10 rounded-full bg-[#10b981]/10 flex items-center justify-center group-hover:bg-[#10b981]/20 transition-colors">
-                                <dim.icon className="w-5 h-5 text-[#10b981]" />
-                              </div>
-                              {dim.label}
-                            </span>
-                          </AccordionTrigger>
-                          <AccordionContent className="text-white/70 font-light text-base md:text-lg leading-relaxed pb-8 pt-2 px-2 md:px-14">
-                            {dim.text}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </div>
-
-                  {/* BLOCO 8: ROTAS ALTERNATIVAS (CIDADES EXTRAS GRÁTIS) */}
-                  <div className="w-full max-w-7xl mx-auto mt-20 mb-32 px-6 text-left">
-                    <div className="flex items-center justify-between mb-12 border-b border-white/10 pb-6">
-                      <div>
-                        <h2 className="font-ps-display text-3xl md:text-4xl font-bold tracking-tighter mb-2 text-white">
-                          Rotas Alternativas
-                        </h2>
-                        <p className="text-white/50 text-base md:text-lg max-w-2xl font-light">
-                          Se o seu Destino Mestre não for viável, estas coordenadas secundárias também ativam a energia desta casa.
-                        </p>
-                      </div>
-                      <div className="hidden md:flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-                         <Sparkles className="w-4 h-4 text-emerald-400" />
-                         <span className="font-mono text-xs uppercase tracking-widest text-emerald-400 font-bold">Incluso</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      {[
-                        { title: "Nacional", desc: "Acessível e perto de você", data: citiesObj.nacional || [] },
-                        { title: "Acessível", desc: "Viagem internacional viável", data: citiesObj.acessivel || [] },
-                        { title: "High Ticket", desc: "Destino de alto padrão", data: citiesObj.highticket || [] }
-                      ].map((tier, idx) => (
-                        <div key={idx} className="flex flex-col gap-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-mono text-xs font-bold text-white">{idx+1}</div>
-                            <div>
-                              <h4 className="font-bold text-lg text-white">{tier.title}</h4>
-                              <p className="text-white/50 text-xs uppercase tracking-wider">{tier.desc}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-col gap-4">
-                            {tier.data.map((city, i) => (
-                              <div key={i} className="bg-black/40 border border-white/10 rounded-2xl p-5 hover:bg-white/5 transition-colors relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-[100px] pointer-events-none group-hover:bg-[#10b981]/10 transition-colors"></div>
-                                <div className="flex justify-between items-start mb-4">
-                                  <h5 className="font-ps-display text-2xl font-bold text-white">{city.city}</h5>
-                                  <span className="font-mono text-xs font-bold bg-[#10b981]/20 text-[#10b981] px-2 py-1 rounded">
-                                    {city.score}% MATCH
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-2 text-white/50 text-sm">
-                                  <MapPin className="w-4 h-4 text-[#10b981]" />
-                                  <span>{city.country}</span>
-                                </div>
-                              </div>
-                            ))}
-                            {tier.data.length === 0 && (
-                              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-white/40 text-sm italic">
-                                Nenhuma rota encontrada para este nível.
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* BLOCO 7: A GRADE DE 12 CASAS (UPSELL) */}
-                  <div className="w-full max-w-7xl mx-auto mt-40 mb-32 px-6 text-left">
-                    <div className="text-center mb-16">
-                      <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tighter mb-4 text-white">
-                        Expanda o Seu Mapa.
-                      </h2>
-                      <p className="text-white/60 text-lg max-w-2xl mx-auto">
-                        Você desbloqueou a visão profunda para a <strong>{P.houseLabel}</strong>. Descubra quais cidades ativam a sua saúde, amor, viagens e as outras 11 áreas da sua vida.
-                      </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {[1,2,3,4,5,6,7,8,9,10,11,12].map((num) => {
-                        const isCurrent = num === P.house;
-                        const dbData = cityDatabase[num as keyof typeof cityDatabase];
-                        const label = dbData?.name?.split('—')[1]?.trim() || dbData?.label || "Área da Vida";
-                        const isUnlocked = isCurrent;
-                        const cityForThisHouse = isCurrent ? P.city : "???";
-
-                        return (
-                          <div 
-                            key={num}
-                            onClick={() => {
-                              if (!isUnlocked) {
-                                setTargetLockedArea({ label: label, color: "#10b981", id: num.toString() });
-                                setIsPaywallOpen(true);
-                              }
-                            }}
-                            className={`relative p-6 rounded-3xl border transition-all duration-300 ${isCurrent ? 'bg-white/10 border-white/30' : 'bg-[#050505] border-white/5 hover:border-white/20 cursor-pointer'} overflow-hidden h-48 flex flex-col justify-between group`}
+                      <motion.div 
+                        initial="hidden" 
+                        whileInView="visible" 
+                        viewport={{ once: true, margin: "-50px" }}
+                        variants={{
+                          visible: { transition: { staggerChildren: 0.15 } },
+                          hidden: {}
+                        }}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                      >
+                        {currentActiveData.pillars?.map((pilar, index) => (
+                          <motion.div 
+                             key={index}
+                             variants={{
+                               hidden: { opacity: 0, y: 30 },
+                               visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+                             }}
+                             className="bg-black/40 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 md:p-10 hover:bg-white/[0.04] hover:-translate-y-2 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative overflow-hidden group"
                           >
-                            <div className="absolute top-0 right-0 w-32 h-32 blur-[50px] opacity-20 pointer-events-none transition-opacity duration-500 group-hover:opacity-40 bg-[#10b981]"></div>
+                             <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: `inset 0 0 0 1px ${currentActiveData.color}20` }} />
+                             <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:opacity-20 blur-3xl" style={{ backgroundColor: currentActiveData.color }} />
+                             
+                             <div className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border transition-transform duration-500 group-hover:scale-110 shadow-lg" style={{ backgroundColor: `${currentActiveData.color}10`, borderColor: `${currentActiveData.color}30`, boxShadow: `0 10px 20px -10px ${currentActiveData.color}40` }}>
+                               <pilar.icon className="w-7 h-7" style={{ color: currentActiveData.color }} />
+                             </div>
+                             <h3 className="text-2xl font-bold mb-4 tracking-tight transition-colors duration-500 text-white hover-color-magic" style={{ '--hover-color': currentActiveData.color } as React.CSSProperties}>{pilar.title}</h3>
+                             <p className="text-white/60 text-base leading-[1.8] font-light">{pilar.text}</p>
+                          </motion.div>
+                        ))}
+                      </motion.div>
 
-                            <div className="relative z-10 flex justify-between items-start">
-                              <div>
-                                <span className="font-mono text-[10px] tracking-widest uppercase mb-1 block text-[#10b981]">Casa ${num}</span>
-                                <h3 className="font-ps-display text-xl font-bold text-white mb-1">{label}</h3>
-                              </div>
-                              {!isUnlocked ? (
-                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                                  <Lock className="w-3.5 h-3.5 text-white/40" />
-                                </div>
-                              ) : (
-                                <div className="px-3 py-1 bg-white/10 rounded-full border border-white/20 flex items-center gap-1">
-                                  <Sparkles className="w-3 h-3 text-white" />
-                                  <span className="text-[10px] uppercase font-mono font-bold text-white">Livre</span>
-                                </div>
-                              )}
+                      {/* BLOCO 3: O SEU DNA DE ATIVAÇÃO (Borderless Apple Narrative) */}
+                      <div className="w-full mt-40">
+                        
+                        <div className="flex flex-col gap-32 md:gap-40 w-full relative">
+                          
+                          {/* Elemento 1: Essência (Left Aligned) */}
+                          <motion.div 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="flex flex-col items-start text-left max-w-3xl relative z-10"
+                          >
+                            <span className="font-mono uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                              01. Sua Essência
+                            </span>
+                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                              Sol em Leão.
+                            </h3>
+                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                              {currentActiveData.dna?.essencia}
+                            </p>
+                          </motion.div>
+
+                          {/* Elemento 2: Método (Right Aligned) */}
+                          <motion.div 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="flex flex-col items-start md:items-end text-left md:text-right max-w-3xl self-end relative z-10"
+                          >
+                            <span className="font-mono uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                              02. Seu Método
+                            </span>
+                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                              Ascendente <br className="hidden md:block" />em Virgem.
+                            </h3>
+                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                              {currentActiveData.dna?.metodo}
+                            </p>
+                          </motion.div>
+
+                          {/* Elemento 3: Fase Atual (Center Aligned) */}
+                          <motion.div 
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="flex flex-col items-start md:items-center text-left md:text-center max-w-4xl self-center relative z-10 mt-10"
+                          >
+                            <span className="font-mono uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                              03. Fase Atual
+                            </span>
+                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                              Maturidade.
+                            </h3>
+                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                              {currentActiveData.dna?.fase}
+                            </p>
+                          </motion.div>
+
+                          {/* Fundo Atmosférico abstrato para amarrar os textos */}
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] opacity-10 pointer-events-none blur-[150px] -z-10" style={{ backgroundColor: currentActiveData.color }} />
+                        </div>
+
+                      </div>
+
+{/* BLOCO 4: O RITUAL E A CIDADE (PAINEL SPLIT APPLE) */}
+                      <div ref={block4Ref} 
+                           className="w-full mt-40 max-w-[1400px] mx-auto mb-32 h-auto min-h-[750px] relative rounded-[40px] overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row justify-end"
+                           style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)', isolation: 'isolate' }}>
+                        
+                        {/* Imagem de Fundo (Global: Nova York) */}
+                        <motion.div 
+                          style={{ y: parallaxY }}
+                          className="absolute -inset-[20%] w-[140%] h-[140%] left-0 z-0 pointer-events-none"
+                        >
+                          <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop" alt="Nova York" className="w-full h-full object-cover opacity-90" />
+                        </motion.div>
+                        
+                        {/* Gradiente protegendo o texto */}
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#03100B]/20 via-[#03100B]/80 to-[#03100B]/90 z-0 pointer-events-none"></div>
+
+                        {/* Painel Lateral Direito */}
+                        <div className="relative z-10 w-full md:w-[45%] h-auto min-h-[750px] bg-black/20 backdrop-blur-3xl border-t md:border-t-0 md:border-l border-white/10 p-8 md:p-14 flex flex-col justify-center shrink-0">
+                          
+                          <div className="mb-8 shrink-0">
+                            {/* Selo de Localização */}
+                            <div className="flex items-center gap-2 mb-6 px-5 py-2.5 bg-black/40 rounded-full border border-white/10 w-fit backdrop-blur-md">
+                                <MapPin className="w-5 h-5 text-emerald-400" />
+                                <span className="font-mono text-sm tracking-widest uppercase text-white font-semibold">Nova York, EUA</span>
                             </div>
                             
-                            <div className="relative z-10">
-                              {!isUnlocked ? (
-                                <p className="text-white/30 text-sm font-light select-none blur-sm transition-all duration-300 group-hover:blur-0 group-hover:text-white/50">
-                                  Desbloqueie para descobrir a cidade desta casa.
-                                </p>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  <MapPin className="w-4 h-4 text-amber-500" />
-                                  <span className="text-white/80 font-medium text-sm">{cityForThisHouse}</span>
-                                </div>
-                              )}
-                            </div>
+                            <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
+                              A energia inesgotável desta ilha não aceita mediocridade, forçando você a assumir a autoridade da sua própria vida e colocar suas ideias nos maiores palcos disponíveis. Um epicentro de vibração alta que acelera manifestações materiais.
+                            </p>
                           </div>
-                        );
-                      })}
+
+                          {/* Caixa do Ritual (shrink-0 garante que não seja espremida) */}
+                          <div className="bg-white/5 rounded-3xl p-8 border border-white/10 relative overflow-hidden group shrink-0">
+                            <div className="absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-opacity group-hover:opacity-30" style={{ backgroundColor: currentActiveData?.color || '#10b981' }}></div>
+                            
+                            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/50 block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>O Ritual de 24 Horas</span>
+                            
+                            <p className="text-white/90 text-lg md:text-xl font-light leading-relaxed relative z-10 mb-6">
+                              {currentActiveData?.ritual}
+                            </p>
+
+                            
+                          </div>
+
+                        </div>
+                      </div>
+
+                      {/* BLOCO 4.5: O MANTRA DE ATIVAÇÃO (GRADIENTE CINEMÁTICO) */}
+                      <div className="w-full max-w-6xl mx-auto mt-32 mb-48 px-6 text-center flex flex-col items-center relative">
+                        {/* Glow suave de fundo para ancorar o texto */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] blur-[120px] opacity-20 pointer-events-none" style={{ backgroundColor: currentActiveData?.color || '#10b981' }}></div>
+                        
+                        <div className="relative z-10 flex flex-col items-center">
+                          <div className="flex items-center gap-3 mb-10 px-5 py-2.5 bg-white/5 rounded-full border border-white/10 backdrop-blur-md shadow-lg">
+                             <Sparkles className="w-4 h-4" style={{ color: currentActiveData?.color || '#10b981' }} />
+                             <span className="font-mono text-xs tracking-[0.2em] uppercase font-bold" style={{ color: currentActiveData?.color || '#10b981' }}>O Mantra de Ativação</span>
+                          </div>
+                          
+                          <p className="text-4xl md:text-6xl lg:text-7xl font-ps-display font-bold tracking-tighter leading-[1.1] md:leading-[1.15] bg-clip-text text-transparent pb-2 max-w-5xl"
+                             style={{ backgroundImage: `linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.9) 40%, ${currentActiveData?.color || '#10b981'} 100%)` }}>
+                            "{currentActiveData?.mantra}"
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
+                      <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
+                        <div className="text-center mb-24">
+                          <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Seu Ano em 3 Fases.</h2>
+                          <p className="text-white/60 text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                            Como o seu foco em <strong className="text-white font-medium">{currentActiveData.label}</strong> se desdobra ao longo dos próximos 12 meses nesta cidade.
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col border-t border-white/10">
+                          {currentActiveData.timeline?.map((phase, index) => {
+                            const isOpen = openTimelinePhase === index;
+                            return (
+                              <div key={index} className="border-b border-white/10 flex flex-col group">
+                                <button 
+                                  onClick={() => setOpenTimelinePhase(isOpen ? null : index)}
+                                  className="w-full py-10 md:py-14 flex flex-col md:flex-row md:items-center justify-between text-left transition-colors duration-500 hover:bg-white/[0.02]"
+                                >
+                                  <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-16 w-full px-4 md:px-8">
+                                    <span 
+                                      className="font-mono text-sm tracking-[0.2em] uppercase transition-colors duration-500 w-40 shrink-0" 
+                                      style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.4)' }}
+                                    >
+                                      {phase.period}
+                                    </span>
+                                    <h3 className={`font-ps-display text-3xl md:text-5xl font-bold tracking-tight transition-colors duration-500 ${isOpen ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`}>
+                                      {phase.phase}
+                                    </h3>
+                                  </div>
+                                  <div className="hidden md:flex shrink-0 ml-4 mr-8 w-12 h-12 items-center justify-center rounded-full border transition-all duration-500" style={{ borderColor: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.1)', backgroundColor: isOpen ? `${currentActiveData.color}10` : 'transparent' }}>
+                                     <Plus className={`w-5 h-5 transition-transform duration-500 ${isOpen ? 'rotate-45' : ''}`} style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.4)' }} />
+                                  </div>
+                                </button>
+
+                                <AnimatePresence>
+                                  {isOpen && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="pb-14 px-4 md:pl-[14rem] md:pr-12">
+                                         <p className="text-white/70 text-lg md:text-2xl leading-relaxed font-light">{phase.text}</p>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                      {/* BLOCO 6: O PONTO CEGO (AMEAÇA CRÍTICA - V2) */}
+                      <div className="w-full max-w-5xl mx-auto mt-40 mb-32 px-6">
+                        <div className="bg-[#020202] rounded-3xl border border-red-900/30 p-1 md:p-1.5 relative overflow-hidden shadow-[0_0_60px_rgba(239,68,68,0.15)]">
+                          
+                          {/* Pulsing subtle glow */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] blur-[8px] bg-red-600"></div>
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[1px] bg-red-500"></div>
+
+                          <div className="bg-[#050505] rounded-[28px] p-8 md:p-16 relative z-10 flex flex-col items-center text-center border border-white/[0.02]">
+                            
+                            <div className="flex items-center gap-3 mb-10 px-5 py-2 bg-red-500/10 rounded-full border border-red-500/20">
+                               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                               <span className="font-mono text-[10px] tracking-widest uppercase text-red-400 font-bold">Risco de Autossabotagem</span>
+                            </div>
+                            
+                            <h3 className="font-ps-display text-4xl md:text-6xl font-bold text-white mb-10 tracking-tighter">
+                              O Ponto Cego.
+                            </h3>
+                            
+                            <p className="text-red-50/70 text-lg md:text-2xl font-light leading-relaxed max-w-3xl mb-14">
+                              A euforia desta configuração astrológica atrai oportunidades, mas também um impulso irresistível para o desperdício. Seu maior risco é confundir alto fluxo com patrimônio consolidado.
+                            </p>
+
+                            <div className="w-full h-px bg-gradient-to-r from-transparent via-red-900/50 to-transparent mb-14"></div>
+                            
+                            <div className="text-left w-full max-w-3xl bg-black/40 p-8 rounded-2xl border border-red-900/20">
+                               <div className="flex items-center gap-3 mb-6 border-b border-red-900/30 pb-4">
+                                 <ShieldAlert className="w-5 h-5 text-red-500" />
+                                 <span className="font-mono text-xs tracking-[0.2em] uppercase text-red-500 font-bold">Protocolo de Defesa</span>
+                               </div>
+                               <p className="text-white text-xl md:text-2xl font-serif italic leading-relaxed">
+                                 "Congele 30% de todo lucro novo no momento em que ele tocar a sua conta, antes de tomar qualquer decisão de gasto."
+                               </p>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+
+
                     </div>
-                  </div>
-
-
+                  )}
+               </div>
+            </div>
           
-            </div>
-            </div>
 </Reveal>
         </div>
       </section>
@@ -853,23 +1093,6 @@ export default function AppleResultPreview() {
 
       
       <style dangerouslySetInnerHTML={{__html: `.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}} />
-      <UnlockPremiumModal 
-        isOpen={isPaywallOpen} 
-        onClose={() => setIsPaywallOpen(false)} 
-        targetAreaLabel={targetLockedArea?.label} 
-        targetAreaColor={targetLockedArea?.color} 
-        userCredits={userCredits}
-        onUnlock={(option) => {
-          if (option === 'single' && targetLockedArea) {
-            setAreas(areas.map(a => a.id === targetLockedArea.id ? { ...a, unlocked: true } : a));
-            setHoveredArea(targetLockedArea.id);
-          } else if (option === 'all') {
-            setAreas(areas.map(a => ({ ...a, unlocked: true })));
-            if (targetLockedArea) setHoveredArea(targetLockedArea.id);
-          }
-          setIsPaywallOpen(false);
-        }}
-      />
     </div>
   );
 }
