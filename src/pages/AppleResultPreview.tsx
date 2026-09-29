@@ -91,12 +91,7 @@ const LIFE_AREAS = [
       metodo: "A mente analítica trabalha a seu favor. O universo facilita que você organize o caos e execute processos com disciplina, método impecável e visão cirúrgica de longo prazo.",
       fase: "A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real."
     },
-    ritual: {
-      manha: { titulo: "O Despertar do Valor", texto: "Comece o dia frequentando o ambiente mais exclusivo que puder acessar nesta cidade. Peça um café premium. Aja, caminhe e respire como alguém que já faturou o seu maior objetivo do ano. O universo lê a sua postura física antes dos seus pensamentos." },
-      tarde: { titulo: "Ancoragem Material", texto: "Compre um item de valor simbólico (uma caneta, um acessório, um livro de negócios) usando dinheiro físico. Este objeto será o seu amuleto de tração financeira pelos próximos 12 meses." },
-      noite: { titulo: "Fechamento de Caixa", texto: "Escreva em um papel três fontes de renda ou negócios que você deseja destravar neste ano. Guarde este papel na carteira ou na capa do celular." },
-      mantra: "Eu comando a minha autonomia. O dinheiro flui até mim não por sorte, mas como consequência inevitável da minha excelência."
-    },
+    ritual: "Compre um item simbólico de alto valor percebido (mesmo que pequeno) usando dinheiro físico. Durante a transação, afirme mentalmente que aquele é o último investimento do seu ciclo de escassez.",
     pillars: [
       { icon: ArrowUpRight, title: "Aumento de Ganhos", text: "A energia favorece o faturamento e atrai novos clientes. O universo aqui não entrega por sorte, mas recompensa a sua coragem de faturar e expandir horizontes." },
       { icon: Crown, title: "Valorização do Trabalho", text: "A vibração do lugar convida à autoconfiança extrema. O cenário é perfeito para acabar com os descontos emocionais e cobrar o valor justo pelo seu talento." },
@@ -116,19 +111,14 @@ const LIFE_AREAS = [
       metodo: "A sua necessidade de excelência encontra o terreno fértil. O destino recompensa a sua capacidade de estruturar equipes, otimizar rotinas e liderar pelo exemplo prático.",
       fase: "O foco agora é consolidação. Não se trata mais de provar o seu valor para o mercado, mas de assumir a autoridade que você já construiu e colher os frutos financeiros disso."
     },
-    ritual: {
-      manha: { titulo: "Visualização do Topo", texto: "Vá ao centro financeiro ou empresarial da cidade. Observe o fluxo. Mande uma mensagem estratégica para alguém de alto nível do seu mercado, plantando uma semente sem pedir nada em troca." },
-      tarde: { titulo: "Atualização de Status", texto: "Reserve 30 minutos em um café local para reescrever a sua biografia (LinkedIn, currículo ou apresentação pessoal). Eleve o tom. Remova a humildade excessiva." },
-      noite: { titulo: "O Brinde da Autoridade", texto: "Tome um drink ou faça um jantar celebrando o cargo ou contrato que você AINDA não tem, mas que a energia do ano já começou a trazer." },
-      mantra: "Eu ocupo o meu espaço por direito. A minha autoridade é inquestionável e o meu trabalho gera impacto irreplicável."
-    },
+    ritual: "Vá ao centro financeiro ou bairro de negócios da cidade. Caminhe observando o fluxo e mande uma mensagem estratégica para alguém de alto nível do seu mercado, plantando uma semente sem pedir nada em troca.",
     pillars: [
       { icon: ArrowUpRight, title: "Ascensão Acelerada", text: "O alinhamento abre caminho para que saltos de negócio apareçam com naturalidade. A sua autoridade ganha um palco iluminado diante dos tomadores de decisão." },
       { icon: Crown, title: "Liderança Incontestável", text: "A energia atrai pessoas buscando a sua direção. O cenário é propício para assumir o protagonismo da sua equipe ou mercado sem pedir licença pelo seu brilho." },
       { icon: Shield, title: "Blindagem Profissional", text: "O universo ajuda a transformar sua carreira no seu maior ativo. O destino cria uma armadura de competência que te protege contra crises externas." }
     ],
     timeline: [
-      { phase: "Fase 1: Estruturação de Autoridade", period: "Meses 1 a 4", text: "O início do ciclo não é sobre aparecer, mas sobre construir alicerces. A energia favorece o redesenho dos seus processos e a montagem do time que sustentará seu próximo nível." },
+      { phase: "Fase 1: Estruturação de Autoridade", period: "Meses 1 a 4", text: "O início do ciclo não é sobre aparecer, mas sobre construir alicerces. A energia favorece o redesenho dos seus processes e a montagem do time que sustentará seu próximo nível." },
       { phase: "Fase 2: O Palco Iluminado", period: "Meses 5 a 8", text: "Sua competência atinge massa crítica. O cenário abre portas para visibilidade real diante de tomadores de decisão, tornando suas ideias o centro das atenções." },
       { phase: "Fase 3: Liderança Estabelecida", period: "Meses 9 a 12", text: "Você não precisa mais convencer ninguém do seu valor. A vibração consolida o seu nome como referência, atraindo convites sem que você precise forçar a prospecção." }
     ]
@@ -141,12 +131,7 @@ const LIFE_AREAS = [
       metodo: "A sua imagem passa a transmitir uma precisão cirúrgica. As pessoas confiam em você porque o seu brilho vem acompanhado de extrema competência e atenção aos detalhes.",
       fase: "A necessidade de aprovação externa desaparece. Você entra num ciclo onde a sua marca pessoal é pautada por quem você realmente é, e não pelo que esperam de você."
     },
-    ritual: {
-      manha: { titulo: "O Novo Espelho", texto: "Compre ou vista uma peça de roupa marcante logo pela manhã. Algo que a sua versão antiga teria medo ou vergonha de usar. Caminhe pelas ruas da cidade habitando essa nova pele." },
-      tarde: { titulo: "Registro de Poder", texto: "Tire uma foto sua no local mais icônico ou bonito do destino. Não para postar, mas para guardar. Olhe para a foto e perceba a diferença na sua postura." },
-      noite: { titulo: "Descarte de Rótulos", texto: "Escreva em um guardanapo três características ou medos que as pessoas associam a você e que você não aceita mais. Rasgue e jogue fora." },
-      mantra: "A minha presença fala por si. Eu não me diminuo para caber em espaços que não honram a minha grandeza."
-    },
+    ritual: "Vista ou compre uma peça de roupa que a sua versão antiga teria medo de usar. Caminhe pelas ruas da cidade habitando essa nova pele, sem justificar o seu estilo ou a sua presença para absolutamente ninguém.",
     pillars: [
       { icon: ArrowUpRight, title: "Autoconfiança Magnética", text: "A sensação ao pisar neste destino é de clareza absoluta de quem você é. A energia afasta a dúvida e garante que você entre em qualquer sala sabendo o seu valor." },
       { icon: Crown, title: "Posicionamento Premium", text: "O universo alinha a sua imagem ao alto valor. O magnetismo é tão forte que as pessoas costumam ler o seu sucesso antes mesmo de você abrir a boca." },
@@ -166,12 +151,7 @@ const LIFE_AREAS = [
       metodo: "O seu Ascendente está em casa. A energia local transforma o seu preciosismo em alta produtividade, ajudando a criar sistemas que funcionam quase no piloto automático.",
       fase: "O tempo se tornou seu recurso mais caro. A fase atual exige que você corte tudo aquilo que não traz retorno, blindando sua agenda contra distrações inúteis."
     },
-    ritual: {
-      manha: { titulo: "Auditoria do Tempo", texto: "Acorde sem usar alarmes ou redes sociais. O luxo do primeiro dia do seu ano solar deve ser dominar o próprio tempo e não responder à agenda dos outros." },
-      tarde: { titulo: "O Ato de Delegar", texto: "Terceirize, pague ou delegue uma tarefa que você odeia fazer durante a viagem (ex: lavar roupa, carregar malas). Acostume o cérebro a comprar tempo." },
-      noite: { titulo: "A Regra de Ouro", texto: "Defina uma única regra inquebrável para a sua rotina neste ano (ex: Não abrir o WhatsApp antes das 9h). Escreva na primeira página da sua agenda." },
-      mantra: "Meu tempo é a minha moeda mais valiosa. A disciplina não me prende, ela é a base da minha liberdade absoluta."
-    },
+    ritual: "Desligue todos os alarmes e não abra as redes sociais nas primeiras 4 horas do seu dia. O luxo absoluto do seu primeiro dia de Revolução Solar deve ser dominar o próprio tempo.",
     pillars: [
       { icon: ArrowUpRight, title: "Alta Performance Real", text: "O alinhamento dissolve a procrastinação. A energia favorece um estado de foco profundo, permitindo que você produza em 4 horas o que costumava levar 10." },
       { icon: Crown, title: "Automação do Caos", text: "O universo pede eficiência extrema. A vibração da cidade facilita a delegação de tarefas, libertando o seu tempo para decisões que realmente movem o ponteiro." },
@@ -191,12 +171,7 @@ const LIFE_AREAS = [
       metodo: "A sua rede de contatos ganha um filtro de utilidade mútua. O universo facilita alianças onde os dois lados entregam excelência, sem espaço para promessas vazias.",
       fase: "Você não quer mais 'fazer amigos por fazer'. A maturidade pede círculos de influência focados em crescimento, suporte mútuo e expansão de impérios."
     },
-    ritual: {
-      manha: { titulo: "Poda Estratégica", texto: "Deixe de seguir ou silencie 5 pessoas nas suas redes sociais que te sugam energia, reclamam muito ou não representam o futuro que você quer construir." },
-      tarde: { titulo: "A Semente do Lobo", texto: "Vá a um evento, restaurante ou lobby de hotel onde o público é do nível que você deseja alcançar. Sente-se no bar. Apenas observe as conversas e a postura. Pertenca." },
-      noite: { titulo: "A Ponte", texto: "Mande uma mensagem elogiando (de forma sincera e sem pedir favores) um contato profissional ou parceiro que você admira. Plante uma aliança." },
-      mantra: "Eu atraio pessoas que puxam o meu nível para cima. Eu sento em mesas onde a colaboração substitui a competição."
-    },
+    ritual: "Mande mensagem para 3 pessoas que te inspiram ou com quem você quer criar laços de alto nível. Depois, sente-se no lobby de um hotel ou café elegante da cidade apenas para observar e pertencer àquele ambiente.",
     pillars: [
       { icon: ArrowUpRight, title: "Acesso a Mesas Fechadas", text: "A vibração atrai encontros mágicos. Convites para ambientes exclusivos costumam surgir, colocando você a um aperto de mãos dos maiores contratos." },
       { icon: Crown, title: "Parcerias de Elite", text: "O destino eleva a sua frequência social. A energia atrai apenas associações com quem puxa o seu nível para cima, afastando relações que sugam o seu tempo." },
@@ -216,12 +191,7 @@ const LIFE_AREAS = [
       metodo: "O romantismo encontra a praticidade. O universo favorece parceiros que trazem ordem, cuidado diário e que saibam construir uma vida a dois sem dramas desnecessários.",
       fase: "A fase de montanha-russa emocional já passou. O que você busca e atrai agora é paz, previsibilidade e alguém para ser o seu porto seguro nas conquistas da vida."
     },
-    ritual: {
-      manha: { titulo: "Auto-Romance Máximo", texto: "Trate a si mesmo como você gostaria que o melhor parceiro do mundo te tratasse hoje. Compre flores para si, faça um spa matinal. O universo reflete o seu próprio padrão." },
-      tarde: { titulo: "A Âncora Visual", texto: "Se estiver com alguém, celebre as conquistas materiais e a parceria de vocês num jantar elegante. Se estiver solteiro, vá a um local romântico e habitue-se a estar confortável sendo o próprio prêmio." },
-      noite: { titulo: "Limpeza de Histórico", texto: "Perdoe intimamente relacionamentos passados que não deram certo. Libere a raiva ou a culpa. Você precisa de espaço vazio no 'HD' para a energia de Casa 7 entrar." },
-      mantra: "Eu aceito receber amor na mesma medida da minha dedicação. Eu me torno magnético ao focar no meu próprio brilho."
-    },
+    ritual: "Trate a si mesmo como você gostaria que o parceiro ideal te tratasse hoje. Reserve a melhor mesa, compre um presente para si e habite o estado de merecimento absoluto. O universo reflete o seu próprio padrão.",
     pillars: [
       { icon: ArrowUpRight, title: "Magnetismo Real", text: "O destino foca na atração de parcerias maduras. A energia é ideal para encontrar quem queira construir junto, cortando o desgaste com relações rasas." },
       { icon: Crown, title: "Valorização Pessoal", text: "A sensação de amor próprio se torna o seu maior escudo. O universo pede o fim das concessões excessivas, garantindo que você dite as regras do seu valor." },
@@ -241,12 +211,7 @@ const LIFE_AREAS = [
       metodo: "A espiritualidade deixa de ser mística e passa a ser prática. O universo alinha a sua intuição com ações calculadas, transformando insight em resultados concretos.",
       fase: "Você entende que o verdadeiro sucesso precisa ter alma. A maturidade espiritual foca em alinhar a sua ambição material com a sua paz de espírito diária."
     },
-    ritual: {
-      manha: { titulo: "Isolamento Fértil", texto: "Faça uma caminhada silenciosa de 30 minutos por algum parque ou templo da cidade, sem fones de ouvido. Deixe a intuição localizar as respostas que você estava buscando fora." },
-      tarde: { titulo: "O Ato de Retribuição", texto: "A energia desta casa é ativada doando. Pague o café de alguém anonimamente, faça uma doação ou ajude um desconhecido. O fluxo universal responde imediatamente." },
-      noite: { titulo: "A Carta ao Futuro", texto: "Escreva como se já tivesse passado 1 ano. Agradeça pelas superações e pelos bloqueios que foram retirados do seu caminho de forma misteriosa." },
-      mantra: "Eu confio na inteligência invisível que orquestra os meus passos. A minha paz de espírito é inegociável."
-    },
+    ritual: "Faça uma caminhada silenciosa de 30 minutos por um parque ou templo, sem fones de ouvido. Faça uma doação financeira anônima, por menor que seja, para ancorar a energia do fluxo universal da abundância.",
     pillars: [
       { icon: ArrowUpRight, title: "Intuição Afiada", text: "O destino aguça o seu sexto sentido de forma inegável. A sensação é de saber o caminho exato antes mesmo que a mente lógica consiga tentar explicar." },
       { icon: Crown, title: "Clareza de Propósito", text: "A vibração da cidade dissipa qualquer crise existencial. O universo te acorda com a certeza do porquê você faz o que faz, unindo carreira e alma." },
@@ -266,12 +231,7 @@ const LIFE_AREAS = [
       metodo: "O Virgem assume o controle absoluto da sua biologia. O universo favorece protocolos de biohacking, rotinas de sono e uma alimentação milimetricamente ajustada.",
       fase: "O corpo já não aceita abusos como antes. O seu momento de vida exige que o autocuidado seja tratado com a mesma prioridade e respeito que a sua conta bancária."
     },
-    ritual: {
-      manha: { titulo: "Choque Biológico", texto: "Pratique o ancoramento físico. Caminhe descalço, tome um banho gelado ou faça um treino intenso. Avise o seu corpo biológico que um novo ciclo superior começou." },
-      tarde: { titulo: "Combustível de Elite", texto: "Faça uma refeição no melhor restaurante saudável que encontrar. Saboreie cada garfada como se estivesse injetando combustível de aviação na máquina que construirá o seu império." },
-      noite: { titulo: "O Protocolo Noturno", texto: "Desligue as telas duas horas antes de dormir. O seu cérebro precisa resetar completamente na primeira noite neste destino." },
-      mantra: "Meu corpo é o templo das minhas ambições. Eu invisto na minha biologia para que ela sustente a minha mente."
-    },
+    ritual: "Comece o dia com um choque biológico (um banho muito gelado ou um treino intenso). Depois, faça a sua primeira refeição no melhor e mais limpo restaurante que encontrar, tratando o alimento como combustível premium.",
     pillars: [
       { icon: ArrowUpRight, title: "Energia Inesgotável", text: "O magnetismo local impulsiona o seu vigor. A sensação de cansaço crônico cede espaço para uma energia limpa, acompanhando o ritmo da sua ambição mental." },
       { icon: Crown, title: "Longevidade e Vigor", text: "A vibração faz com que o seu corpo responda instantaneamente aos bons tratos. O universo recompensa seus novos hábitos com uma aparência de saúde radiante." },
@@ -283,6 +243,7 @@ const LIFE_AREAS = [
       { phase: "Fase 3: Fortaleza Imunológica", period: "Meses 9 a 12", text: "A sensação é de corpo blindado. O metabolismo entra no seu auge de performance e estabilidade, garantindo que a sua saúde consiga bancar integralmente a altura das suas ambições." }
     ]
   }
+];
 ];
 
 export default function AppleResultPreview() {
@@ -919,65 +880,6 @@ export default function AppleResultPreview() {
 
                           {/* Fundo Atmosférico abstrato para amarrar os textos */}
                           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] opacity-10 pointer-events-none blur-[150px] -z-10" style={{ backgroundColor: currentActiveData.color }} />
-                        </div>
-
-                      </div>
-
-                      {/* BLOCO 4: O RITUAL DE ATIVAÇÃO (AS PRIMEIRAS 24 HORAS) */}
-                      <div className="w-full mt-40 max-w-5xl mx-auto">
-                        <div className="text-center mb-24 relative">
-                          <span className="font-mono text-sm tracking-[0.3em] uppercase mb-4 block" style={{ color: currentActiveData.color }}>O Dia do Aniversário</span>
-                          <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Protocolo de Ativação.</h2>
-                          <p className="text-white/60 text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                            O roteiro prático e intencional do que você deve executar nas primeiras 24 horas para plugar sua energia nesta cidade.
-                          </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 relative z-10">
-                          {/* Manhã */}
-                          <div className="bg-black/30 backdrop-blur-md border border-white/5 p-10 rounded-[32px] flex flex-col gap-6 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[50px] rounded-full -mr-10 -mt-10 transition-colors duration-500 group-hover:bg-opacity-20" style={{ backgroundColor: currentActiveData.color }} />
-                            <div className="flex items-center gap-4 border-b border-white/10 pb-6">
-                               <Sun className="w-6 h-6" style={{ color: currentActiveData.color }} />
-                               <h3 className="font-bold text-xl uppercase tracking-widest text-white">Manhã</h3>
-                            </div>
-                            <h4 className="text-2xl font-bold text-white tracking-tight">{currentActiveData.ritual?.manha.titulo}</h4>
-                            <p className="text-white/60 text-lg font-light leading-relaxed">{currentActiveData.ritual?.manha.texto}</p>
-                          </div>
-
-                          {/* Tarde */}
-                          <div className="bg-black/30 backdrop-blur-md border border-white/5 p-10 rounded-[32px] flex flex-col gap-6 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[50px] rounded-full -mr-10 -mt-10 transition-colors duration-500 group-hover:bg-opacity-20" style={{ backgroundColor: currentActiveData.color }} />
-                            <div className="flex items-center gap-4 border-b border-white/10 pb-6">
-                               <Clock className="w-6 h-6" style={{ color: currentActiveData.color }} />
-                               <h3 className="font-bold text-xl uppercase tracking-widest text-white">Tarde</h3>
-                            </div>
-                            <h4 className="text-2xl font-bold text-white tracking-tight">{currentActiveData.ritual?.tarde.titulo}</h4>
-                            <p className="text-white/60 text-lg font-light leading-relaxed">{currentActiveData.ritual?.tarde.texto}</p>
-                          </div>
-
-                          {/* Noite */}
-                          <div className="bg-black/30 backdrop-blur-md border border-white/5 p-10 rounded-[32px] flex flex-col gap-6 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[50px] rounded-full -mr-10 -mt-10 transition-colors duration-500 group-hover:bg-opacity-20" style={{ backgroundColor: currentActiveData.color }} />
-                            <div className="flex items-center gap-4 border-b border-white/10 pb-6">
-                               <Star className="w-6 h-6" style={{ color: currentActiveData.color }} />
-                               <h3 className="font-bold text-xl uppercase tracking-widest text-white">Noite</h3>
-                            </div>
-                            <h4 className="text-2xl font-bold text-white tracking-tight">{currentActiveData.ritual?.noite.titulo}</h4>
-                            <p className="text-white/60 text-lg font-light leading-relaxed">{currentActiveData.ritual?.noite.texto}</p>
-                          </div>
-                        </div>
-
-                        {/* Mantra de Ancoragem */}
-                        <div className="mt-16 w-full p-12 md:p-16 rounded-[40px] border border-white/10 relative overflow-hidden flex flex-col items-center text-center">
-                           <div className="absolute inset-0 opacity-10 blur-[80px]" style={{ backgroundColor: currentActiveData.color }} />
-                           <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8 shadow-2xl relative z-10">
-                              <Sparkles className="w-8 h-8" style={{ color: currentActiveData.color }} />
-                           </div>
-                           <span className="font-mono text-sm tracking-[0.2em] uppercase text-white/50 mb-6 relative z-10">Mantra de Ancoragem</span>
-                           <h4 className="font-ps-display text-3xl md:text-5xl font-bold text-white leading-tight max-w-4xl relative z-10" style={{ textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
-                             "{currentActiveData.ritual?.mantra}"
-                           </h4>
                         </div>
 
                       </div>
