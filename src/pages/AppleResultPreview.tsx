@@ -283,11 +283,17 @@ export default function AppleResultPreview() {
   const vidScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
   const vidOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
+  // Parallax Block 4
+  const block4Ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: scroll4Progress } = useScroll({ target: block4Ref, offset: ["start end", "end start"] });
+  const parallaxY = useTransform(scroll4Progress, [0, 1], ["-15%", "15%"]);
+
+
   const carRef = useRef<HTMLDivElement>(null);
   const scrollCar = (d: number) => carRef.current?.scrollBy({ left: d, behavior: "smooth" });
-  const [openArea, setOpenArea] = useState<string>("dinheiro");
+  const [openArea, setOpenArea] = useState<string>("trabalho");
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
-  const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
+  const [hoveredArea, setHoveredArea] = useState<string | null>("trabalho");
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
@@ -915,48 +921,46 @@ export default function AppleResultPreview() {
 
                       </div>
 
-                      {/* BLOCO 4: O RITUAL E A CIDADE (PAINEL SPLIT APPLE) */}
-                      <div className="w-full mt-40 max-w-[1400px] mx-auto mb-32 h-auto md:h-[700px] relative rounded-[40px] overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row justify-end">
+{/* BLOCO 4: O RITUAL E A CIDADE (PAINEL SPLIT APPLE) */}
+                      <div ref={block4Ref} className="w-full mt-40 max-w-[1400px] mx-auto mb-32 relative rounded-[40px] overflow-hidden border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row justify-end min-h-[700px]">
                         
-                        {/* Imagem de Fundo Completa com Fade */}
+                        {/* Imagem de Fundo Completa com Parallax Real */}
                         <motion.div 
-                          initial={{ scale: 1.1 }}
-                          whileInView={{ scale: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1.5, ease: "easeOut" }}
-                          className="absolute inset-0 w-full md:w-[70%] left-0 h-[400px] md:h-full"
+                          style={{ y: parallaxY }}
+                          className="absolute -inset-[20%] w-[140%] h-[140%] left-0 z-0"
                         >
                           <img src={currentActiveData.image} alt={currentActiveData.city} className="w-full h-full object-cover opacity-90" />
-                          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#03100B]/80 via-transparent to-[#03100B] hidden md:block"></div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#03100B] via-transparent to-transparent md:hidden"></div>
                         </motion.div>
+                        
+                        {/* Overlay Gradient for readability on the left */}
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#03100B]/80 via-transparent to-transparent z-0 pointer-events-none"></div>
 
-                        {/* Painel Lateral Direito */}
-                        <div className="relative z-10 w-full md:w-[45%] h-full bg-[#03100B]/70 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-white/10 p-8 md:p-14 flex flex-col justify-center">
+                        {/* Painel Lateral Direito (Flex auto para crescer conforme o texto sem cortar) */}
+                        <div className="relative z-10 w-full md:w-[45%] h-full min-h-[700px] bg-[#03100B]/80 backdrop-blur-3xl border-t md:border-t-0 md:border-l border-white/10 p-10 md:p-16 flex flex-col justify-center">
                           
                           <div className="mb-10">
-                            {/* A Pill de Localização solicitada pelo usuário (Maior) */}
-                            <div className="flex items-center gap-3 mb-8 px-6 py-3 bg-black/60 rounded-full border border-white/10 w-fit backdrop-blur-md">
+                            {/* Selo de Localização (Maior) */}
+                            <div className="flex items-center gap-3 mb-8 px-6 py-3 bg-black/60 rounded-full border border-white/10 w-fit backdrop-blur-md shadow-lg">
                                 <MapPin className="w-5 h-5" style={{ color: currentActiveData.color }} />
-                                <span className="font-mono text-sm md:text-base tracking-widest uppercase text-white font-medium">{currentActiveData.city}</span>
+                                <span className="font-mono text-sm md:text-base tracking-widest uppercase text-white font-semibold">{currentActiveData.city}</span>
                             </div>
                             
-                            <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
+                            <p className="text-white/90 text-xl font-light leading-relaxed">
                               {currentActiveData.cityDesc}
                             </p>
                           </div>
 
-                          <div className="bg-white/5 rounded-3xl p-8 border border-white/10 relative overflow-hidden group shadow-xl">
-                            <div className="absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-opacity group-hover:opacity-30" style={{ backgroundColor: currentActiveData.color }}></div>
+                          <div className="bg-white/5 rounded-3xl p-8 border border-white/10 relative overflow-hidden shadow-2xl shrink-0">
+                            <div className="absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-opacity" style={{ backgroundColor: currentActiveData.color }}></div>
                             
-                            <span className="font-mono text-xs tracking-[0.2em] uppercase text-white/50 block mb-4" style={{ color: currentActiveData.color }}>O Ritual de 24 Horas</span>
-                            <p className="text-white/90 text-lg md:text-xl font-light leading-relaxed relative z-10 mb-6">
+                            <span className="font-mono text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/60 block mb-4" style={{ color: currentActiveData.color }}>O Ritual de 24 Horas</span>
+                            <p className="text-white text-lg md:text-xl font-light leading-relaxed relative z-10 mb-6">
                               {currentActiveData.ritual}
                             </p>
 
                             <div className="w-full h-px bg-white/10 mb-6"></div>
 
-                            <p className="text-white/60 text-base md:text-lg font-serif italic relative z-10">
+                            <p className="text-white/70 text-base md:text-lg font-serif italic relative z-10">
                               "{currentActiveData.mantra}"
                             </p>
                           </div>
@@ -964,7 +968,7 @@ export default function AppleResultPreview() {
                         </div>
                       </div>
 
-                      {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
+                                            {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
                       <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
                         <div className="text-center mb-24">
                           <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Seu Ano em 3 Fases.</h2>
