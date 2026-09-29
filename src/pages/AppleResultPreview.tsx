@@ -922,53 +922,56 @@ export default function AppleResultPreview() {
                       </div>
 
 {/* BLOCO 4: O RITUAL E A CIDADE (PAINEL SPLIT APPLE) */}
-                      <div ref={block4Ref} className="w-full mt-40 max-w-[1400px] mx-auto mb-32 relative rounded-[40px] overflow-hidden border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row justify-end min-h-[700px]">
+                      <div ref={block4Ref} 
+                           className="w-full mt-40 max-w-[1400px] mx-auto mb-32 relative rounded-[40px] border border-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row justify-end min-h-[700px]"
+                           style={{ overflow: 'hidden', WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
+                      >
                         
                         {/* Imagem de Fundo Completa com Parallax Real */}
                         <motion.div 
                           style={{ y: parallaxY }}
                           className="absolute -inset-[20%] w-[140%] h-[140%] left-0 z-0"
                         >
-                          <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop" alt="Nova York, EUA" className="w-full h-full object-cover opacity-90" />
+                          <img src={GLOBAL_CITY_IMAGE} alt={GLOBAL_CITY_NAME} className="w-full h-full object-cover opacity-100" />
                         </motion.div>
                         
-                        {/* Overlay Gradient for readability on the left */}
-                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#03100B]/80 via-transparent to-transparent z-0 pointer-events-none"></div>
+                        {/* Overlay Gradient suave apenas para leitura (nao escurecer tudo) */}
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/60 via-transparent to-transparent z-0 pointer-events-none"></div>
 
-                        {/* Painel Lateral Direito (Flex auto para crescer conforme o texto sem cortar) */}
-                        <div className="relative z-10 w-full md:w-[45%] h-full min-h-[700px] bg-[#03100B]/80 backdrop-blur-3xl border-t md:border-t-0 md:border-l border-white/10 p-10 md:p-16 flex flex-col justify-center">
+                        {/* Painel Lateral Direito (O verdadeiro vidro fosco) */}
+                        <div className="relative z-10 w-full md:w-[45%] h-full min-h-[700px] bg-black/20 backdrop-blur-[40px] border-t md:border-t-0 md:border-l border-white/10 p-10 md:p-16 flex flex-col justify-center rounded-b-[40px] md:rounded-bl-none md:rounded-r-[40px]">
                           
                           <div className="mb-10">
-                            {/* Selo de Localização (Maior) */}
-                            <div className="flex items-center gap-3 mb-8 px-6 py-3 bg-black/60 rounded-full border border-white/10 w-fit backdrop-blur-md shadow-lg">
-                                <MapPin className="w-5 h-5" style={{ color: currentActiveData.color }} />
-                                <span className="font-mono text-sm md:text-base tracking-widest uppercase text-white font-semibold">Nova York, EUA</span>
+                            {/* Selo de Localização */}
+                            <div className="flex items-center gap-3 mb-8 px-6 py-3 bg-black/40 rounded-full border border-white/20 w-fit backdrop-blur-md shadow-lg">
+                                <MapPin className="w-5 h-5 text-white" />
+                                <span className="font-mono text-sm md:text-base tracking-widest uppercase text-white font-semibold">{GLOBAL_CITY_NAME}</span>
                             </div>
                             
-                            <p className="text-white/90 text-xl font-light leading-relaxed">
-                              A energia inesgotável desta ilha não aceita mediocridade, forçando você a assumir a autoridade da sua própria vida e colocar suas ideias nos maiores palcos disponíveis. Um epicentro de vibração alta que acelera manifestações materiais.
+                            <p className="text-white/90 text-xl font-light leading-relaxed drop-shadow-md">
+                              {GLOBAL_CITY_DESC}
                             </p>
                           </div>
 
-                          <div className="bg-white/5 rounded-3xl p-8 border border-white/10 relative overflow-hidden shadow-2xl shrink-0">
-                            <div className="absolute top-0 right-0 w-32 h-32 blur-[40px] opacity-10 transition-opacity" style={{ backgroundColor: currentActiveData.color }}></div>
+                          <div className="bg-white/10 rounded-3xl p-8 border border-white/10 relative overflow-hidden shadow-2xl shrink-0 backdrop-blur-md">
+                            <div className="absolute top-0 right-0 w-32 h-32 blur-[50px] opacity-20 transition-opacity" style={{ backgroundColor: currentActiveData?.color || '#10b981' }}></div>
                             
-                            <span className="font-mono text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/60 block mb-4" style={{ color: currentActiveData.color }}>O Ritual de 24 Horas</span>
-                            <p className="text-white text-lg md:text-xl font-light leading-relaxed relative z-10 mb-6">
-                              {currentActiveData.ritual}
+                            <span className="font-mono text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/70 block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>O Ritual de 24 Horas</span>
+                            <p className="text-white text-lg md:text-xl font-light leading-relaxed relative z-10 mb-6 drop-shadow-sm">
+                              {currentActiveData?.ritual}
                             </p>
 
-                            <div className="w-full h-px bg-white/10 mb-6"></div>
+                            <div className="w-full h-px bg-white/20 mb-6"></div>
 
-                            <p className="text-white/70 text-base md:text-lg font-serif italic relative z-10">
-                              "{currentActiveData.mantra}"
+                            <p className="text-white/80 text-base md:text-lg font-serif italic relative z-10 drop-shadow-sm">
+                              "{currentActiveData?.mantra}"
                             </p>
                           </div>
 
                         </div>
                       </div>
 
-                                            {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
+                      {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
                       <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
                         <div className="text-center mb-24">
                           <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Seu Ano em 3 Fases.</h2>
