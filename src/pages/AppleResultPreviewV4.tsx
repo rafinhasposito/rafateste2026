@@ -35,6 +35,22 @@ const CountUp = ({ target, suffix = "" }: { target: number; suffix?: string }) =
 /* ══════════════════════════════════════════════════
    DATA (Theme is hardcoded to #02160F dark blue, #10b981 bright blue)
    ══════════════════════════════════════════════════ */
+
+export const ROUTES_MOCK_DATA = [
+  { house: 1, city: "Nova York, EUA", img: "1496442226666-8d4d0e62e6e9", label: "Protagonismo e Novas Iniciativas", color: "#c9a227", focusId: "identidade" },
+  { house: 2, city: "Tóquio, Japão", img: "1498036882173-b41c28a8ba34", label: "Dinheiro, Valor e Segurança", color: "#10b981", focusId: "dinheiro" },
+  { house: 3, city: "Dubai, EAU", img: "1459787915554-b34915863013", label: "Comunicação, Estudos e Contatos", color: "#14b8a6", focusId: "networking" },
+  { house: 4, city: "Buenos Aires, ARG", img: "1495317823589-e67efe1524b0", label: "Lar, Família e Vida Privada", color: "#f43f5e", focusId: "amor" },
+  { house: 5, city: "Santiago, Chile", img: "1689850543263-01a52ccc6943", label: "Criatividade, Lazer e Autoestima", color: "#c9a227", focusId: "identidade" },
+  { house: 6, city: "Florianópolis, BRA", img: "1565574337618-b08146e94992", label: "Organização, Rotina e Saúde", color: "#22c55e", focusId: "saude" },
+  { house: 7, city: "São Paulo, SP", img: "1470160710819-b3bd5ec85c66", label: "Casamento, Sociedades e Contratos", color: "#f43f5e", focusId: "amor" },
+  { house: 8, city: "Los Angeles, EUA", img: "1444723121867-7a241cacace9", label: "Transformação, Crises e Finanças Compartilhadas", color: "#10b981", focusId: "dinheiro" },
+  { house: 9, city: "Paris, França", img: "1431274172761-fca41d930114", label: "Expansão, Viagens e Estudos Superiores", color: "#6366f1", focusId: "espiritual" },
+  { house: 10, city: "Roma, Itália", img: "1491566102020-21838225c3c8", label: "Carreira, Propósito e Visibilidade", color: "#3b82f6", focusId: "trabalho" },
+  { house: 11, city: "Londres, UK", img: "1448906654166-444d494666b3", label: "Grupos, Projetos Futuros e Amizades", color: "#14b8a6", focusId: "networking" },
+  { house: 12, city: "Bali, Indonésia", img: "1501179691627-eeaa65ea017c", label: "Espiritualidade, Inconsciente e Fechamentos", color: "#6366f1", focusId: "espiritual" }
+];
+
 const P = {
   name: "Rafael Sposito", firstName: "Rafael", year: 2027, date: "09/08/2027", time: "05:30 (UTC)",
   city: "Nova Iorque", coords: "40.71° N, 74.01° W", origin: "Surubim",
@@ -312,11 +328,22 @@ export default function AppleResultPreviewV4() {
   };
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
+  const [activeRouteIndex, setActiveRouteIndex] = useState(1); // Default Casa 2
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
   const [unlockedItems, setUnlockedItems] = useState<string[]>([]);
+  
+  const activeRoute = ROUTES_MOCK_DATA[activeRouteIndex];
+  
+  // Substitui os dados fixos do P pela rota ativa
+  const dynamicCity = activeRoute.city;
+  const dynamicHouseNum = activeRoute.house;
+  const dynamicHouseLabel = activeRoute.label;
+  const dynamicHouseImg = `https://images.unsplash.com/photo-${activeRoute.img}?auto=format&fit=crop&w=2000&q=80`;
+  const currentHouseData = REAL_HOUSES_DATA[activeRouteIndex];
+
   const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
   const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
   
@@ -387,7 +414,7 @@ export default function AppleResultPreviewV4() {
           style={{ scale: textScale, opacity: textOpacity, filter: textBlur }}
           className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#10b981] to-emerald-200 origin-center uppercase text-center"
         >
-          {P.city}
+          {dynamicCity}
         </motion.h2>
 
         <motion.div style={{ opacity: textOpacity }} className="flex flex-col items-center max-w-4xl text-center px-4 mt-2">
@@ -520,7 +547,7 @@ export default function AppleResultPreviewV4() {
                              </div>
                              <div className="flex-1 md:text-right">
                                <p className="text-[#10b981] font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2">
-                                 <span className="truncate">{P.city}</span>
+                                 <span className="truncate">{dynamicCity}</span>
                                  <MapPin className="w-6 h-6 shrink-0"/>
                                </p>
                                <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Destino do Aniversário</p>
@@ -731,7 +758,7 @@ export default function AppleResultPreviewV4() {
                                   <>
                                     <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
                                     <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
-                                    <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.full}</p>
+                                    <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{(area as any).full}</p>
                                     <div
                                       className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2"
                                       style={{ backgroundColor: area.color, color: '#fff', boxShadow: `0 0 30px ${area.color}40` }}
@@ -744,7 +771,7 @@ export default function AppleResultPreviewV4() {
                                   <>
                                     <h3 className="font-ps-display text-3xl font-bold text-white/20 leading-tight mb-4 select-none" style={{ filter: 'blur(4px)' }}>{area.label}</h3>
                                     <div className="w-12 h-px mb-4 opacity-20" style={{ backgroundColor: `${area.color}80` }} />
-                                    <p className="text-white/10 text-sm font-light leading-relaxed mb-6 select-none" style={{ filter: 'blur(6px)' }}>{area.full}</p>
+                                    <p className="text-white/10 text-sm font-light leading-relaxed mb-6 select-none" style={{ filter: 'blur(6px)' }}>{(area as any).full}</p>
                                     <button className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
                                       <CreditCard className="w-4 h-4" />
                                       Desbloquear com 1 Crédito
@@ -803,7 +830,7 @@ export default function AppleResultPreviewV4() {
                             </h3>
                             <div className="w-16 h-px mb-6" style={{ backgroundColor: `${activeArea.color}80` }} />
                             <p className="text-white/75 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl drop-shadow-md">
-                              {activeArea.full}
+                              {(activeArea as any).full}
                             </p>
                             <div
                               className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3"
@@ -821,7 +848,7 @@ export default function AppleResultPreviewV4() {
                             </h3>
                             <div className="w-16 h-px mb-6 opacity-20" style={{ backgroundColor: `${activeArea.color}80` }} />
                             <p className="text-white/10 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl select-none" style={{ filter: 'blur(8px)' }}>
-                              {activeArea.full}
+                              {(activeArea as any).full}
                             </p>
                             <div className="flex flex-col items-center md:items-start gap-4">
                               <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3">
@@ -1220,7 +1247,7 @@ export default function AppleResultPreviewV4() {
                   Expanda o Seu Mapa.
                 </h2>
                 <p className="text-white/50 text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                  Você desbloqueou a Rota principal para a <strong className="text-white font-medium">{P.houseLabel}</strong>. Descubra quais cidades do mundo ativam a sua saúde, seu amor e as outras 11 dimensões da sua vida.
+                  Você desbloqueou a Rota principal para a <strong className="text-white font-medium">{dynamicHouseLabel}</strong>. Descubra quais cidades do mundo ativam a sua saúde, seu amor e as outras 11 dimensões da sua vida.
                 </p>
               </div>
               
@@ -1231,25 +1258,12 @@ export default function AppleResultPreviewV4() {
                   const label = dbData?.name?.split('—')[1]?.trim() || dbData?.label || "Área da Vida";
                   const isUnlocked = isCurrent || unlockedItems.includes(num.toString());
                   
-                  const MOCK_DATA = [
-                    { city: "Nova York, EUA", img: "1496442226666-8d4d0e62e6e9" }, // Casa 1
-                    { city: "Tóquio, Japão", img: "1498036882173-b41c28a8ba34" }, // Casa 2
-                    { city: "Dubai, EAU", img: "1459787915554-b34915863013" }, // Casa 3
-                    { city: "Buenos Aires, ARG", img: "1495317823589-e67efe1524b0" }, // Casa 4
-                    { city: "Santiago, Chile", img: "1689850543263-01a52ccc6943" }, // Casa 5
-                    { city: "Florianópolis, BRA", img: "1565574337618-b08146e94992" }, // Casa 6
-                    { city: "São Paulo, SP", img: "1470160710819-b3bd5ec85c66" }, // Casa 7
-                    { city: "Los Angeles, EUA", img: "1444723121867-7a241cacace9" }, // Casa 8
-                    { city: "Paris, França", img: "1431274172761-fca41d930114" }, // Casa 9
-                    { city: "Roma, Itália", img: "1491566102020-21838225c3c8" }, // Casa 10
-                    { city: "Londres, UK", img: "1448906654166-444d494666b3" }, // Casa 11
-                    { city: "Bali, Indonésia", img: "1501179691627-eeaa65ea017c" }, // Casa 12
-                  ];
                   
-                  const mockData = MOCK_DATA[num - 1];
-                  const cityForThisHouse = isCurrent ? P.city : (isUnlocked ? mockData.city : "Bloqueado");
+                  
+                  const mockData = ROUTES_MOCK_DATA[num - 1];
+                  const cityForThisHouse = isCurrent ? dynamicCity : (isUnlocked ? mockData.city : "Bloqueado");
                   const imageForThisHouse = `https://images.unsplash.com/photo-${mockData.img}?auto=format&fit=crop&w=800&q=80`;
-                  const areaColor = LIFE_AREAS[num - 1]?.color || currentActiveData?.color || '#10b981';
+                  const areaColor = mockData.color || currentActiveData?.color || '#10b981';
 
                   return (
                     <div 
@@ -1258,6 +1272,11 @@ export default function AppleResultPreviewV4() {
                         if (!isUnlocked) {
                           setTargetLockedArea({ label: label, color: areaColor, id: num.toString(), type: 'rota' });
                           setIsPaywallOpen(true);
+                        } else {
+                          // GAMEFICAÇÃO: Transição suave para a Rota Desbloqueada!
+                          setActiveRouteIndex(num - 1);
+                          setHoveredArea(ROUTES_MOCK_DATA[num - 1].focusId);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                       }}
                       className={`relative rounded-[32px] border transition-all duration-500 ease-[0.19,1,0.22,1] overflow-hidden flex flex-col group h-[260px] ${
@@ -1329,6 +1348,10 @@ export default function AppleResultPreviewV4() {
             setUnlockedItems(prev => [...prev, id]);
             if (targetLockedArea?.type === 'foco') {
               setHoveredArea(id);
+            } else if (targetLockedArea?.type === 'rota') {
+              setActiveRouteIndex(parseInt(id) - 1);
+              setHoveredArea(ROUTES_MOCK_DATA[parseInt(id) - 1].focusId);
+              setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 300);
             }
           } else {
             // Full unlock (all 12 houses and focuses)
