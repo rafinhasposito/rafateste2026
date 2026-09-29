@@ -284,7 +284,6 @@ const LIFE_AREAS = [
     ]
   }
 ];
-];
 
 export default function AppleResultPreview() {
   const heroRef = useRef<HTMLDivElement>(null);
