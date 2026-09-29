@@ -883,7 +883,7 @@ export default function AppleResultPreview() {
 
                       </div>
 
-                      {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
+                      {/* BLOCO 4: A LINHA DO TEMPO (ACCORDION) */}
                       <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
                         <div className="text-center mb-24">
                           <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Seu Ano em 3 Fases.</h2>
