@@ -12,6 +12,7 @@ import { FocusedShell } from "./layouts/FocusedShell";
 // Pages
 import Index from "./pages/Index";
 import AppleResultPrototype from "./pages/AppleResultPrototype";
+import AppleResultPreview from "./pages/AppleResultPreview";
 import HouseTrailer from "./pages/HouseTrailer";
 import HouseTrailerApp from "./pages/HouseTrailerApp";
 import Auth from "./pages/Auth";
@@ -25,6 +26,15 @@ import NotFound from "./pages/NotFound";
 import SolarGameV2 from "./pages/SolarGameV2";
 import NorthStarFlow from "./pages/NorthStarFlow";
 import AppleScrollExplosion from "./pages/AppleScrollExplosion";
+import Block3Sandbox from "./pages/Block3Sandbox";
+import Block4Sandbox from "./pages/Block4Sandbox";
+import RitualSandbox from "./pages/RitualSandbox";
+import CityStorytellingSandbox from "./pages/CityStorytellingSandbox";
+import CitySandboxParallax from "./pages/CitySandboxParallax";
+import Option3Refinements from "./pages/Option3Refinements";
+import TheRealFlowSandbox from "./pages/TheRealFlowSandbox";
+import MantraSandbox from "./pages/MantraSandbox";
+import AlertSandbox from "./pages/AlertSandbox";
 import ConceptsShowcase from "./pages/ConceptsShowcase";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -92,6 +102,16 @@ const App = () => (
             <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
             <Route path="/v2-apple" element={<AppleResultPrototype />} />
+            <Route path="/v2-preview" element={<AppleResultPreview />} />
+            <Route path="/bloco3" element={<Block3Sandbox />} />
+            <Route path="/bloco4" element={<Block4Sandbox />} />
+            <Route path="/ritual" element={<RitualSandbox />} />
+            <Route path="/city" element={<CityStorytellingSandbox />} />
+            <Route path="/parallax" element={<CitySandboxParallax />} />
+            <Route path="/split" element={<Option3Refinements />} />
+            <Route path="/flow" element={<TheRealFlowSandbox />} />
+            <Route path="/mantras" element={<MantraSandbox />} />
+            <Route path="/alerts" element={<AlertSandbox />} />
             <Route path="/trailer" element={<HouseTrailer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

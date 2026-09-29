@@ -1,4 +1,20 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+
+class RootErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  componentDidCatch(error, info) { console.error("Root error:", error, info); }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{background:'red', color:'white', padding:50}}>ROOT CRASH: {this.state.error?.toString()}</div>;
+    }
+    return this.props.children;
+  }
+}
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Calendar, Clock, MapPin, Compass, Crown, Scroll } from "lucide-react";
@@ -6,7 +22,7 @@ import StarryBackground from "@/components/StarryBackground";
 
 import HouseCard from "@/components/HouseCard";
 import HouseDetail from "@/components/HouseDetail";
-import DestinyResults from "@/components/DestinyResults";
+import DestinyResults from "@/pages/AppleResultPreview";
 import ConfirmCreditAction from "@/components/ConfirmCreditAction";
 import PageLoader from "@/components/PageLoader";
 import EmptyState from "@/components/EmptyState";

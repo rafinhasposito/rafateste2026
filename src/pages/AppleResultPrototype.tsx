@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
-import { MapPin, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, Eye, Clock, BookOpen, Plane, Hash, CreditCard, Compass, Plus } from "lucide-react";
+import { DesktopWebChrome } from "@/layouts/DesktopWebChrome";
+import { MobileAppChrome } from "@/layouts/MobileAppChrome";
+import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, Eye, Clock, BookOpen, Plane, Hash, CreditCard, Compass, Plus } from "lucide-react";
 
 /* ══════════════════════════════════════════════════
    ANIMATION COMPONENTS
@@ -29,15 +31,31 @@ const CountUp = ({ target, suffix = "" }: { target: number; suffix?: string }) =
 };
 
 /* ══════════════════════════════════════════════════
-   DATA (Theme is hardcoded to #0B1426 dark blue, #3b82f6 bright blue)
+   DATA (Theme is hardcoded to #02160F dark blue, #10b981 bright blue)
    ══════════════════════════════════════════════════ */
 const P = {
   name: "Rafael Sposito", firstName: "Rafael", year: 2027, date: "09/08/2027", time: "05:30 (UTC)",
   city: "Nova Iorque", coords: "40.71° N, 74.01° W", origin: "Surubim",
-  house: 11, houseLabel: "Grupos", houseTitle: "Amigos, Parcerias e Ganhos Digitais",
-  houseTag: "Networking, Comunidades & Escala Viral",
+  house: 2, houseLabel: "Recursos", houseTitle: "Dinheiro, Materialização e Valor",
+  houseTag: "Prosperidade Financeira & Segurança",
   match: 98, cost: 1, vector: "FUTURO", hash: "#CC59F4F6",
-  sign: "Leão", ascendant: "Virgem", phase: "Adulto", intention: "Amor",
+  sign: "Leão", ascendant: "Virgem", phase: "Adulto", intention: "Dinheiro",
+};
+
+/* Textos cinematográficos dinâmicos para cada Casa */
+const HOUSE_CINEMATIC_TEXTS: Record<number, string> = {
+  1: "colocar você em primeiro lugar, resgatar sua coragem e liderar um novo começo na sua vida.",
+  2: "destravar o seu dinheiro, valorizar seu trabalho e construir estabilidade no seu novo ciclo.",
+  3: "destravar a sua voz, fechar novos negócios e fazer sua rotina girar com agilidade.",
+  4: "criar raízes sólidas, reestruturar seu lar e conquistar um porto seguro de paz interior.",
+  5: "reacender a sua paixão, recuperar a alegria de viver e colocar o seu brilho único em evidência.",
+  6: "organizar sua rotina, recuperar sua energia física e fazer o seu dia render com máxima eficiência.",
+  7: "atrair um relacionamento sério, firmar grandes parcerias e viver a verdadeira reciprocidade a dois.",
+  8: "encerrar ciclos antigos, virar a página com coragem e acessar o seu verdadeiro poder pessoal.",
+  9: "dar um salto quântico, expandir seus horizontes e viver uma vida sem fronteiras.",
+  10: "assumir o topo do seu mercado, ser reconhecido publicamente e brilhar no modo CEO.",
+  11: "atrair aliados de peso, multiplicar suas oportunidades pela rede e construir seus grandes projetos de futuro.",
+  12: "desacelerar o barulho externo, gestar grandes ideias nos bastidores e renovar sua paz de espírito."
 };
 
 /* Filtro de cor do vídeo de partículas — 1 vídeo, 12 auras */
@@ -65,31 +83,31 @@ const FAVORECER = [
 ];
 
 const LIFE_AREAS = [
-  { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", score: 98, unlocked: true, teaser: "O romance nasce da afinidade intelectual e do convívio em grupos.", full: "O romance neste período nasce de forma muito natural através da amizade e da cumplicidade intelectual. É comum se apaixonar por alguém do seu círculo de amizades ou que compartilha das mesmas metas de vida. O relacionamento se beneficia de sonhos compartilhados para o futuro e da participação leve em eventos sociais." },
-  { id: "trabalho", icon: Briefcase, label: "Trabalho e Carreira", color: "#10b981", score: 85, unlocked: false, teaser: "Suas metas profissionais avançam com parcerias complementares de sucesso mútuo.", full: "O seu crescimento profissional deixa de ser uma escalada solitária e passa a ser impulsionado por quem você conhece. Oportunidades corporativas surgem através de indicações. Projetos em parceria ganham tração extrema e o seu networking será a sua maior alavanca de promoção e autoridade." },
-  { id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#f59e0b", score: 75, unlocked: false, teaser: "O dinheiro flui através do seu network, não do esforço solo.", full: "Esta é a Casa dos ganhos indiretos. O aumento de receita não vem de trabalhar o dobro de horas, mas sim do alcance que o seu grupo proporciona. Comissões, bônus, indicações de alto ticket, monetização de audiência ou venda de participações em negócios se tornam os canais mais rentáveis." },
-  { id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", score: 55, unlocked: false, teaser: "Mantenha a saúde como prioridade em meio à expansão social intensa.", full: "O perigo aqui é negligenciar o bem-estar físico por excesso de compromissos sociais. A solução magnética para a saúde na Casa 11 é transformar o cuidado físico em um evento coletivo: entre para grupos de corrida, esportes em equipe ou aulas em grupo, onde o contágio social te manterá ativo." },
-  { id: "networking", icon: Users, label: "Networking e Conexões", color: "#3b82f6", score: 95, unlocked: false, teaser: "Pessoas influentes do seu mercado começam a interagir com seus projetos.", full: "Você não será mais a pessoa buscando uma oportunidade, mas sim o centro de uma comunidade. O seu ano é marcado por convites para grupos de masterminds, associações exclusivas e contatos com figuras de liderança que podem encurtar anos de esforço com uma simples indicação." },
-  { id: "rotina", icon: Calendar, label: "Rotina e Produtividade", color: "#a855f7", score: 65, unlocked: false, teaser: "Cuidado para não abraçar muitas atividades de grupo ao mesmo tempo.", full: "A rotina pode ficar caótica se você tentar estar presente em todas as rodas sociais. O segredo da produtividade é a automação e a delegação. Use o poder da Casa 11 para contratar assistentes ou criar sistemas que permitam que você gerencie múltiplas relações sem perder o controle diário." },
-  { id: "espiritual", icon: Sparkles, label: "Espiritual e Propósito", color: "#818cf8", score: 80, unlocked: false, teaser: "Você sente que faz parte de uma rede de suporte real e ganha fôlego.", full: "O sentido de propósito vai além do individual. A sua realização espiritual acontece quando você percebe que os seus talentos estão gerando impacto em uma comunidade, ONG ou grupo focado em uma visão humanitária. O seu trabalho ganha um legado de longo prazo." },
-  { id: "identidade", icon: Crown, label: "Identidade e Imagem", color: "#c9a227", score: 88, unlocked: false, teaser: "Sua mente se liberta do imediatismo e ganha fôlego para metas ambiciosas.", full: "A forma como o mundo te enxerga sofre um upgrade de status social. Você assume uma persona de líder inovador, visionário ou conector de pessoas. A sua marca pessoal fica colada aos círculos de excelência que você passa a frequentar e liderar." },
+  { id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#10b981", score: 98, unlocked: true, teaser: "O dinheiro flui através da sua capacidade de atrair e materializar recursos.", full: "Esta é a Casa da materialização. O aumento de receita não vem de sorte, mas da estruturação sólida do seu valor próprio. Oportunidades financeiras de alto nível se alinham perfeitamente com o seu magnetismo na cidade destino." },
+  { id: "trabalho", icon: Briefcase, label: "Trabalho e Carreira", color: "#10b981", score: 88, unlocked: false, teaser: "Suas metas profissionais avançam focadas na escala de valor.", full: "O seu crescimento profissional passa a exigir uma gestão de carreira impecável. Você começará a ser valorizado não apenas pelo esforço, mas pelo impacto financeiro que a sua expertise gera nos ambientes em que circula." },
+  { id: "identidade", icon: Crown, label: "Identidade e Imagem", color: "#c9a227", score: 80, unlocked: false, teaser: "Sua marca pessoal se torna sinônimo de excelência e poder realizador.", full: "A forma como o mundo te enxerga atinge um nível premium. Você assume uma postura de líder com resultados inquestionáveis. A sua marca pessoal passa a atrair parceiros dispostos a investir e multiplicar a sua visão." },
+  { id: "rotina", icon: Calendar, label: "Rotina e Produtividade", color: "#a855f7", score: 72, unlocked: false, teaser: "A disciplina se transforma na sua principal ferramenta de escala.", full: "A rotina caótica cede espaço para processos refinados. O segredo da sua prosperidade neste período será a automação do que não exige sua criatividade, liberando sua energia apenas para decisões financeiras e criativas de alto nível." },
+  { id: "networking", icon: Users, label: "Networking e Conexões", color: "#3b82f6", score: 65, unlocked: false, teaser: "Pessoas influentes abrem portas restritas do seu mercado.", full: "Você seleciona a dedo com quem compartilha seu tempo. O ano é marcado por círculos menores, porém muito mais poderosos e focados em gerar riqueza, escalar resultados e criar estruturas sólidas de colaboração mútua." },
+  { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", score: 62, unlocked: false, teaser: "O romance pede estabilidade, respeito ao tempo e construção conjunta.", full: "O foco sai da intensidade desmedida e vai para a confiança mútua. O relacionamento se beneficia de sonhos financeiros compartilhados e de uma parceria que traz segurança material e emocional para ambas as partes." },
+  { id: "espiritual", icon: Sparkles, label: "Espiritual e Propósito", color: "#818cf8", score: 55, unlocked: false, teaser: "Você encontra propósito ao transformar ideias abstratas em valor material.", full: "O seu legado se torna visível. A realização espiritual acontece quando você percebe que a sua riqueza e os seus talentos estão criando não só conforto para você, mas uma base segura para apoiar projetos que refletem seus princípios." },
+  { id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", score: 52, unlocked: false, teaser: "A manutenção física se torna a base para aguentar o teto patrimonial.", full: "O corpo precisa de constância. Cuidar da alimentação e do sono deixam de ser luxo e passam a ser o requisito número um para você manter o pique exigido pelo volume de realizações materiais que este destino oferece." },
 ];
 
 const TIMELINE = [
-  { phase: "Fase 1", months: "Mês 1 a 3", title: "Organização de Contatos", desc: "Faça uma limpa saudável nas suas redes sociais, afaste-se de relações que não somam e teste novos projetos em formato experimental.", img: "/apple-mock/audio_mix__cv5tvd3y13ee_large.jpg" },
-  { phase: "Fase 2", months: "Mês 4 a 8", title: "Extroversão Máxima", desc: "A fase mais forte para aceitar convites, frequentar eventos presenciais, fechar parcerias comerciais e ver novos aliados surgirem.", img: "/apple-mock/app_actions__budci8e25k76_large.jpg", highlight: true },
-  { phase: "Fase 3", months: "Mês 9 a 12", title: "Escala de Resultados", desc: "Hora de colher os frutos do networking, delegar tarefas operacionais pesadas e deixar que a força do grupo multiplique o alcance do seu faturamento.", img: "/apple-mock/photographic_styles__ef8cg39z0q2q_large.jpg" },
+  { phase: "Fase 1", months: "Mês 1 a 3", title: "Mapeamento e Auditoria", desc: "Faça uma limpa saudável nas despesas desnecessárias, organize a sua estrutura de precificação e teste novas fontes de receita.", img: "/apple-mock/audio_mix__cv5tvd3y13ee_large.jpg" },
+  { phase: "Fase 2", months: "Mês 4 a 8", title: "Aceleração Financeira", desc: "A fase mais forte e magnética para fechar negócios, atrair capital, precificar alto e materializar as sementes que você plantou.", img: "/apple-mock/app_actions__budci8e25k76_large.jpg", highlight: true },
+  { phase: "Fase 3", months: "Mês 9 a 12", title: "Consolidação do Status", desc: "Hora de converter o faturamento em patrimônio seguro, blindar o que você construiu e elevar o seu padrão e conforto de vida.", img: "/apple-mock/photographic_styles__ef8cg39z0q2q_large.jpg" },
 ];
 
 const DIMS = [
-  { icon: Heart, label: "Amor", val: 98, color: "#f43f5e" },
-  { icon: Users, label: "Networking", val: 95, color: "#3b82f6" },
-  { icon: Crown, label: "Identidade", val: 88, color: "#c9a227" },
-  { icon: Briefcase, label: "Trabalho", val: 85, color: "#10b981" },
-  { icon: Sparkles, label: "Espiritual", val: 80, color: "#818cf8" },
-  { icon: DollarSign, label: "Dinheiro", val: 75, color: "#f59e0b" },
-  { icon: Calendar, label: "Rotina", val: 65, color: "#a855f7" },
-  { icon: Leaf, label: "Saúde", val: 55, color: "#22c55e" },
+  { icon: DollarSign, label: "Dinheiro", val: 98, color: "#f59e0b" },
+  { icon: Briefcase, label: "Trabalho", val: 88, color: "#10b981" },
+  { icon: Crown, label: "Identidade", val: 80, color: "#c9a227" },
+  { icon: Calendar, label: "Rotina", val: 72, color: "#a855f7" },
+  { icon: Users, label: "Networking", val: 65, color: "#10b981" },
+  { icon: Heart, label: "Amor", val: 62, color: "#f43f5e" },
+  { icon: Sparkles, label: "Espiritual", val: 55, color: "#818cf8" },
+  { icon: Leaf, label: "Saúde", val: 52, color: "#22c55e" },
 ];
 
 export default function AppleResultPrototype() {
@@ -100,483 +118,570 @@ export default function AppleResultPrototype() {
 
   const carRef = useRef<HTMLDivElement>(null);
   const scrollCar = (d: number) => carRef.current?.scrollBy({ left: d, behavior: "smooth" });
-  const [openArea, setOpenArea] = useState<string>("amor");
+  const [openArea, setOpenArea] = useState<string>("dinheiro");
+  const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
+  const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
+  const [isPanelHovered, setIsPanelHovered] = useState(false);
+  const sortedAreas = [...LIFE_AREAS].sort((a,b) => b.score - a.score);
+  const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
+  
+  // DEBUG HELPER
+  React.useEffect(() => {
+    const handleErr = (msg, url, line, col, error) => {
+      alert("RUNTIME ERROR: " + msg + " line: " + line);
+    };
+    window.addEventListener("error", handleErr);
+    return () => window.removeEventListener("error", handleErr);
+  }, []);
+
   const [showSummary, setShowSummary] = useState<boolean>(false);
 
   const casaRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: casaProgress } = useScroll({
     target: casaRef,
-    offset: ["start 85%", "start 30%"]
+    offset: ["start 90%", "start 40%"]
   });
-  const casaScale = useTransform(casaProgress, [0, 1], [1.4, 1]);
-  const casaOpacity = useTransform(casaProgress, [0, 1], [0, 1]);
-  const casaBlur = useTransform(casaProgress, [0, 1], ["blur(16px)", "blur(0px)"]);
+  const textScale = useTransform(casaProgress, [0, 1], [1.4, 1]);
+  const textOpacity = useTransform(casaProgress, [0, 1], [0, 1]);
+  const textBlur = useTransform(casaProgress, [0, 1], ["blur(16px)", "blur(0px)"]);
 
   return (
-    <div className="min-h-screen bg-[#0B1426] text-[#f5f5f7] overflow-x-hidden font-sans bg-gradient-to-b from-[#0B1426] via-[#101D36] to-[#0B1426]">
+    <div className="min-h-screen bg-[#02160F] text-[#f5f5f7] overflow-x-hidden font-sans bg-gradient-to-b from-[#02160F] via-[#042A1D] to-[#02160F]">
       
-      {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 w-full z-[100] bg-[#0B1426]/50 backdrop-blur-xl border-b border-white/[0.04] px-6 h-14 flex items-center justify-between text-sm">
-        <span className="font-ps-display font-semibold tracking-widest text-white/90 text-xs uppercase">Protocolo Solar</span>
-        <div className="flex items-center gap-4">
-          <span className="hidden md:inline text-white/50 text-[10px] font-mono tracking-widest">110 Créditos</span>
-          <button className="bg-[#3b82f6] text-white text-[10px] font-bold px-4 py-1.5 rounded-full hover:brightness-110 transition uppercase tracking-wider">Dossiê Executivo</button>
-        </div>
-      </nav>
+      {/* ── NAVBAR PADRÃO (RESPONSIVA) ── */}
+      <div className="hidden lg:block">
+        <DesktopWebChrome />
+      </div>
+      <div className="block lg:hidden">
+        <MobileAppChrome />
+      </div>
 
       {/* ══════════════════════════════════════════════════
-         1. HERO DO VÍDEO + CIDADE (tudo na mesma section = zero linha visível)
+         1. HERO DO VÍDEO (Padrão)
          ══════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative h-[110vh] w-full bg-[#0B1426]">
-        {/* Vídeo em full brightness, ocupa a parte superior */}
-        <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0">
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+      <section ref={heroRef} className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+        {/* Vídeo em full brightness */}
+        <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#02160F] z-10" />
+          <video autoPlay muted loop playsInline className="w-full h-full object-cover">
             <source src="/assets/ny.mp4" type="video/mp4" />
           </video>
         </motion.div>
-
-        {/* Degradê nasce do fundo e sobe suavemente cobrindo os últimos 60% */}
-        <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-t from-[#0B1426] via-[#0B1426]/85 to-transparent pointer-events-none" />
-
-        {/* Legenda de País no topo direito (estilo UI de sistema) */}
+        
         <div className="absolute top-20 md:top-24 right-6 md:right-10 z-20 flex items-center gap-2 text-white/50">
            <MapPin className="w-3.5 h-3.5" />
            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">EUA</span>
         </div>
 
-        {/* Texto flutua DENTRO da seção, posicionado no bottom sobre o gradiente */}
-        <div className="absolute bottom-0 left-0 right-0 pb-16 flex flex-col items-center text-center px-6 z-10">
-
-          {/* Pill tag acima — estilo da página Tecnologia */}
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/10 bg-white/5 backdrop-blur-xl rounded-full text-xs uppercase font-bold tracking-[0.3em] text-white/70 mb-6">
-            <span>✦</span>
-            <span>{P.firstName}, o seu próximo aniversário pode ser em...</span>
-          </div>
-
-          {/* Nome da cidade — máximo impacto */}
-          <h1 className="font-ps-display text-[15vw] md:text-[140px] font-bold tracking-tight leading-[0.85] mb-6">
-            {P.city}
-          </h1>
-
-          {/* Descrição: copy única por Casa */}
-          <p className="text-white/60 text-base md:text-lg font-light max-w-lg mx-auto leading-relaxed">
-            O destino exato para ativar a Casa que multiplica o seu poder de conexão e coloca grupos, amizades e internet a serviço dos seus resultados.
-          </p>
-        </div>
+        {/* Degradê na base para proteger a transição */}
+        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-[#02160F] to-transparent pointer-events-none z-10" />
       </section>
 
       {/* ══════════════════════════════════════════════════
-         3. CASA 11 GIGANTE com tags visuais abaixo do título
+         2. TEXTO DA CIDADE (Sobreposição Option 1)
          ══════════════════════════════════════════════════ */}
-      <section ref={casaRef} className="relative pt-16 pb-20 md:pb-32 bg-[#0B1426]">
-        <div className="max-w-[1200px] mx-auto px-6 relative z-10">
-          <div className="text-center mb-16 flex flex-col items-center">
-            <motion.h2
-              style={{ scale: casaScale, opacity: casaOpacity, filter: casaBlur }}
-              className="font-ps-display text-[22vw] md:text-[200px] font-bold tracking-tighter leading-[0.8] mb-2 text-transparent bg-clip-text bg-gradient-to-b from-[#3b82f6] to-blue-200 origin-center uppercase"
-            >
-              CASA {P.house}
-            </motion.h2>
-            {/* O subtítulo e a tag acompanham o fade da Casa */}
-            <motion.div style={{ opacity: casaOpacity }} className="flex flex-col items-center">
-              <h3 className="text-2xl md:text-4xl text-white/90 font-ps-display tracking-tight mb-5">{P.houseTitle}</h3>
-              <span className="inline-block bg-white/[0.04] border border-white/10 text-white/60 text-xs font-semibold px-5 py-2 rounded-full tracking-[0.15em] uppercase">
-                {P.houseTag}
-              </span>
-            </motion.div>
+      <section ref={casaRef} className="relative z-20 -mt-[15vh] pb-12 flex flex-col items-center px-6">
+        <motion.div style={{ opacity: textOpacity }} className="mb-6">
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/10 bg-white/5 backdrop-blur-xl rounded-full text-[10px] md:text-xs uppercase font-bold tracking-[0.3em] text-white/70">
+            <span>✦</span>
+            <span>{P.firstName}, o seu próximo aniversário pode ser em...</span>
           </div>
+        </motion.div>
+        
+        <motion.h2
+          style={{ scale: textScale, opacity: textOpacity, filter: textBlur }}
+          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#10b981] to-emerald-200 origin-center uppercase text-center"
+        >
+          {P.city}
+        </motion.h2>
 
-          {/* 1. A ENERGIA DO ANO (Editorial Typography + Video Background) */}
-          <section className="relative py-32 md:py-48 px-6 flex flex-col items-center justify-center">
-            
-            {/* Fundo em Vídeo - Quebra o limite de 1200px para ocupar a TELA TODA (100vw) */}
-            <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[100vw] pointer-events-none flex items-center justify-center -z-10">
-              <div 
-                className="absolute inset-0 w-full h-full opacity-30 mix-blend-lighten"
-                style={{
-                  WebkitMaskImage: 'radial-gradient(50% 50% at 50% 50%, black 30%, transparent 100%)',
-                  maskImage: 'radial-gradient(50% 50% at 50% 50%, black 30%, transparent 100%)'
-                }}
-              >
-                <video 
-                  autoPlay 
-                  muted 
-                  loop 
-                  playsInline 
-                  className="w-full h-full object-cover"
-                  style={{ filter: HOUSE_VIDEO_FILTER[P.house] || 'none' }}
-                >
-                  <source src="/videos/teste-fundo.mp4" type="video/mp4" />
-                </video>
-              </div>
-            </div>
+        <motion.div style={{ opacity: textOpacity }} className="flex flex-col items-center max-w-4xl text-center px-4 mt-2">
+           <p className="text-2xl md:text-3xl lg:text-4xl font-light text-white/90 leading-[1.4] md:leading-[1.3] tracking-tight">
+             O destino exato para{" "}
+             <span className="text-[#10b981] font-medium block mt-1 md:inline md:mt-0">{HOUSE_CINEMATIC_TEXTS[P.house]}</span>
+           </p>
+        </motion.div>
 
-            <Reveal className="text-center max-w-[1000px] mx-auto relative z-10">
-              <h3 className="text-[#3b82f6] text-[11px] font-bold uppercase tracking-[0.3em] mb-10">A Energia do Ano</h3>
-              
-              <h2 className="text-4xl md:text-5xl lg:text-7xl font-ps-display text-white/90 leading-tight mb-10">
-                Seu ano gira em torno de <br className="hidden md:block" />
-                <span className="text-[#3b82f6]">projetos coletivos, tecnologia</span> <br className="hidden md:block" />
-                e parcerias de negócios.
-              </h2>
-            </Reveal>
 
-            <Reveal delay={0.2} className="text-center max-w-2xl mx-auto relative z-10">
-              <p className="text-lg md:text-xl text-white/50 leading-relaxed font-light px-4">
-                Pessoas, grupos e a internet terão um papel vital na realização dos seus objetivos práticos.
-              </p>
-              
-              <div className="w-px h-12 bg-white/10 mx-auto my-12"></div>
-              
-              <p className="text-2xl md:text-4xl text-white/90 leading-tight font-ps-display italic">
-                Trabalhar sozinho tem limite. <br className="hidden md:block" />
-                <span className="text-white/60">A magia consiste em olhar para o lado e aceitar a força do coletivo.</span>
-              </p>
-            </Reveal>
-          </section>
+      </section>
 
-          {/* 2. O DIAGNÓSTICO E PARA QUEM É (Interactive Tabs) */}
+      {/* ══════════════════════════════════════════════════
+         3. PERSONALIZAÇÃO (ACORDEÃO)
+         ══════════════════════════════════════════════════ */}
+      <section className="relative pt-8 pb-20 md:pb-32">
+        <div className="max-w-[1200px] mx-auto px-6 relative z-10">
           <Reveal className="mb-24 max-w-[1000px] mx-auto">
             <div className="bg-white/[0.02] border border-white/[0.04] rounded-[32px] p-8 md:p-12 relative overflow-hidden">
                {/* Fundo glow sutil */}
-               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[40%] bg-[#3b82f6]/5 blur-[120px] rounded-full pointer-events-none"></div>
-
-               <h3 className="text-white/90 text-3xl md:text-5xl font-ps-display font-bold mb-6 text-center relative z-10">Para Quem É A Casa {P.house}?</h3>
-               <p className="text-white/50 text-center mb-10 text-lg relative z-10">Esta viagem de aniversário é exatamente para você que:</p>
-
-               <ul className="space-y-6 max-w-3xl mx-auto mb-16 relative z-10">
-                  <li className="flex items-start gap-4">
-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
-                    <p className="text-white/80 text-lg leading-relaxed">Cansou de carregar a vida sozinho no esforço individual e entendeu que o seu sucesso depende do ecossistema certo.</p>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
-                    <p className="text-white/80 text-lg leading-relaxed">Quer parar de bater em portas fechadas e precisa de aliados ou mentores influentes abrindo caminhos para você.</p>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <div className="mt-1.5"><div className="w-2 h-2 rounded-full bg-[#3b82f6]"></div></div>
-                    <p className="text-white/80 text-lg leading-relaxed">Busca um ano leve, onde o seu nome circula através de indicações, convites e pertencimento a uma egrégora forte.</p>
-                  </li>
-               </ul>
-
+               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[40%] bg-[#10b981]/5 blur-[120px] rounded-full pointer-events-none"></div>
+               
                {/* A GRANDE DIVISÃO DA PERSONALIZAÇÃO */}
-               <div className="mt-20 pt-16 border-t border-white/5 relative z-10 flex flex-col items-center">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#3b82f6] mb-8">
+               <div className="relative z-10 flex flex-col items-center">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#10b981] mb-8">
                     <Sparkles className="w-3 h-3" />
                     <span>Seu Resultado Personalizado</span>
                   </div>
                   
-                  <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O foco é <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-rose-600">{P.intention}</span>.</h3>
+                  <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O foco é <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-emerald-300">{P.intention}</span>.</h3>
                   <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
-                    O algoritmo escolheu a Casa {P.house} milimetricamente porque ela é a grande chave para destravar esse objetivo específico no seu próximo ano.
+                    A Casa {P.house} foi calculada sob medida para ser a chave exata que destrava o seu objetivo no novo ciclo.
                   </p>
 
-                  {/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
-                  <div className="w-full mt-10">
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                      {/* Lista de Acordeões */}
-                      <div className="md:col-span-5 space-y-3">
-                        {LIFE_AREAS.map((area) => {
-                          const isUnlocked = area.id.toLowerCase() === P.intention.toLowerCase() || area.unlocked;
-                          const isOpen = openArea === area.id;
-                          return (
-                            <motion.button
-                              key={area.id}
-                              onClick={() => setOpenArea(isOpen ? "" : area.id)}
-                              initial="closed"
-                              animate={isOpen ? "open" : "closed"}
-                              whileHover="hovered"
-                              className={`w-full text-left rounded-3xl border transition-colors duration-500 overflow-hidden ${isOpen ? (isUnlocked ? 'bg-rose-500/10 border-rose-500/20 shadow-[0_0_40px_rgba(244,63,94,0.1)]' : 'bg-white/[0.04] border-white/10 shadow-[0_0_60px_rgba(255,255,255,0.05)]') : 'bg-black/40 border-white/5'}`}
-                            >
-                              <div className="flex items-center gap-4 px-6 py-5">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${isUnlocked ? 'bg-rose-500/20 border-rose-500/30' : 'bg-white/5 border-white/10'}`}>
-                                  {isUnlocked ? <area.icon className="w-5 h-5 text-rose-400" /> : <Lock className="w-4 h-4 text-white/30" />}
-                                </div>
-                                <div className="flex-1 text-left">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className={`block text-base font-medium ${isOpen ? 'text-white' : 'text-white/70'}`}>{area.label}</span>
-                                  </div>
-                                  
-                                  {/* SCORE EMBAIXO DO TEXTO (Mais grossa e animada no hover/select) */}
-                                  <div className="flex items-center gap-4 mt-2.5">
-                                    <div className="flex-1 max-w-[220px] h-3.5 bg-white/[0.05] rounded-full overflow-hidden">
-                                      <motion.div 
-                                        className="h-full rounded-full" 
-                                        variants={{
-                                          closed: { width: '0%' },
-                                          hovered: { width: `${area.score}%` },
-                                          open: { width: `${area.score}%` }
-                                        }}
-                                        transition={{ duration: 0.8, ease: "easeOut" }}
-                                        style={{ backgroundColor: area.color }} 
-                                      />
-                                    </div>
-                                    <AnimatePresence>
-                                      {isOpen && (
-                                        <motion.span 
-                                          initial={{ opacity: 0, x: -10 }}
-                                          animate={{ opacity: 1, x: 0 }}
-                                          exit={{ opacity: 0, x: -10 }}
-                                          transition={{ duration: 0.3 }}
-                                          className="text-[10px] font-bold font-ps-display tracking-widest uppercase" 
-                                          style={{ color: area.color }}
-                                        >
-                                          {area.score}% MATCH
-                                        </motion.span>
-                                      )}
-                                    </AnimatePresence>
-                                  </div>
-                                </div>
+                  {/* ======================= BOARDING PASS SOLAR (HIGH-END) ======================= */}
+                  <div className="w-full max-w-4xl mx-auto mb-20">
+                     <div className="bg-[#02160F]/80 border border-[#10b981]/30 rounded-[32px] overflow-hidden shadow-[0_30px_80px_rgba(16,185,129,0.15)] backdrop-blur-xl flex flex-col">
+                       {/* Header */}
+                       <div 
+                         onClick={() => setIsBoardingPassOpen(!isBoardingPassOpen)}
+                         className="bg-[#10b981]/10 border-b border-[#10b981]/20 px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:bg-[#10b981]/20 transition-colors select-none"
+                       >
+                         <div className="flex items-center gap-3">
+                           <Plane className="w-5 h-5 text-[#10b981]" />
+                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-[#10b981] text-sm">Boarding Pass Solar</span>
+                         </div>
+                         <div className="flex items-center gap-4 md:gap-6">
+                           <div className="flex items-center gap-3 hidden md:flex">
+                             <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_10px_#10b981]"></div>
+                             <span className="text-[#10b981]/90 font-mono text-xs tracking-widest">{P.hash} • ATIVO</span>
+                           </div>
+                           
+                           {!isBoardingPassOpen && (
+                             <span className="text-[#10b981] text-[10px] uppercase font-bold tracking-widest bg-[#10b981]/10 border border-[#10b981]/20 px-3 py-1.5 rounded-full animate-pulse">
+                               Ver Completo
+                             </span>
+                           )}
+                           
+                           <div className={`p-1 rounded-full ${!isBoardingPassOpen ? 'bg-[#10b981]/10' : ''}`}>
+                             <ChevronDown className={`w-5 h-5 text-[#10b981] transition-transform duration-500 ${isBoardingPassOpen ? 'rotate-180' : ''}`} />
+                           </div>
+                         </div>
+                       </div>
 
-                                {isUnlocked
-                                  ? <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180 text-rose-400' : 'text-white/30'}`} />
-                                  : <ChevronRight className="w-5 h-5 text-white/20" />
-                                }
-                              </div>
+                       {/* Preview Resumo (Aparece apenas quando fechado) */}
+                       <AnimatePresence initial={false}>
+                         {!isBoardingPassOpen && (
+                           <motion.div
+                             initial={{ height: 0, opacity: 0 }}
+                             animate={{ height: 'auto', opacity: 1 }}
+                             exit={{ height: 0, opacity: 0 }}
+                             className="overflow-hidden bg-[#02160F]/40 cursor-pointer"
+                             onClick={() => setIsBoardingPassOpen(true)}
+                           >
+                             <div className="px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                               <div className="flex items-center gap-3">
+                                  <MapPin className="w-4 h-4 text-white/30" />
+                                  <span className="text-white/60 text-sm font-medium">{P.origin}</span>
+                                  <Plane className="w-4 h-4 text-[#10b981]/50" />
+                                  <span className="text-[#10b981] font-bold text-sm uppercase">{P.city}</span>
+                               </div>
+                               <div className="flex flex-wrap items-center gap-3 text-sm">
+                                  <span className="flex items-center gap-2 text-white/70">
+                                    <Calendar className="w-4 h-4 text-[#10b981]/70" />
+                                    09 Ago, 2027
+                                  </span>
+                                  <span className="text-white/20 hidden md:inline">|</span>
+                                  <span className="text-[#10b981] font-bold flex items-center gap-2">
+                                    <Star className="w-4 h-4" />
+                                    {P.match}% MATCH
+                                  </span>
+                               </div>
+                             </div>
+                           </motion.div>
+                         )}
+                       </AnimatePresence>
+                       
+                       {/* Body Completo */}
+                       <AnimatePresence initial={false}>
+                         {isBoardingPassOpen && (
+                           <motion.div
+                             initial={{ height: 0, opacity: 0 }}
+                             animate={{ height: 'auto', opacity: 1 }}
+                             exit={{ height: 0, opacity: 0 }}
+                             transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+                             className="overflow-hidden origin-top"
+                           >
+                             <div className="p-8 md:p-10 flex flex-col gap-10">
+                         {/* Viajante */}
+                         <div>
+                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-2">Viajante</p>
+                           <p className="text-white font-serif text-3xl">{P.name}</p>
+                         </div>
+                         {/* Rota de Ancoragem */}
+                         <div className="bg-white/[0.02] rounded-2xl p-6 md:p-8 border border-white/5 relative overflow-hidden">
+                           <div className="absolute top-0 right-0 w-64 h-64 bg-[#10b981]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-6">Rota de Ancoragem</p>
+                           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                             <div className="flex-1">
+                               <p className="text-white font-medium text-xl md:text-2xl flex items-center gap-2">
+                                 <MapPin className="w-5 h-5 text-white/50 shrink-0"/> 
+                                 <span className="truncate">{P.origin} <span className="text-white/30 text-sm ml-1">(BR)</span></span>
+                               </p>
+                               <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Origem Natal</p>
+                             </div>
+                             <div className="hidden md:flex flex-col items-center justify-center px-4 w-1/3">
+                               <Plane className="w-6 h-6 text-[#10b981] opacity-80" />
+                               <div className="w-full h-px bg-gradient-to-r from-transparent via-[#10b981]/50 to-transparent mt-3"></div>
+                             </div>
+                             <div className="md:hidden flex items-center gap-4 text-[#10b981]/50 w-full">
+                               <div className="w-px h-8 bg-gradient-to-b from-transparent via-[#10b981]/50 to-transparent ml-2.5"></div>
+                               <Plane className="w-5 h-5 rotate-90" />
+                             </div>
+                             <div className="flex-1 md:text-right">
+                               <p className="text-[#10b981] font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2">
+                                 <span className="truncate">{P.city}</span>
+                                 <MapPin className="w-6 h-6 shrink-0"/>
+                               </p>
+                               <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Destino do Aniversário</p>
+                             </div>
+                           </div>
+                         </div>
+                         {/* Momento Exato */}
+                         <div>
+                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4">Momento Exato da Ativação (Retorno Solar)</p>
+                           <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white text-lg md:text-xl font-medium">
+                             <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                               <Calendar className="w-5 h-5 text-[#10b981]"/> 
+                               09 de Agosto, 2027
+                             </span>
+                             <span className="text-white/20 hidden md:inline">|</span>
+                             <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                               <Clock className="w-5 h-5 text-[#10b981]"/> 
+                               {P.time}
+                             </span>
+                           </div>
+                         </div>
+                         {/* DNA vs Ativação */}
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                           <div className="bg-[#10b981]/5 border border-[#10b981]/10 rounded-2xl p-6">
+                             <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-5">DNA Astrológico</p>
+                             <div className="space-y-4">
+                               <p className="text-white font-medium text-lg flex items-center gap-3">
+                                 <Sun className="w-5 h-5 text-yellow-400"/> Sol em {P.sign}
+                               </p>
+                               <p className="text-white/80 font-medium text-lg flex items-center gap-3">
+                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> Ascendente {P.ascendant}
+                               </p>
+                             </div>
+                           </div>
+                           <div className="bg-[#10b981]/10 border border-[#10b981]/20 rounded-2xl p-6 relative overflow-hidden">
+                             <div className="absolute inset-0 bg-gradient-to-br from-[#10b981]/10 to-transparent pointer-events-none"></div>
+                             <p className="text-[#10b981]/70 text-[10px] uppercase font-bold tracking-widest mb-5 relative z-10">Ativação Anual</p>
+                             <div className="space-y-4 relative z-10">
+                               <p className="text-white font-medium text-lg flex items-center gap-3">
+                                 <Landmark className="w-5 h-5 text-[#10b981]"/> Casa {P.house}
+                               </p>
+                               <p className="text-[#10b981] font-bold text-xl flex items-center gap-3">
+                                 <CircleDollarSign className="w-5 h-5"/> Dinheiro & Prosperidade
+                               </p>
+                             </div>
+                           </div>
+                         </div>
+                         {/* Compatibilidade */}
+                         <div className="flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 pt-8 mt-2 gap-4">
+                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Compatibilidade da Escolha</p>
+                           <div className="flex items-center justify-center gap-3 bg-[#10b981]/20 px-6 py-3 rounded-full border border-[#10b981]/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                             <div className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></div>
+                             <span className="text-[#10b981] font-bold tracking-widest text-lg">{P.match}% MATCH</span>
+                           </div>
+                         </div>
+                       </div>
+                       {/* Footer Barcode */}
+                       <div className="bg-black/60 px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t border-[#10b981]/20">
+                         <div className="font-barcode text-5xl md:text-6xl tracking-[0.2em] text-[#10b981]/70 scale-y-150 py-2">||| || ||| | || || |||</div>
+                         <span className="font-mono text-[10px] md:text-xs text-white/50 tracking-[0.2em] uppercase text-center bg-black/40 px-4 py-2 rounded-lg border border-white/5">Protocolo Solar • 24h de Imantação na Cidade de Destino</span>
+                       </div>
+                     </motion.div>
+                   )}
+                 </AnimatePresence>
+               </div>
+            </div>
+                  
+{/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
+                  <div className="w-full mt-10 flex flex-col lg:flex-row gap-6 min-h-[700px] text-left">
+                                  {/* COLUNA ESQUERDA: SIDEBAR — expandida por padrão, encolhe pra ícones quando mouse vai pro painel */}
+              <motion.div
+                animate={{ width: isPanelHovered ? 72 : 300 }}
+                transition={{ duration: 0.4, type: 'spring', bounce: 0.15 }}
+                className="hidden lg:flex shrink-0 flex-col gap-2 items-stretch min-h-[700px] overflow-hidden"
+              >
+                {sortedAreas.map((area) => {
+                  const currentActive = hoveredArea || sortedAreas[0].id;
+                  const isActive = currentActive === area.id;
 
-                              <AnimatePresence>
-                                {isOpen && (
-                                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}>
-                                    <div className="px-6 pb-6 pt-2">
-                                      {isUnlocked ? (
-                                        <>
-                                          {/* Mobile: Mostra o texto completo pois não há painel lateral */}
-                                          <div className="md:hidden">
-                                            <p className="text-white/80 text-sm font-light leading-relaxed">{area.full}</p>
-                                          </div>
-                                          {/* Desktop: Mostra só o resumo e botão, pois o texto completo já está no painel ao lado */}
-                                          <div className="hidden md:block">
-                                            <p className="text-white/50 text-sm font-light leading-relaxed mb-4">{area.teaser}</p>
-                                            <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-4 flex items-center justify-center gap-3 mt-4 shadow-[0_0_20px_rgba(244,63,94,0.05)] cursor-default">
-                                              <Sparkles className="w-4 h-4 text-rose-400 shrink-0" />
-                                              <span className="text-rose-400 text-[10px] font-bold uppercase tracking-widest">Acesso Livre — Seu Foco Atual</span>
-                                            </div>
-                                          </div>
-                                        </>
-                                      ) : (
-                                        <div>
-                                          <p className="text-white/50 text-sm font-light leading-relaxed mb-4">{area.teaser}</p>
-                                          
-                                          <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-4 flex items-center justify-center gap-3 hover:bg-white/10 transition-colors mt-4 shadow-[0_0_20px_rgba(255,255,255,0.02)]">
-                                            <Lock className="w-4 h-4 text-white/60 shrink-0" />
-                                            <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Desbloquear análise — 1 crédito</span>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </motion.button>
-                          );
-                        })}
-                      </div>
+                  return (
+                    <div
+                      key={area.id}
+                      onMouseEnter={() => setHoveredArea(area.id)}
+                      onClick={() => { setHoveredArea(area.id); setIsPanelHovered(true); }}
+                      className="relative flex-1 rounded-2xl border overflow-hidden cursor-pointer group transition-all duration-300"
+                      style={{
+                        backgroundColor: isActive ? `${area.color}18` : `${area.color}08`,
+                        borderColor: isActive ? `${area.color}44` : 'rgba(255,255,255,0.05)',
+                        boxShadow: isActive ? `0 0 20px ${area.color}20` : 'none',
+                      }}
+                    >
+                      {/* Aura sutil para o item ativo */}
+                      {isActive && (
+                        <div
+                          className="absolute inset-0 pointer-events-none opacity-10"
+                          style={{ background: `linear-gradient(135deg, ${area.color} 0%, transparent 70%)` }}
+                        />
+                      )}
 
-                      {/* Painel Sticky Lateral (Desktop) */}
-                      <div className="md:col-span-7 hidden md:block">
-                        <div className="sticky top-10 bg-black/40 rounded-[32px] border border-white/5 overflow-hidden min-h-[600px] relative flex flex-col justify-end">
-                          <div className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity transition-all duration-1000" style={{ backgroundImage: "url('/apple-mock/apple_intelligence__bkgdcn4e0kj6_large.png')" }} />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-[#0B1426]/60 to-transparent" />
-
-                          <div className="relative z-10 p-12 max-w-2xl">
-                            {LIFE_AREAS.filter(a => a.id === openArea).map(area => {
-                              const isUnlocked = area.id.toLowerCase() === P.intention.toLowerCase() || area.unlocked;
-                              return (
-                                <motion.div key={area.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-                                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border ${isUnlocked ? 'bg-rose-500/20 border-rose-500/30' : 'bg-white/5 border-white/10'}`}>
-                                    <area.icon className={`w-8 h-8 ${isUnlocked ? 'text-rose-400' : 'text-white/30'}`} />
-                                  </div>
-                                  <h3 className="font-ps-display text-4xl font-bold tracking-tight mb-4">{area.label}</h3>
-                                  {isUnlocked ? (
-                                    <p className="text-white/80 text-lg font-light leading-relaxed">{area.full}</p>
-                                  ) : (
-                                    <div>
-                                      <p className="text-white/50 text-lg font-light leading-relaxed mb-8">{area.teaser}</p>
-                                      <button className="px-8 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-full hover:bg-gray-200 transition flex items-center gap-2 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
-                                        <Lock className="w-4 h-4" />
-                                        Liberar Acesso (1 Crédito)
-                                      </button>
-                                    </div>
-                                  )}
-                                </motion.div>
-                              );
-                            })}
-                          </div>
+                      {/* Conteúdo sempre visível: ícone + nome + barra */}
+                      <div className="absolute inset-0 flex items-center gap-3 px-4">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-110"
+                          style={{
+                            backgroundColor: isActive ? `${area.color}33` : `${area.color}15`,
+                            borderColor: isActive ? `${area.color}55` : `${area.color}30`,
+                          }}
+                        >
+                          <area.icon className="w-4 h-4" style={{ color: isActive ? area.color : `${area.color}80` }} />
                         </div>
+
+                        <motion.div
+                          animate={{ opacity: isPanelHovered ? 0 : 1 }}
+                          transition={{ duration: 0.25 }}
+                          className="flex-1 min-w-0 pointer-events-none"
+                        >
+                          <span className={`block font-ps-display text-sm font-bold mb-1 whitespace-nowrap tracking-wide transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white/90'}`}>
+                            {area.label}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
+                              <motion.div
+                                className="h-full rounded-full"
+                                animate={{ width: isActive ? `${area.score}%` : '0%' }}
+                                transition={{ duration: 0.8, type: 'spring', bounce: 0.25, delay: isActive ? 0.05 : 0 }}
+                                style={{ backgroundColor: area.color, opacity: isActive ? 1 : 0.4 }}
+                              />
+                            </div>
+                            <motion.span
+                              animate={{ opacity: isActive ? 1 : 0 }}
+                              transition={{ duration: 0.3, delay: isActive ? 0.7 : 0 }}
+                              className="text-[10px] font-bold tracking-widest shrink-0 text-white"
+                            >
+                              {area.score}%
+                            </motion.span>
+                          </div>
+                        </motion.div>
                       </div>
                     </div>
+                  );
+                })}
+              </motion.div>
+
+              {/* MOBILE: ACCORDION — tap item → barra anima + painel expande inline */}
+              <div className="w-full lg:hidden flex flex-col gap-3">
+                {sortedAreas.map((area) => {
+                  const currentActive = hoveredArea || sortedAreas[0].id;
+                  const isActive = currentActive === area.id;
+
+                  return (
+                    <div key={area.id} className="flex flex-col">
+                      {/* Cabeçalho do item (sempre visível) */}
+                      <button
+                        onClick={() => setHoveredArea(isActive ? null : area.id)}
+                        className="relative flex items-center gap-4 p-4 rounded-2xl border overflow-hidden text-left transition-all duration-300"
+                        style={{
+                          backgroundColor: isActive ? `${area.color}18` : `${area.color}08`,
+                          borderColor: isActive ? `${area.color}44` : 'rgba(255,255,255,0.06)',
+                          boxShadow: isActive ? `0 0 20px ${area.color}20` : 'none',
+                        }}
+                      >
+                        {isActive && (
+                          <div className="absolute inset-0 pointer-events-none opacity-10" style={{ background: `linear-gradient(135deg, ${area.color} 0%, transparent 70%)` }} />
+                        )}
+
+                        <div
+                          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300"
+                          style={{ backgroundColor: isActive ? `${area.color}33` : `${area.color}15`, borderColor: isActive ? `${area.color}55` : `${area.color}30` }}
+                        >
+                          <area.icon className="w-5 h-5" style={{ color: isActive ? area.color : `${area.color}80` }} />
+                        </div>
+
+                        <div className="flex-1 min-w-0 relative z-10">
+                          <span className={`block font-ps-display text-base font-bold mb-2 transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/70'}`}>
+                            {area.label}
+                          </span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
+                              <motion.div
+                                className="h-full rounded-full"
+                                animate={{ width: isActive ? `${area.score}%` : '0%' }}
+                                transition={{ duration: 0.8, type: 'spring', bounce: 0.25, delay: isActive ? 0.05 : 0 }}
+                                style={{ backgroundColor: area.color }}
+                              />
+                            </div>
+                            <motion.span
+                              animate={{ opacity: isActive ? 1 : 0 }}
+                              transition={{ duration: 0.3, delay: isActive ? 0.7 : 0 }}
+                              className="text-[10px] font-bold tracking-widest shrink-0 text-white"
+                            >
+                              {area.score}%
+                            </motion.span>
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* Painel expandido (aparece só quando ativo) */}
+                      <AnimatePresence>
+                        {isActive && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.4, ease: 'easeInOut' }}
+                            className="overflow-hidden"
+                          >
+                            <div
+                              className="relative mt-2 rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)]"
+                              style={{ minHeight: 320 }}
+                            >
+                              {/* Background colorido */}
+                              <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${area.color} 0%, transparent 80%)` }} />
+                              <div className="absolute inset-0 mix-blend-color opacity-60 pointer-events-none" style={{ backgroundColor: area.color }} />
+                              <div className="absolute inset-0 pointer-events-none transition-colors duration-1000" style={{ background: `linear-gradient(to top, ${`color-mix(in srgb, ${area.color || '#10b981'} 12%, #000000)`}, color-mix(in srgb, ${area.color || '#10b981'} 12%, rgba(0,0,0,0.7)) 50%, transparent)` }} />
+
+                              {/* Conteúdo */}
+                              <div className="relative z-10 p-6 flex flex-col">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 bg-black/20" style={{ borderColor: `${area.color}55` }}>
+                                    <area.icon className="w-4 h-4" style={{ color: area.color }} />
+                                  </div>
+                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">{area.label}</span>
+                                </div>
+
+                                {area.unlocked ? (
+                                  <>
+                                    <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
+                                    <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
+                                    <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.full}</p>
+                                    <div
+                                      className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2"
+                                      style={{ backgroundColor: area.color, color: '#fff', boxShadow: `0 0 30px ${area.color}40` }}
+                                    >
+                                      <Sparkles className="w-4 h-4" />
+                                      Foco Ativado ✓
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <h3 className="font-ps-display text-3xl font-bold text-white/20 leading-tight mb-4 select-none" style={{ filter: 'blur(4px)' }}>{area.label}</h3>
+                                    <div className="w-12 h-px mb-4 opacity-20" style={{ backgroundColor: `${area.color}80` }} />
+                                    <p className="text-white/10 text-sm font-light leading-relaxed mb-6 select-none" style={{ filter: 'blur(6px)' }}>{area.full}</p>
+                                    <button className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
+                                      <CreditCard className="w-4 h-4" />
+                                      Desbloquear com 1 Crédito
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+
+
+              {/* COLUNA DIREITA: O PAINEL DE CINEMA — quando mouse entra aqui a sidebar encolhe pra ícones */}
+              <motion.div
+                layout
+                onMouseEnter={() => setIsPanelHovered(true)}
+                onMouseLeave={() => setIsPanelHovered(false)}
+                className="flex-1 h-[600px] lg:min-h-[700px] relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${currentActiveData?.color || '#10b981'} 12%, #000000)` }}
+              >
+                <AnimatePresence mode="wait">
+                  {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
+                    <motion.div
+                      key={activeArea.id}
+                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="absolute inset-0 w-full h-full flex flex-col justify-end"
+                    >
+                      {/* BACKGROUNDS PREMIUM */}
+                      <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${activeArea.color} 0%, transparent 80%)` }} />
+                      <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-60 pointer-events-none" src="/videos/aura-loop.mp4" />
+                      <div className="absolute inset-0 mix-blend-color opacity-80 pointer-events-none" style={{ backgroundColor: activeArea.color }} />
+                      <div className="absolute inset-0 pointer-events-none transition-colors duration-1000" style={{ background: `linear-gradient(to top, ${`color-mix(in srgb, ${activeArea?.color || '#10b981'} 12%, #000000)`}, color-mix(in srgb, ${activeArea?.color || '#10b981'} 12%, rgba(0,0,0,0.8)) 50%, transparent)` }} />
+                      
+                      {/* CONTEÚDO — muda conforme desbloqueio */}
+                      <div className="relative z-10 p-8 md:p-12 w-full flex flex-col justify-end h-full">
+                        
+                        {/* Ícone + label sempre visível */}
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 bg-black/20 backdrop-blur-md" style={{ borderColor: `${activeArea.color}55` }}>
+                            <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
+                          </div>
+                          <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
+                            {activeArea.label}
+                          </span>
+                        </div>
+
+                        {activeArea.unlocked ? (
+                          <>
+                            {/* DESBLOQUEADO — conteúdo completo */}
+                            <h3 className="font-ps-display text-5xl md:text-7xl font-bold tracking-tight text-white leading-none drop-shadow-xl mb-6">
+                              {activeArea.label}
+                            </h3>
+                            <div className="w-16 h-px mb-6" style={{ backgroundColor: `${activeArea.color}80` }} />
+                            <p className="text-white/75 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl drop-shadow-md">
+                              {activeArea.full}
+                            </p>
+                            <div
+                              className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3"
+                              style={{ backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` }}
+                            >
+                              <Sparkles className="w-4 h-4 shrink-0" />
+                              Foco Ativado ✓
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* TRANCADO — preview embaçado + botão de crédito */}
+                            <h3 className="font-ps-display text-5xl md:text-7xl font-bold tracking-tight text-white/20 leading-none drop-shadow-xl mb-6 select-none" style={{ filter: 'blur(6px)' }}>
+                              {activeArea.label}
+                            </h3>
+                            <div className="w-16 h-px mb-6 opacity-20" style={{ backgroundColor: `${activeArea.color}80` }} />
+                            <p className="text-white/10 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl select-none" style={{ filter: 'blur(8px)' }}>
+                              {activeArea.full}
+                            </p>
+                            <div className="flex flex-col items-center md:items-start gap-4">
+                              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3">
+                                <Lock className="w-4 h-4 text-white/40" />
+                                <span className="text-white/50 text-sm font-medium">Conteúdo personalizado bloqueado</span>
+                              </div>
+                              <button
+                                className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
+                              >
+                                <CreditCard className="w-4 h-4 shrink-0" />
+                                Desbloquear com 1 Crédito
+                              </button>
+                            </div>
+                          </>
+                        )}
+                        
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+
                   </div>
                </div>
             </div>
-          </Reveal>
-
-          {/* 4. RADAR 360 */}
-          <Reveal className="mb-24 max-w-[1000px] mx-auto">
-            <div className="bg-black/40 border border-white/5 rounded-[32px] p-8 md:p-12 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#3b82f6]/5 blur-[100px] rounded-full pointer-events-none"></div>
-              <h3 className="text-white/90 text-2xl font-bold mb-2 relative z-10">Radar 360°</h3>
-              <p className="text-white/50 mb-10 text-sm relative z-10">A visão geral do impacto desta Casa nas 8 dimensões do seu ano.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 relative z-10">
-                 {[
-                   { label: "Amor", value: 98, color: "bg-rose-400" },
-                   { label: "Networking", value: 95, color: "bg-[#3b82f6]" },
-                   { label: "Identidade", value: 88, color: "bg-blue-400" },
-                   { label: "Trabalho", value: 85, color: "bg-emerald-400" },
-                   { label: "Espiritual", value: 80, color: "bg-purple-400" },
-                   { label: "Dinheiro", value: 75, color: "bg-emerald-500" },
-                   { label: "Rotina", value: 65, color: "bg-amber-400" },
-                   { label: "Saúde", value: 55, color: "bg-rose-500" },
-                 ].map((item, i) => (
-                   <div key={i}>
-                      <div className="flex justify-between mb-2"><span className="text-white/80 font-medium text-sm">{item.label}</span><span className="text-white/50 text-sm">{item.value}%</span></div>
-                      <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden"><div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.value}%` }}></div></div>
-                   </div>
-                 ))}
-              </div>
-            </div>
-          </Reveal>
-
-          {/* 5. COMO APARECE NA VIDA REAL (Bento Grid 4 Áreas) */}
-          <Reveal className="mb-10 text-center">
-            <h3 className="text-white/90 text-3xl md:text-5xl font-ps-display font-bold mb-4">Na Vida Real</h3>
-            <p className="text-white/50 max-w-xl mx-auto">Como a energia magnética da Casa 11 reconfigura as 4 áreas essenciais do seu ano.</p>
-          </Reveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24 max-w-[1200px] mx-auto">
-            {/* Dinheiro */}
-            <Reveal delay={0.1} className="bg-white/[0.02] border border-white/[0.04] rounded-[32px] p-8 hover:bg-white/[0.03] transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                  <span className="text-emerald-500 text-xl">💰</span>
-                </div>
-                <h4 className="text-xl font-bold text-white/90">Dinheiro & Finanças</h4>
-              </div>
-              <p className="text-white/60 text-sm leading-relaxed">As oportunidades financeiras fogem da via tradicional. O dinheiro flui através de contatos, indicações, público e parcerias, mais do que de um esforço totalmente individual. Comissões e negócios digitais ganham muita força.</p>
-            </Reveal>
-
-            {/* Trabalho */}
-            <Reveal delay={0.2} className="bg-white/[0.02] border border-white/[0.04] rounded-[32px] p-8 hover:bg-white/[0.03] transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                  <span className="text-blue-500 text-xl">💼</span>
-                </div>
-                <h4 className="text-xl font-bold text-white/90">Trabalho & Carreira</h4>
-              </div>
-              <p className="text-white/60 text-sm leading-relaxed">É um ótimo período para quem trabalha com redes sociais, internet, mídias, marketing, eventos ou gestão de comunidades. Suas metas profissionais avançam rápido com parcerias complementares de sucesso mútuo.</p>
-            </Reveal>
-
-            {/* Amor */}
-            <Reveal delay={0.3} className="bg-white/[0.02] border border-white/[0.04] rounded-[32px] p-8 hover:bg-white/[0.03] transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center">
-                  <span className="text-rose-500 text-xl">💖</span>
-                </div>
-                <h4 className="text-xl font-bold text-white/90">Amor & Relações</h4>
-              </div>
-              <p className="text-white/60 text-sm leading-relaxed">O romance neste período nasce de forma muito natural através da amizade e da cumplicidade intelectual. É muito comum se apaixonar por alguém do seu círculo de amizades ou que compartilha dos mesmos ideais que você.</p>
-            </Reveal>
-
-            {/* Saúde */}
-            <Reveal delay={0.4} className="bg-white/[0.02] border border-white/[0.04] rounded-[32px] p-8 hover:bg-white/[0.03] transition-colors">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
-                  <span className="text-purple-500 text-xl">🌿</span>
-                </div>
-                <h4 className="text-xl font-bold text-white/90">Saúde & Mente</h4>
-              </div>
-              <p className="text-white/60 text-sm leading-relaxed">Sua mente se liberta do imediatismo angustiante. Você sente que faz parte de uma rede de suporte real e ganha fôlego e saúde mental para desenhar metas ambiciosas para os próximos anos com total tranquilidade.</p>
-            </Reveal>
-          </div>
-
-          {/* 6. O MANTRA DA CASA */}
-          <Reveal className="mb-24 mt-16 text-center max-w-4xl mx-auto">
-             <span className="text-[#3b82f6] text-xs font-bold uppercase tracking-[0.3em]">Mantra do Ciclo</span>
-             <h3 className="text-3xl md:text-5xl font-ps-display text-white/90 mt-4 leading-tight italic">"A minha visão inspira comunidades e os meus aliados multiplicam os meus resultados."</h3>
-          </Reveal>
-
-          {/* 7. AÇÃO PRÁTICA E ALERTA (Lado a Lado) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[1200px] mx-auto">
-             {/* Ritual */}
-             <Reveal delay={0.2} className="bg-[#3b82f6]/10 border border-[#3b82f6]/20 rounded-[32px] p-8 relative overflow-hidden flex flex-col justify-center">
-                <h4 className="text-[#3b82f6] text-[11px] font-bold uppercase tracking-widest mb-3">O Ritual das 24 Horas</h4>
-                <p className="text-white/80 leading-relaxed text-sm">No exato momento do seu aniversário neste destino, mande mensagem para 3 pessoas que te inspiram ou com quem você quer criar laços. Desenhe um plano para o seu maior sonho de longo prazo.</p>
-             </Reveal>
-
-             {/* Alerta */}
-             <Reveal delay={0.3} className="bg-amber-500/10 border border-amber-500/20 rounded-[32px] p-8 relative overflow-hidden flex flex-col justify-center">
-                <h4 className="text-amber-500 text-[11px] font-bold uppercase tracking-widest mb-3">Ponto Cego & Alerta</h4>
-                <p className="text-white/80 leading-relaxed text-sm">Uso consciente: Cuidado com amizades interesseiras, promessas de apoio sem compromisso real ou com abraçar muitas atividades de grupo ao mesmo tempo e acabar perdendo o foco nas suas obrigações.</p>
-             </Reveal>
-          </div>
+          
+</Reveal>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════
-         4. BOARDING PASS
-         ══════════════════════════════════════════════════ */}
-      <section className="relative z-20 px-6 max-w-5xl mx-auto pb-24 md:pb-32">
-        <Reveal className="bg-white/[0.02] backdrop-blur-xl border border-[#3b82f6]/20 rounded-[28px] overflow-hidden shadow-[0_0_60px_rgba(59,130,246,0.15)] flex flex-col md:flex-row">
-          
-          <div className="p-8 md:p-10 flex-1 relative z-10">
-            <div className="flex items-center gap-3 mb-10">
-              <div className="w-8 h-8 rounded-full bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center">
-                <Plane className="w-4 h-4 text-[#3b82f6]" />
-              </div>
-              <span className="font-ps-display text-lg font-semibold tracking-widest uppercase text-white/90">Boarding Pass Solar</span>
-            </div>
 
-            <div className="grid grid-cols-2 gap-y-8 gap-x-6">
-              <div>
-                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-1">Viajante</p>
-                <p className="text-lg font-semibold text-white/90">{P.name}</p>
-              </div>
-              <div>
-                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-1">Origem Natal</p>
-                <p className="text-lg font-semibold text-white/90">{P.origin}</p>
-              </div>
-              <div>
-                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-1">Data da Viagem</p>
-                <p className="text-lg font-semibold text-white/90">{P.date}</p>
-                <p className="text-xs text-white/50">{P.time}</p>
-              </div>
-              <div>
-                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-1">Destino Ideal</p>
-                <p className="text-lg font-semibold text-white/90">{P.city}</p>
-                <p className="text-xs text-white/50">{P.coords}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="hidden md:flex flex-col items-center justify-center relative w-8">
-            <div className="absolute top-0 bottom-0 w-px border-dashed border-l border-white/20" />
-            <div className="w-8 h-8 bg-[#0B1426] rounded-full absolute -top-4 border-b border-white/10" />
-            <div className="w-8 h-8 bg-[#0B1426] rounded-full absolute -bottom-4 border-t border-white/10" />
-          </div>
-
-          <div className="bg-[#3b82f6]/10 p-8 md:p-10 md:w-[320px] flex flex-col justify-between border-l border-white/[0.02]">
-            <div>
-              <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-2">Classe / Energia</p>
-              <h3 className="text-4xl font-ps-display font-bold text-[#3b82f6] mb-1">Casa {P.house}</h3>
-              <p className="text-sm text-white/70 font-medium mb-6">{P.houseLabel}</p>
-              
-              <div className="bg-black/30 rounded-xl p-4 border border-white/5 flex items-center justify-between mb-4">
-                <span className="text-white/50 text-xs uppercase tracking-widest font-bold">Match</span>
-                <span className="text-2xl font-bold text-[#3b82f6]">{P.match}%</span>
-              </div>
-              
-              <div className="bg-black/30 rounded-xl p-4 border border-white/5 flex items-center justify-between">
-                <span className="text-white/50 text-xs uppercase tracking-widest font-bold">Custo</span>
-                <span className="text-lg font-bold text-white/90">{P.cost} Crédito</span>
-              </div>
-            </div>
-            
-            <div className="mt-8 pt-6 border-t border-white/10 flex justify-between items-center">
-              <span className="text-[10px] font-mono text-white/40">{P.hash}</span>
-              <span className="text-[10px] font-mono text-white/40">{P.vector}</span>
-            </div>
-          </div>
-        </Reveal>
-      </section>
 
       {/* ══════════════════════════════════════════════════
          5. A REVELAÇÃO
@@ -584,8 +689,8 @@ export default function AppleResultPrototype() {
       <section className="max-w-4xl mx-auto px-6 py-20 md:py-24 border-t border-white/[0.02]">
         <Reveal>
           <div className="flex items-center gap-4 mb-10">
-            <div className="w-12 h-12 rounded-full bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-[#3b82f6]" />
+            <div className="w-12 h-12 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-[#10b981]" />
             </div>
             <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tight">A Revelação.</h2>
           </div>
@@ -599,7 +704,7 @@ export default function AppleResultPrototype() {
             
             <div className="pl-6 border-l-2 border-white/10 py-2 my-8">
               <p>
-                No dia <strong>{P.date}</strong>, exatamente às <strong>{P.time}</strong>, o seu Sol retorna à posição exata do seu nascimento. Ao passar este momento milimétrico nas coordenadas <span className="font-mono text-sm text-[#3b82f6]">[{P.coords}]</span> em <strong>{P.city}</strong>, a rotação da Terra forçará a ativação magnética da sua Casa {P.house} para os próximos 365 dias.
+                No dia <strong>{P.date}</strong>, exatamente às <strong>{P.time}</strong>, o seu Sol retorna à posição exata do seu nascimento. Ao passar este momento milimétrico nas coordenadas <span className="font-mono text-sm text-[#10b981]">[{P.coords}]</span> em <strong>{P.city}</strong>, a rotação da Terra forçará a ativação magnética da sua Casa {P.house} para os próximos 365 dias.
               </p>
             </div>
 
@@ -622,32 +727,32 @@ export default function AppleResultPrototype() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           <Reveal className="md:col-span-8 bg-white/[0.02] rounded-[32px] overflow-hidden relative min-h-[500px] border border-white/[0.04] group hover:border-white/10 transition-colors">
             <div className="absolute right-0 top-0 w-2/3 h-full bg-cover bg-right opacity-30 mix-blend-lighten" style={{ backgroundImage: "url('/apple-mock/camera_system_startframe__e0gisudnvv2a_large.jpg')" }} />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0B1426] via-[#0B1426]/90 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#02160F] via-[#02160F]/90 to-transparent" />
             <div className="relative z-10 h-full flex flex-col justify-center p-12 max-w-xl">
-              <Sun className="w-8 h-8 text-[#3b82f6] mb-6" />
+              <Sun className="w-8 h-8 text-[#10b981] mb-6" />
               <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-2">Signo Solar</p>
               <h3 className="font-ps-display text-5xl font-bold mb-6">Sol em {P.sign}.</h3>
               <p className="text-white/60 text-lg font-light leading-relaxed mb-8">
-                Magnético e inspirador. Você não entra em uma comunidade como um mero membro. Você entra como o farol reluzente que atrai e lidera multidões.
+                Magnético e inspirador. Você não persegue a prosperidade através do esforço brutal ou da competição cega. O seu próprio magnetismo atrai naturalmente recursos, clientes e oportunidades exclusivas.
               </p>
-              <div className="bg-white/[0.02] border border-[#3b82f6]/20 p-6 rounded-2xl border-l-4 border-l-[#3b82f6]">
-                <p className="text-white/80 text-lg font-serif italic">"A minha visão inspira comunidades e os meus aliados multiplicam os meus resultados."</p>
+              <div className="bg-white/[0.02] border border-[#10b981]/20 p-6 rounded-2xl border-l-4 border-l-[#10b981]">
+                <p className="text-white/80 text-lg font-serif italic">"A minha visão criativa gera valor real e o mundo material recompensa o meu brilho."</p>
               </div>
             </div>
           </Reveal>
 
-          <Reveal delay={0.1} className="md:col-span-4 bg-[#3b82f6]/10 rounded-[32px] border border-[#3b82f6]/20 p-10 flex flex-col justify-between min-h-[500px]">
+          <Reveal delay={0.1} className="md:col-span-4 bg-[#10b981]/10 rounded-[32px] border border-[#10b981]/20 p-10 flex flex-col justify-between min-h-[500px]">
             <div>
-              <Zap className="w-8 h-8 text-[#3b82f6] mb-6" />
+              <Zap className="w-8 h-8 text-[#10b981] mb-6" />
               <p className="text-white/60 text-[10px] uppercase tracking-widest font-bold mb-2">Ascendente da Revolução</p>
               <h3 className="font-ps-display text-4xl font-bold mb-6">{P.ascendant}.</h3>
               <p className="text-white/80 text-lg font-light leading-relaxed">
-                A escala viral exige processos impecáveis. O seu crescimento em redes não virá do caos, mas da extrema organização.
+                A segurança financeira duradoura exige gestão impecável. A sua prosperidade material este ano não virá de sorte impulsiva, mas da extrema organização.
               </p>
             </div>
             <div className="bg-black/30 rounded-2xl p-5 mt-8 border border-white/5">
               <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-2">Alerta Prático</p>
-              <p className="text-sm font-medium">Evite focar excessivamente nos aplausos da audiência e esquecer de valorizar quem trabalha nos bastidores.</p>
+              <p className="text-sm font-medium">Evite focar obsessivamente em economizar micro-gastos ao invés de estruturar novas fontes de lucro e receita.</p>
             </div>
           </Reveal>
         </div>
@@ -700,14 +805,14 @@ export default function AppleResultPrototype() {
         <div ref={carRef} className="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 md:px-[max(24px,calc(50vw-680px))] pb-8 no-scrollbar scroll-smooth">
           {TIMELINE.map((t, i) => (
             <Reveal key={i} delay={i * 0.1} className="snap-center shrink-0 w-[85vw] md:w-[420px]">
-              <div className={`h-[500px] rounded-[32px] overflow-hidden relative group cursor-pointer border ${t.highlight ? 'border-[#3b82f6]/40 bg-[#3b82f6]/10' : 'border-white/[0.04] bg-white/[0.02]'}`}>
+              <div className={`h-[500px] rounded-[32px] overflow-hidden relative group cursor-pointer border ${t.highlight ? 'border-[#10b981]/40 bg-[#10b981]/10' : 'border-white/[0.04] bg-white/[0.02]'}`}>
                 <div className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity group-hover:scale-105 transition-transform duration-[2s]" style={{ backgroundImage: `url('${t.img}')` }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-[#0B1426]/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#02160F] via-[#02160F]/60 to-transparent" />
                 
-                {t.highlight && <div className="absolute top-6 right-6 z-10 bg-[#3b82f6] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">Pico do Ano</div>}
+                {t.highlight && <div className="absolute top-6 right-6 z-10 bg-[#10b981] text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">Pico do Ano</div>}
                 
                 <div className="absolute bottom-10 left-10 right-10 z-10">
-                  <span className={`text-[10px] font-bold uppercase tracking-widest block mb-3 ${t.highlight ? 'text-[#3b82f6]' : 'text-white/40'}`}>{t.phase} · {t.months}</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest block mb-3 ${t.highlight ? 'text-[#10b981]' : 'text-white/40'}`}>{t.phase} · {t.months}</span>
                   <h3 className="font-ps-display text-3xl font-bold mb-4 tracking-tight">{t.title}</h3>
                   <p className="text-white/60 text-base font-light leading-relaxed">{t.desc}</p>
                 </div>
@@ -729,29 +834,29 @@ export default function AppleResultPrototype() {
             </div>
             <div className="space-y-6">
               <div className="bg-black/20 rounded-2xl p-6 border border-white/5">
-                <h4 className="text-red-300 font-bold mb-2">Amizades Interesseiras</h4>
-                <p className="text-white/60 text-sm leading-relaxed">Falsas promessas de apoio sem compromisso real. Confiar rápido demais pode custar caro.</p>
+                <h4 className="text-red-300 font-bold mb-2">Mentalidade de Escassez</h4>
+                <p className="text-white/60 text-sm leading-relaxed">O medo irreal de perder o que conquistou. Reter recursos por insegurança apenas interrompe o fluxo de abundância do universo.</p>
               </div>
               <div className="bg-black/20 rounded-2xl p-6 border border-white/5">
-                <h4 className="text-red-300 font-bold mb-2">Perda de Foco</h4>
-                <p className="text-white/60 text-sm leading-relaxed">Abraçar muitas atividades de grupo ao mesmo tempo e acabar sem foco nas obrigações diárias.</p>
+                <h4 className="text-red-300 font-bold mb-2">Gastos por Compensação</h4>
+                <p className="text-white/60 text-sm leading-relaxed">Utilizar compras impulsivas e objetos de luxo para preencher vazios emocionais, sabotando o seu teto patrimonial do ano.</p>
               </div>
             </div>
           </Reveal>
 
-          <Reveal delay={0.1} className="bg-[#3b82f6]/10 rounded-[32px] p-10 md:p-14 border border-[#3b82f6]/20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[radial-gradient(circle,rgba(59,130,246,0.1)_0%,transparent_70%)] pointer-events-none" />
+          <Reveal delay={0.1} className="bg-[#10b981]/10 rounded-[32px] p-10 md:p-14 border border-[#10b981]/20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[radial-gradient(circle,rgba(16,185,129,0.1)_0%,transparent_70%)] pointer-events-none" />
             <div className="relative z-10">
               <div className="flex items-center gap-4 mb-8">
-                <BookOpen className="w-8 h-8 text-[#3b82f6]" />
+                <BookOpen className="w-8 h-8 text-[#10b981]" />
                 <h2 className="font-ps-display text-3xl font-bold">O Ritual das 24h.</h2>
               </div>
               <p className="text-white/70 text-lg font-light leading-relaxed mb-8">
-                Não passe o dia do seu aniversário sozinho. Jante com amigos, mande mensagens para pessoas importantes da sua rede de contatos ou visite um local dinâmico e movimentado em <strong className="text-white">{P.city}</strong>. Escreva suas 3 maiores metas de futuro em um papel.
+                Faça uma transação financeira simbólica e luxuosa. Compre algo de extremo bom gosto que represente sua prosperidade em <strong className="text-white">{P.city}</strong>. Escreva as suas 3 metas exatas de patrimônio e faturamento em um papel.
               </p>
               <div className="bg-black/20 rounded-2xl p-6 border border-white/5">
-                <p className="text-[10px] text-[#3b82f6] uppercase tracking-widest font-bold mb-2">Ritual Extra — Ascendente {P.ascendant}</p>
-                <p className="text-white/80 text-sm font-medium">Crie uma planilha de contatos organizada por categorias de networking.</p>
+                <p className="text-[10px] text-[#10b981] uppercase tracking-widest font-bold mb-2">Ritual Extra — Ascendente {P.ascendant}</p>
+                <p className="text-white/80 text-sm font-medium">Estruture a planilha matriz dos seus rendimentos, investimentos e divisão de lucros.</p>
               </div>
             </div>
           </Reveal>
@@ -773,8 +878,8 @@ export default function AppleResultPrototype() {
                 <h4 className="text-xl font-bold mb-1 text-white/90">{r.city}</h4>
                 <span className="text-white/40 text-[10px] font-semibold uppercase tracking-widest">Casa {P.house}</span>
               </div>
-              <div className="w-14 h-14 rounded-full border-2 border-white/10 flex items-center justify-center group-hover:border-[#3b82f6] transition-all">
-                <span className="text-[#3b82f6] text-sm font-bold">{r.match}%</span>
+              <div className="w-14 h-14 rounded-full border-2 border-white/10 flex items-center justify-center group-hover:border-[#10b981] transition-all">
+                <span className="text-[#10b981] text-sm font-bold">{r.match}%</span>
               </div>
             </Reveal>
           ))}
@@ -784,18 +889,18 @@ export default function AppleResultPrototype() {
       {/* ══════════════════════════════════════════════════
          12. PAYWALL & FOOTER
          ══════════════════════════════════════════════════ */}
-      <section className="relative py-32 md:py-48 text-center overflow-hidden border-t border-white/[0.04] bg-[#0B1426]">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.15)_0%,transparent_60%)] pointer-events-none" />
+      <section className="relative py-32 md:py-48 text-center overflow-hidden border-t border-white/[0.04] bg-[#02160F]">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.15)_0%,transparent_60%)] pointer-events-none" />
         
         <Reveal className="max-w-4xl mx-auto px-6 relative z-10">
-          <Lock className="w-12 h-12 text-[#3b82f6] mx-auto mb-8" />
+          <Lock className="w-12 h-12 text-[#10b981] mx-auto mb-8" />
           <h2 className="font-ps-display text-5xl md:text-7xl font-bold tracking-tight mb-6">
             Dossiê Executivo.
           </h2>
           <p className="text-white/50 text-xl md:text-2xl font-light mb-12 max-w-2xl mx-auto leading-relaxed">
             Desbloqueie todas as dimensões trancadas, o radar 360°, os pontos cegos e o plano B alternativo. O mapeamento mais profundo do seu destino.
           </p>
-          <button className="bg-[#3b82f6] text-white px-10 py-5 rounded-full text-sm font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_0_60px_rgba(59,130,246,0.15)]">
+          <button className="bg-[#10b981] text-white px-10 py-5 rounded-full text-sm font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_0_60px_rgba(16,185,129,0.15)]">
             Liberar Dossiê Completo
           </button>
         </Reveal>

@@ -32,3 +32,5 @@ protocolo-solar-antigravity-release*/
 VIDEOS PARA BACKGROUND/
 *.mp4
 *.mov
+
+.env.local
