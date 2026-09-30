@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Fingerprint, MapPin, Search, Compass, Scroll, Crown } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
+import { cityDatabase } from "@/data/houses";
 import { BackButton } from "@/components/ui/BackButton";
 
 interface ConsultationRow {
@@ -123,6 +124,7 @@ export default function History() {
               const hasHouse = c.goal !== null && c.goal !== undefined;
               const hasOrigin = !!c.origin;
               const shortId = c.id.substring(0, 8);
+              const houseData = c.goal ? cityDatabase[c.goal] : null;
               
               // A Lógica da Badge de Topo (Método de Busca)
               let MethodIcon = Crown;
@@ -175,15 +177,31 @@ export default function History() {
                          
                          if (hasOrigin) {
                            return (
-                             <p className="font-ps-ui text-sm text-white/90">
-                               <span className="text-[#C9A227] font-bold">📍 Origem:</span> {c.origin} • Destino: Casa {c.goal} <span className="text-white/40 ml-1">(Foco: {displayIntent})</span>
-                             </p>
+                             <div className="flex flex-col gap-1.5">
+                               <p className="font-ps-ui text-sm text-white/90">
+                                 <span className="text-[#C9A227] font-bold">📍 Origem:</span> {c.origin} • Destino: Casa {c.goal} <span className="text-white/40 ml-1">(Foco: {displayIntent})</span>
+                               </p>
+                               {houseData?.tag && (
+                                 <p className="text-ps-gold/60 text-[9px] uppercase tracking-widest flex items-center gap-1.5">
+                                   <div className="w-1 h-1 rounded-full bg-ps-gold/40"></div>
+                                   O TEMA DA CASA {c.goal}: {houseData.tag}
+                                 </p>
+                               )}
+                             </div>
                            );
                          } else {
                            return (
-                             <p className="font-ps-ui text-sm text-white/90">
-                               <span className="text-[#C9A227] font-bold">🎯 Foco:</span> {displayIntent} • Casa {c.goal}
-                             </p>
+                             <div className="flex flex-col gap-1.5">
+                               <p className="font-ps-ui text-sm text-white/90">
+                                 <span className="text-[#C9A227] font-bold">🎯 Foco:</span> {displayIntent} • Casa {c.goal}
+                               </p>
+                               {houseData?.tag && (
+                                 <p className="text-ps-gold/60 text-[9px] uppercase tracking-widest flex items-center gap-1.5">
+                                   <div className="w-1 h-1 rounded-full bg-ps-gold/40"></div>
+                                   O TEMA DA CASA {c.goal}: {houseData.tag}
+                                 </p>
+                               )}
+                             </div>
                            );
                          }
                       })()}
