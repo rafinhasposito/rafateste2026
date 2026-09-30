@@ -8,6 +8,7 @@ import { FOCUS_MATRIX } from "@/data/focusMatrix";
 import { DNA_MATRIX } from "@/data/dnaMatrix";
 import { prefixosSol, prefixosAscendente, prefixosFase } from "@/data/modifiers";
 import { BASE_HOUSE_PROFILES } from "@/data/baseHouseProfiles";
+import { houseThemes } from "@/data/houseThemes";
 import { REAL_HOUSES_DATA } from "@/data/houses_content";
 import UnlockPremiumModal from "@/components/UnlockPremiumModal";
 import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, ShieldAlert, Eye, Clock, Hourglass, BookOpen, Plane, QrCode, Fingerprint, Hash, CreditCard, Compass, Plus, Unlock } from "lucide-react";
@@ -370,9 +371,14 @@ export interface DestinyResultsProps {
   onSelectHouse?: (h: number) => void;
   mode?: string;
   unlockedCount?: number;
+  intent?: string | null;
 }
 
 export default function AppleResultPreviewV3(props: DestinyResultsProps) {
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [props.house]);
+
   const { houseId } = useParams();
   const parsedId = houseId ? parseInt(houseId) : 2;
   const urlHouseIndex = props.house || ((parsedId >= 1 && parsedId <= 12) ? parsedId : 2);
@@ -388,16 +394,64 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     coords: bestCity ? `${bestCity.lat?.toFixed(2)}°, ${bestCity.lon?.toFixed(2)}°` : "40.71° N, 74.01° W"
   };
   
+  // Cor dinâmica da Casa
+  const houseColor = houseThemes[P_DYNAMIC.house]?.themeColor || "#10b981";
+  
   const getHeroVideo = (cityName: string) => {
     if (!cityName) return "/assets/particles.mp4";
-    const norm = cityName.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-    if (norm.includes("nova york") || norm.includes("new york")) return "/assets/ny.mp4";
-    if (norm.includes("toquio") || norm.includes("tokyo")) return "/assets/cities/tokyo.mp4";
-    if (norm.includes("dubai")) return "/assets/cities/dubai.mp4";
-    if (norm.includes("paris")) return "/assets/cities/paris.mp4";
-    if (norm.includes("roma") || norm.includes("rome")) return "/assets/cities/roma.mov";
-    if (norm.includes("londres") || norm.includes("london")) return "/assets/cities/london.mp4";
-    if (norm.includes("bali")) return "/assets/cities/bali.mp4";
+    
+    // Pega só o nome da cidade (antes da vírgula)
+    const baseCity = cityName.split(',')[0].trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    // Mapeamento direto e blindado para evitar problemas de nomeação
+    const map: Record<string, string> = {
+      "nova york": "new_york.mp4",
+      "new york": "new_york.mp4",
+      "toquio": "tokyo.mp4",
+      "tokyo": "tokyo.mp4",
+      "dubai": "dubai.mp4",
+      "paris": "paris.mp4",
+      "roma": "roma.mov",
+      "rome": "roma.mov",
+      "londres": "london.mp4",
+      "london": "london.mp4",
+      "bali": "bali.mp4",
+      "amsterda": "amsterdam.mov",
+      "amsterdam": "amsterdam.mov",
+      "barcelona": "barcelona.mp4",
+      "buenos aires": "buenosaires.mp4",
+      "atenas": "athens.mp4",
+      "athens": "athens.mp4",
+      "cairo": "cairo.mp4",
+      "florenca": "florence.mp4",
+      "florence": "florence.mp4",
+      "genebra": "geneva.mp4",
+      "geneva": "geneva.mp4",
+      "ibiza": "ibiza.mp4",
+      "jerusalem": "jerusalem.mp4",
+      "kyoto": "kyoto.mp4",
+      "quiotto": "kyoto.mp4",
+      "las vegas": "las_vegas.mp4",
+      "monaco": "monaco.mp4",
+      "patagonia": "patagonia.mp4",
+      "provence": "provence.mp4",
+      "reykjavik": "reykjavik.mp4",
+      "santorini": "santorini.mp4",
+      "seul": "seoul.mp4",
+      "seoul": "seoul.mp4",
+      "singapura": "singapore.mp4",
+      "singapore": "singapore.mp4",
+      "veneza": "venice.mp4",
+      "venice": "venice.mp4",
+      "zurique": "zurich.mp4",
+      "zurich": "zurich.mp4"
+    };
+
+    if (map[baseCity]) {
+      return `/assets/cities/${map[baseCity]}`;
+    }
+    
+    // Fallback global de estrelas premium
     return "/assets/particles.mp4"; 
   };
   const heroVideoSrc = getHeroVideo(P_DYNAMIC.city);
@@ -418,7 +472,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const scrollCar = (d: number) => carRef.current?.scrollBy({ left: d, behavior: "smooth" });
   const [openArea, setOpenArea] = useState<string>("dinheiro");
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-  const [targetLockedArea, setTargetLockedArea] = useState<{ id: string; label: string; color: string; type: 'foco' | 'rota' } | null>(null);
+  const [targetLockedArea, setTargetLockedArea] = useState<{ id: string; label: string; color: string; type: 'foco' | 'rota', houseNum?: number } | null>(null);
   // Fallbacks genéricos e atmosféricos baseados no luxo e não em cidades específicas
   const getAtmosphericFallback = (house: number) => {
     const fallbacks: Record<number, string> = {
@@ -443,10 +497,14 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   
   const extractRoute = (tierData: any, fallbackName: string) => {
     if (!tierData) return null;
+    // tierData is an array of cities from Python API
+    const cityData = Array.isArray(tierData) ? tierData[0] : tierData;
+    if (!cityData) return null;
     return {
-      ...tierData,
-      score: tierData.score || (fallbackName === 'Nacional' ? 96 : fallbackName === 'Acessível' ? 94 : 98),
-      img: tierData.img || getAtmosphericFallback(P_DYNAMIC.house)
+      ...cityData,
+      city: cityData.city || cityData.name || "Destino",
+      score: cityData.score || (fallbackName === 'Nacional' ? 96 : fallbackName === 'Acessível' ? 94 : 98),
+      img: cityData.img || getAtmosphericFallback(P_DYNAMIC.house)
     };
   };
 
@@ -467,7 +525,19 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   };
 
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
-  const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
+  // Find the intended area based on props.intent
+  const intendedAreaId = React.useMemo(() => {
+    if (!props.intent) return null;
+    const matched = [...LIFE_AREAS].find(a => a.id.toLowerCase() === props.intent?.toLowerCase() || a.label.toLowerCase().includes(props.intent?.toLowerCase() || ""));
+    return matched ? matched.id : null;
+  }, [props.intent]);
+
+  const [hoveredArea, setHoveredArea] = useState<string | null>(intendedAreaId);
+
+  // Force reset hovered focus when the house changes
+  React.useEffect(() => {
+    setHoveredArea(intendedAreaId);
+  }, [P_DYNAMIC.house, intendedAreaId]);
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
@@ -486,8 +556,12 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     if (norm.includes("dubai")) return "https://images.unsplash.com/photo-1459787915554-b34915863013?auto=format&fit=crop&w=2000&q=80";
     if (norm.includes("paris")) return "https://images.unsplash.com/photo-1502602898657-3e907a5ea071?auto=format&fit=crop&w=2000&q=80";
     if (norm.includes("roma")) return "https://images.unsplash.com/photo-1516483638261-f40889eba30e?auto=format&fit=crop&w=2000&q=80";
-    if (norm.includes("londres")) return "https://images.unsplash.com/photo-1513635269975-59693e2d8400?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("londres") || norm.includes("london")) return "https://images.unsplash.com/photo-1513635269975-59693e2d8400?auto=format&fit=crop&w=2000&q=80";
     if (norm.includes("bali")) return "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("sao paulo") || norm.includes("são paulo")) return "https://images.unsplash.com/photo-1470160710819-b3bd5ec85c66?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("rio de janeiro")) return "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("jerusalem") || norm.includes("jerusale")) return "https://images.unsplash.com/photo-1547483238-f400e65ccd56?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("berlim") || norm.includes("berlin")) return "https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=2000&q=80";
     
     return getAtmosphericFallback(houseId);
   };
@@ -518,11 +592,27 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     // As per user rule: The 96 combinations in focusMatrix.ts ARE the intended personalized experience!
     // The photo and city are locked, but the Pillars, Timeline, and Ritual MUST adapt to the Focus.
     
-    if (!focusData) return area;
+    let finalScore = focusData ? (focusData.match || area.score) : area.score;
+    
+    // O DEVER DA PÁGINA É ENTREGAR O QUE O USUÁRIO PEDIU:
+    // Se o usuário escolheu uma intenção específica na consulta, ela deve vencer SEMPRE.
+    if (props.intent) {
+      const intentNorm = props.intent.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+      const areaLabelNorm = area.label.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+      const areaIdNorm = area.id.toLowerCase();
+      // Se a intenção do banco bater com o ID ou com o Label da área da vida, damos o Score Máximo (999)
+      if (areaLabelNorm.includes(intentNorm) || intentNorm.includes(areaLabelNorm.split(' ')[0]) || intentNorm.includes(areaIdNorm)) {
+        finalScore = 999;
+      }
+    }
+
+    if (!focusData) {
+      return { ...area, score: finalScore };
+    }
     
     return {
       ...area,
-      score: focusData.match || area.score,
+      score: finalScore,
       teaser: focusData.headline || area.teaser,
       full: focusData.headline || area.teaser,
       mantra: focusData.mantra || area.mantra,
@@ -547,7 +637,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
 
 
-  const sortedAreas = [...mergedAreas].sort((a,b) => b.score - a.score);
+  const sortedAreas = [...mergedAreas].sort((a,b) => {
+    const isA = a.id === intendedAreaId;
+    const isB = b.id === intendedAreaId;
+    if (isA && !isB) return -1;
+    if (!isA && isB) return 1;
+    return b.score - a.score;
+  });
   const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id)) || sortedAreas[0];
 
   
@@ -572,7 +668,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const textBlur = useTransform(casaProgress, [0, 1], ["blur(16px)", "blur(0px)"]);
 
   return (
-    <div className="min-h-screen text-[#f5f5f7] overflow-x-hidden font-sans transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${currentActiveData?.color || '#10b981'} 6%, #03100B)` }}>
+    <div className="min-h-screen text-[#f5f5f7] overflow-x-hidden font-sans transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${houseColor} 6%, #03100B)`, "--hc": houseColor, "--hc10": `${houseColor}1a`, "--hc15": `${houseColor}26`, "--hc20": `${houseColor}33`, "--hc30": `${houseColor}4d`, "--hc40": `${houseColor}66`, "--hc70": `${houseColor}b3` } as React.CSSProperties}>
       
       {/* ── NAVBAR PADRÃO (RESPONSIVA) ── */}
       <div className="hidden lg:block">
@@ -590,7 +686,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#03100B] z-10" />
           <video autoPlay muted loop playsInline className="w-full h-full object-cover" key={heroVideoSrc}>
-            <source src={heroVideoSrc} type="video/mp4" />
+            <source src={heroVideoSrc} type={heroVideoSrc?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
           </video>
         </motion.div>
         
@@ -615,8 +711,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         </motion.div>
         
         <motion.h2
-          style={{ scale: textScale, opacity: textOpacity, filter: textBlur }}
-          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#10b981] to-emerald-200 origin-center uppercase text-center break-words whitespace-normal break-all sm:break-normal px-2"
+          style={{ scale: textScale, opacity: textOpacity, filter: textBlur, color: houseColor, backgroundImage: `linear-gradient(to bottom, ${houseColor}, #a7f3d0)` }}
+          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[1] mb-8 pt-2 text-transparent bg-clip-text origin-center uppercase text-center break-words whitespace-normal break-all sm:break-normal px-2"
         >
           {P_DYNAMIC.city.split(', ')[0]}
         </motion.h2>
@@ -638,11 +734,11 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
           <Reveal className="mb-24 max-w-[1000px] mx-auto">
             <div className="bg-white/[0.02] border border-white/[0.04] rounded-[32px] p-8 md:p-12 relative overflow-hidden">
                {/* Fundo glow sutil */}
-               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[40%] bg-[#10b981]/5 blur-[120px] rounded-full pointer-events-none"></div>
+               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[40%] bg-[var(--hc5)] blur-[120px] rounded-full pointer-events-none"></div>
                
                {/* A GRANDE DIVISÃO DA PERSONALIZAÇÃO */}
                <div className="relative z-10 flex flex-col items-center">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[#10b981] mb-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[var(--hc)] mb-8">
                     <Sparkles className="w-3 h-3" />
                     <span>Seu Resultado Personalizado</span>
                   </div>
@@ -651,37 +747,37 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                     <span className="font-ps-display text-2xl md:text-3xl lg:text-4xl text-white/60 font-light tracking-wide">
                       Casa {P_DYNAMIC.house}
                     </span>
-                    <span className="font-ps-display text-5xl md:text-7xl lg:text-[80px] text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-emerald-300 leading-[1] tracking-tight">
-                      Foco em {P.intention}
+                    <span className="font-ps-display text-5xl md:text-7xl lg:text-[80px] text-transparent bg-clip-text bg-gradient-to-r from-[var(--hc)] to-white/50 leading-[1] tracking-tight">
+                      Foco em {currentActiveData?.label?.split(" ")[0] || P.intention}
                     </span>
                   </h3>
 
                   {/* ======================= PROTOCOLO SOLAR • CASA {P_DYNAMIC.house} (HIGH-END) ======================= */}
                   <div className="w-full max-w-4xl mx-auto mb-20">
-                     <div className="bg-black/40 border border-[#10b981]/30 rounded-[32px] overflow-hidden shadow-[0_30px_80px_rgba(16,185,129,0.15)] backdrop-blur-xl flex flex-col">
+                     <div className="bg-black/40 border border-[var(--hc30)] rounded-[32px] overflow-hidden shadow-[0_30px_80px_var(--hc15)] backdrop-blur-xl flex flex-col">
                        {/* Header */}
                        <div 
                          onClick={() => setIsBoardingPassOpen(!isBoardingPassOpen)}
-                         className="bg-[#10b981]/10 border-b border-[#10b981]/20 px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:bg-[#10b981]/20 transition-colors select-none"
+                         className="bg-[var(--hc10)] border-b border-[var(--hc20)] px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:bg-[var(--hc20)] transition-colors select-none"
                        >
                          <div className="flex items-center gap-3">
-                           <Plane className="w-5 h-5 text-[#10b981]" />
-                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-[#10b981] text-sm">Protocolo Solar • Casa {P_DYNAMIC.house}</span>
+                           <Plane className="w-5 h-5 text-[var(--hc)]" />
+                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-[var(--hc)] text-sm">Protocolo Solar • Casa {P_DYNAMIC.house}</span>
                          </div>
                          <div className="flex items-center gap-4 md:gap-6">
                            <div className="flex items-center gap-3 hidden md:flex">
-                             <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_10px_#10b981]"></div>
-                             <span className="text-[#10b981]/90 font-sans text-xs tracking-widest">{P_DYNAMIC.hash} • ATIVO</span>
+                             <div className="w-2 h-2 rounded-full bg-[var(--hc)] animate-pulse shadow-[0_0_10px_var(--hc)]"></div>
+                             <span className="text-[var(--hc90)] font-sans text-xs tracking-widest">{P_DYNAMIC.hash} • ATIVO</span>
                            </div>
                            
                            {!isBoardingPassOpen && (
-                             <span className="text-[#10b981] text-[10px] uppercase font-bold tracking-widest bg-[#10b981]/10 border border-[#10b981]/20 px-3 py-1.5 rounded-full animate-pulse">
+                             <span className="text-[var(--hc)] text-[10px] uppercase font-bold tracking-widest bg-[var(--hc10)] border border-[var(--hc20)] px-3 py-1.5 rounded-full animate-pulse">
                                Ver Completo
                              </span>
                            )}
                            
-                           <div className={`p-1 rounded-full ${!isBoardingPassOpen ? 'bg-[#10b981]/10' : ''}`}>
-                             <ChevronDown className={`w-5 h-5 text-[#10b981] transition-transform duration-500 ${isBoardingPassOpen ? 'rotate-180' : ''}`} />
+                           <div className={`p-1 rounded-full ${!isBoardingPassOpen ? 'bg-[var(--hc10)]' : ''}`}>
+                             <ChevronDown className={`w-5 h-5 text-[var(--hc)] transition-transform duration-500 ${isBoardingPassOpen ? 'rotate-180' : ''}`} />
                            </div>
                          </div>
                        </div>
@@ -705,7 +801,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                   <span className="text-white/70">{P_DYNAMIC.sign}</span>
                                   
                                   <div className="ml-auto flex items-center gap-2">
-                                    <span className="text-[#10b981] font-bold flex items-center gap-2">
+                                    <span className="text-[var(--hc)] font-bold flex items-center gap-2">
                                       <Star className="w-4 h-4" />
                                       {P.match}% MATCH
                                     </span>
@@ -734,7 +830,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                          </div>
                          {/* Rota de Ancoragem */}
                          <div className="bg-white/[0.02] rounded-2xl p-6 md:p-8 border border-white/5 relative overflow-hidden">
-                           <div className="absolute top-0 right-0 w-64 h-64 bg-[#10b981]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+                           <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--hc5)] rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-6">Rota de Ancoragem</p>
                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
                              <div className="flex-1">
@@ -745,15 +841,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Origem Natal</p>
                              </div>
                              <div className="hidden md:flex flex-col items-center justify-center px-4 w-1/3">
-                               <Plane className="w-6 h-6 text-[#10b981] opacity-80" />
+                               <Plane className="w-6 h-6 text-[var(--hc)] opacity-80" />
                                <div className="w-full h-px bg-gradient-to-r from-transparent via-[#10b981]/50 to-transparent mt-3"></div>
                              </div>
-                             <div className="md:hidden flex items-center gap-4 text-[#10b981]/50 w-full">
+                             <div className="md:hidden flex items-center gap-4 text-[var(--hc50)] w-full">
                                <div className="w-px h-8 bg-gradient-to-b from-transparent via-[#10b981]/50 to-transparent ml-2.5"></div>
                                <Plane className="w-5 h-5 rotate-90" />
                              </div>
                              <div className="flex-1 md:text-right">
-                               <p className="text-[#10b981] font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2">
+                               <p className="text-[var(--hc)] font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2">
                                  <span className="truncate">{P_DYNAMIC.city}</span>
                                  <MapPin className="w-6 h-6 shrink-0"/>
                                </p>
@@ -766,19 +862,19 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4">Momento Exato da Ativação (Retorno Solar)</p>
                            <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white text-lg md:text-xl font-medium">
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                               <Calendar className="w-5 h-5 text-[#10b981]"/> 
+                               <Calendar className="w-5 h-5 text-[var(--hc)]"/> 
                                09 de Agosto, 2027
                              </span>
                              <span className="text-white/20 hidden md:inline">|</span>
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                               <Clock className="w-5 h-5 text-[#10b981]"/> 
+                               <Clock className="w-5 h-5 text-[var(--hc)]"/> 
                                {P_DYNAMIC.time}
                              </span>
                            </div>
                          </div>
                          {/* DNA vs Ativação */}
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                           <div className="bg-[#10b981]/5 border border-[#10b981]/10 rounded-2xl p-6">
+                           <div className="bg-[var(--hc5)] border border-[var(--hc10)] rounded-2xl p-6">
                              <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-5">DNA Astrológico</p>
                              <div className="space-y-4">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
@@ -789,15 +885,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                </p>
                              </div>
                            </div>
-                           <div className="bg-[#10b981]/10 border border-[#10b981]/20 rounded-2xl p-6 relative overflow-hidden">
+                           <div className="bg-[var(--hc10)] border border-[var(--hc20)] rounded-2xl p-6 relative overflow-hidden">
                              <div className="absolute inset-0 bg-gradient-to-br from-[#10b981]/10 to-transparent pointer-events-none"></div>
-                             <p className="text-[#10b981]/70 text-[10px] uppercase font-bold tracking-widest mb-5 relative z-10">Ativação Anual</p>
+                             <p className="text-[var(--hc70)] text-[10px] uppercase font-bold tracking-widest mb-5 relative z-10">Ativação Anual</p>
                              <div className="space-y-4 relative z-10">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Landmark className="w-5 h-5 text-[#10b981]"/> Casa {P_DYNAMIC.house}
+                                 <Landmark className="w-5 h-5 text-[var(--hc)]"/> Casa {P_DYNAMIC.house}
                                </p>
-                               <p className="text-[#10b981] font-bold text-xl flex items-center gap-3">
-                                 <CircleDollarSign className="w-5 h-5"/> Dinheiro & Prosperidade
+                               <p className="text-[var(--hc)] font-bold text-xl flex items-center gap-3">
+                                 <CircleDollarSign className="w-5 h-5"/> {currentActiveData?.label || "Dinheiro & Prosperidade"}
                                </p>
                              </div>
                            </div>
@@ -805,15 +901,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                          {/* Compatibilidade */}
                          <div className="flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 pt-8 mt-2 gap-4">
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Compatibilidade da Escolha</p>
-                           <div className="flex items-center justify-center gap-3 bg-[#10b981]/20 px-6 py-3 rounded-full border border-[#10b981]/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                             <div className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></div>
-                             <span className="text-[#10b981] font-bold tracking-widest text-lg">{P.match}% MATCH</span>
+                           <div className="flex items-center justify-center gap-3 bg-[var(--hc20)] px-6 py-3 rounded-full border border-[var(--hc30)] shadow-[0_0_30px_var(--hc20)]">
+                             <div className="w-2.5 h-2.5 rounded-full bg-[var(--hc)] animate-pulse"></div>
+                             <span className="text-[var(--hc)] font-bold tracking-widest text-lg">{P.match}% MATCH</span>
                            </div>
                          </div>
                        </div>
                        {/* Footer Barcode */}
-                       <div className="bg-black/60 px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t border-[#10b981]/20">
-                         <div className="font-barcode text-5xl md:text-6xl tracking-[0.2em] text-[#10b981]/70 scale-y-150 py-2">||| || ||| | || || |||</div>
+                       <div className="bg-black/60 px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t border-[var(--hc20)]">
+                         <div className="font-barcode text-5xl md:text-6xl tracking-[0.2em] text-[var(--hc70)] scale-y-150 py-2">||| || ||| | || || |||</div>
                          <span className="font-sans text-[10px] md:text-xs text-white/50 tracking-[0.2em] uppercase text-center bg-black/40 px-4 py-2 rounded-lg border border-white/5">Protocolo Solar • 24h de Imantação na Cidade de Destino</span>
                        </div>
                      </motion.div>
@@ -838,7 +934,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       key={area.id}
                       onClick={() => {
                         if (!isUnlockedLocally) {
-                          if (props.onUnlock) { props.onUnlock(P_DYNAMIC.house); } else { setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco' }); setIsPaywallOpen(true); }
+                          setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house }); setIsPaywallOpen(true);
                         } else {
                           setHoveredArea(area.id);
                         }
@@ -884,7 +980,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       <button
                         onClick={() => {
                           if (!isUnlockedLocally) {
-                            if (props.onUnlock) { props.onUnlock(P_DYNAMIC.house); } else { setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco' }); setIsPaywallOpen(true); }
+                            setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house }); setIsPaywallOpen(true);
                           } else {
                             setHoveredArea(isActive ? null : area.id);
                           }
@@ -1592,7 +1688,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         </div>
                         <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
                           <div className="flex justify-between items-end mb-3">
-                            <h5 className="font-ps-display text-2xl font-bold text-white transition-colors">{city.city}</h5>
+                            <h5 className="font-ps-display text-2xl font-bold text-white transition-colors">{city.city || city.name || "Destino Desconhecido"}</h5>
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 text-white/50 text-sm font-medium">
@@ -1604,10 +1700,12 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         </div>
                       </div>
                     )) : (
-                      <div className="bg-black/40 border border-white/5 rounded-[28px] h-56 flex flex-col items-center justify-center p-6 text-center">
-                         <MapPin className="w-6 h-6 text-white/20 mb-3" />
-                         <span className="font-sans text-xs uppercase tracking-widest text-white/40 font-bold mb-1">Rota Indisponível</span>
-                         <span className="text-white/20 text-[10px]">A API não retornou destino para este tier.</span>
+                      <div className="border border-dashed border-white/10 rounded-[28px] h-56 flex flex-col items-center justify-center p-6 text-center bg-white/[0.02] backdrop-blur-sm">
+                         <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center mb-4">
+                           <Lock className="w-5 h-5 text-white/20" />
+                         </div>
+                         <span className="font-ps-display text-sm font-bold text-white/50 mb-1">Em breve</span>
+                         <span className="text-white/25 text-[10px] leading-relaxed max-w-[200px]">Nosso sistema está calculando a melhor rota para o seu perfil.</span>
                       </div>
                     )}
                   </div>
@@ -1628,7 +1726,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   Expanda o Seu Mapa.
                 </h2>
                 <p className="text-white/50 text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                  Você desbloqueou a Rota principal para a <strong className="text-white font-medium">{P_DYNAMIC.houseLabel}</strong>. Descubra quais cidades do mundo ativam a sua saúde, seu amor e as outras 11 dimensões da sua vida.
+                  Você desbloqueou a Rota principal para: <strong className="text-white font-medium">{cityDatabase[P_DYNAMIC.house as keyof typeof cityDatabase]?.name?.split('—')[1]?.trim() || P_DYNAMIC.houseLabel}</strong>. Descubra quais cidades do mundo ativam a sua saúde, seu amor e as outras 11 dimensões da sua vida.
                 </p>
               </div>
               
@@ -1645,24 +1743,27 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   const mappedCityName = resultForHouse && resultForHouse.city ? resultForHouse.city.city : fallbackCity;
                   
                   const cityForThisHouse = isCurrent ? P_DYNAMIC.city.split(", ")[0] : (isUnlocked ? mappedCityName.split(", ")[0] : "Bloqueado");
-                  const imageForThisHouse = resultForHouse?.options?.highticket?.img 
-                    ? resultForHouse.options.highticket.img 
+                  const rawImg = resultForHouse?.options?.highticket?.img;
+                  const imageForThisHouse = rawImg 
+                    ? (rawImg.startsWith("http") ? rawImg : `https://images.unsplash.com/photo-${rawImg}?auto=format&fit=crop&w=1000&q=80`) 
                     : getAtmosphericFallback(num);
-                  const areaColor = LIFE_AREAS[num - 1]?.color || currentActiveData?.color || '#10b981';
+                  const areaColor = houseThemes[num]?.themeColor || '#10b981';
 
                   return (
                     <div 
                       key={num}
                       onClick={() => {
                         if (!isUnlocked) {
-                          if (props.onUnlock) { props.onUnlock(num); } else { setTargetLockedArea({ label: label, color: areaColor, id: num.toString(), type: 'rota' }); setIsPaywallOpen(true); }
+                          setTargetLockedArea({ label: label, color: areaColor, id: num.toString(), type: 'rota', houseNum: num }); setIsPaywallOpen(true);
+                        } else if (!isCurrent && props.onSelectHouse) {
+                          props.onSelectHouse(num);
                         }
                       }}
                       className={`relative rounded-[32px] border transition-all duration-500 ease-[0.19,1,0.22,1] overflow-hidden flex flex-col group h-[260px] ${
                         isCurrent 
                           ? 'bg-[#050505] border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)] scale-[1.02]' 
                           : isUnlocked 
-                            ? 'bg-[#050505] cursor-default'
+                            ? 'bg-[#050505] cursor-pointer hover:border-white/20'
                             : 'bg-[#050505] border-white/5 hover:border-white/20 hover:bg-white/[0.02] cursor-pointer p-6 justify-between'
                       }`}
                       style={{ borderColor: isUnlocked && !isCurrent ? `${areaColor}30` : undefined }}
@@ -1671,7 +1772,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         <>
                           {/* FOTO TOP (Corte Seco) */}
                           <div className="relative h-[130px] w-full shrink-0 overflow-hidden bg-[#050505]">
-                            <img src={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} alt={cityForThisHouse} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                            <img src={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} onError={(e) => { e.currentTarget.src = getAtmosphericFallback(num); }} alt={cityForThisHouse} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                             {isCurrent && (
                               <div className="absolute inset-0 bg-white/5 mix-blend-overlay"></div>
                             )}
@@ -1721,23 +1822,33 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       </section>
       <UnlockPremiumModal 
         isOpen={isPaywallOpen} 
+        isEmbedded={!!props.onUnlock}
+        userCredits={props.userCredits}
         onClose={() => setIsPaywallOpen(false)} 
         onSuccess={(id, purchaseType) => {
-          if (purchaseType === 'single') {
-            setUnlockedItems(prev => [...prev, id]);
-            if (targetLockedArea?.type === 'foco') {
-              setHoveredArea(id);
-            }
+          if (props.onUnlock && targetLockedArea?.houseNum) {
+             // In production Dashboard mode, we call the real backend unlock
+             // (We only support single route unlocks via this API in V1)
+             props.onUnlock(targetLockedArea.houseNum);
+             window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
-            // Full unlock (all 12 houses and focuses)
-            const allIds = [
-              ...LIFE_AREAS.map(a => a.id),
-              ..."1,2,3,4,5,6,7,8,9,10,11,12".split(',')
-            ];
-            setUnlockedItems(allIds);
-            if (targetLockedArea?.type === 'foco') {
-              setHoveredArea(id);
-            }
+             // Sandbox / Preview mode behavior
+             if (purchaseType === 'single') {
+               setUnlockedItems(prev => [...prev, id]);
+               if (targetLockedArea?.type === 'foco') {
+                 setHoveredArea(id);
+               }
+             } else {
+               // Full unlock (all 12 houses and focuses)
+               const allIds = [
+                 ...LIFE_AREAS.map(a => a.id),
+                 ..."1,2,3,4,5,6,7,8,9,10,11,12".split(',')
+               ];
+               setUnlockedItems(allIds);
+               if (targetLockedArea?.type === 'foco') {
+                 setHoveredArea(id);
+               }
+             }
           }
         }}
         targetArea={targetLockedArea} 

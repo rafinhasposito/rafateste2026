@@ -22,11 +22,12 @@ import StarryBackground from "@/components/StarryBackground";
 
 import HouseCard from "@/components/HouseCard";
 import HouseDetail from "@/components/HouseDetail";
-import DestinyResults from "@/pages/AppleResultPreview";
+import DestinyResults from "@/pages/AppleResultPreviewV3";
 import ConfirmCreditAction from "@/components/ConfirmCreditAction";
 import PageLoader from "@/components/PageLoader";
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast, houseColors } from "@/data/houses";
@@ -137,6 +138,10 @@ const Dashboard = () => {
   const [autoUnlockDone, setAutoUnlockDone] = useState(false);
   const [pendingUnlock, setPendingUnlock] = useState<number | null>(null);
 
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [consultationId]);
 
   useEffect(() => {
     if (!user) return;
@@ -290,6 +295,72 @@ const Dashboard = () => {
     }
   }
 
+  // Se existe uma casa selecionada, o componente V3 (DestinyResults) assume 100% da tela.
+  if (selectedHouse) {
+    const house = cityDatabase[selectedHouse];
+    const result = getHouseResult(selectedHouse);
+    if (house && result) {
+      const toArr = (v: any): CityOption[] => {
+        if (!v) return [];
+        if (Array.isArray(v)) return v.filter(Boolean);
+        return [v];
+      };
+      const htArr = toArr(result.options?.highticket);
+      const acArr = toArr(result.options?.acessivel);
+      const naArr = toArr(result.options?.nacional);
+      const masterCity = result.city || htArr[0] || acArr[0] || naArr[0] || null;
+      const seen = new Set<string>();
+      const dedup = (arr: CityOption[]): CityOption[] => arr.filter(c => {
+        if (!c) return false;
+        const k = `${c.city}|${c.country}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      if (masterCity) seen.add(`${masterCity.city}|${masterCity.country}`);
+      const highticket: CityOption[] = masterCity ? [masterCity, ...dedup(htArr)] : dedup(htArr);
+      const acessivel: CityOption[] = dedup(acArr);
+      const nacional: CityOption[] = dedup(naArr);
+
+      return (
+        <>
+          <DestinyResults
+            house={selectedHouse}
+            houseName={house.label}
+            houseData={house}
+            cities={{ highticket, acessivel, nacional }}
+            allResults={consultation.result?.results}
+            userCredits={credits}
+            isAuthenticated={!!user}
+            consultationId={consultation.id}
+            autoUnlocked={true}
+            onUnlock={(n) => handleUnlock(n)}
+            embedded={false}
+            isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
+            onSelectHouse={(h) => setSelectedHouse(h)}
+            mode={currentMode}
+            unlockedCount={consultation.houses_unlocked}
+          />
+          <ConfirmCreditAction
+            open={pendingUnlock !== null}
+            onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}
+            onConfirm={() => {
+              const n = pendingUnlock;
+              setPendingUnlock(null);
+              if (n) handleUnlock(n);
+            }}
+            title={pendingUnlock ? `Desbloquear Casa ${pendingUnlock}` : ""}
+            description={pendingUnlock ? `Você está prestes a desbloquear a Casa ${pendingUnlock} desta consulta.` : undefined}
+            credits={1}
+            currentBalance={credits}
+            confirmLabel="Desbloquear agora"
+            loading={unlocking}
+          />
+        </>
+      );
+    }
+  }
+
   return (
     <>
       <StarryBackground />
@@ -395,87 +466,7 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* Selected House Detail — unified DestinyResults layout */}
-        <AnimatePresence>
-          {selectedHouse && (() => {
-            const house = cityDatabase[selectedHouse];
-            const result = getHouseResult(selectedHouse);
-            if (!house) return null;
-            if (!result) {
-              return (
-                <HouseDetail
-                  house={house}
-                  result={result}
-                  mode={currentMode}
-                  isGoal={goalHouse === selectedHouse}
-                  originCity={consultation.origin}
-                  onClose={() => setSelectedHouse(null)}
-                  searchPath={inferSearchType(consultation).label}
-                />
-              );
-            }
-            // Convert single-option HouseResult → DestinyResults arrays.
-            // API may return arrays OR single objects for options — handle both.
-            const toArr = (v: any): CityOption[] => {
-              if (!v) return [];
-              if (Array.isArray(v)) return v.filter(Boolean);
-              return [v];
-            };
-            const htArr = toArr(result.options?.highticket);
-            const acArr = toArr(result.options?.acessivel);
-            const naArr = toArr(result.options?.nacional);
-            // master city: prefer result.city, fallback to first of any tier
-            const masterCity = result.city || htArr[0] || acArr[0] || naArr[0] || null;
-            const seen = new Set<string>();
-            const dedup = (arr: CityOption[]): CityOption[] => {
-              return arr.filter(c => {
-                if (!c) return false;
-                const k = `${c.city}|${c.country}`;
-                if (seen.has(k)) return false;
-                seen.add(k);
-                return true;
-              });
-            };
-            if (masterCity) seen.add(`${masterCity.city}|${masterCity.country}`);
-            const highticket: CityOption[] = masterCity ? [masterCity, ...dedup(htArr)] : dedup(htArr);
-            const acessivel: CityOption[] = dedup(acArr);
-            const nacional: CityOption[] = dedup(naArr);
-            if (highticket.length === 0 && acessivel.length === 0 && nacional.length === 0) {
-              // No city data — show a fallback instead of black screen
-              return (
-                <HouseDetail
-                  house={house}
-                  result={result}
-                  mode={currentMode}
-                  isGoal={goalHouse === selectedHouse}
-                  originCity={consultation.origin}
-                  onClose={() => setSelectedHouse(null)}
-                />
-              );
-            }
-            return (
-              <div key={selectedHouse} className="mb-12">
-                <DestinyResults
-                  house={selectedHouse}
-                  houseName={house.label}
-                  houseData={house}
-                  cities={{ highticket, acessivel, nacional }}
-                  allResults={consultation.result?.results}
-                  userCredits={credits}
-                  isAuthenticated={!!user}
-                  consultationId={consultation.id}
-                  autoUnlocked={true}
-                  onUnlock={(n) => setPendingUnlock(n)}
-                  embedded={false} // Use the sleek compact grid from DestinyResults!
-                  isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
-                  onSelectHouse={(h) => setSelectedHouse(h)}
-                  mode={currentMode}
-                  unlockedCount={consultation.houses_unlocked}
-                />
-              </div>
-            );
-          })()}
-        </AnimatePresence>
+        
 
 
       </div>
