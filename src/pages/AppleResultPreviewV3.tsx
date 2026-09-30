@@ -507,7 +507,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       ...cityData,
       city: cityData.city || cityData.name || "Destino",
       score: cityData.score || (fallbackName === 'Nacional' ? 96 : fallbackName === 'Acessível' ? 94 : 98),
-      img: cityData.img || getAtmosphericFallback(P_DYNAMIC.house)
+      img: (cityData.img && cityData.img.startsWith('http')) ? cityData.img : getAtmosphericFallback(P_DYNAMIC.house)
     };
   };
 
@@ -1832,9 +1832,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         onClose={() => setIsPaywallOpen(false)} 
         onSuccess={(id, purchaseType) => {
           if (props.onUnlock && targetLockedArea?.houseNum) {
-             // In production Dashboard mode, we call the real backend unlock
-             // (We only support single route unlocks via this API in V1)
-             props.onUnlock(targetLockedArea.houseNum);
+             // Se purchaseType for 'full', passamos 0 como flag de Unlock All
+             props.onUnlock(purchaseType === 'full' ? 0 : targetLockedArea.houseNum);
              window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
              // Sandbox / Preview mode behavior
