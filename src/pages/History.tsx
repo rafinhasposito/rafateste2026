@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Fingerprint, MapPin, Search } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Fingerprint, MapPin, Search, Compass, Scroll, Crown } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 
 interface ConsultationRow {
@@ -113,7 +113,18 @@ export default function History() {
               const modeLabel = c.mode?.toLowerCase() || "futuro";
               const hasIntent = !!c.intent;
               const hasHouse = c.goal !== null && c.goal !== undefined;
+              const hasOrigin = !!c.origin;
               const shortId = c.id.substring(0, 8);
+              
+              let MethodIcon = Crown;
+              let methodLabel = "BUSCA: POR CASA";
+              if (hasOrigin) {
+                MethodIcon = Compass;
+                methodLabel = "BUSCA: POR CIDADE";
+              } else if (hasIntent) {
+                MethodIcon = Scroll;
+                methodLabel = "BUSCA: POR INTENÇÃO";
+              }
               
               return (
                 <motion.div
@@ -127,9 +138,15 @@ export default function History() {
                   
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className={`text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${getModeStyles(modeLabel)}`}>
-                        Tempo: {modeLabel.toUpperCase()}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${getModeStyles(modeLabel)}`}>
+                          Tempo: {modeLabel.toUpperCase()}
+                        </span>
+                        <span className="px-3 py-1 border border-white/10 text-white/40 text-[9px] uppercase tracking-widest rounded-full flex items-center gap-1.5 font-bold">
+                          <MethodIcon className="w-3 h-3" />
+                          {methodLabel}
+                        </span>
+                      </div>
                       
                       <div className="flex items-center gap-2 text-ps-muted text-[10px] uppercase tracking-widest">
                         <CheckCircle2 className="w-3 h-3" />
