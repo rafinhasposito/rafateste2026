@@ -91,8 +91,8 @@ export default function History() {
       case "futuro":
       default:
         return {
-          border: "hover:border-ps-gold/30",
-          glow: "bg-ps-gold/5 group-hover:bg-ps-gold/10"
+          border: "hover:border-[#C9A227]/30",
+          glow: "bg-[#C9A227]/5 group-hover:bg-[#C9A227]/10"
         };
     }
   };
@@ -204,8 +204,8 @@ export default function History() {
                                  <span className="text-[#C9A227] font-bold">📍 Origem:</span> {c.origin} • Destino: Casa {c.goal} <span className="text-white/40 ml-1">(Foco: {displayIntent})</span>
                                </p>
                                {houseData?.tag && (
-                                 <p className="text-ps-gold/60 text-[9px] uppercase tracking-widest flex items-center gap-1.5">
-                                   <div className="w-1 h-1 rounded-full bg-ps-gold/40"></div>
+                                 <p className="text-[#C9A227]/60 text-[9px] uppercase tracking-widest flex items-center gap-1.5">
+                                   <span className="w-1 h-1 rounded-full bg-[#C9A227]/40 inline-block"></span>
                                    O TEMA DA CASA {c.goal}: {houseData.tag}
                                  </p>
                                )}
@@ -218,8 +218,8 @@ export default function History() {
                                  <span className="text-[#C9A227] font-bold">🎯 Foco:</span> {displayIntent} • Casa {c.goal}
                                </p>
                                {houseData?.tag && (
-                                 <p className="text-ps-gold/60 text-[9px] uppercase tracking-widest flex items-center gap-1.5">
-                                   <div className="w-1 h-1 rounded-full bg-ps-gold/40"></div>
+                                 <p className="text-[#C9A227]/60 text-[9px] uppercase tracking-widest flex items-center gap-1.5">
+                                   <span className="w-1 h-1 rounded-full bg-[#C9A227]/40 inline-block"></span>
                                    O TEMA DA CASA {c.goal}: {houseData.tag}
                                  </p>
                                )}
