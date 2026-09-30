@@ -124,14 +124,12 @@ export default function History() {
               const hasOrigin = !!c.origin;
               const shortId = c.id.substring(0, 8);
               
+              // A Lógica da Badge de Topo (Método de Busca)
               let MethodIcon = Crown;
               let methodLabel = "BUSCA: POR CASA";
               if (hasOrigin) {
                 MethodIcon = Compass;
                 methodLabel = "BUSCA: POR CIDADE";
-              } else if (hasIntent) {
-                MethodIcon = Scroll;
-                methodLabel = "BUSCA: POR INTENÇÃO";
               }
               
               return (
@@ -170,41 +168,24 @@ export default function History() {
                       {c.name || "Dossiê Desconhecido"}
                     </h3>
 
-                    {/* Foco/Intenção Real / Origem */}
+                    {/* Renderização de Foco e Origem */}
                     <div className="mb-6 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
                       {(() => {
-                         const displayIntent = c.intent ? (intentMap[c.intent.toLowerCase()] || c.intent) : null;
+                         const displayIntent = c.intent ? (intentMap[c.intent.toLowerCase()] || c.intent) : "Análise Geral";
                          
-                         if (hasOrigin && hasHouse) {
+                         if (hasOrigin) {
                            return (
-                             <p className="font-ps-ui text-sm text-ps-text">
-                               <span className="text-ps-gold font-bold">📍 Origem:</span> {c.origin} • Destino: Casa {c.goal}
+                             <p className="font-ps-ui text-sm text-white/90">
+                               <span className="text-[#C9A227] font-bold">📍 Origem:</span> {c.origin} • Destino: Casa {c.goal} <span className="text-white/40 ml-1">(Foco: {displayIntent})</span>
                              </p>
                            );
-                         } else if (hasIntent && hasHouse) {
+                         } else {
                            return (
-                             <p className="font-ps-ui text-sm text-ps-text">
-                               <span className="text-ps-gold font-bold">🎯 Intenção:</span> {displayIntent} • Casa {c.goal}
-                             </p>
-                           );
-                         } else if (hasIntent) {
-                           return (
-                             <p className="font-ps-ui text-sm text-ps-text">
-                               <span className="text-ps-gold font-bold">🎯 Foco:</span> {displayIntent}
-                             </p>
-                           );
-                         } else if (hasHouse) {
-                           return (
-                             <p className="font-ps-ui text-sm text-ps-text">
-                               <span className="text-ps-gold font-bold">🎯 Foco:</span> Casa {c.goal}
+                             <p className="font-ps-ui text-sm text-white/90">
+                               <span className="text-[#C9A227] font-bold">🎯 Foco:</span> {displayIntent} • Casa {c.goal}
                              </p>
                            );
                          }
-                         return (
-                           <p className="font-ps-ui text-sm text-ps-muted">
-                             <Search className="inline w-3 h-3 mr-1" /> Análise Completa
-                           </p>
-                         );
                       })()}
                     </div>
 
