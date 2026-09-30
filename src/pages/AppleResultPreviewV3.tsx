@@ -93,7 +93,7 @@ const FAVORECER = [
 
 const LIFE_AREAS = [
   { 
-    id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#10b981", score: 98, unlocked: true, 
+    id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#10b981", score: 98, 
     teaser: "O magnetismo deste destino destrava a sua capacidade de atrair e materializar recursos.", 
     city: "Tóquio, Japão",
     cityDesc: "Uma metrópole onde a eficiência cirúrgica encontra o caos vibrante. Tóquio pulsa com uma energia de disciplina e hiperprodutividade, criando o terreno magnético exato para quem precisa transformar metas dispersas em lucro previsível.",
@@ -376,7 +376,10 @@ export interface DestinyResultsProps {
 
 export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   React.useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    const timer = setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, 100);
+    return () => clearTimeout(timer);
   }, [props.house]);
 
   const { houseId } = useParams();
@@ -610,9 +613,11 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       return { ...area, score: finalScore };
     }
     
+    const isIntended = (area.id === intendedAreaId);
     return {
       ...area,
       score: finalScore,
+      unlocked: isIntended ? true : (area.unlocked || false),
       teaser: focusData.headline || area.teaser,
       full: focusData.headline || area.teaser,
       mantra: focusData.mantra || area.mantra,
@@ -748,7 +753,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       Casa {P_DYNAMIC.house}
                     </span>
                     <span className="font-ps-display text-5xl md:text-7xl lg:text-[80px] text-transparent bg-clip-text bg-gradient-to-r from-[var(--hc)] to-white/50 leading-[1] tracking-tight">
-                      Foco em {currentActiveData?.label?.split(" ")[0] || P.intention}
+                      Foco em {currentActiveData?.label?.split(" ")[0] }
                     </span>
                   </h3>
 
