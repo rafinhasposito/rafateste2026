@@ -285,51 +285,122 @@ const LIFE_AREAS = [
   }
 ];
 
-export default function AppleResultPreviewV3() {
+// Apple Highlight Text Component
+const AppleHighlightText = ({ text, activeColor, gradientParent = false }: { text: string, activeColor: string, gradientParent?: boolean }) => {
+  if (!text) return null;
+  const keywords = [
+    "valor real do seu tempo", "talentos", "dar desconto por vergonha",
+    "pé no chão", "juízo com cada centavo", "reajuste de preços", "viver com tranquilidade", "reservas",
+    "terreno firme", "base sólida",
+    "colocar você em primeiro lugar", "coragem", "liderar um novo começo",
+    "destravar a sua voz", "fechar novos negócios", "contatos úteis",
+    "porto seguro de paz interior", "sossego", "recarregar as energias", "paz mental",
+    "talentos autorais no centro do palco", "alegria de viver", "amor, tesão e personalidade",
+    "vida fit em dia", "render sem estresse", "corpo forte", "mente calma",
+    "parcerias de peso", "compromissos sérios", "negociar com maturidade",
+    "desapego", "renascimento", "grandes investimentos", "virar a página", "poder pessoal",
+    "salto gigante", "liberdade", "sem medo do tamanho dos seus sonhos",
+    "modo CEO ligado", "holofotes na sua autoridade", "sucesso", "postura de líder",
+    "amigos que abrem portas", "network", "mídias digitais",
+    "santuário de paz", "intuição afiada", "trabalho profundo de bastidores", "descanso reparador",
+    "Sintonize a intenção", "ação física", "Ancore na cidade"
+  ];
+  
+  const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
+  const parts = text.split(regex);
+  
+  return (
+    <>
+      {parts.map((part, i) => {
+        const isMatch = keywords.some(k => k.toLowerCase() === part.toLowerCase());
+        if (isMatch) {
+          return (
+            <span 
+              key={i} 
+              style={gradientParent ? { color: activeColor, WebkitTextFillColor: activeColor } : { color: activeColor }} 
+              className="font-normal opacity-100 drop-shadow-md"
+            >
+              {part}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+};
+
+export interface CityOption {
+  city: string;
+  country: string;
+  continent: string;
+  display_name: string;
+  lat: number;
+  lon: number;
+  img?: string;
+  score?: number;
+}
+
+export interface HouseResult {
+  city?: CityOption;
+  options?: {
+    nacional: CityOption | null;
+    acessivel: CityOption | null;
+    highticket: CityOption | null;
+  };
+}
+
+export interface DestinyResultsProps {
+  house?: number | null;
+  houseName?: string;
+  houseData?: any;
+  cities?: {
+    highticket: CityOption[];
+    acessivel: CityOption[];
+    nacional: CityOption[];
+  };
+  allResults?: Record<string, HouseResult> | undefined;
+  userCredits?: number;
+  isAuthenticated?: boolean;
+  consultationId?: string;
+  autoUnlocked?: boolean;
+  onUnlock?: (n: number) => void;
+  embedded?: boolean;
+  isHouseUnlocked?: (h: number) => boolean;
+  onSelectHouse?: (h: number) => void;
+  mode?: string;
+  unlockedCount?: number;
+}
+
+export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const { houseId } = useParams();
   const parsedId = houseId ? parseInt(houseId) : 2;
-  const urlHouseIndex = (parsedId >= 1 && parsedId <= 12) ? parsedId : 2;
+  const urlHouseIndex = props.house || ((parsedId >= 1 && parsedId <= 12) ? parsedId : 2);
 
-  
-
-  
-  const ROUTES_MOCK_DATA = [
-    { house: 1, city: "Nova York, EUA", coords: "40.71° N, 74.01° W", img: "1496442226666-8d4d0e62e6e9" },
-    { house: 2, city: "Tóquio, Japão", coords: "35.68° N, 139.69° E", img: "1498036882173-b41c28a8ba34" },
-    { house: 3, city: "Dubai, EAU", coords: "25.20° N, 55.27° E", img: "1459787915554-b34915863013" },
-    { house: 4, city: "Buenos Aires, ARG", coords: "34.60° S, 58.38° W", img: "1495317823589-e67efe1524b0" },
-    { house: 5, city: "Santiago, Chile", coords: "33.45° S, 70.67° W", img: "1689850543263-01a52ccc6943" },
-    { house: 6, city: "Florianópolis, BRA", coords: "27.59° S, 48.55° W", img: "1565574337618-b08146e94992" },
-    { house: 7, city: "São Paulo, SP", coords: "23.55° S, 46.63° W", img: "1470160710819-b3bd5ec85c66" },
-    { house: 8, city: "Los Angeles, EUA", coords: "34.05° N, 118.24° W", img: "1444723121867-7a241cacace9" },
-    { house: 9, city: "Paris, França", coords: "48.85° N, 2.35° E", img: "1431274172761-fca41d930114" },
-    { house: 10, city: "Roma, Itália", coords: "41.90° N, 12.49° E", img: "1491566102020-21838225c3c8" },
-    { house: 11, city: "Londres, UK", coords: "51.50° N, 0.12° W", img: "1448906654166-444d494666b3" },
-    { house: 12, city: "Bali, Indonésia", coords: "8.40° S, 115.18° E", img: "1501179691627-eeaa65ea017c" }
-  ];
-
-  const currentHouseMap = ROUTES_MOCK_DATA.find(r => r.house === urlHouseIndex) || ROUTES_MOCK_DATA[1];
+  const bestCity = props.cities?.highticket?.[0] || props.cities?.acessivel?.[0] || props.cities?.nacional?.[0];
+  const cityStr = bestCity ? `${bestCity.city}, ${bestCity.country}` : "Nova York, EUA";
 
   const P_DYNAMIC = {
     ...P,
     house: urlHouseIndex,
-    city: currentHouseMap.city,
-    coords: currentHouseMap.coords
+    houseLabel: props.houseName || "Casa",
+    city: cityStr,
+    coords: bestCity ? `${bestCity.lat?.toFixed(2)}°, ${bestCity.lon?.toFixed(2)}°` : "40.71° N, 74.01° W"
   };
   
-  const getHeroVideo = (houseId: number) => {
-    const vids: Record<number, string> = {
-      1: "/assets/ny.mp4",
-      2: "/assets/cities/tokyo.mp4",
-      3: "/assets/cities/dubai.mp4",
-      9: "/assets/cities/paris.mp4",
-      10: "/assets/cities/roma.mov",
-      11: "/assets/cities/london.mp4",
-      12: "/assets/cities/bali.mp4"
-    };
-    return vids[houseId] || "/assets/particles.mp4";
+  const getHeroVideo = (cityName: string) => {
+    if (!cityName) return "/assets/particles.mp4";
+    const norm = cityName.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    if (norm.includes("nova york") || norm.includes("new york")) return "/assets/ny.mp4";
+    if (norm.includes("toquio") || norm.includes("tokyo")) return "/assets/cities/tokyo.mp4";
+    if (norm.includes("dubai")) return "/assets/cities/dubai.mp4";
+    if (norm.includes("paris")) return "/assets/cities/paris.mp4";
+    if (norm.includes("roma") || norm.includes("rome")) return "/assets/cities/roma.mov";
+    if (norm.includes("londres") || norm.includes("london")) return "/assets/cities/london.mp4";
+    if (norm.includes("bali")) return "/assets/cities/bali.mp4";
+    return "/assets/particles.mp4"; 
   };
-  const heroVideoSrc = getHeroVideo(P_DYNAMIC.house);
+  const heroVideoSrc = getHeroVideo(P_DYNAMIC.city);
   const heroCountry = P_DYNAMIC.city.split(', ')[1] || "Destino";
 
   const heroRef = useRef<HTMLDivElement>(null);
@@ -348,20 +419,53 @@ export default function AppleResultPreviewV3() {
   const [openArea, setOpenArea] = useState<string>("dinheiro");
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [targetLockedArea, setTargetLockedArea] = useState<{ id: string; label: string; color: string; type: 'foco' | 'rota' } | null>(null);
-  const citiesObj = {
-    nacional: [
-      { city: "São Paulo, SP", country: "Brasil", score: 96, lat: -23.55, lon: -46.63, img: "https://images.unsplash.com/photo-1470160710819-b3bd5ec85c66?auto=format&fit=crop&w=1000&q=80" },
-      { city: "Florianópolis", country: "Brasil", score: 93, lat: -27.59, lon: -48.55, img: "https://images.unsplash.com/photo-1565574337618-b08146e94992?auto=format&fit=crop&w=1000&q=80" }
-    ],
-    acessivel: [
-      { city: "Santiago", country: "Chile", score: 94, lat: -33.45, lon: -70.67, img: "https://images.unsplash.com/photo-1689850543263-01a52ccc6943?auto=format&fit=crop&w=1000&q=80" },
-      { city: "Buenos Aires", country: "Argentina", score: 92, lat: -34.60, lon: -58.38, img: "https://images.unsplash.com/photo-1495317823589-e67efe1524b0?auto=format&fit=crop&w=1000&q=80" }
-    ],
-    highticket: [
-      { city: "Dubai", country: "Emirados Árabes", score: 98, lat: 25.20, lon: 55.27, img: "https://images.unsplash.com/photo-1459787915554-b34915863013?auto=format&fit=crop&w=1000&q=80" },
-      { city: "Tóquio", country: "Japão", score: 97, lat: 35.68, lon: 139.69, img: "https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?auto=format&fit=crop&w=1000&q=80" }
-    ]
+  // Fallbacks genéricos e atmosféricos baseados no luxo e não em cidades específicas
+  const getAtmosphericFallback = (house: number) => {
+    const fallbacks: Record<number, string> = {
+      1: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&w=1000&q=80",
+      2: "https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&w=1000&q=80",
+      3: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1000&q=80",
+      4: "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1000&q=80",
+      5: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80",
+      6: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d4?auto=format&fit=crop&w=1000&q=80",
+      7: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1000&q=80",
+      8: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+      9: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1000&q=80",
+      10: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
+      11: "https://images.unsplash.com/photo-1511649475669-e288648b2339?auto=format&fit=crop&w=1000&q=80",
+      12: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=1000&q=80"
+    };
+    return fallbacks[house] || fallbacks[2];
   };
+
+  // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual (P_DYNAMIC.house)
+  const currentHouseResult = props.allResults ? props.allResults[P_DYNAMIC.house.toString()] : null;
+  
+  const extractRoute = (tierData: any, fallbackName: string) => {
+    if (!tierData) return null;
+    return {
+      ...tierData,
+      score: tierData.score || (fallbackName === 'Nacional' ? 96 : fallbackName === 'Acessível' ? 94 : 98),
+      img: tierData.img || getAtmosphericFallback(P_DYNAMIC.house)
+    };
+  };
+
+  const htRoute = extractRoute(currentHouseResult?.options?.highticket, 'High-Ticket');
+  const acRoute = extractRoute(currentHouseResult?.options?.acessivel, 'Acessível');
+  const naRoute = extractRoute(currentHouseResult?.options?.nacional, 'Nacional');
+
+  // Somente usa o props.cities genérico se currentHouseResult não existir E estivermos na mesma casa inicial
+  const isInitialHouse = !props.allResults || (props.consultationId && P_DYNAMIC.house === props.house);
+  const fallbackNa = isInitialHouse ? props.cities?.nacional : [];
+  const fallbackAc = isInitialHouse ? props.cities?.acessivel : [];
+  const fallbackHt = isInitialHouse ? props.cities?.highticket : [];
+  
+  const citiesObj = {
+    nacional: naRoute ? [naRoute] : fallbackNa || [],
+    acessivel: acRoute ? [acRoute] : fallbackAc || [],
+    highticket: htRoute ? [htRoute] : fallbackHt || []
+  };
+
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
   const [isPanelHovered, setIsPanelHovered] = useState(false);
@@ -374,8 +478,20 @@ export default function AppleResultPreviewV3() {
   const houseBaseData = (BASE_HOUSE_PROFILES as any)[baseHouseId];
 
   
-  const houseFixedData = currentHouseMap;
-  const houseFixedImageUrl = `https://images.unsplash.com/photo-${houseFixedData.img}?auto=format&fit=crop&w=2000&q=80`;
+  const getHouseImageUrl = (cityName: string, houseId: number, apiImg?: string) => {
+    if (apiImg) return apiImg;
+    const norm = (cityName||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    if (norm.includes("nova york")) return "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("toquio")) return "https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("dubai")) return "https://images.unsplash.com/photo-1459787915554-b34915863013?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("paris")) return "https://images.unsplash.com/photo-1502602898657-3e907a5ea071?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("roma")) return "https://images.unsplash.com/photo-1516483638261-f40889eba30e?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("londres")) return "https://images.unsplash.com/photo-1513635269975-59693e2d8400?auto=format&fit=crop&w=2000&q=80";
+    if (norm.includes("bali")) return "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=2000&q=80";
+    
+    return getAtmosphericFallback(houseId);
+  };
+  const houseFixedImageUrl = getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img);
 
   const currentHouseProfiles = (FOCUS_MATRIX as any)[baseHouseId] || {};
 
@@ -500,7 +616,7 @@ export default function AppleResultPreviewV3() {
         
         <motion.h2
           style={{ scale: textScale, opacity: textOpacity, filter: textBlur }}
-          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#10b981] to-emerald-200 origin-center uppercase text-center"
+          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#10b981] to-emerald-200 origin-center uppercase text-center break-words whitespace-normal break-all sm:break-normal px-2"
         >
           {P_DYNAMIC.city.split(', ')[0]}
         </motion.h2>
@@ -531,10 +647,14 @@ export default function AppleResultPreviewV3() {
                     <span>Seu Resultado Personalizado</span>
                   </div>
                   
-                  <h3 className="text-3xl md:text-5xl font-ps-display font-bold text-center mb-4">Ativação da Casa {P_DYNAMIC.house} — Foco em <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-emerald-300">{P.intention}</span></h3>
-                  <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
-                    A Casa {P_DYNAMIC.house} carrega a vibração exata para impulsionar o seu objetivo no novo ciclo.
-                  </p>
+                  <h3 className="text-center mb-16 md:mb-20 flex flex-col items-center gap-2 md:gap-3">
+                    <span className="font-ps-display text-2xl md:text-3xl lg:text-4xl text-white/60 font-light tracking-wide">
+                      Casa {P_DYNAMIC.house}
+                    </span>
+                    <span className="font-ps-display text-5xl md:text-7xl lg:text-[80px] text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-emerald-300 leading-[1] tracking-tight">
+                      Foco em {P.intention}
+                    </span>
+                  </h3>
 
                   {/* ======================= PROTOCOLO SOLAR • CASA {P_DYNAMIC.house} (HIGH-END) ======================= */}
                   <div className="w-full max-w-4xl mx-auto mb-20">
@@ -711,15 +831,14 @@ export default function AppleResultPreviewV3() {
                 {sortedAreas.map((area) => {
                   const currentActive = hoveredArea || sortedAreas[0].id;
                   const isActive = currentActive === area.id;
-                  const isUnlockedLocally = area.unlocked || unlockedItems.includes(area.id);
+                  const isUnlockedLocally = props.isHouseUnlocked ? props.isHouseUnlocked(P_DYNAMIC.house) : (area.unlocked || unlockedItems.includes(area.id));
 
                   return (
                     <div
                       key={area.id}
                       onClick={() => {
                         if (!isUnlockedLocally) {
-                          setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco' });
-                          setIsPaywallOpen(true);
+                          if (props.onUnlock) { props.onUnlock(P_DYNAMIC.house); } else { setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco' }); setIsPaywallOpen(true); }
                         } else {
                           setHoveredArea(area.id);
                         }
@@ -757,7 +876,7 @@ export default function AppleResultPreviewV3() {
                 {sortedAreas.map((area) => {
                   const currentActive = hoveredArea || sortedAreas[0].id;
                   const isActive = currentActive === area.id;
-                  const isUnlockedLocally = area.unlocked || unlockedItems.includes(area.id);
+                  const isUnlockedLocally = props.isHouseUnlocked ? props.isHouseUnlocked(P_DYNAMIC.house) : (area.unlocked || unlockedItems.includes(area.id));
 
                   return (
                     <div key={area.id} className="flex flex-col">
@@ -765,8 +884,7 @@ export default function AppleResultPreviewV3() {
                       <button
                         onClick={() => {
                           if (!isUnlockedLocally) {
-                            setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco' });
-                            setIsPaywallOpen(true);
+                            if (props.onUnlock) { props.onUnlock(P_DYNAMIC.house); } else { setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco' }); setIsPaywallOpen(true); }
                           } else {
                             setHoveredArea(isActive ? null : area.id);
                           }
@@ -1092,6 +1210,13 @@ export default function AppleResultPreviewV3() {
                           return (
                             <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }}>
                               
+                              {/* O CABEÇALHO DO BLOCO */}
+                              <motion.div variants={itemVariants} className="w-full flex justify-center mb-8">
+                                <h3 className="font-sans text-[11px] md:text-sm tracking-[0.4em] uppercase font-bold" style={{ color: activeColor }}>
+                                  Ativação da Casa {P_DYNAMIC.house}
+                                </h3>
+                              </motion.div>
+
                               {/* 1. O HERO: Foto Panorâmica com Hierarquia Focada */}
                               <motion.div variants={itemVariants} className="w-full h-[50vh] min-h-[450px] md:h-[65vh] rounded-[40px] overflow-hidden relative shadow-2xl mb-12 border border-white/10 group">
                                   <motion.img 
@@ -1099,26 +1224,28 @@ export default function AppleResultPreviewV3() {
                                     whileInView={{ scale: 1 }}
                                     transition={{ duration: 2.5, ease: "easeOut" }}
                                     src={houseFixedImageUrl} 
-                                    alt={houseFixedData.city} 
+                                    alt={P_DYNAMIC.city} 
                                     className="w-full h-full object-cover object-center" 
                                   />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/40 to-transparent"></div>
+                                  <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/50 to-transparent"></div>
                                   
-                                  <div className="absolute bottom-12 left-8 md:bottom-16 md:left-16 z-10 flex flex-col">
+                                  <div className="absolute bottom-10 md:bottom-16 left-0 right-0 z-10 flex flex-col items-center text-center px-6">
                                     <motion.h1 
-                                      initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.8 }}
-                                      className="font-ps-display text-5xl md:text-8xl text-white mb-2 tracking-tight drop-shadow-2xl uppercase"
+                                      initial={{ opacity: 0, y: 30 }} 
+                                      whileInView={{ opacity: 1, y: 0 }} 
+                                      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                                      className="font-ps-display text-5xl md:text-8xl text-white mb-3 tracking-tight drop-shadow-2xl uppercase"
                                     >
-                                      {houseFixedData.city}
+                                      {P_DYNAMIC.city}
                                     </motion.h1>
-                                    <motion.div 
-                                      initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}
-                                      className="flex items-center gap-3 md:gap-4"
+                                    <motion.p 
+                                      initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }} 
+                                      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }} 
+                                      transition={{ delay: 0.3, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                                      className="font-ps-ui text-lg md:text-[24px] font-light tracking-wide drop-shadow-md text-white/90 max-w-3xl leading-[1.4]"
                                     >
-                                      <span className="font-ps-ui text-lg md:text-2xl italic font-light drop-shadow-md" style={{ color: activeColor }}>
-                                        Ativação da Casa {P_DYNAMIC.house}
-                                      </span>
-                                    </motion.div>
+                                      {quote}
+                                    </motion.p>
                                   </div>
                               </motion.div>
 
@@ -1135,14 +1262,27 @@ export default function AppleResultPreviewV3() {
                                        subtitle: "A vibração desse destino",
                                        icon: <MapPin className="w-8 h-8" />,
                                        content: (
-                                          <div className="flex flex-col gap-6 sm:gap-8 w-full min-w-[280px] max-w-[450px]">
-                                            <p className="font-ps-display text-white text-2xl sm:text-3xl lg:text-4xl leading-[1.2]">
-                                              "{quote}"
-                                            </p>
-                                            <div className="w-12 h-px bg-white/20"></div>
-                                            <div>
-                                              <span className="font-sans text-white/40 text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-3 block">Benefícios Reais</span>
-                                              <p className="font-ps-ui text-white/70 text-[15px] sm:text-[16px] leading-[1.7] font-light">{beneficios}</p>
+                                          <div className="flex flex-col h-full w-full min-w-0 max-w-[500px] justify-center relative">
+                                            {/* Marca d'água sutil para preencher o vazio sem poluir */}
+                                            <Sparkles className="absolute -bottom-4 -right-4 w-48 h-48 opacity-[0.03] pointer-events-none" style={{ color: activeColor }} />
+                                            
+                                            <div className="relative z-10 flex flex-col gap-6 md:gap-8">
+                                              <div>
+                                                <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-3 md:mb-4" style={{ color: activeColor }}>
+                                                  Benefício Central
+                                                </span>
+                                                <p className="font-ps-display text-white/95 text-[22px] sm:text-[26px] md:text-[28px] leading-[1.1] tracking-tight pr-4">
+                                                  <AppleHighlightText text={beneficios} activeColor={activeColor} />
+                                                </p>
+                                              </div>
+                                              
+                                              {/* Transferido do Card 2 - O Momento Ideal */}
+                                              <div className="pt-5 md:pt-6 border-t border-white/[0.04]">
+                                                <span className="font-sans text-[8px] uppercase tracking-[0.3em] font-bold text-white/30 block mb-2">O Momento Ideal</span>
+                                                <p className="font-ps-ui text-white/50 text-[13px] md:text-[14px] leading-relaxed font-light pr-4">
+                                                  <AppleHighlightText text={paraQuem} activeColor={activeColor} />
+                                                </p>
+                                              </div>
                                             </div>
                                           </div>
                                        )
@@ -1150,18 +1290,21 @@ export default function AppleResultPreviewV3() {
                                      {
                                        id: 1,
                                        title: "O Objetivo",
-                                       subtitle: "Perfil para este ciclo",
+                                       subtitle: "A dinâmica no dia a dia",
                                        icon: <Target className="w-8 h-8" />,
                                        content: (
-                                          <div className="flex flex-col gap-6 sm:gap-8 w-full min-w-[280px] max-w-[450px]">
-                                            <div>
-                                              <span className="font-sans text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-3 block" style={{ color: activeColor }}>O Perfil Central</span>
-                                              <p className="font-ps-ui text-white/90 text-[16px] sm:text-[18px] leading-[1.6]">{paraQuem}</p>
-                                            </div>
-                                            <div className="w-12 h-px bg-white/20"></div>
-                                            <div>
-                                              <span className="font-sans text-white/40 text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-3 block">Na Vida Real</span>
-                                              <p className="font-ps-ui text-white/70 text-[15px] sm:text-[16px] leading-[1.7] font-light">{houseBaseData?.realDynamics || "O cotidiano se alinha perfeitamente."}</p>
+                                          <div className="flex flex-col justify-center h-full w-full min-w-0 max-w-[500px]">
+                                            <div className="flex flex-col gap-5 md:gap-6 pr-2 md:pr-6">
+                                              {/* Badge estilo iOS */}
+                                              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] shadow-lg w-fit backdrop-blur-sm">
+                                                <Target className="w-3 h-3" style={{ color: activeColor }} />
+                                                <span className="font-sans text-[9px] uppercase tracking-[0.2em] font-bold" style={{ color: activeColor }}>Na Prática</span>
+                                              </div>
+                                              
+                                              {/* Texto Principal (Manchete Apple) */}
+                                              <p className="font-ps-display text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/40 text-[20px] md:text-[24px] leading-[1.2] tracking-tight pr-2">
+                                                <AppleHighlightText text={houseBaseData?.realDynamics || "O cotidiano se alinha perfeitamente com a energia do local."} activeColor={activeColor} gradientParent={true} />
+                                              </p>
                                             </div>
                                           </div>
                                        )
@@ -1172,18 +1315,18 @@ export default function AppleResultPreviewV3() {
                                        subtitle: "O Segredo do Ciclo",
                                        icon: <Sparkles className="w-8 h-8" />,
                                        content: (
-                                          <div className="flex flex-col gap-6 sm:gap-8 w-full min-w-[280px] max-w-[450px]">
+                                          <div className="flex flex-col gap-10 w-full min-w-0 max-w-[450px]">
                                             <div>
-                                              <span className="font-sans text-[9px] sm:text-[10px] tracking-[0.2em] uppercase block mb-3 text-white/40">Foco do Novo Ciclo</span>
+                                              <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-4 text-white/40">Foco do Novo Ciclo</span>
                                               <p className="font-ps-display text-white text-3xl sm:text-4xl leading-tight">
-                                                {currentActiveData.themeData || "Consolidação e Crescimento"}
+                                                <AppleHighlightText text={currentActiveData.themeData || "Consolidação e Crescimento"} activeColor={activeColor} />
                                               </p>
                                             </div>
-                                            <div className="w-12 h-px bg-white/20"></div>
+                                            
                                             <div>
-                                              <span className="font-sans text-[9px] sm:text-[10px] tracking-[0.2em] uppercase block mb-3" style={{ color: activeColor }}>A Chave Oculta</span>
-                                              <p className="font-ps-ui text-white/80 text-[15px] sm:text-[17px] leading-[1.6] font-light">
-                                                {currentActiveData.secretData || "A verdadeira prosperidade neste ciclo não virá do esforço exaustivo, mas do posicionamento estratégico."}
+                                              <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-3" style={{ color: activeColor }}>A Chave Oculta</span>
+                                              <p className="font-ps-ui text-white/80 text-[16px] leading-[1.6] font-light">
+                                                <AppleHighlightText text={currentActiveData.secretData || "A verdadeira prosperidade neste ciclo não virá do esforço exaustivo, mas do posicionamento estratégico."} activeColor={activeColor} />
                                               </p>
                                             </div>
                                           </div>
@@ -1195,19 +1338,31 @@ export default function AppleResultPreviewV3() {
                                        subtitle: "Ativação em 24h",
                                        icon: <Compass className="w-8 h-8" />,
                                        content: (
-                                          <div className="flex flex-col gap-5 sm:gap-8 w-full min-w-[280px] max-w-[450px] h-full">
-                                            <span className="font-sans text-[10px] sm:text-[11px] tracking-[0.2em] uppercase block" style={{ color: activeColor }}>O Passo a Passo</span>
-                                            <div className="flex flex-col gap-6 overflow-y-auto pr-2 custom-scrollbar max-h-[300px]">
+                                          <div className="flex flex-col w-full min-w-0 max-w-[500px] justify-center h-full">
+                                            <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-6 md:mb-10" style={{ color: activeColor }}>Guia de Ativação</span>
+                                            
+                                            {/* Apple Giant Numbers Layout */}
+                                            <div className="flex flex-col gap-6 md:gap-8">
                                                {[
                                                  currentActiveData.ritualData?.step1 || 'Sintonize a intenção.',
                                                  currentActiveData.ritualData?.step2 || 'Faça uma ação física.',
                                                  currentActiveData.ritualData?.step3 || 'Ancore na cidade.'
                                                ].map((step, idx) => (
-                                                 <div key={idx} className="flex items-start gap-4 sm:gap-5">
-                                                   <span className="font-ps-display text-3xl sm:text-4xl leading-none mt-1" style={{ color: `color-mix(in srgb, ${activeColor} 30%, transparent)` }}>
+                                                 <div key={idx} className="flex items-start gap-5 md:gap-6">
+                                                   <span 
+                                                     className="font-ps-display text-[40px] md:text-[56px] leading-[0.75] tracking-tighter opacity-90 flex-shrink-0 mt-1" 
+                                                     style={{ 
+                                                       color: activeColor, 
+                                                       textShadow: `0 4px 24px ${activeColor}50` 
+                                                     }}
+                                                   >
                                                      0{idx + 1}
                                                    </span>
-                                                   <p className="font-ps-ui text-white/80 text-[14px] sm:text-[15px] leading-relaxed font-light pt-1">{step}</p>
+                                                   <div className="pt-1">
+                                                     <p className="font-ps-ui text-white/90 text-[15px] md:text-[16px] leading-relaxed font-light pr-2">
+                                                       <AppleHighlightText text={step} activeColor={activeColor} />
+                                                     </p>
+                                                   </div>
                                                  </div>
                                                ))}
                                             </div>
@@ -1425,7 +1580,7 @@ export default function AppleResultPreviewV3() {
                         <p className="text-white/40 text-[10px] uppercase tracking-[0.2em]">{tier.desc}</p>
                       </div>
                     </div>
-                    {tier.data.map((city, i) => (
+                    {tier.data.length > 0 ? tier.data.map((city, i) => (
                       <div key={i} className="bg-black border rounded-[28px] overflow-hidden transition-all group relative h-56 flex flex-col justify-end p-6 cursor-pointer" style={{ borderColor: 'rgba(255,255,255,0.05)' }}
                         onMouseEnter={(e) => e.currentTarget.style.borderColor = currentActiveData?.color || '#10b981'}
                         onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'}
@@ -1448,7 +1603,13 @@ export default function AppleResultPreviewV3() {
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="bg-black/40 border border-white/5 rounded-[28px] h-56 flex flex-col items-center justify-center p-6 text-center">
+                         <MapPin className="w-6 h-6 text-white/20 mb-3" />
+                         <span className="font-sans text-xs uppercase tracking-widest text-white/40 font-bold mb-1">Rota Indisponível</span>
+                         <span className="text-white/20 text-[10px]">A API não retornou destino para este tier.</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1476,13 +1637,17 @@ export default function AppleResultPreviewV3() {
                   const isCurrent = num === P_DYNAMIC.house;
                   const dbData = cityDatabase[num as keyof typeof cityDatabase];
                   const label = dbData?.name?.split('—')[1]?.trim() || dbData?.label || "Área da Vida";
-                  const isUnlocked = isCurrent || unlockedItems.includes(num.toString());
+                  const isUnlocked = props.isHouseUnlocked ? props.isHouseUnlocked(num) : (isCurrent || unlockedItems.includes(num.toString()));
                   
-                  const MOCK_DATA = ROUTES_MOCK_DATA;
                   
-                  const mockData = MOCK_DATA[num - 1];
-                  const cityForThisHouse = isCurrent ? P_DYNAMIC.city.split(", ")[0] : (isUnlocked ? mockData.city.split(", ")[0] : "Bloqueado");
-                  const imageForThisHouse = `https://images.unsplash.com/photo-${mockData.img}?auto=format&fit=crop&w=800&q=80`;
+                  const resultForHouse = props.allResults && props.allResults[num.toString()];
+                  const fallbackCity = "Desconhecido";
+                  const mappedCityName = resultForHouse && resultForHouse.city ? resultForHouse.city.city : fallbackCity;
+                  
+                  const cityForThisHouse = isCurrent ? P_DYNAMIC.city.split(", ")[0] : (isUnlocked ? mappedCityName.split(", ")[0] : "Bloqueado");
+                  const imageForThisHouse = resultForHouse?.options?.highticket?.img 
+                    ? resultForHouse.options.highticket.img 
+                    : getAtmosphericFallback(num);
                   const areaColor = LIFE_AREAS[num - 1]?.color || currentActiveData?.color || '#10b981';
 
                   return (
@@ -1490,8 +1655,7 @@ export default function AppleResultPreviewV3() {
                       key={num}
                       onClick={() => {
                         if (!isUnlocked) {
-                          setTargetLockedArea({ label: label, color: areaColor, id: num.toString(), type: 'rota' });
-                          setIsPaywallOpen(true);
+                          if (props.onUnlock) { props.onUnlock(num); } else { setTargetLockedArea({ label: label, color: areaColor, id: num.toString(), type: 'rota' }); setIsPaywallOpen(true); }
                         }
                       }}
                       className={`relative rounded-[32px] border transition-all duration-500 ease-[0.19,1,0.22,1] overflow-hidden flex flex-col group h-[260px] ${
@@ -1507,7 +1671,7 @@ export default function AppleResultPreviewV3() {
                         <>
                           {/* FOTO TOP (Corte Seco) */}
                           <div className="relative h-[130px] w-full shrink-0 overflow-hidden bg-[#050505]">
-                            <img src={isCurrent ? currentActiveData.image : imageForThisHouse} alt={cityForThisHouse} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                            <img src={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} alt={cityForThisHouse} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                             {isCurrent && (
                               <div className="absolute inset-0 bg-white/5 mix-blend-overlay"></div>
                             )}
