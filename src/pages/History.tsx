@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Fingerprint, MapPin, Search, Compass, Scroll, Crown } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface ConsultationRow {
   id: string;
@@ -16,6 +17,18 @@ interface ConsultationRow {
   origin: string | null;
   houses_unlocked: number;
 }
+
+
+const intentMap: Record<string, string> = {
+  amor: "Amor e Relacionamento",
+  trabalho: "Trabalho e Carreira",
+  dinheiro: "Dinheiro e Recursos",
+  saude: "Saúde e Vitalidade",
+  networking: "Networking e Conexões",
+  rotina: "Rotina e Produtividade",
+  espiritual: "Espiritual e Propósito",
+  identidade: "Identidade e Imagem"
+};
 
 export default function History() {
   const { user } = useAuth();
@@ -78,12 +91,7 @@ export default function History() {
     <div className="min-h-screen bg-ps-void text-ps-text font-ps-ui selection:bg-ps-gold/30">
       <StarryBackground />
       <div className="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto relative z-10">
-        <button 
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-ps-muted hover:text-ps-text transition-colors mb-8 text-xs font-bold uppercase tracking-widest"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar ao Início
-        </button>
+<BackButton className="mb-8" label="Descobrir" to="/"/>
 
         <div className="mb-12">
           <h1 className="font-ps-display text-4xl md:text-5xl text-ps-champagne mb-4">Arquivo Confidencial</h1>
@@ -162,34 +170,45 @@ export default function History() {
                       {c.name || "Dossiê Desconhecido"}
                     </h3>
 
-                    {/* Foco/Intenção Real */}
+                    {/* Foco/Intenção Real / Origem */}
                     <div className="mb-6 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                      {hasIntent && hasHouse ? (
-                        <p className="font-ps-ui text-sm text-ps-text">
-                          <span className="text-ps-gold font-bold">🎯 Intenção:</span> {c.intent} • Casa {c.goal}
-                        </p>
-                      ) : hasIntent ? (
-                        <p className="font-ps-ui text-sm text-ps-text">
-                          <span className="text-ps-gold font-bold">🎯 Foco:</span> {c.intent}
-                        </p>
-                      ) : hasHouse ? (
-                        <p className="font-ps-ui text-sm text-ps-text">
-                          <span className="text-ps-gold font-bold">🎯 Foco:</span> Casa {c.goal}
-                        </p>
-                      ) : (
-                        <p className="font-ps-ui text-sm text-ps-muted">
-                          <Search className="inline w-3 h-3 mr-1" /> Análise Completa
-                        </p>
-                      )}
+                      {(() => {
+                         const displayIntent = c.intent ? (intentMap[c.intent.toLowerCase()] || c.intent) : null;
+                         
+                         if (hasOrigin && hasHouse) {
+                           return (
+                             <p className="font-ps-ui text-sm text-ps-text">
+                               <span className="text-ps-gold font-bold">📍 Origem:</span> {c.origin} • Destino: Casa {c.goal}
+                             </p>
+                           );
+                         } else if (hasIntent && hasHouse) {
+                           return (
+                             <p className="font-ps-ui text-sm text-ps-text">
+                               <span className="text-ps-gold font-bold">🎯 Intenção:</span> {displayIntent} • Casa {c.goal}
+                             </p>
+                           );
+                         } else if (hasIntent) {
+                           return (
+                             <p className="font-ps-ui text-sm text-ps-text">
+                               <span className="text-ps-gold font-bold">🎯 Foco:</span> {displayIntent}
+                             </p>
+                           );
+                         } else if (hasHouse) {
+                           return (
+                             <p className="font-ps-ui text-sm text-ps-text">
+                               <span className="text-ps-gold font-bold">🎯 Foco:</span> Casa {c.goal}
+                             </p>
+                           );
+                         }
+                         return (
+                           <p className="font-ps-ui text-sm text-ps-muted">
+                             <Search className="inline w-3 h-3 mr-1" /> Análise Completa
+                           </p>
+                         );
+                      })()}
                     </div>
 
                     <div className="space-y-3 mb-8">
-                      {c.origin && (
-                        <p className="flex items-center gap-3 text-ps-muted text-[11px] uppercase tracking-widest">
-                          <MapPin className="w-4 h-4 text-white/10" /> 
-                          Ponto de Partida: <span className="text-white/60 font-bold">{c.origin}</span>
-                        </p>
-                      )}
                       <p className="flex items-center gap-3 text-ps-muted text-[11px] uppercase tracking-widest">
                         <Calendar className="w-4 h-4 text-white/10" /> 
                         Data da Consulta: <span className="text-white/60">{formatDate(c.created_at)}</span>
