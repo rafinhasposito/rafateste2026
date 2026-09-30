@@ -1,8 +1,14 @@
+import { useParams } from "react-router-dom";
 import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { DesktopWebChrome } from "@/layouts/DesktopWebChrome";
 import { MobileAppChrome } from "@/layouts/MobileAppChrome";
 import { cityDatabase } from "@/data/houses";
+import { FOCUS_MATRIX } from "@/data/focusMatrix";
+import { DNA_MATRIX } from "@/data/dnaMatrix";
+import { prefixosSol, prefixosAscendente, prefixosFase } from "@/data/modifiers";
+import { BASE_HOUSE_PROFILES } from "@/data/baseHouseProfiles";
+import { REAL_HOUSES_DATA } from "@/data/houses_content";
 import UnlockPremiumModal from "@/components/UnlockPremiumModal";
 import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, ShieldAlert, Eye, Clock, Hourglass, BookOpen, Plane, QrCode, Fingerprint, Hash, CreditCard, Compass, Plus, Unlock } from "lucide-react";
 
@@ -37,8 +43,8 @@ const CountUp = ({ target, suffix = "" }: { target: number; suffix?: string }) =
    ══════════════════════════════════════════════════ */
 const P = {
   name: "Rafael Sposito", firstName: "Rafael", year: 2027, date: "09/08/2027", time: "05:30 (UTC)",
-  city: "Nova Iorque", coords: "40.71° N, 74.01° W", origin: "Surubim",
-  house: 2, houseLabel: "Recursos", houseTitle: "Dinheiro, Materialização e Valor",
+  origin: "Surubim",
+  // house and city are now dynamic
   houseTag: "Prosperidade Financeira & Segurança",
   match: 98, cost: 1, vector: "FUTURO", hash: "#CC59F4F6",
   sign: "Leão", ascendant: "Virgem", phase: "Adulto", intention: "Dinheiro",
@@ -97,7 +103,7 @@ const LIFE_AREAS = [
       fase: "A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real."
     },
     ritual: "Compre um item simbólico de alto valor (mesmo que pequeno) usando dinheiro físico. Este objeto será o seu amuleto. Durante a transação, afirme mentalmente que aquele é o último investimento do seu antigo ciclo de escassez.",
-    mantra: "Eu comando a minha autonomia. O dinheiro flui até mim não por sorte, mas como consequência inevitável da minha excelência.",
+    mantra: "Eu sei o valor do meu trabalho, cuido bem das minhas contas e faço meu dinheiro render.",
     pillars: [
       { icon: ArrowUpRight, title: "Aumento de Ganhos", text: "A energia favorece o faturamento e atrai novos clientes. O universo aqui não entrega por sorte, mas recompensa a sua coragem de faturar e expandir horizontes." },
       { icon: Crown, title: "Valorização do Trabalho", text: "A vibração do lugar convida à autoconfiança extrema. O cenário é perfeito para acabar com os descontos emocionais e cobrar o valor justo pelo seu talento." },
@@ -280,6 +286,52 @@ const LIFE_AREAS = [
 ];
 
 export default function AppleResultPreviewV3() {
+  const { houseId } = useParams();
+  const parsedId = houseId ? parseInt(houseId) : 2;
+  const urlHouseIndex = (parsedId >= 1 && parsedId <= 12) ? parsedId : 2;
+
+  
+
+  
+  const ROUTES_MOCK_DATA = [
+    { house: 1, city: "Nova York, EUA", coords: "40.71° N, 74.01° W", img: "1496442226666-8d4d0e62e6e9" },
+    { house: 2, city: "Tóquio, Japão", coords: "35.68° N, 139.69° E", img: "1498036882173-b41c28a8ba34" },
+    { house: 3, city: "Dubai, EAU", coords: "25.20° N, 55.27° E", img: "1459787915554-b34915863013" },
+    { house: 4, city: "Buenos Aires, ARG", coords: "34.60° S, 58.38° W", img: "1495317823589-e67efe1524b0" },
+    { house: 5, city: "Santiago, Chile", coords: "33.45° S, 70.67° W", img: "1689850543263-01a52ccc6943" },
+    { house: 6, city: "Florianópolis, BRA", coords: "27.59° S, 48.55° W", img: "1565574337618-b08146e94992" },
+    { house: 7, city: "São Paulo, SP", coords: "23.55° S, 46.63° W", img: "1470160710819-b3bd5ec85c66" },
+    { house: 8, city: "Los Angeles, EUA", coords: "34.05° N, 118.24° W", img: "1444723121867-7a241cacace9" },
+    { house: 9, city: "Paris, França", coords: "48.85° N, 2.35° E", img: "1431274172761-fca41d930114" },
+    { house: 10, city: "Roma, Itália", coords: "41.90° N, 12.49° E", img: "1491566102020-21838225c3c8" },
+    { house: 11, city: "Londres, UK", coords: "51.50° N, 0.12° W", img: "1448906654166-444d494666b3" },
+    { house: 12, city: "Bali, Indonésia", coords: "8.40° S, 115.18° E", img: "1501179691627-eeaa65ea017c" }
+  ];
+
+  const currentHouseMap = ROUTES_MOCK_DATA.find(r => r.house === urlHouseIndex) || ROUTES_MOCK_DATA[1];
+
+  const P_DYNAMIC = {
+    ...P,
+    house: urlHouseIndex,
+    city: currentHouseMap.city,
+    coords: currentHouseMap.coords
+  };
+  
+  const getHeroVideo = (houseId: number) => {
+    const vids: Record<number, string> = {
+      1: "/assets/ny.mp4",
+      2: "/assets/cities/tokyo.mp4",
+      3: "/assets/cities/dubai.mp4",
+      9: "/assets/cities/paris.mp4",
+      10: "/assets/cities/roma.mov",
+      11: "/assets/cities/london.mp4",
+      12: "/assets/cities/bali.mp4"
+    };
+    return vids[houseId] || "/assets/particles.mp4";
+  };
+  const heroVideoSrc = getHeroVideo(P_DYNAMIC.house);
+  const heroCountry = P_DYNAMIC.city.split(', ')[1] || "Destino";
+
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const vidScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
@@ -317,8 +369,71 @@ export default function AppleResultPreviewV3() {
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
   const [unlockedItems, setUnlockedItems] = useState<string[]>([]);
-  const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
-  const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
+  const [activeDossierCard, setActiveDossierCard] = useState<number | null>(0);
+  const baseHouseId = P_DYNAMIC.house as keyof typeof BASE_HOUSE_PROFILES;
+  const houseBaseData = (BASE_HOUSE_PROFILES as any)[baseHouseId];
+
+  
+  const houseFixedData = currentHouseMap;
+  const houseFixedImageUrl = `https://images.unsplash.com/photo-${houseFixedData.img}?auto=format&fit=crop&w=2000&q=80`;
+
+  const currentHouseProfiles = (FOCUS_MATRIX as any)[baseHouseId] || {};
+
+  const normalizeKey = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z]/g, "");
+  
+  const gerarDnaText = (sol: string, asc: string, fase: string, dnaOrig: { essencia: string, metodo: string, fase: string }) => {
+    if (!dnaOrig || !dnaOrig.essencia) return dnaOrig;
+    const solKey = normalizeKey(sol);
+    const ascKey = normalizeKey(asc);
+    const faseKey = normalizeKey(fase);
+    
+    const formatSuffix = (text: string) => text ? text.charAt(0).toLowerCase() + text.slice(1) : "";
+    
+    return {
+      essencia: `${prefixosSol[solKey] || "Na sua essência,"} ${formatSuffix(dnaOrig.essencia)}`,
+      metodo: `${prefixosAscendente[ascKey] || "Na sua atitude,"} ${formatSuffix(dnaOrig.metodo)}`,
+      fase: `${prefixosFase[faseKey] || "Nesta fase da vida,"} ${formatSuffix(dnaOrig.fase)}`
+    };
+  };
+
+  const mergedAreas = areas.map(area => {
+    const focusData = currentHouseProfiles[area.id];
+    
+    // As per user rule: The 96 combinations in focusMatrix.ts ARE the intended personalized experience!
+    // The photo and city are locked, but the Pillars, Timeline, and Ritual MUST adapt to the Focus.
+    
+    if (!focusData) return area;
+    
+    return {
+      ...area,
+      score: focusData.match || area.score,
+      teaser: focusData.headline || area.teaser,
+      full: focusData.headline || area.teaser,
+      mantra: focusData.mantra || area.mantra,
+      themeData: focusData.theme,
+      secretData: focusData.secret,
+      blindSpotData: focusData.blindSpot,
+      defenseProtocolData: focusData.defenseProtocol,
+      dnaData: gerarDnaText(P_DYNAMIC.sign, P_DYNAMIC.ascendant, P_DYNAMIC.phase, DNA_MATRIX[P_DYNAMIC.house]?.[area.id]) || area.dna,
+      pillars: focusData.pillars?.map((p: any, i: number) => ({
+        icon: area.pillars?.[i]?.icon || area.pillars?.[0]?.icon || Target,
+        title: p.title,
+        text: p.description
+      })) || area.pillars,
+      timeline: focusData.phases?.map((p: any, i: number) => ({
+        phase: p.title,
+        period: `Mês ${i * 4 + 1} a ${(i + 1) * 4}`,
+        text: p.description
+      })) || area.timeline,
+      ritualData: focusData.ritual || area.ritualData
+    };
+  });
+
+
+
+  const sortedAreas = [...mergedAreas].sort((a,b) => b.score - a.score);
+  const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id)) || sortedAreas[0];
+
   
   // DEBUG HELPER
   React.useEffect(() => {
@@ -358,14 +473,14 @@ export default function AppleResultPreviewV3() {
         {/* Vídeo em full brightness */}
         <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#03100B] z-10" />
-          <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-            <source src="/assets/ny.mp4" type="video/mp4" />
+          <video autoPlay muted loop playsInline className="w-full h-full object-cover" key={heroVideoSrc}>
+            <source src={heroVideoSrc} type="video/mp4" />
           </video>
         </motion.div>
         
         <div className="absolute top-20 md:top-24 right-6 md:right-10 z-20 flex items-center gap-2 text-white/50">
            <MapPin className="w-3.5 h-3.5" />
-           <span className="text-[10px] font-bold uppercase tracking-[0.3em]">EUA</span>
+           <span className="text-[10px] font-bold uppercase tracking-[0.3em]">{heroCountry}</span>
         </div>
 
         {/* Degradê na base para proteger a transição */}
@@ -379,7 +494,7 @@ export default function AppleResultPreviewV3() {
         <motion.div style={{ opacity: textOpacity }} className="mb-6">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/10 bg-white/5 backdrop-blur-xl rounded-full text-[10px] md:text-xs uppercase font-bold tracking-[0.3em] text-white/70">
             <span>✦</span>
-            <span>{P.firstName}, o seu próximo aniversário pode ser em...</span>
+            <span>{P_DYNAMIC.firstName}, o seu próximo aniversário pode ser em...</span>
           </div>
         </motion.div>
         
@@ -387,13 +502,12 @@ export default function AppleResultPreviewV3() {
           style={{ scale: textScale, opacity: textOpacity, filter: textBlur }}
           className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#10b981] to-emerald-200 origin-center uppercase text-center"
         >
-          {P.city}
+          {P_DYNAMIC.city.split(', ')[0]}
         </motion.h2>
 
         <motion.div style={{ opacity: textOpacity }} className="flex flex-col items-center max-w-4xl text-center px-4 mt-2">
            <p className="text-2xl md:text-3xl lg:text-4xl font-light text-white/90 leading-[1.4] md:leading-[1.3] tracking-tight">
-             O destino exato para{" "}
-             <span className="text-[#10b981] font-medium block mt-1 md:inline md:mt-0">{HOUSE_CINEMATIC_TEXTS[P.house]}</span>
+             {currentActiveData.teaser}
            </p>
         </motion.div>
 
@@ -417,12 +531,12 @@ export default function AppleResultPreviewV3() {
                     <span>Seu Resultado Personalizado</span>
                   </div>
                   
-                  <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O foco é <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-emerald-300">{P.intention}</span>.</h3>
+                  <h3 className="text-3xl md:text-5xl font-ps-display font-bold text-center mb-4">Ativação da Casa {P_DYNAMIC.house} — Foco em <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-emerald-300">{P.intention}</span></h3>
                   <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
-                    A Casa {P.house} foi calculada sob medida para ser a chave exata que destrava o seu objetivo no novo ciclo.
+                    A Casa {P_DYNAMIC.house} carrega a vibração exata para impulsionar o seu objetivo no novo ciclo.
                   </p>
 
-                  {/* ======================= BOARDING PASS SOLAR (HIGH-END) ======================= */}
+                  {/* ======================= PROTOCOLO SOLAR • CASA {P_DYNAMIC.house} (HIGH-END) ======================= */}
                   <div className="w-full max-w-4xl mx-auto mb-20">
                      <div className="bg-black/40 border border-[#10b981]/30 rounded-[32px] overflow-hidden shadow-[0_30px_80px_rgba(16,185,129,0.15)] backdrop-blur-xl flex flex-col">
                        {/* Header */}
@@ -432,12 +546,12 @@ export default function AppleResultPreviewV3() {
                        >
                          <div className="flex items-center gap-3">
                            <Plane className="w-5 h-5 text-[#10b981]" />
-                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-[#10b981] text-sm">Boarding Pass Solar</span>
+                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-[#10b981] text-sm">Protocolo Solar • Casa {P_DYNAMIC.house}</span>
                          </div>
                          <div className="flex items-center gap-4 md:gap-6">
                            <div className="flex items-center gap-3 hidden md:flex">
                              <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_10px_#10b981]"></div>
-                             <span className="text-[#10b981]/90 font-sans text-xs tracking-widest">{P.hash} • ATIVO</span>
+                             <span className="text-[#10b981]/90 font-sans text-xs tracking-widest">{P_DYNAMIC.hash} • ATIVO</span>
                            </div>
                            
                            {!isBoardingPassOpen && (
@@ -464,11 +578,11 @@ export default function AppleResultPreviewV3() {
                            >
                              <div className="px-8 py-5 flex items-center justify-between gap-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                                <div className="flex items-center gap-4 text-sm w-full">
-                                  <span className="text-white/90 font-medium">{P.firstName}</span>
+                                  <span className="text-white/90 font-medium">{P_DYNAMIC.firstName}</span>
                                   <span className="text-white/20">|</span>
                                   <span className="text-white/70">09/08/1985</span>
                                   <span className="text-white/20">|</span>
-                                  <span className="text-white/70">{P.sign}</span>
+                                  <span className="text-white/70">{P_DYNAMIC.sign}</span>
                                   
                                   <div className="ml-auto flex items-center gap-2">
                                     <span className="text-[#10b981] font-bold flex items-center gap-2">
@@ -496,7 +610,7 @@ export default function AppleResultPreviewV3() {
                          {/* Viajante */}
                          <div>
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-2">Viajante</p>
-                           <p className="text-white font-serif text-3xl">{P.name}</p>
+                           <p className="text-white font-serif text-3xl">{P_DYNAMIC.name}</p>
                          </div>
                          {/* Rota de Ancoragem */}
                          <div className="bg-white/[0.02] rounded-2xl p-6 md:p-8 border border-white/5 relative overflow-hidden">
@@ -506,7 +620,7 @@ export default function AppleResultPreviewV3() {
                              <div className="flex-1">
                                <p className="text-white font-medium text-xl md:text-2xl flex items-center gap-2">
                                  <MapPin className="w-5 h-5 text-white/50 shrink-0"/> 
-                                 <span className="truncate">{P.origin} <span className="text-white/30 text-sm ml-1">(BR)</span></span>
+                                 <span className="truncate">{P_DYNAMIC.origin} <span className="text-white/30 text-sm ml-1">(BR)</span></span>
                                </p>
                                <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Origem Natal</p>
                              </div>
@@ -520,7 +634,7 @@ export default function AppleResultPreviewV3() {
                              </div>
                              <div className="flex-1 md:text-right">
                                <p className="text-[#10b981] font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2">
-                                 <span className="truncate">{P.city}</span>
+                                 <span className="truncate">{P_DYNAMIC.city}</span>
                                  <MapPin className="w-6 h-6 shrink-0"/>
                                </p>
                                <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Destino do Aniversário</p>
@@ -538,7 +652,7 @@ export default function AppleResultPreviewV3() {
                              <span className="text-white/20 hidden md:inline">|</span>
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                                <Clock className="w-5 h-5 text-[#10b981]"/> 
-                               {P.time}
+                               {P_DYNAMIC.time}
                              </span>
                            </div>
                          </div>
@@ -548,10 +662,10 @@ export default function AppleResultPreviewV3() {
                              <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-5">DNA Astrológico</p>
                              <div className="space-y-4">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Sun className="w-5 h-5 text-yellow-400"/> Sol em {P.sign}
+                                 <Sun className="w-5 h-5 text-yellow-400"/> Sol em {P_DYNAMIC.sign}
                                </p>
                                <p className="text-white/80 font-medium text-lg flex items-center gap-3">
-                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> Ascendente {P.ascendant}
+                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> Ascendente {P_DYNAMIC.ascendant}
                                </p>
                              </div>
                            </div>
@@ -560,7 +674,7 @@ export default function AppleResultPreviewV3() {
                              <p className="text-[#10b981]/70 text-[10px] uppercase font-bold tracking-widest mb-5 relative z-10">Ativação Anual</p>
                              <div className="space-y-4 relative z-10">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Landmark className="w-5 h-5 text-[#10b981]"/> Casa {P.house}
+                                 <Landmark className="w-5 h-5 text-[#10b981]"/> Casa {P_DYNAMIC.house}
                                </p>
                                <p className="text-[#10b981] font-bold text-xl flex items-center gap-3">
                                  <CircleDollarSign className="w-5 h-5"/> Dinheiro & Prosperidade
@@ -727,7 +841,7 @@ export default function AppleResultPreviewV3() {
                                   <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">{area.label}</span>
                                 </div>
 
-                                {area.unlocked ? (
+                                {(area.unlocked || unlockedItems.includes(area.id)) ? (
                                   <>
                                     <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
                                     <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
@@ -745,10 +859,10 @@ export default function AppleResultPreviewV3() {
                                     <h3 className="font-ps-display text-3xl font-bold text-white/20 leading-tight mb-4 select-none" style={{ filter: 'blur(4px)' }}>{area.label}</h3>
                                     <div className="w-12 h-px mb-4 opacity-20" style={{ backgroundColor: `${area.color}80` }} />
                                     <p className="text-white/10 text-sm font-light leading-relaxed mb-6 select-none" style={{ filter: 'blur(6px)' }}>{area.full}</p>
-                                    <button className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
-                                      <CreditCard className="w-4 h-4" />
-                                      Desbloquear com 1 Crédito
-                                    </button>
+                                    <button onClick={(e) => { e.stopPropagation(); setUnlockedItems(prev => [...prev, area.id]); }} className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
+    <CreditCard className="w-4 h-4" />
+    Desbloquear com 1 Crédito
+  </button>
                                   </>
                                 )}
                               </div>
@@ -795,7 +909,7 @@ export default function AppleResultPreviewV3() {
                           </span>
                         </div>
 
-                        {activeArea.unlocked ? (
+                        {(activeArea.unlocked || unlockedItems.includes(activeArea.id)) ? (
                           <>
                             {/* DESBLOQUEADO — conteúdo completo */}
                             <h3 className="font-ps-display text-5xl md:text-7xl font-bold tracking-tight text-white leading-none drop-shadow-xl mb-6">
@@ -829,7 +943,7 @@ export default function AppleResultPreviewV3() {
                                 <span className="text-white/50 text-sm font-medium">Conteúdo personalizado bloqueado</span>
                               </div>
                               <button
-                                onClick={() => setAreas(areas.map(a => a.id === activeArea.id ? { ...a, unlocked: true } : a))}
+                                onClick={(e) => { e.stopPropagation(); setUnlockedItems(prev => [...prev, activeArea.id]); }}
                                 className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
                               >
                                 <CreditCard className="w-4 h-4 shrink-0" />
@@ -848,13 +962,13 @@ export default function AppleResultPreviewV3() {
                   </div>
                   
                   {/* ÁREA DE CONTEÚDO DESBLOQUEADO (DOSSIÊ) */}
-                  {currentActiveData?.unlocked && (
+                  {(currentActiveData?.unlocked || (currentActiveData && unlockedItems.includes(currentActiveData.id))) && (
                     <div className="w-full mt-24 animate-in fade-in slide-in-from-bottom-10 duration-1000">
                       <div className="flex items-center gap-4 mb-12">
                         <div className="w-12 h-12 rounded-full flex items-center justify-center border" style={{ backgroundColor: `${currentActiveData.color}15`, borderColor: `${currentActiveData.color}30` }}>
                           <Target className="w-5 h-5" style={{ color: currentActiveData.color }} />
                         </div>
-                        <h2 className="font-ps-display text-3xl md:text-5xl font-bold tracking-tight">Os 3 Pilares da Ativação</h2>
+                        <h2 className="font-ps-display text-3xl md:text-5xl font-bold tracking-tight">Os 3 Pilares da Ativação da Casa {P_DYNAMIC.house}</h2>
                       </div>
                       
                       <motion.div 
@@ -908,7 +1022,7 @@ export default function AppleResultPreviewV3() {
                               Sol em Leão.
                             </h3>
                             <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
-                              {currentActiveData.dna?.essencia}
+                              {currentActiveData.dnaData?.essencia || currentActiveData.dna?.essencia}
                             </p>
                           </motion.div>
 
@@ -927,7 +1041,7 @@ export default function AppleResultPreviewV3() {
                               Ascendente <br className="hidden md:block" />em Virgem.
                             </h3>
                             <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
-                              {currentActiveData.dna?.metodo}
+                              {currentActiveData.dnaData?.metodo || currentActiveData.dna?.metodo}
                             </p>
                           </motion.div>
 
@@ -946,7 +1060,7 @@ export default function AppleResultPreviewV3() {
                               Maturidade.
                             </h3>
                             <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
-                              {currentActiveData.dna?.fase}
+                              {currentActiveData.dnaData?.fase || currentActiveData.dna?.fase}
                             </p>
                           </motion.div>
 
@@ -956,87 +1070,220 @@ export default function AppleResultPreviewV3() {
 
                       </div>
 
-{/* BLOCO 4: O RITUAL E A CIDADE (PAINEL SPLIT APPLE) */}
-                      <div ref={block4Ref} 
-                           className="w-full mt-40 max-w-[1400px] mx-auto mb-32 h-auto min-h-[750px] relative rounded-[40px] overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row justify-end"
-                           style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)', isolation: 'isolate' }}>
-                        
-                        {/* Imagem de Fundo (Global: Cidade Ativa) */}
-                        <motion.div 
-                          style={{ y: parallaxY }}
-                          className="absolute -inset-[20%] w-[140%] h-[140%] left-0 z-0 pointer-events-none"
-                        >
-                          <img src={currentActiveData.image} alt={currentActiveData.city} className="w-full h-full object-cover opacity-90 transition-all duration-1000" />
-                        </motion.div>
-                        
-                        {/* Gradiente protegendo o texto */}
-                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#03100B]/20 via-[#03100B]/80 to-[#03100B]/90 z-0 pointer-events-none"></div>
-
-                        {/* Painel Lateral Direito */}
-                        <div className="relative z-10 w-full md:w-[45%] h-auto min-h-[750px] bg-black/20 backdrop-blur-3xl border-t md:border-t-0 md:border-l border-white/10 p-8 md:p-14 flex flex-col justify-center shrink-0">
+{/* BLOCO 4: O PLANO DE ATIVAÇÃO MESTRE (SIMÉTRICO & DIGESTÍVEL) */}
+                      <div ref={block4Ref} className="w-full mt-40 max-w-[1400px] mx-auto mb-32 relative px-4 md:px-8">
+                        {(() => {
+                          const sentences = (houseBaseData?.understand || currentActiveData.cityDesc || "").split(". ").filter(Boolean);
+                          const quote = sentences[0] ? sentences[0].trim() + (sentences[0].endsWith('.') ? '' : '.') : "";
+                          const beneficios = sentences[1] ? sentences[1].trim() + (sentences[1].endsWith('.') ? '' : '.') : "";
+                          const paraQuem = sentences[2] ? sentences[2].trim() + (sentences[2].endsWith('.') ? '' : '.') : "";
+                          const activeColor = currentActiveData?.color || '#C9A227';
                           
-                          <div className="mb-8 shrink-0">
-                            {/* Selo de Localização */}
-                            <div className="flex items-center gap-2 mb-6 px-5 py-2.5 bg-black/40 rounded-full border border-white/10 w-fit backdrop-blur-md">
-                                <MapPin className="w-5 h-5" style={{ color: currentActiveData?.color || '#34d399' }} />
-                                <span className="font-sans text-sm tracking-widest uppercase text-white font-semibold">{currentActiveData.city}</span>
-                            </div>
-                            
-                            <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
-                              {currentActiveData.cityDesc}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                          // Animações
+                          const containerVariants = {
+                            hidden: { opacity: 0 },
+                            show: { opacity: 1, transition: { staggerChildren: 0.15 } }
+                          };
+                          const itemVariants = {
+                            hidden: { opacity: 0, y: 20 },
+                            show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+                          };
 
-                      {/* BLOCO 4.1: DOSSIÊ ASTROLÓGICO & RITUAL (Movido para fora do bloco de Nova York) */}
-                      <div className="w-full max-w-4xl mx-auto mt-16 mb-32 bg-[#050505] rounded-3xl p-10 md:p-16 border border-white/10 relative overflow-hidden group shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-                        <div className="absolute top-0 right-0 w-[500px] h-[500px] blur-[120px] opacity-10 transition-opacity duration-1000 group-hover:opacity-20 pointer-events-none" style={{ backgroundColor: currentActiveData?.color || '#10b981' }}></div>
-                        
-                        {/* O Tema */}
-                        <div className="mb-12 relative z-10">
-                          <span className="font-sans text-xs md:text-sm tracking-[0.2em] uppercase block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>O Tema do Seu Ano</span>
-                          <p className="text-white text-2xl md:text-4xl font-ps-display font-medium leading-tight">
-                            Consolidação e Crescimento Material
-                          </p>
-                        </div>
+                          return (
+                            <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }}>
+                              
+                              {/* 1. O HERO: Foto Panorâmica com Hierarquia Focada */}
+                              <motion.div variants={itemVariants} className="w-full h-[50vh] min-h-[450px] md:h-[65vh] rounded-[40px] overflow-hidden relative shadow-2xl mb-12 border border-white/10 group">
+                                  <motion.img 
+                                    initial={{ scale: 1.1 }}
+                                    whileInView={{ scale: 1 }}
+                                    transition={{ duration: 2.5, ease: "easeOut" }}
+                                    src={houseFixedImageUrl} 
+                                    alt={houseFixedData.city} 
+                                    className="w-full h-full object-cover object-center" 
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/40 to-transparent"></div>
+                                  
+                                  <div className="absolute bottom-12 left-8 md:bottom-16 md:left-16 z-10 flex flex-col">
+                                    <motion.h1 
+                                      initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.8 }}
+                                      className="font-ps-display text-5xl md:text-8xl text-white mb-2 tracking-tight drop-shadow-2xl uppercase"
+                                    >
+                                      {houseFixedData.city}
+                                    </motion.h1>
+                                    <motion.div 
+                                      initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}
+                                      className="flex items-center gap-3 md:gap-4"
+                                    >
+                                      <span className="font-ps-ui text-lg md:text-2xl italic font-light drop-shadow-md" style={{ color: activeColor }}>
+                                        Ativação da Casa {P_DYNAMIC.house}
+                                      </span>
+                                    </motion.div>
+                                  </div>
+                              </motion.div>
 
-                        <div className="w-full h-px bg-white/10 my-12 relative z-10"></div>
+                              {/* 2. OS BLOCOS DE CONTEÚDO (Expanding Bento Grid Perfeito) */}
+                              <div className="flex flex-col gap-6 lg:gap-8 relative z-10 max-w-6xl mx-auto w-full">
+                                 {/* Glow de fundo */}
+                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] blur-[150px] opacity-10 pointer-events-none" style={{ backgroundColor: activeColor }}></div>
+                                 
+                                 {(() => {
+                                   const cardData = [
+                                     {
+                                       id: 0,
+                                       title: "O Efeito",
+                                       subtitle: "A vibração desse destino",
+                                       icon: <MapPin className="w-8 h-8" />,
+                                       content: (
+                                          <div className="flex flex-col gap-6 sm:gap-8 w-full min-w-[280px] max-w-[450px]">
+                                            <p className="font-ps-display text-white text-2xl sm:text-3xl lg:text-4xl leading-[1.2]">
+                                              "{quote}"
+                                            </p>
+                                            <div className="w-12 h-px bg-white/20"></div>
+                                            <div>
+                                              <span className="font-sans text-white/40 text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-3 block">Benefícios Reais</span>
+                                              <p className="font-ps-ui text-white/70 text-[15px] sm:text-[16px] leading-[1.7] font-light">{beneficios}</p>
+                                            </div>
+                                          </div>
+                                       )
+                                     },
+                                     {
+                                       id: 1,
+                                       title: "O Objetivo",
+                                       subtitle: "Perfil para este ciclo",
+                                       icon: <Target className="w-8 h-8" />,
+                                       content: (
+                                          <div className="flex flex-col gap-6 sm:gap-8 w-full min-w-[280px] max-w-[450px]">
+                                            <div>
+                                              <span className="font-sans text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-3 block" style={{ color: activeColor }}>O Perfil Central</span>
+                                              <p className="font-ps-ui text-white/90 text-[16px] sm:text-[18px] leading-[1.6]">{paraQuem}</p>
+                                            </div>
+                                            <div className="w-12 h-px bg-white/20"></div>
+                                            <div>
+                                              <span className="font-sans text-white/40 text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-3 block">Na Vida Real</span>
+                                              <p className="font-ps-ui text-white/70 text-[15px] sm:text-[16px] leading-[1.7] font-light">{houseBaseData?.realDynamics || "O cotidiano se alinha perfeitamente."}</p>
+                                            </div>
+                                          </div>
+                                       )
+                                     },
+                                     {
+                                       id: 2,
+                                       title: "A Chave",
+                                       subtitle: "O Segredo do Ciclo",
+                                       icon: <Sparkles className="w-8 h-8" />,
+                                       content: (
+                                          <div className="flex flex-col gap-6 sm:gap-8 w-full min-w-[280px] max-w-[450px]">
+                                            <div>
+                                              <span className="font-sans text-[9px] sm:text-[10px] tracking-[0.2em] uppercase block mb-3 text-white/40">Foco do Novo Ciclo</span>
+                                              <p className="font-ps-display text-white text-3xl sm:text-4xl leading-tight">
+                                                {currentActiveData.themeData || "Consolidação e Crescimento"}
+                                              </p>
+                                            </div>
+                                            <div className="w-12 h-px bg-white/20"></div>
+                                            <div>
+                                              <span className="font-sans text-[9px] sm:text-[10px] tracking-[0.2em] uppercase block mb-3" style={{ color: activeColor }}>A Chave Oculta</span>
+                                              <p className="font-ps-ui text-white/80 text-[15px] sm:text-[17px] leading-[1.6] font-light">
+                                                {currentActiveData.secretData || "A verdadeira prosperidade neste ciclo não virá do esforço exaustivo, mas do posicionamento estratégico."}
+                                              </p>
+                                            </div>
+                                          </div>
+                                       )
+                                     },
+                                     {
+                                       id: 3,
+                                       title: "O Ritual",
+                                       subtitle: "Ativação em 24h",
+                                       icon: <Compass className="w-8 h-8" />,
+                                       content: (
+                                          <div className="flex flex-col gap-5 sm:gap-8 w-full min-w-[280px] max-w-[450px] h-full">
+                                            <span className="font-sans text-[10px] sm:text-[11px] tracking-[0.2em] uppercase block" style={{ color: activeColor }}>O Passo a Passo</span>
+                                            <div className="flex flex-col gap-6 overflow-y-auto pr-2 custom-scrollbar max-h-[300px]">
+                                               {[
+                                                 currentActiveData.ritualData?.step1 || 'Sintonize a intenção.',
+                                                 currentActiveData.ritualData?.step2 || 'Faça uma ação física.',
+                                                 currentActiveData.ritualData?.step3 || 'Ancore na cidade.'
+                                               ].map((step, idx) => (
+                                                 <div key={idx} className="flex items-start gap-4 sm:gap-5">
+                                                   <span className="font-ps-display text-3xl sm:text-4xl leading-none mt-1" style={{ color: `color-mix(in srgb, ${activeColor} 30%, transparent)` }}>
+                                                     0{idx + 1}
+                                                   </span>
+                                                   <p className="font-ps-ui text-white/80 text-[14px] sm:text-[15px] leading-relaxed font-light pt-1">{step}</p>
+                                                 </div>
+                                               ))}
+                                            </div>
+                                          </div>
+                                       )
+                                     }
+                                   ];
 
-                        {/* O Segredo */}
-                        <div className="mb-12 relative z-10">
-                          <span className="font-sans text-xs md:text-sm tracking-[0.2em] uppercase block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>O Segredo Deste Ano</span>
-                          <p className="text-white/70 text-lg md:text-xl font-light leading-relaxed">
-                            A verdadeira prosperidade neste ciclo não virá do esforço exaustivo, mas do posicionamento estratégico. O universo pede que você pare de trocar tempo por dinheiro e comece a ancorar o seu valor. A cidade destino ativa a frequência da abundância: o dinheiro que trabalha para você.
-                          </p>
-                        </div>
+                                   const ExpandingRow = ({ cardsRow }: { cardsRow: typeof cardData }) => {
+                                      const [activeCardId, setActiveCardId] = useState<number | null>(null);
 
-                        <div className="w-full h-px bg-white/10 my-12 relative z-10"></div>
+                                      return (
+                                        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 w-full lg:h-[450px]">
+                                           {cardsRow.map((card) => {
+                                              const isHovered = activeCardId === card.id;
+                                              const isNeighborHovered = activeCardId !== null && activeCardId !== card.id;
 
-                        {/* Os Gestos que Ancoram */}
-                        <div className="relative z-10">
-                          <span className="font-sans text-xs md:text-sm tracking-[0.2em] uppercase block mb-8" style={{ color: currentActiveData?.color || '#10b981' }}>Os Gestos que Ancoram (Ritual 24h)</span>
-                          <div className="space-y-8">
-                            <div className="flex items-start gap-6">
-                              <span className="font-sans text-xl font-bold mt-1" style={{ color: currentActiveData?.color || '#10b981' }}>1.</span>
-                              <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
-                                Compre um item simbólico de alto valor (mesmo que pequeno) usando dinheiro físico. Este objeto será o seu amuleto financeiro.
-                              </p>
-                            </div>
-                            <div className="flex items-start gap-6">
-                              <span className="font-sans text-xl font-bold mt-1" style={{ color: currentActiveData?.color || '#10b981' }}>2.</span>
-                              <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
-                                Durante a transação, afirme mentalmente: "Este é o último investimento do meu antigo ciclo de escassez".
-                              </p>
-                            </div>
-                            <div className="flex items-start gap-6">
-                              <span className="font-sans text-xl font-bold mt-1" style={{ color: currentActiveData?.color || '#10b981' }}>3.</span>
-                              <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
-                                Ancore na cidade caminhando pelos distritos financeiros sentindo que aquele é o seu habitat natural.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
+                                              return (
+                                                <motion.div
+                                                   key={card.id}
+                                                   onMouseEnter={() => window.innerWidth >= 1024 && setActiveCardId(card.id)}
+                                                   onMouseLeave={() => window.innerWidth >= 1024 && setActiveCardId(null)}
+                                                   onClick={() => window.innerWidth < 1024 && setActiveCardId(isHovered ? null : card.id)}
+                                                   initial={false}
+                                                   animate={{ 
+                                                     flex: (typeof window !== 'undefined' && window.innerWidth >= 1024) 
+                                                              ? (isHovered ? 2.5 : isNeighborHovered ? 0.8 : 1) 
+                                                              : 1,
+                                                     height: (typeof window !== 'undefined' && window.innerWidth < 1024)
+                                                              ? (isHovered ? "auto" : "250px")
+                                                              : "100%"
+                                                   }}
+                                                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                                                   className="group relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden cursor-pointer shadow-2xl flex-shrink-0"
+                                                >
+                                                   <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none z-0"></div>
+                                                   
+                                                   {/* Estado: CAPA (Desaparece no hover/tap) */}
+                                                   <motion.div 
+                                                     animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
+                                                     transition={{ duration: 0.5 }}
+                                                     className="absolute inset-0 p-8 md:p-12 flex flex-col items-center justify-center text-center z-20 pointer-events-none bg-[#030306]/40 backdrop-blur-sm"
+                                                   >
+                                                      <div className="p-4 rounded-full bg-white/5 mb-6 shadow-[0_0_30px_rgba(255,255,255,0.05)]" style={{ color: activeColor }}>
+                                                        {card.icon}
+                                                      </div>
+                                                      <h3 className="font-ps-display text-3xl md:text-4xl text-white mb-3" style={{ opacity: isNeighborHovered ? 0.3 : 1, transition: 'opacity 0.5s' }}>{card.title}</h3>
+                                                      <span className="font-ps-ui text-[10px] uppercase font-bold tracking-[0.2em] text-white/40">{card.subtitle}</span>
+                                                   </motion.div>
+
+                                                   {/* Estado: CONTEÚDO (Aparece no hover/tap) */}
+                                                   <motion.div 
+                                                     animate={{ opacity: isHovered ? 1 : 0 }}
+                                                     transition={{ duration: 0.6, delay: isHovered ? 0.1 : 0 }}
+                                                     className={`absolute inset-0 p-8 md:p-12 flex flex-col justify-center z-10 ${isHovered ? 'pointer-events-auto' : 'pointer-events-none'}`}
+                                                   >
+                                                      {card.content}
+                                                   </motion.div>
+                                                </motion.div>
+                                              );
+                                           })}
+                                        </div>
+                                      );
+                                   };
+
+                                   return (
+                                     <>
+                                       <ExpandingRow cardsRow={[cardData[0], cardData[1]]} />
+                                       <ExpandingRow cardsRow={[cardData[2], cardData[3]]} />
+                                     </>
+                                   );
+                                 })()}
+                              </div>
+                            </motion.div>
+                          );
+                        })()}
                       </div>
 
                       {/* BLOCO 4.5: O MANTRA DE ATIVAÇÃO (GRADIENTE CINEMÁTICO) */}
@@ -1060,9 +1307,9 @@ export default function AppleResultPreviewV3() {
                       {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
                       <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
                         <div className="text-center mb-24">
-                          <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">O Seu Ano em 3 Fases.</h2>
+                          <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">A Evolução da Casa {P_DYNAMIC.house}</h2>
                           <p className="text-white/60 text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                            Como o seu foco em <strong className="text-white font-medium">{currentActiveData.label}</strong> se desdobra ao longo dos próximos 12 meses nesta cidade.
+                            Como a energia da cidade trabalha o seu foco em <strong className="text-white font-medium">{currentActiveData.label}</strong> ao longo do novo ciclo.
                           </p>
                         </div>
 
@@ -1123,7 +1370,7 @@ export default function AppleResultPreviewV3() {
                             
                             <div className="flex items-center gap-3 mb-10 px-5 py-2 bg-red-500/10 rounded-full border border-red-500/20">
                                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                               <span className="font-sans text-[10px] tracking-widest uppercase text-red-400 font-bold">Risco de Autossabotagem</span>
+                               <span className="font-sans text-[10px] tracking-widest uppercase text-red-400 font-bold">O Ponto Cego</span>
                             </div>
                             
                             <h3 className="font-ps-display text-4xl md:text-6xl font-bold text-white mb-10 tracking-tighter">
@@ -1131,7 +1378,7 @@ export default function AppleResultPreviewV3() {
                             </h3>
                             
                             <p className="text-red-50/70 text-lg md:text-2xl font-light leading-relaxed max-w-3xl mb-14">
-                              A euforia desta configuração astrológica atrai oportunidades, mas também um impulso irresistível para o desperdício. Seu maior risco é confundir alto fluxo com patrimônio consolidado.
+                              {currentActiveData.blindSpotData || "A euforia desta configuração atrai oportunidades, mas também um impulso irresistível para o desperdício."}
                             </p>
 
                             <div className="w-full h-px bg-gradient-to-r from-transparent via-red-900/50 to-transparent mb-14"></div>
@@ -1142,7 +1389,7 @@ export default function AppleResultPreviewV3() {
                                  <span className="font-sans text-xs tracking-[0.2em] uppercase text-red-500 font-bold">Protocolo de Defesa</span>
                                </div>
                                <p className="text-white text-xl md:text-2xl font-serif italic leading-relaxed">
-                                 "Congele 30% de todo lucro novo no momento em que ele tocar a sua conta, antes de tomar qualquer decisão de gasto."
+                                 "{currentActiveData.defenseProtocolData || 'Congele 30% de todo lucro novo no momento em que ele tocar a sua conta, antes de tomar qualquer decisão de gasto.'}"
                                </p>
                             </div>
 
@@ -1220,34 +1467,21 @@ export default function AppleResultPreviewV3() {
                   Expanda o Seu Mapa.
                 </h2>
                 <p className="text-white/50 text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                  Você desbloqueou a Rota principal para a <strong className="text-white font-medium">{P.houseLabel}</strong>. Descubra quais cidades do mundo ativam a sua saúde, seu amor e as outras 11 dimensões da sua vida.
+                  Você desbloqueou a Rota principal para a <strong className="text-white font-medium">{P_DYNAMIC.houseLabel}</strong>. Descubra quais cidades do mundo ativam a sua saúde, seu amor e as outras 11 dimensões da sua vida.
                 </p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {[1,2,3,4,5,6,7,8,9,10,11,12].map((num) => {
-                  const isCurrent = num === P.house;
+                  const isCurrent = num === P_DYNAMIC.house;
                   const dbData = cityDatabase[num as keyof typeof cityDatabase];
                   const label = dbData?.name?.split('—')[1]?.trim() || dbData?.label || "Área da Vida";
                   const isUnlocked = isCurrent || unlockedItems.includes(num.toString());
                   
-                  const MOCK_DATA = [
-                    { city: "Nova York, EUA", img: "1496442226666-8d4d0e62e6e9" }, // Casa 1
-                    { city: "Tóquio, Japão", img: "1498036882173-b41c28a8ba34" }, // Casa 2
-                    { city: "Dubai, EAU", img: "1459787915554-b34915863013" }, // Casa 3
-                    { city: "Buenos Aires, ARG", img: "1495317823589-e67efe1524b0" }, // Casa 4
-                    { city: "Santiago, Chile", img: "1689850543263-01a52ccc6943" }, // Casa 5
-                    { city: "Florianópolis, BRA", img: "1565574337618-b08146e94992" }, // Casa 6
-                    { city: "São Paulo, SP", img: "1470160710819-b3bd5ec85c66" }, // Casa 7
-                    { city: "Los Angeles, EUA", img: "1444723121867-7a241cacace9" }, // Casa 8
-                    { city: "Paris, França", img: "1431274172761-fca41d930114" }, // Casa 9
-                    { city: "Roma, Itália", img: "1491566102020-21838225c3c8" }, // Casa 10
-                    { city: "Londres, UK", img: "1448906654166-444d494666b3" }, // Casa 11
-                    { city: "Bali, Indonésia", img: "1501179691627-eeaa65ea017c" }, // Casa 12
-                  ];
+                  const MOCK_DATA = ROUTES_MOCK_DATA;
                   
                   const mockData = MOCK_DATA[num - 1];
-                  const cityForThisHouse = isCurrent ? P.city : (isUnlocked ? mockData.city : "Bloqueado");
+                  const cityForThisHouse = isCurrent ? P_DYNAMIC.city.split(", ")[0] : (isUnlocked ? mockData.city.split(", ")[0] : "Bloqueado");
                   const imageForThisHouse = `https://images.unsplash.com/photo-${mockData.img}?auto=format&fit=crop&w=800&q=80`;
                   const areaColor = LIFE_AREAS[num - 1]?.color || currentActiveData?.color || '#10b981';
 
