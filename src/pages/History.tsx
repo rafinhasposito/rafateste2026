@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Fingerprint, MapPin, Search, Compass, Scroll, Crown } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Fingerprint, MapPin, Search, Compass, Scroll, Crown, ChevronRight } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import { cityDatabase } from "@/data/houses";
 import { BackButton } from "@/components/ui/BackButton";
@@ -162,7 +162,8 @@ export default function History() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className={`group bg-ps-surface border border-white/5 ${hoverStyles.border} rounded-3xl p-8 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden flex flex-col justify-between`}
+                  onClick={() => navigate(`/dashboard?id=${c.id}`)}
+                  className={`group bg-ps-surface border border-white/5 ${hoverStyles.border} rounded-3xl p-6 md:p-8 transition-all duration-500 hover:-translate-y-1 cursor-pointer relative overflow-hidden flex flex-col justify-between`}
                 >
                   <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full pointer-events-none transition-colors duration-700 ${hoverStyles.glow}`}></div>
                   
