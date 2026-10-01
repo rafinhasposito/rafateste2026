@@ -55,10 +55,10 @@ const Admin = () => {
       <div className="min-h-[100dvh] px-4 py-12 max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <BackButton label="Voltar" to="/" className="mb-6" />
-          <h1 className="font-ps-display text-3xl md:text-4xl font-bold text-foreground uppercase tracking-wider mb-2">Painel Admin</h1>
-          <p className="text-muted-foreground text-sm mb-8">Gerencie preços, usuários e transações da plataforma.</p>
+          <h1 className="font-ps-display text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-md">Painel Admin</h1>
+          <p className="text-white/40 text-lg font-light font-ps-ui mb-10 leading-relaxed max-w-2xl">Gerencie preços, usuários e transações da plataforma.</p>
 
-          <div className="flex gap-2 mb-6 border-b border-border pb-3">
+          <div className="flex gap-3 mb-8 p-1.5 bg-white/5 border border-white/10 rounded-2xl w-fit backdrop-blur-md">
             {tabs.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
                 className={`px-4 py-2 rounded-t-lg text-xs uppercase tracking-widest font-semibold transition-all ${tab === t.id ? "bg-primary text-background" : "text-muted-foreground hover:text-foreground"}`}>

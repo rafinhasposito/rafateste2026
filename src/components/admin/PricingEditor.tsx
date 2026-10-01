@@ -33,23 +33,23 @@ const PricingEditor = () => {
     const d = draft[item.key] || {};
     const has = Object.keys(d).length > 0;
     return (
-      <div className="glass-panel p-4 grid grid-cols-12 gap-3 items-center">
+      <div className="p-4 grid grid-cols-12 gap-3 items-center rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
         <input
           value={d.label ?? item.label}
           onChange={e => change(item.key, "label", e.target.value)}
-          className="col-span-3 px-3 py-2 rounded-lg bg-background/40 border border-border text-foreground text-sm"
+          className="col-span-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-white/30 transition-colors"
         />
         <input
           value={d.description ?? item.description ?? ""}
           onChange={e => change(item.key, "description", e.target.value)}
           placeholder="Descrição"
-          className="col-span-5 px-3 py-2 rounded-lg bg-background/40 border border-border text-muted-foreground text-xs"
+          className="col-span-5 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs focus:outline-none focus:border-white/30 transition-colors"
         />
         <input
           type="number" min={0}
           value={d.credits ?? item.credits}
           onChange={e => change(item.key, "credits", parseInt(e.target.value) || 0)}
-          className="col-span-1 px-2 py-2 rounded-lg bg-background/40 border border-border text-primary text-sm text-center font-bold"
+          className="col-span-1 px-2 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm text-center font-bold focus:outline-none focus:border-white/30 transition-colors"
           title="Créditos"
         />
         {showPrice ? (
@@ -58,12 +58,12 @@ const PricingEditor = () => {
             value={d.price_brl ?? item.price_brl ?? ""}
             onChange={e => change(item.key, "price_brl", parseFloat(e.target.value) || null)}
             placeholder="R$"
-            className="col-span-2 px-2 py-2 rounded-lg bg-background/40 border border-border text-foreground text-sm text-center"
+            className="col-span-2 px-2 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm text-center focus:outline-none focus:border-white/30 transition-colors"
           />
-        ) : <div className="col-span-2 text-center text-muted-foreground text-xs">—</div>}
+        ) : <div className="col-span-2 text-center text-white/30 text-xs">—</div>}
         <button
           onClick={() => save(item)} disabled={!has || saving === item.key}
-          className="col-span-1 py-2 rounded-lg bg-primary text-background text-xs font-bold uppercase disabled:opacity-30"
+          className="col-span-1 py-3 rounded-xl bg-white text-black text-[10px] font-bold uppercase tracking-widest disabled:opacity-20 hover:scale-105 active:scale-95 transition-all"
         >
           {saving === item.key ? "..." : "Salvar"}
         </button>
@@ -74,16 +74,16 @@ const PricingEditor = () => {
   return (
     <div className="space-y-8">
       <section>
-        <h3 className="font-ps-display text-sm text-foreground uppercase tracking-widest mb-3">Pacotes de Compra</h3>
-        <div className="grid grid-cols-12 gap-3 px-4 mb-2 text-[10px] uppercase tracking-widest text-muted-foreground/60">
+        <h3 className="font-ps-display text-xl text-white tracking-widest mb-4">Pacotes de Compra</h3>
+        <div className="grid grid-cols-12 gap-3 px-4 mb-3 text-[9px] uppercase tracking-[0.2em] font-bold text-white/40">
           <span className="col-span-3">Nome</span><span className="col-span-5">Descrição</span>
           <span className="col-span-1 text-center">Cr</span><span className="col-span-2 text-center">Preço R$</span><span className="col-span-1" />
         </div>
         <div className="space-y-2">{packages.map(i => <Row key={i.key} item={i} showPrice />)}</div>
       </section>
       <section>
-        <h3 className="font-ps-display text-sm text-foreground uppercase tracking-widest mb-3">Custos por Ação</h3>
-        <div className="grid grid-cols-12 gap-3 px-4 mb-2 text-[10px] uppercase tracking-widest text-muted-foreground/60">
+        <h3 className="font-ps-display text-xl text-white tracking-widest mb-4">Custos por Ação</h3>
+        <div className="grid grid-cols-12 gap-3 px-4 mb-3 text-[9px] uppercase tracking-[0.2em] font-bold text-white/40">
           <span className="col-span-3">Nome</span><span className="col-span-5">Descrição</span>
           <span className="col-span-1 text-center">Cr</span><span className="col-span-2 text-center">Preço</span><span className="col-span-1" />
         </div>
