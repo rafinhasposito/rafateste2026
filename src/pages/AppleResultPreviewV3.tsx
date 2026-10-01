@@ -366,6 +366,8 @@ export interface DestinyResultsProps {
   consultationId?: string;
   autoUnlocked?: boolean;
   onUnlock?: (n: number) => void;
+  onUnlockFocus?: (focusId: string, houseNum: number) => Promise<void>;
+  unlockedFocuses?: Record<string, string[]>;
   embedded?: boolean;
   isHouseUnlocked?: (h: number) => boolean;
   onSelectHouse?: (h: number) => void;
@@ -545,7 +547,18 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
-  const [unlockedItems, setUnlockedItems] = useState<string[]>([]);
+  const [unlockingFocus, setUnlockingFocus] = useState<string | null>(null);
+  const [unlockedItems, setUnlockedItems] = useState<string[]>(() => {
+    const defaultFocus = intendedAreaId ? intendedAreaId : Object.keys(LIFE_AREAS)[0];
+    const saved = P.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
+    return [defaultFocus, ...saved];
+  });
+  
+  useEffect(() => {
+    const defaultFocus = intendedAreaId ? intendedAreaId : Object.keys(LIFE_AREAS)[0];
+    const saved = P.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
+    setUnlockedItems([defaultFocus, ...saved]);
+  }, [P.unlockedFocuses, P_DYNAMIC.house, intendedAreaId]);
   const [activeDossierCard, setActiveDossierCard] = useState<number | null>(0);
   const baseHouseId = P_DYNAMIC.house as keyof typeof BASE_HOUSE_PROFILES;
   const houseBaseData = (BASE_HOUSE_PROFILES as any)[baseHouseId];
@@ -1078,9 +1091,21 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                     <h3 className="font-ps-display text-3xl font-bold text-white/20 leading-tight mb-4 select-none" style={{ filter: 'blur(4px)' }}>{area.label}</h3>
                                     <div className="w-12 h-px mb-4 opacity-20" style={{ backgroundColor: `${area.color}80` }} />
                                     <p className="text-white/10 text-sm font-light leading-relaxed mb-6 select-none" style={{ filter: 'blur(6px)' }}>{area.full}</p>
-                                    <button onClick={(e) => { e.stopPropagation(); setUnlockedItems(prev => [...prev, area.id]); }} className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
+                                    <button onClick={async (e) => { 
+                                      e.stopPropagation(); 
+                                      if (P.onUnlockFocus) {
+                                        setUnlockingFocus(area.id);
+                                        try {
+                                          await P.onUnlockFocus(area.id, P_DYNAMIC.house);
+                                        } catch(err) {}
+                                        finally { setUnlockingFocus(null); }
+                                      } else {
+                                        setUnlockedItems(prev => [...prev, area.id]); 
+                                      }
+                                    }}
+                                    disabled={unlockingFocus === area.id} className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
     <CreditCard className="w-4 h-4" />
-    Desbloquear com 1 Crédito
+    {unlockingFocus === area.id ? "Desbloqueando..." : "Desbloquear com 1 Crédito"}
   </button>
                                   </>
                                 )}
@@ -1162,11 +1187,23 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                 <span className="text-white/50 text-sm font-medium">Conteúdo personalizado bloqueado</span>
                               </div>
                               <button
-                                onClick={(e) => { e.stopPropagation(); setUnlockedItems(prev => [...prev, activeArea.id]); }}
+                                onClick={async (e) => { 
+                                  e.stopPropagation(); 
+                                  if (P.onUnlockFocus) {
+                                    setUnlockingFocus(activeArea.id);
+                                    try {
+                                      await P.onUnlockFocus(activeArea.id, P_DYNAMIC.house);
+                                    } catch(err) {}
+                                    finally { setUnlockingFocus(null); }
+                                  } else {
+                                    setUnlockedItems(prev => [...prev, activeArea.id]); 
+                                  }
+                                }}
+                                disabled={unlockingFocus === activeArea.id}
                                 className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
                               >
                                 <CreditCard className="w-4 h-4 shrink-0" />
-                                Desbloquear com 1 Crédito
+                                {unlockingFocus === activeArea.id ? "Desbloqueando..." : "Desbloquear com 1 Crédito"}
                               </button>
                             </div>
                           </>

@@ -186,6 +186,59 @@ const Dashboard = () => {
     setSelectedHouse(firstUnlocked);
   }, [consultation?.id, consultation?.goal, consultation?.houses_unlocked, consultation?.unlocked_houses, consultation?.result]);
 
+  const handleUnlockFocus = async (focusId: string, houseNum: number) => {
+    if (!user || !profile || !consultation || unlocking) return;
+
+    if (!isAdmin && credits < 1) {
+      showAlert(`Você não tem créditos suficientes. Adquira mais no menu.`);
+      navigate("/credits");
+      throw new Error("Sem créditos");
+    }
+
+    setUnlocking(true);
+    try {
+      if (!isAdmin) {
+        const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
+          p_amount: 1,
+          p_description: `Desbloqueio de Foco: ${focusId} (Casa ${houseNum})`,
+          p_type: "deduction"
+        });
+        if (chargeErr || !chargeSuccess) throw new Error(chargeErr?.message || "Erro ao debitar créditos");
+      }
+
+      // Save to database
+      const currentResult = consultation.result || {};
+      const currentUnlockedFocuses = currentResult.unlocked_focuses || {};
+      const houseFocuses = currentUnlockedFocuses[String(houseNum)] || [];
+      
+      if (!houseFocuses.includes(focusId)) {
+        houseFocuses.push(focusId);
+      }
+      currentUnlockedFocuses[String(houseNum)] = houseFocuses;
+      
+      const newResult = { ...currentResult, unlocked_focuses: currentUnlockedFocuses };
+      
+      const { error: updateErr } = await supabase
+        .from("consultations")
+        .update({ result: newResult })
+        .eq("id", consultation.id);
+        
+      if (updateErr) throw new Error("Erro ao salvar desbloqueio.");
+      
+      // Update local state
+      setConsultation(prev => prev ? { ...prev, result: newResult } : null);
+      if (!isAdmin) {
+         setProfile(prev => prev ? { ...prev, credits: prev.credits - 1 } : null);
+      }
+      showAlert("Foco ativado com sucesso!", "success");
+    } catch (err: any) {
+      showAlert(err.message || "Erro ao desbloquear.");
+      throw err;
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
     return isHouseLockedByConsultation(consultation, houseNum);
@@ -377,6 +430,8 @@ const Dashboard = () => {
             consultationId={consultation.id}
             autoUnlocked={true}
             onUnlock={(n) => handleUnlock(n)}
+            onUnlockFocus={(fid, hNum) => handleUnlockFocus(fid, hNum)}
+            unlockedFocuses={consultation.result?.unlocked_focuses || {}}
             embedded={false}
             isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
             onSelectHouse={(h) => setSelectedHouse(h)}
