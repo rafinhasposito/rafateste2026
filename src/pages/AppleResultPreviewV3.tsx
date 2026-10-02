@@ -377,6 +377,8 @@ export interface DestinyResultsProps {
   mode?: string;
   unlockedCount?: number;
   intent?: string | null;
+  houseCost?: number;
+  fullMapCost?: number;
 }
 
 export default function AppleResultPreviewV3(props: DestinyResultsProps) {
@@ -1891,6 +1893,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         isOpen={isPaywallOpen} 
         isEmbedded={!!props.onUnlock}
         userCredits={props.userCredits}
+        houseCost={props.houseCost}
+        fullMapCost={props.fullMapCost}
         onClose={() => setIsPaywallOpen(false)} 
         onSuccess={(id, purchaseType) => {
           if (props.onUnlock && targetLockedArea?.houseNum) {

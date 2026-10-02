@@ -301,7 +301,7 @@ const Dashboard = () => {
     if (!user || !profile || !consultation || unlocking) return;
 
     const isUnlockAll = targetHouse === 0;
-    const requiredCredits = isUnlockAll ? 7 : 1;
+    const requiredCredits = isUnlockAll ? getCost("cost_full_map", 7) : getCost("cost_house_1", 1);
 
     if (!isAdmin && credits < requiredCredits) {
       showAlert(`Você não tem créditos suficientes. Adquira mais no menu.`);
@@ -321,9 +321,9 @@ const Dashboard = () => {
          if (!isAdmin) {
             // Debit 7 credits manually
             const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
-               p_amount: 7,
+               p_amount: requiredCredits,
                p_description: "Visão 360 Completa - Desbloqueio de 12 Casas",
-               p_type: "deduction"
+               p_type: "cost_full_map"
             });
             if (chargeErr || !chargeSuccess) throw new Error(chargeErr?.message || "Erro ao debitar créditos");
          }
@@ -488,8 +488,12 @@ const Dashboard = () => {
             onSelectHouse={(h) => setSelectedHouse(h)}
             mode={currentMode}
             unlockedCount={consultation.houses_unlocked}
+            fullMapCost={getCost("cost_full_map", 7)}
+            houseCost={getCost("cost_house_1", 1)}
           />
           <ConfirmCreditAction
+            fullMapCost={getCost("cost_full_map", 7)}
+            houseCost={getCost("cost_house_1", 1)}
             open={pendingUnlock !== null}
             onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}
             onConfirm={() => {
@@ -499,7 +503,7 @@ const Dashboard = () => {
             }}
             title={pendingUnlock ? `Desbloquear Casa ${pendingUnlock}` : ""}
             description={pendingUnlock ? `Você está prestes a desbloquear a Casa ${pendingUnlock} desta consulta.` : undefined}
-            credits={1}
+            credits={getCost("cost_house_1", 1)}
             currentBalance={credits}
             confirmLabel="Desbloquear agora"
             loading={unlocking}
@@ -633,7 +637,7 @@ const Dashboard = () => {
             ? `Você está prestes a desbloquear a Casa ${pendingUnlock} desta consulta.`
             : undefined
         }
-        credits={1}
+        credits={getCost("cost_house_1", 1)}
         currentBalance={credits}
         confirmLabel="Desbloquear agora"
         loading={unlocking}
