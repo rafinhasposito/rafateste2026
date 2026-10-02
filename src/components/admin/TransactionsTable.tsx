@@ -15,6 +15,7 @@ const TransactionsTable = () => {
   const [txs, setTxs] = useState<Tx[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -31,6 +32,11 @@ const TransactionsTable = () => {
   }, []);
 
   const filtered = txs.filter(t => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const match = (t.user_email || "").toLowerCase().includes(q) || (t.description || "").toLowerCase().includes(q);
+      if (!match) return false;
+    }
     if (typeFilter === "all") return true;
     if (typeFilter === "pago") return t.amount > 0 && t.type === "purchase";
     if (typeFilter === "gratis") return t.amount > 0 && t.type !== "purchase";
@@ -42,7 +48,8 @@ const TransactionsTable = () => {
 
   return (
     <div>
-      <div className="flex gap-3 mb-6 flex-wrap">
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
+        <div className="flex gap-3 flex-wrap">
         {[
           { id: "all", label: "Todas" },
           { id: "pago", label: "Pagos (R$)" },
@@ -61,6 +68,16 @@ const TransactionsTable = () => {
             {t.label}
           </button>
         ))}
+        </div>
+        <div className="relative w-full md:w-64">
+          <input
+            type="text"
+            placeholder="Buscar email ou transação..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full bg-black/50 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none focus:border-white/30 focus:bg-white/5 transition-all shadow-inner text-xs placeholder:text-white/20"
+          />
+        </div>
       </div>
       <div className="space-y-1.5">
         {filtered.map(t => (
