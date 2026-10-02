@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
-const ICONS: Record<string, any> = { cost_house_1: Lock, cost_house_3: Unlock, cost_full_map: Map, cost_city: Map };
+const ICONS: Record<string, any> = { cost_house_1: Lock, cost_focus: Unlock, cost_city: Map };
 
 const Credits = () => {
   const { profile } = useAuth();
@@ -62,7 +62,6 @@ const Credits = () => {
     }
   };
   const fmt = (n: number | null) => n == null ? ["0", "00"] : n.toFixed(2).split(".");
-  const housesLabel = (c: number) => c === 1 ? "1 Casa" : c === 2 ? "3 Casas" : "12 Casas";
 
   return (
     <>
@@ -115,7 +114,7 @@ const Credits = () => {
               <div>
                 <div className="mb-4">
                   <span className={`text-[9px] font-bold uppercase tracking-[0.4em] ${highlight ? 'text-white/80' : 'text-white/30'}`}>
-                    {housesLabel(pkg.credits)}
+                    {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}
                   </span>
                 </div>
                 <h3 className={`font-ps-display text-3xl font-bold tracking-tight mb-4 ${highlight ? 'text-white drop-shadow-md' : 'text-white/80'}`}>
@@ -158,7 +157,7 @@ const Credits = () => {
           <h3 className="font-ps-display text-2xl text-white/80 font-light tracking-widest mb-12 text-center">
             Tabela de Conversão
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {costs.map((item) => {
               const Icon = ICONS[item.key] || Map;
               return (

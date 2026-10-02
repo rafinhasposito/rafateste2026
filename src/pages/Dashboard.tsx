@@ -433,6 +433,7 @@ const Dashboard = () => {
             autoUnlocked={true}
             onUnlock={(n) => handleUnlock(n)}
             onUnlockFocus={(fid, hNum) => handleUnlockFocus(fid, hNum)}
+            focusCostLabel={`${getCost("cost_focus", 1)} Crédito${getCost("cost_focus", 1) > 1 ? "s" : ""}`}
             unlockedFocuses={consultation.result?.unlocked_focuses || {}}
             embedded={false}
             isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}

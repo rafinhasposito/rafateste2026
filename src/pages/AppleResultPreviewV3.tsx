@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { DesktopWebChrome } from "@/layouts/DesktopWebChrome";
 import { MobileAppChrome } from "@/layouts/MobileAppChrome";
@@ -367,6 +367,7 @@ export interface DestinyResultsProps {
   autoUnlocked?: boolean;
   onUnlock?: (n: number) => void;
   onUnlockFocus?: (focusId: string, houseNum: number) => Promise<void>;
+  focusCostLabel?: string;
   unlockedFocuses?: Record<string, string[]>;
   embedded?: boolean;
   isHouseUnlocked?: (h: number) => boolean;
@@ -1105,7 +1106,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                     }}
                                     disabled={unlockingFocus === area.id} className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
     <CreditCard className="w-4 h-4" />
-    {unlockingFocus === area.id ? "Desbloqueando..." : "Desbloquear com 1 Crédito"}
+    {unlockingFocus === area.id ? "Desbloqueando..." : `Desbloquear com ${P.focusCostLabel || "1 Crédito"}`}
   </button>
                                   </>
                                 )}
@@ -1203,7 +1204,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                 className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
                               >
                                 <CreditCard className="w-4 h-4 shrink-0" />
-                                {unlockingFocus === activeArea.id ? "Desbloqueando..." : "Desbloquear com 1 Crédito"}
+                                {unlockingFocus === activeArea.id ? "Desbloqueando..." : `Desbloquear com ${P.focusCostLabel || "1 Crédito"}`}
                               </button>
                             </div>
                           </>
