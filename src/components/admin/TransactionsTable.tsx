@@ -30,30 +30,49 @@ const TransactionsTable = () => {
     })();
   }, []);
 
-  const filtered = txs.filter(t => typeFilter === "all" || t.type === typeFilter);
-  const types = Array.from(new Set(txs.map(t => t.type)));
+  const filtered = txs.filter(t => {
+    if (typeFilter === "all") return true;
+    if (typeFilter === "pago") return t.amount > 0 && t.type === "purchase";
+    if (typeFilter === "gratis") return t.amount > 0 && t.type !== "purchase";
+    if (typeFilter === "gastos") return t.amount < 0;
+    return true;
+  });
 
-  if (loading) return <p className="text-muted-foreground text-sm">Carregando…</p>;
+  if (loading) return <p className="text-white/50 text-sm">Carregando…</p>;
 
   return (
     <div>
-      <div className="flex gap-2 mb-4 flex-wrap">
-        <button onClick={() => setTypeFilter("all")} className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest border ${typeFilter === "all" ? "bg-primary text-background border-primary" : "border-border text-muted-foreground"}`}>Tudo</button>
-        {types.map(t => (
-          <button key={t} onClick={() => setTypeFilter(t)} className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest border ${typeFilter === t ? "bg-primary text-background border-primary" : "border-border text-muted-foreground"}`}>{t}</button>
+      <div className="flex gap-3 mb-6 flex-wrap">
+        {[
+          { id: "all", label: "Todas" },
+          { id: "pago", label: "Pagos (R$)" },
+          { id: "gratis", label: "Grátis / Admin" },
+          { id: "gastos", label: "Desbloqueios" }
+        ].map(t => (
+          <button 
+            key={t.id} 
+            onClick={() => setTypeFilter(t.id)} 
+            className={`px-6 py-2.5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 border 
+              ${typeFilter === t.id 
+                ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)] scale-105" 
+                : "bg-black/50 border-white/10 text-white/40 hover:text-white hover:bg-white/5"}
+            `}
+          >
+            {t.label}
+          </button>
         ))}
       </div>
       <div className="space-y-1.5">
         {filtered.map(t => (
-          <div key={t.id} className="glass-panel p-3 flex items-center gap-3 text-xs">
-            <span className="text-muted-foreground w-24 shrink-0">{new Date(t.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
-            <span className="text-foreground truncate flex-1">{t.user_email}</span>
-            <span className="text-muted-foreground text-[10px] uppercase tracking-widest bg-secondary/40 px-2 py-0.5 rounded">{t.type}</span>
-            <span className={`font-bold w-12 text-right ${t.amount > 0 ? "text-emerald-400" : "text-destructive"}`}>{t.amount > 0 ? "+" : ""}{t.amount}</span>
-            <span className="text-muted-foreground/70 truncate w-64 hidden md:block">{t.description}</span>
+          <div key={t.id} className="border border-white/10 bg-white/[0.02] rounded-2xl backdrop-blur-md p-4 flex items-center gap-4 text-xs hover:bg-white/[0.04] transition-colors">
+            <span className="text-white/50 w-24 shrink-0">{new Date(t.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
+            <span className="text-white truncate flex-1">{t.user_email}</span>
+            <span className="text-white/40 text-[10px] uppercase tracking-widest bg-white/5 border border-white/5 px-2 py-1 rounded-lg">{t.type.replace('cost_', 'custo_')}</span>
+            <span className={`font-bold w-12 text-right text-sm ${t.amount > 0 ? "text-[#10b981]" : "text-amber-500"}`}>{t.amount > 0 ? "+" : ""}{t.amount}</span>
+            <span className="text-white/30 truncate flex-1 hidden md:block" title={t.description || ""}>{t.description}</span>
           </div>
         ))}
-        {filtered.length === 0 && <p className="text-muted-foreground text-sm text-center py-6">Sem transações.</p>}
+        {filtered.length === 0 && <p className="text-white/50 text-sm text-center py-6">Sem transações.</p>}
       </div>
     </div>
   );
