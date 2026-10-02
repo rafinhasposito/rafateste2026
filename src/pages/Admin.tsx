@@ -58,10 +58,10 @@ const Admin = () => {
           <h1 className="font-ps-display text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-md">Painel Admin</h1>
           <p className="text-white/40 text-lg font-light font-ps-ui mb-10 leading-relaxed max-w-2xl">Gerencie preços, usuários e transações da plataforma.</p>
 
-          <div className="flex gap-3 mb-8 p-1.5 bg-white/5 border border-white/10 rounded-2xl w-fit backdrop-blur-md">
+          <div className="flex flex-wrap gap-3 mb-12 p-2 bg-black/40 border border-white/10 rounded-3xl w-fit backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.8)]">
             {tabs.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)}
-                className={`px-4 py-2 rounded-t-lg text-xs uppercase tracking-widest font-semibold transition-all ${tab === t.id ? "bg-primary text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                className={`px-8 py-3 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-500 rounded-2xl ${tab === t.id ? "bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.2)] scale-105" : "text-white/40 hover:text-white hover:bg-white/5"}`}>
                 {t.label}
               </button>
             ))}

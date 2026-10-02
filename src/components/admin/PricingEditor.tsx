@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { usePricing, type PricingItem } from "@/hooks/usePricing";
 import { toast } from "sonner";
+import { Package, Zap, CreditCard, Coins } from "lucide-react";
 
 const PricingEditor = () => {
   const { items, loading, refresh } = usePricing();
@@ -24,70 +25,103 @@ const PricingEditor = () => {
     refresh();
   };
 
-  if (loading) return <p className="text-muted-foreground text-sm">Carregando…</p>;
+  if (loading) return <div className="animate-pulse text-white/50">Carregando arquitetura...</div>;
 
   const packages = items.filter(i => i.category === "package");
   const costs = items.filter(i => i.category === "cost");
 
-  const Row = ({ item, showPrice }: { item: PricingItem; showPrice: boolean }) => {
+  const Card = ({ item, isPackage }: { item: PricingItem; isPackage: boolean }) => {
     const d = draft[item.key] || {};
     const has = Object.keys(d).length > 0;
+    
     return (
-      <div className="p-4 grid grid-cols-12 gap-3 items-center rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-        <input
-          value={d.label ?? item.label}
-          onChange={e => change(item.key, "label", e.target.value)}
-          className="col-span-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-white/30 transition-colors"
-        />
-        <input
-          value={d.description ?? item.description ?? ""}
-          onChange={e => change(item.key, "description", e.target.value)}
-          placeholder="Descrição"
-          className="col-span-5 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs focus:outline-none focus:border-white/30 transition-colors"
-        />
-        <input
-          type="number" min={0}
-          value={d.credits ?? item.credits}
-          onChange={e => change(item.key, "credits", parseInt(e.target.value) || 0)}
-          className="col-span-1 px-2 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm text-center font-bold focus:outline-none focus:border-white/30 transition-colors"
-          title="Créditos"
-        />
-        {showPrice ? (
-          <input
-            type="number" step="0.01" min={0}
-            value={d.price_brl ?? item.price_brl ?? ""}
-            onChange={e => change(item.key, "price_brl", parseFloat(e.target.value) || null)}
-            placeholder="R$"
-            className="col-span-2 px-2 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm text-center focus:outline-none focus:border-white/30 transition-colors"
-          />
-        ) : <div className="col-span-2 text-center text-white/30 text-xs">—</div>}
+      <div className="relative group p-6 rounded-[32px] border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] backdrop-blur-xl transition-all duration-500 flex flex-col justify-between overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+        {/* Glow de Fundo */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-[60px] pointer-events-none transition-all duration-700 group-hover:bg-white/10"></div>
+        
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
+              {isPackage ? <Package className="w-5 h-5 text-white/70" /> : <Zap className="w-5 h-5 text-white/70" />}
+            </div>
+            <input
+              value={d.label ?? item.label}
+              onChange={e => change(item.key, "label", e.target.value)}
+              className="w-full bg-transparent border-b border-transparent focus:border-white/30 text-white font-ps-display text-2xl font-bold tracking-tight focus:outline-none transition-colors placeholder:text-white/20"
+              placeholder="Nome"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/30 ml-1">Descrição</label>
+            <textarea
+              value={d.description ?? item.description ?? ""}
+              onChange={e => change(item.key, "description", e.target.value)}
+              className="w-full h-20 p-3 rounded-2xl bg-black/40 border border-white/10 text-white/70 text-sm focus:outline-none focus:border-white/30 focus:bg-black/60 transition-all resize-none shadow-inner"
+              placeholder="Descreva este item..."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/30 ml-1 flex items-center gap-1"><Coins className="w-3 h-3"/> Créditos</label>
+              <input
+                type="number" min={0}
+                value={d.credits ?? item.credits}
+                onChange={e => change(item.key, "credits", parseInt(e.target.value) || 0)}
+                className="w-full p-3 rounded-2xl bg-black/40 border border-white/10 text-white font-bold text-center focus:outline-none focus:border-white/30 focus:bg-black/60 transition-all shadow-inner"
+              />
+            </div>
+            
+            {isPackage ? (
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/30 ml-1 flex items-center gap-1"><CreditCard className="w-3 h-3"/> Preço (R$)</label>
+                <input
+                  type="number" step="0.01" min={0}
+                  value={d.price_brl ?? item.price_brl ?? ""}
+                  onChange={e => change(item.key, "price_brl", parseFloat(e.target.value) || null)}
+                  className="w-full p-3 rounded-2xl bg-black/40 border border-white/10 text-white font-bold text-center focus:outline-none focus:border-white/30 focus:bg-black/60 transition-all shadow-inner"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5 opacity-30">
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/30 ml-1 flex items-center gap-1"><CreditCard className="w-3 h-3"/> Preço (R$)</label>
+                <div className="w-full p-3 rounded-2xl bg-black/40 border border-white/10 text-white/30 font-bold text-center cursor-not-allowed">—</div>
+              </div>
+            )}
+          </div>
+        </div>
+
         <button
           onClick={() => save(item)} disabled={!has || saving === item.key}
-          className="col-span-1 py-3 rounded-xl bg-white text-black text-[10px] font-bold uppercase tracking-widest disabled:opacity-20 hover:scale-105 active:scale-95 transition-all"
+          className="relative z-10 w-full mt-6 py-4 rounded-2xl bg-white text-black font-bold text-xs uppercase tracking-widest disabled:opacity-20 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:scale-[1.02] active:scale-95 transition-all duration-300"
         >
-          {saving === item.key ? "..." : "Salvar"}
+          {saving === item.key ? "Sincronizando..." : "Salvar Alterações"}
         </button>
       </div>
     );
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-16">
       <section>
-        <h3 className="font-ps-display text-xl text-white tracking-widest mb-4">Pacotes de Compra</h3>
-        <div className="grid grid-cols-12 gap-3 px-4 mb-3 text-[9px] uppercase tracking-[0.2em] font-bold text-white/40">
-          <span className="col-span-3">Nome</span><span className="col-span-5">Descrição</span>
-          <span className="col-span-1 text-center">Cr</span><span className="col-span-2 text-center">Preço R$</span><span className="col-span-1" />
+        <div className="mb-8 border-b border-white/10 pb-6">
+          <h3 className="font-ps-display text-3xl text-white tracking-tight font-bold mb-2">Pacotes de Compra</h3>
+          <p className="text-white/40 text-sm font-ps-ui">Defina os valores em Reais (R$) que os usuários pagarão no Checkout.</p>
         </div>
-        <div className="space-y-2">{packages.map(i => <Row key={i.key} item={i} showPrice />)}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {packages.map(i => <Card key={i.key} item={i} isPackage={true} />)}
+        </div>
       </section>
+
       <section>
-        <h3 className="font-ps-display text-xl text-white tracking-widest mb-4">Custos por Ação</h3>
-        <div className="grid grid-cols-12 gap-3 px-4 mb-3 text-[9px] uppercase tracking-[0.2em] font-bold text-white/40">
-          <span className="col-span-3">Nome</span><span className="col-span-5">Descrição</span>
-          <span className="col-span-1 text-center">Cr</span><span className="col-span-2 text-center">Preço</span><span className="col-span-1" />
+        <div className="mb-8 border-b border-white/10 pb-6">
+          <h3 className="font-ps-display text-3xl text-white tracking-tight font-bold mb-2">Custos por Ação</h3>
+          <p className="text-white/40 text-sm font-ps-ui">Defina quantos Créditos cada ação custa dentro do aplicativo.</p>
         </div>
-        <div className="space-y-2">{costs.map(i => <Row key={i.key} item={i} showPrice={false} />)}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {costs.map(i => <Card key={i.key} item={i} isPackage={false} />)}
+        </div>
       </section>
     </div>
   );
