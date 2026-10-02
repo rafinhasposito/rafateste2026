@@ -28,6 +28,7 @@ import PageLoader from "@/components/PageLoader";
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { usePricing } from "@/hooks/usePricing";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast, houseColors } from "@/data/houses";
@@ -125,6 +126,7 @@ const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: nu
 
 const Dashboard = () => {
   const { user, profile, refreshProfile } = useAuth();
+  const { getCost, loading: pricingLoading } = usePricing();
   const { showAlert } = useAlert();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
