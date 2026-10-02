@@ -241,6 +241,52 @@ const Dashboard = () => {
     }
   };
 
+  const handleUnlockAllFocuses = async (allFocusIds: string[], houseNum: number) => {
+    if (!user || !profile || !consultation || unlocking) return;
+
+    const requiredCredits = getCost("cost_all_focuses", 3);
+
+    if (!isAdmin && credits < requiredCredits) {
+      showAlert(`Você precisa de ${requiredCredits} créditos. Adquira mais no menu.`);
+      navigate("/credits");
+      throw new Error("Sem créditos");
+    }
+
+    setUnlocking(true);
+    try {
+      if (!isAdmin) {
+        const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
+          p_amount: requiredCredits,
+          p_description: `Desbloqueio de Todos os Focos (Casa ${houseNum})`,
+          p_type: "cost_all_focuses"
+        });
+        if (chargeErr || !chargeSuccess) throw new Error(chargeErr?.message || "Erro ao debitar créditos");
+      }
+
+      const currentResult = consultation.result || {};
+      const currentUnlockedFocuses = currentResult.unlocked_focuses || {};
+      currentUnlockedFocuses[String(houseNum)] = allFocusIds;
+      
+      const newResult = { ...currentResult, unlocked_focuses: currentUnlockedFocuses };
+      
+      const { error: updateErr } = await supabase
+        .from("consultations")
+        .update({ result: newResult })
+        .eq("id", consultation.id);
+        
+      if (updateErr) throw new Error("Erro ao salvar desbloqueio.");
+      
+      setConsultation(prev => prev ? { ...prev, result: newResult } : null);
+      await refreshProfile();
+      showAlert("Todos os focos desta Casa foram ativados!", "success");
+    } catch (err: any) {
+      showAlert(err.message || "Erro ao desbloquear.");
+      throw err;
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
   const isHouseLocked = (houseNum: number) => {
     if (!consultation) return true;
     return isHouseLockedByConsultation(consultation, houseNum);
@@ -433,7 +479,9 @@ const Dashboard = () => {
             autoUnlocked={true}
             onUnlock={(n) => handleUnlock(n)}
             onUnlockFocus={(fid, hNum) => handleUnlockFocus(fid, hNum)}
+            onUnlockAllFocuses={(allIds, hNum) => handleUnlockAllFocuses(allIds, hNum)}
             focusCostLabel={`${getCost("cost_focus", 1)} Crédito${getCost("cost_focus", 1) > 1 ? "s" : ""}`}
+            allFocusesCostLabel={`${getCost("cost_all_focuses", 3)} Créditos`}
             unlockedFocuses={consultation.result?.unlocked_focuses || {}}
             embedded={false}
             isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}

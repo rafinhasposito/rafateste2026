@@ -368,6 +368,8 @@ export interface DestinyResultsProps {
   onUnlock?: (n: number) => void;
   onUnlockFocus?: (focusId: string, houseNum: number) => Promise<void>;
   focusCostLabel?: string;
+  onUnlockAllFocuses?: (allFocusIds: string[], houseNum: number) => Promise<void>;
+  allFocusesCostLabel?: string;
   unlockedFocuses?: Record<string, string[]>;
   embedded?: boolean;
   isHouseUnlocked?: (h: number) => boolean;
@@ -1120,6 +1122,28 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 })}
               </div>
 
+              {/* Botão "Desbloquear Todos os Focos" */}
+              {P.onUnlockAllFocuses && (() => {
+                const lockedFocuses = sortedAreas.filter(a => !isFocusUnlocked(a.id));
+                if (lockedFocuses.length <= 1) return null;
+                return (
+                  <button
+                    onClick={async () => {
+                      const allIds = sortedAreas.map(a => a.id);
+                      setUnlockingFocus("__all__");
+                      try {
+                        await P.onUnlockAllFocuses!(allIds, P_DYNAMIC.house);
+                      } catch(err) {}
+                      finally { setUnlockingFocus(null); }
+                    }}
+                    disabled={unlockingFocus === "__all__"}
+                    className="w-full mt-4 px-6 py-4 font-bold text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 border border-white/10 bg-white/5 text-white hover:bg-white/10 active:scale-95 transition-all backdrop-blur-md"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    {unlockingFocus === "__all__" ? "Desbloqueando..." : `Desbloquear Todos os Focos · ${P.allFocusesCostLabel || "3 Créditos"}`}
+                  </button>
+                );
+              })()}
 
               {/* COLUNA DIREITA: O PAINEL GIGANTE (Travado) */}
               <div

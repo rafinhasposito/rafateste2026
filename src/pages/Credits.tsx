@@ -3,13 +3,13 @@ import { motion } from "framer-motion";
 import StarryBackground from "@/components/StarryBackground";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Lock, Unlock, Map, ArrowLeft, CreditCard } from "lucide-react";
+import { Lock, Unlock, Map, ArrowLeft, CreditCard, Sparkles } from "lucide-react";
 import { usePricing, type PricingItem } from "@/hooks/usePricing";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
-const ICONS: Record<string, any> = { cost_house_1: Lock, cost_focus: Unlock, cost_city: Map };
+const ICONS: Record<string, any> = { cost_house_1: Lock, cost_focus: Unlock, cost_all_focuses: Sparkles, cost_city: Map };
 
 const Credits = () => {
   const { profile } = useAuth();
@@ -157,7 +157,7 @@ const Credits = () => {
           <h3 className="font-ps-display text-2xl text-white/80 font-light tracking-widest mb-12 text-center">
             Tabela de Conversão
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {costs.map((item) => {
               const Icon = ICONS[item.key] || Map;
               return (
