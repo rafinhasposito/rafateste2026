@@ -461,10 +461,23 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       return `/assets/cities/${map[baseCity]}`;
     }
     
-    // Fallback global de estrelas premium
-    return "/assets/particles.mp4"; 
+    // Sem vídeo para esta cidade — retorna null para usar imagem Unsplash
+    return null; 
   };
+
+  const getHeroImage = (cityName: string, houseId: number, apiImg?: string): string => {
+    // 1. Se a API trouxe imagem, usa ela
+    if (apiImg && apiImg.startsWith("http")) return apiImg;
+    // 2. Tenta o mapa interno de fotos por nome da cidade
+    const img = getHouseImageUrl(cityName, houseId);
+    if (img && !img.includes("unsplash.com/photo-1542281286")) return img; // não é o fallback genérico
+    // 3. Unsplash Source API — busca automática por nome da cidade
+    const cleanCity = cityName.split(',')[0].trim();
+    return `https://images.unsplash.com/1600x900/?${encodeURIComponent(cleanCity)}+city+travel&auto=format&fit=crop&w=2000&q=80`;
+  };
+
   const heroVideoSrc = getHeroVideo(P_DYNAMIC.city);
+  const heroImageSrc = getHeroImage(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img);
   const heroCountry = P_DYNAMIC.city.split(', ')[1] || "Destino";
 
   const heroRef = useRef<HTMLDivElement>(null);
@@ -705,12 +718,16 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
          1. HERO DO VÍDEO (Padrão)
          ══════════════════════════════════════════════════ */}
       <section ref={heroRef} className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
-        {/* Vídeo em full brightness */}
+        {/* Vídeo ou Imagem Full Bleed */}
         <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#03100B] z-10" />
-          <video autoPlay muted loop playsInline className="w-full h-full object-cover" key={heroVideoSrc}>
-            <source src={heroVideoSrc} type={heroVideoSrc?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
-          </video>
+          {heroVideoSrc ? (
+            <video autoPlay muted loop playsInline className="w-full h-full object-cover" key={heroVideoSrc}>
+              <source src={heroVideoSrc} type={heroVideoSrc?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
+            </video>
+          ) : (
+            <img src={heroImageSrc} alt={P_DYNAMIC.city} className="w-full h-full object-cover" />
+          )}
         </motion.div>
         
         <div className="absolute top-20 md:top-24 right-6 md:right-10 z-20 flex items-center gap-2 text-white/50">
