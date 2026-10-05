@@ -461,23 +461,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       return `/assets/cities/${map[baseCity]}`;
     }
     
-    // Sem vídeo para esta cidade — retorna null para usar imagem Unsplash
     return null; 
   };
 
-  const getHeroImage = (cityName: string, houseId: number, apiImg?: string): string => {
-    // 1. Se a API trouxe imagem, usa ela
-    if (apiImg && apiImg.startsWith("http")) return apiImg;
-    // 2. Tenta o mapa interno de fotos por nome da cidade
-    const img = getHouseImageUrl(cityName, houseId);
-    if (img && !img.includes("unsplash.com/photo-1542281286")) return img; // não é o fallback genérico
-    // 3. Unsplash Source API — busca automática por nome da cidade
-    const cleanCity = cityName.split(',')[0].trim();
-    return `https://images.unsplash.com/1600x900/?${encodeURIComponent(cleanCity)}+city+travel&auto=format&fit=crop&w=2000&q=80`;
-  };
-
   const heroVideoSrc = getHeroVideo(P_DYNAMIC.city);
-  const heroImageSrc = getHeroImage(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img);
   const heroCountry = P_DYNAMIC.city.split(', ')[1] || "Destino";
 
   const heroRef = useRef<HTMLDivElement>(null);
@@ -600,6 +587,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     return getAtmosphericFallback(houseId);
   };
   const houseFixedImageUrl = getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img);
+
+  const getHeroImage = (cityName: string, houseId: number, apiImg?: string): string => {
+    if (apiImg && apiImg.startsWith("http")) return apiImg;
+    const img = getHouseImageUrl(cityName, houseId);
+    if (img && !img.includes("unsplash.com/photo-1542281286")) return img;
+    const cleanCity = cityName.split(',')[0].trim();
+    return `https://images.unsplash.com/1600x900/?${encodeURIComponent(cleanCity)}+city+travel&auto=format&fit=crop&w=2000&q=80`;
+  };
+  const heroImageSrc = getHeroImage(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img);
 
   const currentHouseProfiles = (FOCUS_MATRIX as any)[baseHouseId] || {};
 
