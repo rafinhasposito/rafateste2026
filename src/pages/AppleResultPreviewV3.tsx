@@ -1014,7 +1014,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 {sortedAreas.map((area) => {
                   const currentActive = hoveredArea || sortedAreas[0].id;
                   const isActive = currentActive === area.id;
-                  const isUnlockedLocally = props.isHouseUnlocked ? props.isHouseUnlocked(P_DYNAMIC.house) : (area.unlocked || unlockedItems.includes(area.id));
+                  const isUnlockedLocally = unlockedItems.includes(area.id);
 
                   return (
                     <div
@@ -1059,7 +1059,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 {sortedAreas.map((area) => {
                   const currentActive = hoveredArea || sortedAreas[0].id;
                   const isActive = currentActive === area.id;
-                  const isUnlockedLocally = props.isHouseUnlocked ? props.isHouseUnlocked(P_DYNAMIC.house) : (area.unlocked || unlockedItems.includes(area.id));
+                  const isUnlockedLocally = unlockedItems.includes(area.id);
 
                   return (
                     <div key={area.id} className="flex flex-col">
