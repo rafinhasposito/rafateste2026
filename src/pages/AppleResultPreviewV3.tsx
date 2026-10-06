@@ -529,7 +529,23 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       "nova york": "new_york.mp4",
       "belo horizonte": "belo_horizonte.mp4",
       "maceio": "maceio.mp4",
-      "macei\u00f3": "maceio.mp4"
+      "macei\u00f3": "maceio.mp4",
+      "bangkok": "singapore.mp4",
+      "seul": "seoul.mp4",
+      "genebra": "geneva.mp4",
+      "berlim": "berlin.mp4",
+      "jerusalem": "jerusalem.mp4",
+      "jerusalem": "jerusalem.mp4",
+      "copenhague": "singapore.mp4",
+      "amsterda": "berlin.mp4",
+      "monte carlo": "monaco.mp4",
+      "nova delhi": "singapore.mp4",
+      "nova delhi": "singapore.mp4",
+      "zurique": "zurich.mp4",
+      "munique": "berlin.mp4",
+      "viena": "geneva.mp4",
+      "los angeles": "las_vegas.mp4",
+      "cidade do panama": "panama_city.mp4"
 };
     
     const file = map[baseCity] || map[Object.keys(map).find(k => baseCity.includes(k)) || ""];
