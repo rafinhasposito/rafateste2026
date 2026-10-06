@@ -126,6 +126,7 @@ const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: nu
 
 const Dashboard = () => {
   const { user, profile, refreshProfile } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const { getCost, loading: pricingLoading } = usePricing();
   const { showAlert } = useAlert();
   const navigate = useNavigate();
