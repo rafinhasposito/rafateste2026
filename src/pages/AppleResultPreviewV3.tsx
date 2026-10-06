@@ -629,7 +629,6 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   };
   const houseFixedImageUrl = getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img);
 
-  const heroImageSrc = useCityImage(P_DYNAMIC.city, P_DYNAMIC.house) || bestCity?.img || getAtmosphericFallback(P_DYNAMIC.house);
 
   const currentHouseProfiles = (FOCUS_MATRIX as any)[baseHouseId] || {};
 
