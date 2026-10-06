@@ -219,11 +219,11 @@ export default function HouseTrailerApp() {
 
         <motion.div className="relative z-20 flex flex-col items-center text-center px-6 max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: "easeOut" }}>
-            <h1 className="text-[140px] md:text-[220px] font-ps-display font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/30 uppercase" style={{ filter: `drop-shadow(0px 20px 40px ${theme.themeColor}33)` }}>
+            <h1 className="text-[140px] md:text-[220px] font-ps-display font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/30 uppercase pb-6 md:pb-12" style={{ filter: `drop-shadow(0px 20px 40px ${theme.themeColor}33)` }}>
               Casa {currentHouse}
             </h1>
           </motion.div>
-          <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-xl md:text-3xl font-ps-display font-light tracking-tight text-white/80 mt-[-10px] md:mt-[-20px]">
+          <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-xl md:text-3xl font-ps-display font-light tracking-tight text-white/80 mt-[-30px] md:mt-[-60px]">
             {theme.subtitle}
           </motion.h2>
         </motion.div>
