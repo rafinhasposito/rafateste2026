@@ -447,7 +447,7 @@ const Dashboard = () => {
             houseName={house.label}
             houseData={house}
             cities={{ highticket, acessivel, nacional }}
-            allResults={consultation.result?.results}
+            allResults={safeResults}
             unlockedFocuses={consultation.result?.unlocked_focuses}
             userCredits={credits}
             isAuthenticated={!!user}

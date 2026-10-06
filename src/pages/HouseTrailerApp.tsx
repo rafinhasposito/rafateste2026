@@ -152,7 +152,12 @@ export default function HouseTrailerApp() {
 
       const allResults: Record<string, any> = {};
       if (data.results) {
-        for (const [key, val] of Object.entries(data.results)) {
+        // Hotfix: Filtra Mumbai no frontend até o backend (Render) ser atualizado
+        let safeData = JSON.stringify(data.results);
+        safeData = safeData.replace(/Mumbai/g, "Nova York").replace(/mumbai.avif/g, "new_york.mp4");
+        const parsedData = JSON.parse(safeData);
+
+        for (const [key, val] of Object.entries(parsedData)) {
           allResults[key] = val;
         }
       }
