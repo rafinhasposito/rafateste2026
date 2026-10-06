@@ -381,6 +381,40 @@ export interface DestinyResultsProps {
   fullMapCost?: number;
 }
 
+
+const WikiImage = ({ cityName, initialSrc, fallbackSrc, alt, className }: any) => {
+  const [imgSrc, setImgSrc] = useState<string>(initialSrc || fallbackSrc);
+
+  useEffect(() => {
+    if (!cityName || cityName === "Bloqueado" || cityName === "Desconhecido") return;
+    
+    // If the initialSrc is already a generic atmospheric fallback, try to get a real city image from Wikipedia
+    if (imgSrc.includes("unsplash.com/photo-") && (
+        imgSrc.includes("1542281286") || imgSrc.includes("1579532537") || 
+        imgSrc.includes("1519389950") || imgSrc.includes("1449844908") ||
+        imgSrc.includes("1492684223") || imgSrc.includes("1494500764") ||
+        imgSrc.includes("1511895426") || imgSrc.includes("1518709268") ||
+        imgSrc.includes("1454496522") || imgSrc.includes("1486406146") ||
+        imgSrc.includes("1511649475") || imgSrc.includes("1490730141")
+    )) {
+      const cleanCity = cityName.split(',')[0].trim();
+      fetch(`https://pt.wikipedia.org/w/api.php?origin=*&action=query&titles=${encodeURIComponent(cleanCity)}&prop=pageimages&format=json&pithumbsize=1000`)
+        .then(res => res.json())
+        .then(data => {
+          const pages = data.query?.pages;
+          if (pages) {
+            const page = Object.values(pages)[0] as any;
+            if (page?.thumbnail?.source) {
+              setImgSrc(page.thumbnail.source.split('?')[0]);
+            }
+          }
+        }).catch(() => {});
+    }
+  }, [cityName, imgSrc]);
+
+  return <img src={imgSrc} alt={alt} className={className} onError={(e) => { e.currentTarget.src = fallbackSrc; }} />;
+};
+
 export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -1888,7 +1922,13 @@ const useCityImage = (cityName: string, houseId: number) => {
                         <>
                           {/* FOTO TOP (Corte Seco) */}
                           <div className="relative h-[130px] w-full shrink-0 overflow-hidden bg-[#050505]">
-                            <img src={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} onError={(e) => { e.currentTarget.src = getAtmosphericFallback(num); }} alt={cityForThisHouse} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                            <WikiImage 
+                              cityName={cityForThisHouse} 
+                              initialSrc={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} 
+                              fallbackSrc={getAtmosphericFallback(num)} 
+                              alt={cityForThisHouse} 
+                              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
+                            />
                             {isCurrent && (
                               <div className="absolute inset-0 bg-white/5 mix-blend-overlay"></div>
                             )}
