@@ -1979,11 +1979,20 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         fullMapCost={props.fullMapCost}
         onClose={() => setIsPaywallOpen(false)} 
         onSuccess={(id, purchaseType) => {
-          if (props.onUnlock && targetLockedArea?.houseNum) {
-             // Se purchaseType for 'full', passamos 0 como flag de Unlock All
+          if (targetLockedArea?.type === 'foco') {
+             if (purchaseType === 'single' && props.onUnlockFocus && targetLockedArea.houseNum) {
+                props.onUnlockFocus(id, targetLockedArea.houseNum);
+             } else if (purchaseType === 'full' && props.onUnlockAllFocuses && targetLockedArea.houseNum) {
+                const allIds = LIFE_AREAS.map(a => a.id);
+                props.onUnlockAllFocuses(allIds, targetLockedArea.houseNum);
+             }
+             return;
+          }
+          
+          if (targetLockedArea?.type === 'rota' && props.onUnlock && targetLockedArea?.houseNum) {
              props.onUnlock(purchaseType === 'full' ? 0 : targetLockedArea.houseNum);
              window.scrollTo({ top: 0, behavior: 'smooth' });
-          } else {
+          } else if (!props.onUnlock) {
              // Sandbox / Preview mode behavior
              if (purchaseType === 'single') {
                setUnlockedItems(prev => [...prev, id]);
