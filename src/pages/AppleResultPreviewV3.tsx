@@ -388,7 +388,16 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
   useEffect(() => {
     if (!cityName || cityName === "Bloqueado" || cityName === "Desconhecido") return;
     
-    if (localFallback && !localFallback.includes("unsplash.com/photo-1542281286")) {
+    const isGenericFallback = localFallback && localFallback.includes("unsplash.com/photo-") && (
+        localFallback.includes("1542281286") || localFallback.includes("1579532537") || 
+        localFallback.includes("1519389950") || localFallback.includes("1449844908") ||
+        localFallback.includes("1492684223") || localFallback.includes("1494500764") ||
+        localFallback.includes("1511895426") || localFallback.includes("1518709268") ||
+        localFallback.includes("1454496522") || localFallback.includes("1486406146") ||
+        localFallback.includes("1511649475") || localFallback.includes("1490730141")
+    );
+
+    if (localFallback && !isGenericFallback) {
       setImgSrc(localFallback);
       return;
     }
