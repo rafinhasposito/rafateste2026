@@ -361,6 +361,7 @@ export interface DestinyResultsProps {
     nacional: CityOption[];
   };
   allResults?: Record<string, HouseResult> | undefined;
+  unlockedFocuses?: Record<string, string[]>;
   userCredits?: number;
   isAuthenticated?: boolean;
   consultationId?: string;
@@ -611,6 +612,16 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     const saved = P.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
     return [defaultFocus, ...saved];
   });
+  useEffect(() => {
+    if (props.unlockedFocuses?.[String(props.house)]) {
+      setUnlockedItems(prev => {
+        const saved = props.unlockedFocuses![String(props.house)] || [];
+        const combined = [...new Set([...prev, ...saved])];
+        return combined;
+      });
+    }
+  }, [props.unlockedFocuses, props.house]);
+
   
   useEffect(() => {
     const defaultFocus = intendedAreaId ? intendedAreaId : Object.keys(LIFE_AREAS)[0];
@@ -1986,9 +1997,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         onSuccess={(id, purchaseType) => {
           if (targetLockedArea?.type === 'foco') {
              if (purchaseType === 'single' && props.onUnlockFocus && targetLockedArea.houseNum) {
+                setUnlockedItems(prev => [...prev, id]);
+                setHoveredArea(id);
                 props.onUnlockFocus(id, targetLockedArea.houseNum);
              } else if (purchaseType === 'full' && props.onUnlockAllFocuses && targetLockedArea.houseNum) {
                 const allIds = LIFE_AREAS.map(a => a.id);
+                setUnlockedItems(prev => [...new Set([...prev, ...allIds])]);
+                setHoveredArea(id);
                 props.onUnlockAllFocuses(allIds, targetLockedArea.houseNum);
              }
              return;

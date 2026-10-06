@@ -448,6 +448,7 @@ const Dashboard = () => {
             houseData={house}
             cities={{ highticket, acessivel, nacional }}
             allResults={consultation.result?.results}
+            unlockedFocuses={consultation.result?.unlocked_focuses}
             userCredits={credits}
             isAuthenticated={!!user}
             consultationId={consultation.id}
