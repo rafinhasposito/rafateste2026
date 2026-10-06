@@ -490,6 +490,8 @@ const Dashboard = () => {
             unlockedCount={consultation.houses_unlocked}
             fullMapCost={getCost("cost_full_map", 7)}
             houseCost={getCost("cost_house_1", 1)}
+            focusCost={getCost("cost_focus", 1)}
+            allFocusesCost={getCost("cost_all_focuses", 3)}
           />
           <ConfirmCreditAction
             fullMapCost={getCost("cost_full_map", 7)}

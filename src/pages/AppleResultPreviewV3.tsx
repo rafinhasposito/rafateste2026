@@ -379,6 +379,8 @@ export interface DestinyResultsProps {
   intent?: string | null;
   houseCost?: number;
   fullMapCost?: number;
+  focusCost?: number;
+  allFocusesCost?: number;
 }
 
 
@@ -386,6 +388,7 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
   const [imgSrc, setImgSrc] = useState<string>(initialSrc || fallbackSrc);
 
   useEffect(() => {
+    console.log("WikiImage rendered for:", cityName, "imgSrc:", imgSrc, "localFallback:", localFallback);
     if (!cityName || cityName === "Bloqueado" || cityName === "Desconhecido") return;
     
     const isGenericFallback = localFallback && localFallback.includes("unsplash.com/photo-") && (
@@ -1977,6 +1980,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         userCredits={props.userCredits}
         houseCost={props.houseCost}
         fullMapCost={props.fullMapCost}
+        focusCost={props.focusCost}
+        allFocusesCost={props.allFocusesCost}
         onClose={() => setIsPaywallOpen(false)} 
         onSuccess={(id, purchaseType) => {
           if (targetLockedArea?.type === 'foco') {

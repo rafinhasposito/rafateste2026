@@ -12,7 +12,7 @@ interface Props {
   userCredits?: number;
 }
 
-export default function UnlockPremiumModal({ isOpen, onClose, onSuccess, targetArea, isEmbedded, userCredits, houseCost = 1, fullMapCost = 7 }: Props & { houseCost?: number; fullMapCost?: number }) {
+export default function UnlockPremiumModal({ isOpen, onClose, onSuccess, targetArea, isEmbedded, userCredits, houseCost = 1, fullMapCost = 7, focusCost = 1, allFocusesCost = 3 }: Props & { houseCost?: number; fullMapCost?: number, focusCost?: number, allFocusesCost?: number }) {
   if (!isOpen) return null;
   const color = targetArea?.color || '#10b981';
   const isFoco = targetArea?.type === 'foco';
@@ -23,7 +23,7 @@ export default function UnlockPremiumModal({ isOpen, onClose, onSuccess, targetA
       if (purchaseType === 'single') {
         toast.success(`${isFoco ? 'Intenção' : 'Rota'} de ${targetArea?.label || 'Destino'} desbloqueada com sucesso!`);
       } else {
-        toast.success("Visão 360º desbloqueada! Todas as 12 Casas e Focos estão livres.");
+        toast.success(isFoco ? "Todas as Intenções desbloqueadas com sucesso!" : "Visão 360º desbloqueada! Todas as 12 Casas e Focos estão livres.");
       }
     }
     if (onSuccess && targetArea) {
@@ -95,7 +95,7 @@ export default function UnlockPremiumModal({ isOpen, onClose, onSuccess, targetA
             <div onClick={() => handleUnlock('single')} className="bg-[#111] border border-white/10 rounded-2xl p-6 mb-4 hover:border-white/30 transition-colors cursor-pointer group">
               <div className="flex justify-between items-start mb-2">
                 <h4 className="text-white font-bold text-xl">Passe Único</h4>
-                <div className="font-mono font-bold text-white/50 group-hover:text-white transition-colors">{houseCost} Crédito{houseCost > 1 ? "s" : ""}</div>
+                <div className="font-mono font-bold text-white/50 group-hover:text-white transition-colors">{isFoco ? focusCost : houseCost} Crédito{(isFoco ? focusCost : houseCost) > 1 ? "s" : ""}</div>
               </div>
               <p className="text-white/40 text-sm mb-6">
                 Desbloqueia apenas {isFoco ? 'a intenção de ' : 'a rota de '} {targetArea?.label || 'Destino'}.
@@ -113,12 +113,12 @@ export default function UnlockPremiumModal({ isOpen, onClose, onSuccess, targetA
                 </span>
               </div>
               <div className="flex justify-between items-start mb-2 mt-2">
-                <h4 className="text-white font-bold text-xl">Visão 360º Completa</h4>
-                <div className="font-mono font-bold" style={{ color }}>{fullMapCost} Créditos</div>
+                <h4 className="text-white font-bold text-xl">{isFoco ? 'Todas as Intenções' : 'Visão 360º Completa'}</h4>
+                <div className="font-mono font-bold" style={{ color }}>{isFoco ? allFocusesCost : fullMapCost} Créditos</div>
               </div>
-              <p className="text-white/50 text-sm mb-6">Desbloqueia as 11 Rotas restantes do seu mapa de uma só vez.</p>
+              <p className="text-white/50 text-sm mb-6">{isFoco ? 'Desbloqueia todas as Intenções desta mesma Casa de uma vez.' : 'Desbloqueia as 11 Rotas restantes do seu mapa de uma só vez.'}</p>
               <button className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-white border transition-colors shadow-2xl pointer-events-none" style={{ backgroundColor: `${color}20`, borderColor: `${color}50` }}>
-                <Compass className="w-4 h-4" /> Expandir Mapa Inteiro
+                <Compass className="w-4 h-4" /> {isFoco ? 'Expandir Todas' : 'Expandir Mapa Inteiro'}
               </button>
             </div>
 
