@@ -318,40 +318,14 @@ const Dashboard = () => {
     setUnlocking(true);
 
     try {
-      if (isUnlockAll) {
-         if (!isAdmin) {
-            // Debit 7 credits manually
-            const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
-               p_amount: requiredCredits,
-               p_description: "Visão 360 Completa - Desbloqueio de 12 Casas",
-               p_type: "cost_full_map"
-            });
-            if (chargeErr || !chargeSuccess) throw new Error(chargeErr?.message || "Erro ao debitar créditos");
-         }
-         
-         // Update all 12 houses
-         const allHouses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-         const { error: updateError } = await supabase
-          .from("consultations")
-          .update({ unlocked_houses: allHouses })
-          .eq("id", consultation.id);
-         if (updateError) throw updateError;
-      } else {
-        if (isAdmin) {
-          const newUnlocked = consultation.unlocked_houses ? [...consultation.unlocked_houses, targetHouse] : [targetHouse];
-          const { error: updateError } = await supabase
-            .from("consultations")
-            .update({ unlocked_houses: Array.from(new Set(newUnlocked)) })
-            .eq("id", consultation.id);
-          if (updateError) throw updateError;
-        } else {
-          const { error: rpcError } = await supabase.rpc("unlock_consultation_houses", {
-            p_consultation_id: consultation.id,
-            p_target_house: targetHouse
-          });
-          if (rpcError) throw rpcError;
-        }
-      }
+      // The RPC 'unlock_consultation_houses' handles both single house and '0' (Visao 360) natively, 
+      // AND it deducts credits automatically if the user is not an admin.
+      const { error: rpcError } = await supabase.rpc("unlock_consultation_houses", {
+        p_consultation_id: consultation.id,
+        p_target_house: targetHouse
+      });
+
+      if (rpcError) throw rpcError;
 
       const { data: refreshedConsultation, error: fetchError } = await supabase
         .from("consultations")
