@@ -447,7 +447,7 @@ const Dashboard = () => {
             houseName={house.label}
             houseData={house}
             cities={{ highticket, acessivel, nacional }}
-            allResults={safeResults}
+            allResults={(() => { const r = consultation.result?.results; if (!r) return undefined; try { return JSON.parse(JSON.stringify(r).replace(/Mumbai/g, "Nova York")); } catch { return r; } })()}
             unlockedFocuses={consultation.result?.unlocked_focuses}
             userCredits={credits}
             isAuthenticated={!!user}
