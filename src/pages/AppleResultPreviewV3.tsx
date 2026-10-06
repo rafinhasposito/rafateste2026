@@ -790,7 +790,13 @@ const useCityImage = (cityName: string, houseId: number) => {
               <source src={heroVideoSrc} type={heroVideoSrc?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
             </video>
           ) : (
-            <img src={heroImageSrc} alt={P_DYNAMIC.city} className="w-full h-full object-cover" />
+            <WikiImage 
+              cityName={P_DYNAMIC.city} 
+              initialSrc={bestCity?.img || getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)} 
+              fallbackSrc={getAtmosphericFallback(P_DYNAMIC.house)} 
+              alt={P_DYNAMIC.city} 
+              className="w-full h-full object-cover" 
+            />
           )}
         </motion.div>
         
