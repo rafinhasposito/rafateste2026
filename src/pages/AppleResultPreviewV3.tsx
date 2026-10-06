@@ -504,45 +504,6 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   };
 
   
-const useCityImage = (cityName: string, houseId: number) => {
-  const [imgUrl, setImgUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!cityName) return;
-    const cleanCity = cityName.split(',')[0].trim();
-    
-    // 1. Tenta imagens hardcoded de alta qualidade primeiro
-    const localFallback = getHouseImageUrl(cleanCity, houseId);
-    if (localFallback && !localFallback.includes("unsplash.com/photo-1542281286")) {
-      setImgUrl(localFallback);
-      return;
-    }
-
-    // 2. Busca na Wikipedia dinamicamente
-    const fetchWikiImage = async () => {
-      try {
-        const res = await fetch(`https://pt.wikipedia.org/w/api.php?origin=*&action=query&titles=${encodeURIComponent(cleanCity)}&prop=pageimages&format=json&pithumbsize=1600`);
-        const data = await res.json();
-        const pages = data.query?.pages;
-        if (pages) {
-          const page = Object.values(pages)[0] as any;
-          if (page && page.thumbnail && page.thumbnail.source) {
-            // Remove o utm_source para a URL ficar limpa
-            const cleanUrl = page.thumbnail.source.split('?')[0];
-            setImgUrl(cleanUrl);
-            return;
-          }
-        }
-      } catch (e) {}
-      // 3. Fallback atmosférico se nada funcionar
-      setImgUrl(getAtmosphericFallback(houseId));
-    };
-
-    fetchWikiImage();
-  }, [cityName, houseId]);
-
-  return imgUrl;
-};
 
   const heroVideoSrc = getHeroVideo(P_DYNAMIC.city);
   const heroCountry = P_DYNAMIC.city.split(', ')[1] || "Destino";
@@ -1476,14 +1437,21 @@ const useCityImage = (cityName: string, houseId: number) => {
 
                               {/* 1. O HERO: Foto Panorâmica com Hierarquia Focada */}
                               <motion.div variants={itemVariants} className="w-full h-[50vh] min-h-[450px] md:h-[65vh] rounded-[40px] overflow-hidden relative shadow-2xl mb-12 border border-white/10 group">
-                                  <motion.img 
+                                  <motion.div 
                                     initial={{ scale: 1.1 }}
                                     whileInView={{ scale: 1 }}
                                     transition={{ duration: 2.5, ease: "easeOut" }}
-                                    src={houseFixedImageUrl} 
-                                    alt={P_DYNAMIC.city} 
-                                    className="w-full h-full object-cover object-center" 
-                                  />
+                                    className="w-full h-full"
+                                  >
+                                    <WikiImage 
+                                      cityName={P_DYNAMIC.city}
+                                      initialSrc={bestCity?.img}
+                                      fallbackSrc={getAtmosphericFallback(P_DYNAMIC.house)}
+                                      localFallback={getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
+                                      alt={P_DYNAMIC.city}
+                                      className="w-full h-full object-cover object-center"
+                                    />
+                                  </motion.div>
                                   <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/50 to-transparent"></div>
                                   
                                   <div className="absolute bottom-10 md:bottom-16 left-0 right-0 z-10 flex flex-col items-center text-center px-6">
