@@ -382,12 +382,17 @@ export interface DestinyResultsProps {
 }
 
 
-const WikiImage = ({ cityName, initialSrc, fallbackSrc, alt, className }: any) => {
+const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, className }: any) => {
   const [imgSrc, setImgSrc] = useState<string>(initialSrc || fallbackSrc);
 
   useEffect(() => {
     if (!cityName || cityName === "Bloqueado" || cityName === "Desconhecido") return;
     
+    if (localFallback && !localFallback.includes("unsplash.com/photo-1542281286")) {
+      setImgSrc(localFallback);
+      return;
+    }
+
     // If the initialSrc is already a generic atmospheric fallback, try to get a real city image from Wikipedia
     if (imgSrc.includes("unsplash.com/photo-") && (
         imgSrc.includes("1542281286") || imgSrc.includes("1579532537") || 
@@ -1838,7 +1843,14 @@ const useCityImage = (cityName: string, houseId: number) => {
                         onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'}
                       >
                         <div className="absolute inset-0">
-                          <img src={city.img} alt={city.city} className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-90 transition-all duration-1000 ease-[0.19,1,0.22,1]" />
+                          <WikiImage 
+                            cityName={city.city || city.name}
+                            initialSrc={city.img}
+                            fallbackSrc={getAtmosphericFallback(P_DYNAMIC.house)}
+                            localFallback={getHouseImageUrl(city.city || city.name, P_DYNAMIC.house)}
+                            alt={city.city || "City"} 
+                            className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-90 transition-all duration-1000 ease-[0.19,1,0.22,1]" 
+                          />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-black/40 to-transparent"></div>
                           <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-700" style={{ backgroundColor: currentActiveData?.color || '#10b981' }}></div>
                         </div>
@@ -1932,6 +1944,7 @@ const useCityImage = (cityName: string, houseId: number) => {
                               cityName={cityForThisHouse} 
                               initialSrc={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} 
                               fallbackSrc={getAtmosphericFallback(num)} 
+                              localFallback={getHouseImageUrl(cityForThisHouse, num)}
                               alt={cityForThisHouse} 
                               className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
                             />
