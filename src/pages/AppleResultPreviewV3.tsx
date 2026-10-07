@@ -597,22 +597,20 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual (P_DYNAMIC.house)
   const currentHouseResult = props.allResults ? props.allResults[P_DYNAMIC.house.toString()] : null;
   
-  const extractRoute = (tierData: any, fallbackName: string) => {
-    if (!tierData) return null;
-    // tierData is an array of cities from Python API
-    const cityData = Array.isArray(tierData) ? tierData[0] : tierData;
-    if (!cityData) return null;
-    return {
+  const extractRoutes = (tierData: any, fallbackName: string): any[] => {
+    if (!tierData) return [];
+    const arr = Array.isArray(tierData) ? tierData : [tierData];
+    return arr.filter(Boolean).map(cityData => ({
       ...cityData,
       city: cityData.city || cityData.name || "Destino",
       score: cityData.score || (fallbackName === 'Nacional' ? 96 : fallbackName === 'Acessível' ? 94 : 98),
       img: (cityData.img && cityData.img.startsWith('http')) ? cityData.img : getAtmosphericFallback(P_DYNAMIC.house)
-    };
+    }));
   };
 
-  const htRoute = extractRoute(currentHouseResult?.options?.highticket, 'High-Ticket');
-  const acRoute = extractRoute(currentHouseResult?.options?.acessivel, 'Acessível');
-  const naRoute = extractRoute(currentHouseResult?.options?.nacional, 'Nacional');
+  const htRoutes = extractRoutes(currentHouseResult?.options?.highticket, 'High-Ticket');
+  const acRoutes = extractRoutes(currentHouseResult?.options?.acessivel, 'Acessível');
+  const naRoutes = extractRoutes(currentHouseResult?.options?.nacional, 'Nacional');
 
   // Somente usa o props.cities genérico se currentHouseResult não existir E estivermos na mesma casa inicial
   const isInitialHouse = !props.allResults || (props.consultationId && P_DYNAMIC.house === props.house);
@@ -621,9 +619,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const fallbackHt = isInitialHouse ? props.cities?.highticket : [];
   
   const citiesObj = {
-    nacional: naRoute ? [naRoute] : fallbackNa || [],
-    acessivel: acRoute ? [acRoute] : fallbackAc || [],
-    highticket: htRoute ? [htRoute] : fallbackHt || []
+    nacional: naRoutes.length > 0 ? naRoutes : fallbackNa || [],
+    acessivel: acRoutes.length > 0 ? acRoutes : fallbackAc || [],
+    highticket: htRoutes.length > 0 ? htRoutes : fallbackHt || []
   };
 
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
@@ -735,10 +733,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     }
     
     const isIntended = (area.id === intendedAreaId);
+    const isPaidFocus = props.unlockedFocuses?.[String(P_DYNAMIC.house)]?.includes(area.id) || false;
+    const isLocallyUnlocked = unlockedItems.includes(area.id);
+    
     return {
       ...area,
       score: finalScore,
-      unlocked: isIntended ? true : (area.unlocked || false),
+      unlocked: isIntended || isPaidFocus || isLocallyUnlocked,
       teaser: focusData.headline || area.teaser,
       full: focusData.headline || area.teaser,
       mantra: focusData.mantra || area.mantra,
