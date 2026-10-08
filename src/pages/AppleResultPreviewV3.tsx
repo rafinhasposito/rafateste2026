@@ -1855,9 +1855,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
-                  { title: "Nacional", desc: "Acessível e perto de você", data: citiesObj.nacional },
-                  { title: "Acessível", desc: "Viagem internacional viável", data: citiesObj.acessivel },
-                  { title: "High Ticket", desc: "Destino de alto padrão", data: citiesObj.highticket }
+                  { title: "Nacional", desc: "Rota Nacional Alternativa", data: citiesObj.nacional },
+                  { title: "Acessível", desc: "Rota Internacional Alternativa", data: citiesObj.acessivel },
+                  { title: "High Ticket", desc: "Destino Alternativo de Luxo", data: citiesObj.highticket }
                 ].map((tier, idx) => (
                   <div key={idx} className="flex flex-col gap-6">
                     <div className="flex items-center gap-4 mb-4">
