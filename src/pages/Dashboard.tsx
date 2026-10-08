@@ -128,6 +128,9 @@ const Dashboard = () => {
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { getCost, loading: pricingLoading } = usePricing();
+  const costFocus = getCost("cost_focus", 1);
+  const costHouse = getCost("cost_house_1", 1);
+  const costFull = getCost("cost_full_map", 7);
   const { showAlert } = useAlert();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -192,7 +195,7 @@ const Dashboard = () => {
   const handleUnlockFocus = async (focusId: string, houseNum: number) => {
     if (!user || !profile || !consultation || unlocking) return;
 
-    if (!isAdmin && credits < 1) {
+    if (!isAdmin && credits < costFocus) {
       showAlert(`Você não tem créditos suficientes. Adquira mais no menu.`);
       navigate("/credits");
       throw new Error("Sem créditos");
@@ -202,7 +205,7 @@ const Dashboard = () => {
     try {
       if (!isAdmin) {
         const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
-          p_amount: 1,
+          p_amount: costFocus,
           p_description: `Desbloqueio de Foco: ${focusId} (Casa ${houseNum})`,
           p_type: "deduction"
         });
@@ -231,7 +234,7 @@ const Dashboard = () => {
       // Update local state
       setConsultation(prev => prev ? { ...prev, result: newResult } : null);
       if (!isAdmin) {
-         setProfile(prev => prev ? { ...prev, credits: prev.credits - 1 } : null);
+         await refreshProfile();
       }
       showAlert("Foco ativado com sucesso!", "success");
     } catch (err: any) {
@@ -434,8 +437,10 @@ const Dashboard = () => {
         seen.add(k);
         return true;
       });
-      if (masterCity) seen.add(`${masterCity.city}|${masterCity.country}`);
-      const highticket: CityOption[] = masterCity ? [masterCity, ...dedup(htArr)] : dedup(htArr);
+      // CRITICAL FIX: DO NOT add masterCity to 'seen' beforehand!
+      // If we do, the deduplicator strips the user's searched city from the arrays,
+      // causing the Hero banner to fallback to a random extra destination (e.g., Salvador).
+      const highticket: CityOption[] = dedup(htArr);
       const acessivel: CityOption[] = dedup(acArr);
       const nacional: CityOption[] = dedup(naArr);
 
@@ -458,7 +463,6 @@ const Dashboard = () => {
             onUnlockAllFocuses={(allIds, hNum) => handleUnlockAllFocuses(allIds, hNum)}
             focusCostLabel={`${getCost("cost_focus", 1)} Crédito${getCost("cost_focus", 1) > 1 ? "s" : ""}`}
             allFocusesCostLabel={`${getCost("cost_all_focuses", 3)} Créditos`}
-            unlockedFocuses={consultation.result?.unlocked_focuses || {}}
             embedded={false}
             isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
             onSelectHouse={(h) => setSelectedHouse(h)}
