@@ -352,6 +352,7 @@ export interface HouseResult {
 }
 
 export interface DestinyResultsProps {
+  birthDate?: string;
   userName?: string;
   originName?: string;
   targetYear?: string;
@@ -458,6 +459,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
   // P_DYNAMIC uses real user profile data if available
   const P_DYNAMIC = {
+    birthDate: props.birthDate || "Data Não Informada",
     ...P,
     name: props.userName || "Viajante",
     origin: props.originName || props.birthPlace || "Origem não informada",
@@ -944,7 +946,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                <div className="flex items-center gap-4 text-sm w-full">
                                   <span className="text-white/90 font-medium">{P_DYNAMIC.firstName}</span>
                                   <span className="text-white/20">|</span>
-                                  <span className="text-white/70">09/08/1985</span>
+                                  <span className="text-white/70">{P_DYNAMIC.birthDate}</span>
                                   <span className="text-white/20">|</span>
                                   <span className="text-white/70">{P_DYNAMIC.sign}</span>
                                   
@@ -1011,7 +1013,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                            <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white text-lg md:text-xl font-medium">
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                                <Calendar className="w-5 h-5 text-[var(--hc)]"/> 
-                               09 de Agosto, 2027
+                               Aniversário em {P_DYNAMIC.year}
                              </span>
                              <span className="text-white/20 hidden md:inline">|</span>
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
