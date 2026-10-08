@@ -447,6 +447,10 @@ const Dashboard = () => {
       return (
         <>
           <DestinyResults
+            userName={consultation.name || profile?.display_name || undefined}
+            originName={consultation.origin || undefined}
+            targetYear={consultation.year}
+            birthPlace={consultation.birth_place}
             intent={consultation.intent}
             house={selectedHouse}
             houseName={house.label}

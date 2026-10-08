@@ -352,6 +352,10 @@ export interface HouseResult {
 }
 
 export interface DestinyResultsProps {
+  userName?: string;
+  originName?: string;
+  targetYear?: string;
+  birthPlace?: string;
   house?: number | null;
   houseName?: string;
   houseData?: any;
@@ -452,8 +456,14 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const bestCity = props.cities?.highticket?.[0] || props.cities?.acessivel?.[0] || props.cities?.nacional?.[0];
   const cityStr = bestCity ? `${bestCity.city}, ${bestCity.country}` : "Nova York, EUA";
 
+  // P_DYNAMIC uses real user profile data if available
   const P_DYNAMIC = {
     ...P,
+    name: props.userName || "Viajante",
+    origin: props.originName || props.birthPlace || "Origem não informada",
+    year: props.targetYear || P.year,
+    sign: "Seu Sol",
+    ascendant: "Seu Ascendente",
     house: urlHouseIndex,
     houseLabel: props.houseName || "Casa",
     city: cityStr,
@@ -1016,10 +1026,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                              <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-5">DNA Astrológico</p>
                              <div className="space-y-4">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Sun className="w-5 h-5 text-yellow-400"/> Sol em {P_DYNAMIC.sign}
+                                 <Sun className="w-5 h-5 text-yellow-400"/> {P_DYNAMIC.sign}
                                </p>
                                <p className="text-white/80 font-medium text-lg flex items-center gap-3">
-                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> Ascendente {P_DYNAMIC.ascendant}
+                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> {P_DYNAMIC.ascendant}
                                </p>
                              </div>
                            </div>
@@ -1417,7 +1427,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               01. Sua Essência
                             </span>
                             <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
-                              Sol em Leão.
+                              Sua Identidade Astral.
                             </h3>
                             <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
                               {currentActiveData.dnaData?.essencia || currentActiveData.dna?.essencia}
@@ -1436,7 +1446,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               02. Seu Método
                             </span>
                             <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
-                              Ascendente <br className="hidden md:block" />em Virgem.
+                              Como Você<br className="hidden md:block" />Se Manifesta.
                             </h3>
                             <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
                               {currentActiveData.dnaData?.metodo || currentActiveData.dna?.metodo}
