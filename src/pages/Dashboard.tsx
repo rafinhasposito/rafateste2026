@@ -70,7 +70,7 @@ interface ConsultationRow {
   intent: string | null;
   origin: string | null;
   birth_place: string;
-  dob?: string;
+  birthdate?: string;
   houses_unlocked: number;
   unlocked_houses: number[];
   result: ApiResult | null;
@@ -448,7 +448,7 @@ const Dashboard = () => {
       return (
         <>
           <DestinyResults
-            birthDate={consultation.dob}
+            birthDate={consultation.birthdate}
             userName={consultation.name || profile?.display_name || undefined}
             originName={consultation.origin || undefined}
             targetYear={consultation.year}
