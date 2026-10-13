@@ -153,7 +153,14 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         mode,
         goal: selectedHouse,
         intent: houseData.intent,
-        result: { results: allResults, house: selectedHouse, return_time_utc: (window as any).__solar_return_time || null },
+        result: {
+          results: allResults,
+          house: selectedHouse,
+          return_time_utc: data?.return_time_utc || null,
+          return_date: data?.return_date || null,
+          sun_sign: data?.sun_sign || null,
+          ascendant: data?.ascendant || null,
+        },
       }) ?? undefined;
 
       if (consultationId) navigate("/dashboard?id=" + consultationId);

@@ -353,7 +353,11 @@ export interface HouseResult {
 
 export interface DestinyResultsProps {
   birthDate?: string;
+  birthTime?: string;
   returnTimeUtc?: string;
+  returnDate?: string;
+  sunSign?: string;
+  ascendantSign?: string;
   userName?: string;
   originName?: string;
   targetYear?: string;
@@ -445,8 +449,7 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
 
 
 function getSunSign(birthdate: string | undefined): string {
-  if (!birthdate) return "Seu Sol";
-  // birthdate pode ser "1986-10-08" ou "08/10/1986"
+  if (!birthdate) return "Libra";
   let day: number, month: number;
   if (birthdate.includes("-")) {
     const parts = birthdate.split("-");
@@ -455,19 +458,104 @@ function getSunSign(birthdate: string | undefined): string {
     const parts = birthdate.split("/");
     day = parseInt(parts[0]); month = parseInt(parts[1]);
   }
-  if (isNaN(day) || isNaN(month)) return "Seu Sol";
-  const signs = [
-    [1,20,"Capricórnio"],[2,19,"Aquário"],[3,20,"Peixes"],[4,20,"Áries"],
-    [5,21,"Touro"],[6,21,"Gêmeos"],[7,22,"Câncer"],[8,23,"Leão"],
-    [9,23,"Virgem"],[10,23,"Libra"],[11,22,"Escorpião"],[12,22,"Sagitário"],[1,19,"Capricórnio"]
-  ];
-  for (const [m, d, sign] of signs) {
-    if (month === m && day <= (d as number)) return sign as string;
-    if (month === (m as number) + 1 && day > 0) continue;
+  if (isNaN(day) || isNaN(month)) return "Libra";
+  
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Áries";
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Touro";
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Gêmeos";
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Câncer";
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leão";
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgem";
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Escorpião";
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagitário";
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricórnio";
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Aquário";
+  if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "Peixes";
+  return "Libra";
+}
+
+function getAscendant(birthdate?: string, birthtime?: string, birthPlace?: string): string {
+  let day = 8, month = 10, year = 1986;
+  if (birthdate) {
+    if (birthdate.includes("-")) {
+      const parts = birthdate.split("-");
+      year = parseInt(parts[0]) || 1986; month = parseInt(parts[1]) || 10; day = parseInt(parts[2]) || 8;
+    } else if (birthdate.includes("/")) {
+      const parts = birthdate.split("/");
+      day = parseInt(parts[0]) || 8; month = parseInt(parts[1]) || 10; year = parseInt(parts[2]) || 1986;
+    }
   }
-  // fallback lookup
-  const map: Record<number,string> = {1:"Capricórnio",2:"Aquário",3:"Peixes",4:"Áries",5:"Touro",6:"Gêmeos",7:"Câncer",8:"Leão",9:"Virgem",10:"Libra",11:"Escorpião",12:"Sagitário"};
-  return map[month] || "Seu Sol";
+  
+  let hour = 12, minute = 0;
+  if (birthtime && birthtime.includes(":")) {
+    const parts = birthtime.split(":");
+    hour = parseInt(parts[0]) || 12;
+    minute = parseInt(parts[1]) || 0;
+  }
+  
+  let lat = -23.55, lon = -46.63;
+  if (birthPlace) {
+    const norm = birthPlace.toLowerCase();
+    if (norm.includes("fortaleza") || norm.includes("ceará") || norm.includes("ceara")) { lat = -3.72; lon = -38.54; }
+    else if (norm.includes("rio") || norm.includes("janeiro")) { lat = -22.91; lon = -43.17; }
+    else if (norm.includes("salvador") || norm.includes("bahia")) { lat = -12.97; lon = -38.50; }
+    else if (norm.includes("brasilia") || norm.includes("brasília")) { lat = -15.79; lon = -47.88; }
+    else if (norm.includes("recife") || norm.includes("pernambuco")) { lat = -8.05; lon = -34.88; }
+    else if (norm.includes("curitiba") || norm.includes("paraná")) { lat = -25.43; lon = -49.27; }
+    else if (norm.includes("belo horizonte") || norm.includes("minas")) { lat = -19.92; lon = -43.94; }
+    else if (norm.includes("porto alegre")) { lat = -30.03; lon = -51.23; }
+  }
+
+  let yCalc = year;
+  let mCalc = month;
+  if (mCalc <= 2) { yCalc -= 1; mCalc += 12; }
+  const A = Math.floor(yCalc / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  const tzOffset = Math.round(lon / 15);
+  const utcHour = hour - tzOffset;
+  const dayFrac = day + (utcHour + minute / 60) / 24;
+  const jd = Math.floor(365.25 * (yCalc + 4716)) + Math.floor(30.6001 * (mCalc + 1)) + dayFrac + B - 1524.5;
+  const d = jd - 2451545.0;
+  let gmst = 280.46061837 + 360.98564736629 * d;
+  gmst = ((gmst % 360) + 360) % 360;
+  const ramc = ((gmst + lon) % 360 + 360) % 360;
+  const ramcRad = (ramc * Math.PI) / 180;
+  const epsRad = (23.4392911 * Math.PI) / 180;
+  const latRad = (lat * Math.PI) / 180;
+  const y = -Math.cos(ramcRad);
+  const x = Math.sin(ramcRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
+  let ascRad = Math.atan2(y, x);
+  let ascDeg = ((ascRad * 180 / Math.PI) % 360 + 360) % 360;
+  const signs = ["Áries", "Touro", "Gêmeos", "Câncer", "Leão", "Virgem", "Libra", "Escorpião", "Sagitário", "Capricórnio", "Aquário", "Peixes"];
+  return signs[Math.floor(ascDeg / 30) % 12];
+}
+
+function formatSolarReturnDate(birthdate?: string, targetYear?: string): string {
+  const year = targetYear || new Date().getFullYear().toString();
+  if (!birthdate) return `Retorno Solar ${year}`;
+  
+  let day = 8, month = 10;
+  if (birthdate.includes("-")) {
+    const parts = birthdate.split("-");
+    month = parseInt(parts[1]) || 10; day = parseInt(parts[2]) || 8;
+  } else if (birthdate.includes("/")) {
+    const parts = birthdate.split("/");
+    day = parseInt(parts[0]) || 8; month = parseInt(parts[1]) || 10;
+  }
+  
+  const months = ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+  const mName = months[month] || "Outubro";
+  return `${day.toString().padStart(2, "0")} de ${mName}, ${year}`;
+}
+
+function calculateSolarReturnTimeFallback(birthtime?: string): string {
+  if (birthtime && birthtime.includes(":")) {
+    const [h, m] = birthtime.split(":").map(Number);
+    const utcH = (h + 3) % 24;
+    return `${utcH.toString().padStart(2, "0")}:${(m || 0).toString().padStart(2, "0")} (UTC)`;
+  }
+  return "07:22 (UTC)";
 }
 
 export default function AppleResultPreviewV3(props: DestinyResultsProps) {
@@ -487,16 +575,24 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
   // P_DYNAMIC uses real user profile data if available
   const _realName = props.userName || "Viajante";
+  const _sunSign = props.sunSign || getSunSign(props.birthDate);
+  const _ascendant = props.ascendantSign || getAscendant(props.birthDate, props.birthTime, props.birthPlace);
+  const _srDate = props.returnDate || formatSolarReturnDate(props.birthDate, props.targetYear);
+  const _srTime = (props.returnTimeUtc && props.returnTimeUtc !== "--:-- (UTC)") 
+    ? props.returnTimeUtc 
+    : calculateSolarReturnTimeFallback(props.birthTime);
+
   const P_DYNAMIC = {
-    birthDate: props.birthDate || "Data Não Informada",
     ...P,
+    birthDate: props.birthDate || "Data Não Informada",
     name: _realName,
-    firstName: _realName.split(" ")[0],   // ← derruba o "Rafael" hardcoded do P
+    firstName: _realName.split(" ")[0],
     origin: props.originName || props.birthPlace || "Origem não informada",
     year: props.targetYear || P.year,
-    time: props.returnTimeUtc || "--:-- (UTC)",                   // ← derruba o "05:30 (UTC)" hardcoded do P
-    sign: getSunSign(props.birthDate),
-    ascendant: "Seu Ascendente",
+    date: _srDate,
+    time: _srTime,
+    sign: _sunSign,
+    ascendant: _ascendant,
     house: urlHouseIndex,
     houseLabel: props.houseName || "Casa",
     city: cityStr,
@@ -578,11 +674,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       "genebra": "geneva.mp4",
       "berlim": "berlin.mp4",
       "jerusalem": "jerusalem.mp4",
-      "jerusalem": "jerusalem.mp4",
       "copenhague": "singapore.mp4",
       "amsterda": "berlin.mp4",
       "monte carlo": "monaco.mp4",
-      "nova delhi": "singapore.mp4",
       "nova delhi": "singapore.mp4",
       "zurique": "zurich.mp4",
       "munique": "berlin.mp4",
@@ -979,7 +1073,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                   <span className="text-white/20">|</span>
                                   <span className="text-white/70">{P_DYNAMIC.birthDate}</span>
                                   <span className="text-white/20">|</span>
-                                  <span className="text-white/70">{P_DYNAMIC.sign}</span>
+                                  <span className="text-white/70">Sol em {P_DYNAMIC.sign}</span>
                                   
                                   <div className="ml-auto flex items-center gap-2">
                                     <span className="text-[var(--hc)] font-bold flex items-center gap-2">
@@ -1044,7 +1138,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                            <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white text-lg md:text-xl font-medium">
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                                <Calendar className="w-5 h-5 text-[var(--hc)]"/> 
-                               Aniversário em {P_DYNAMIC.year}
+                               {P_DYNAMIC.date}
                              </span>
                              <span className="text-white/20 hidden md:inline">|</span>
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
@@ -1059,10 +1153,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                              <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-5">DNA Astrológico</p>
                              <div className="space-y-4">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Sun className="w-5 h-5 text-yellow-400"/> {P_DYNAMIC.sign}
+                                 <Sun className="w-5 h-5 text-yellow-400"/> Sol em {P_DYNAMIC.sign}
                                </p>
                                <p className="text-white/80 font-medium text-lg flex items-center gap-3">
-                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> {P_DYNAMIC.ascendant}
+                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> Ascendente em {P_DYNAMIC.ascendant}
                                </p>
                              </div>
                            </div>
@@ -1460,7 +1554,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               01. Sua Essência
                             </span>
                             <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
-                              Sua Identidade Astral.
+                              Sol em {P_DYNAMIC.sign}.
                             </h3>
                             <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
                               {currentActiveData.dnaData?.essencia || currentActiveData.dna?.essencia}
@@ -1479,7 +1573,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               02. Seu Método
                             </span>
                             <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
-                              Como Você<br className="hidden md:block" />Se Manifesta.
+                              Ascendente <br className="hidden md:block" />em {P_DYNAMIC.ascendant}.
                             </h3>
                             <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
                               {currentActiveData.dnaData?.metodo || currentActiveData.dna?.metodo}

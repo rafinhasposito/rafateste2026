@@ -66,6 +66,13 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
   const handleSelect = (houseNum: number) => {
     setSelectedHouse(houseNum);
     setResult(null);
+    // Armazena no sessionStorage para o Trailer processar a API
+    sessionStorage.setItem('ps_natal_name', name);
+    sessionStorage.setItem('ps_natal_date', birthdate);
+    sessionStorage.setItem('ps_natal_time', birthtime);
+    sessionStorage.setItem('ps_natal_place', birthPlace);
+    if (year) sessionStorage.setItem('ps_natal_year', year.toString());
+    if (mode) sessionStorage.setItem('ps_natal_mode', mode);
   };
 
   const handleLookup = async () => {
@@ -164,7 +171,14 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         year,
         mode,
         goal: target,
-        result: { results: allResults, house: target },
+        result: {
+          results: allResults,
+          house: target,
+          return_time_utc: data?.return_time_utc || null,
+          return_date: data?.return_date || null,
+          sun_sign: data?.sun_sign || null,
+          ascendant: data?.ascendant || null,
+        },
       }) ?? undefined;
 
       if (consultationId) navigate("/dashboard?id=" + consultationId);

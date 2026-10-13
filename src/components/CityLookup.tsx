@@ -143,6 +143,11 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         lon: cityCoords.lon,
       };
 
+      let returnTimeUtc = auditData.return_time_utc || null;
+      let returnDate = auditData.return_date || null;
+      let sunSign = auditData.sun_sign || null;
+      let ascendant = auditData.ascendant || null;
+
       // Enrich in parallel with full 12-house city map so unlocks work later
       // just like in the "futuro" flow (HouseLookup / IntentLookup).
       const allResults: Record<string, any> = {};
@@ -158,7 +163,10 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
           if (enrichData?.results) {
             for (const [k, v] of Object.entries(enrichData.results)) allResults[k] = v;
           }
-          if (enrichData?.return_time_utc) (window as any).__solar_return_time = enrichData.return_time_utc;
+          if (enrichData?.return_time_utc) returnTimeUtc = enrichData.return_time_utc;
+          if (enrichData?.return_date) returnDate = enrichData.return_date;
+          if (enrichData?.sun_sign) sunSign = enrichData.sun_sign;
+          if (enrichData?.ascendant) ascendant = enrichData.ascendant;
         }
       } catch (e) {
         console.warn("[CityLookup] enrich failed (non-fatal)", e);
@@ -173,6 +181,15 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
           acessivel: allResults[String(houseNum)]?.options?.acessivel ?? null,
           nacional: allResults[String(houseNum)]?.options?.nacional ?? null,
         },
+      };
+
+      const finalResultPayload = {
+        results: allResults,
+        house: houseNum,
+        return_time_utc: returnTimeUtc,
+        return_date: returnDate,
+        sun_sign: sunSign,
+        ascendant: ascendant,
       };
 
       // ATOMIC CHARGE AND SAVE
@@ -190,7 +207,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
           mode,
           goal: houseNum,
           origin: city.trim(),
-          result: { results: allResults, house: houseNum, return_time_utc: (window as any).__solar_return_time || null },
+          result: finalResultPayload,
         });
         
         if (!savedId) {
@@ -211,7 +228,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
           mode,
           goal: houseNum,
           origin: city.trim(),
-          result: { results: allResults, house: houseNum },
+          result: finalResultPayload,
         });
         if (savedId) consultationId = savedId;
       }

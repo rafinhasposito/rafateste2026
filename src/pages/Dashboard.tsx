@@ -449,10 +449,14 @@ const Dashboard = () => {
         <>
           <DestinyResults
             birthDate={consultation.birthdate}
+            birthTime={(consultation as any).birthtime}
             userName={consultation.name || profile?.display_name || undefined}
             originName={consultation.origin || undefined}
             targetYear={consultation.year}
             returnTimeUtc={(consultation.result as any)?.return_time_utc || undefined}
+            returnDate={(consultation.result as any)?.return_date || undefined}
+            sunSign={(consultation.result as any)?.sun_sign || undefined}
+            ascendantSign={(consultation.result as any)?.ascendant || undefined}
             birthPlace={consultation.birth_place}
             intent={consultation.intent}
             house={selectedHouse}
