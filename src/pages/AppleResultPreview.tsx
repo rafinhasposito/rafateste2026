@@ -95,7 +95,7 @@ const LIFE_AREAS = [
       fase: "A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real."
     },
     ritual: "Compre um item simbólico de alto valor (mesmo que pequeno) usando dinheiro físico. Este objeto será o seu amuleto. Durante a transação, afirme mentalmente que aquele é o último investimento do seu antigo ciclo de escassez.",
-    mantra: "Eu comando a minha autonomia. O dinheiro flui até mim não por sorte, mas como consequência inevitável da minha excelência.",
+    mantra: "Eu sei o valor do meu trabalho, cuido bem das minhas contas e faço meu dinheiro render.",
     pillars: [
       { icon: ArrowUpRight, title: "Aumento de Ganhos", text: "A energia favorece o faturamento e atrai novos clientes. O universo aqui não entrega por sorte, mas recompensa a sua coragem de faturar e expandir horizontes." },
       { icon: Crown, title: "Valorização do Trabalho", text: "A vibração do lugar convida à autoconfiança extrema. O cenário é perfeito para acabar com os descontos emocionais e cobrar o valor justo pelo seu talento." },

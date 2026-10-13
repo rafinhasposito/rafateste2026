@@ -501,7 +501,7 @@ export default function HouseTrailer() {
                   </div>
 
                   <button 
-                    onClick={() => navigate('/map')}
+                    onClick={() => { const id = searchParams.get('id'); if (id) { navigate(`/dashboard?id=${id}`); } else { navigate('/dashboard'); } }}
                     className="w-full md:w-auto px-10 py-4 font-bold uppercase tracking-widest text-sm rounded-full hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 text-white"
                     style={{
                       backgroundColor: color,

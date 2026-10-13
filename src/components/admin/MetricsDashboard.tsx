@@ -20,13 +20,13 @@ interface Metrics {
 }
 
 const Card = ({ icon: Icon, label, value, hint, accent = "primary" }: { icon: any; label: string; value: string | number; hint?: string; accent?: string }) => (
-  <div className="glass-panel p-4">
+  <div className="border border-white/10 bg-white/[0.02] rounded-3xl backdrop-blur-md p-4">
     <div className="flex items-center gap-2 mb-2">
       <Icon className={`w-4 h-4 text-${accent}`} />
-      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="text-[10px] uppercase tracking-widest text-white/50">{label}</p>
     </div>
-    <p className="font-ps-display text-2xl text-foreground font-bold leading-none">{value}</p>
-    {hint && <p className="text-muted-foreground/60 text-[10px] mt-1.5">{hint}</p>}
+    <p className="font-ps-display text-2xl text-white font-bold leading-none">{value}</p>
+    {hint && <p className="text-white/30 text-[10px] mt-1.5">{hint}</p>}
   </div>
 );
 
@@ -114,7 +114,7 @@ const MetricsDashboard = () => {
     })();
   }, []);
 
-  if (!m) return <p className="text-muted-foreground text-sm">Carregando métricas…</p>;
+  if (!m) return <p className="text-white/50 text-sm">Carregando métricas…</p>;
 
   const fmtBrl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -131,8 +131,8 @@ const MetricsDashboard = () => {
         <Card icon={Search} label="Consultas" value={m.consultations} hint={`Cidade ${m.byType.city} · Casa ${m.byType.house} · Intenção ${m.byType.intent}`} />
       </div>
 
-      <div className="glass-panel p-5">
-        <h3 className="font-ps-display text-sm uppercase tracking-wider text-foreground mb-4">Cadastros — últimos 30 dias</h3>
+      <div className="border border-white/10 bg-white/[0.02] rounded-3xl backdrop-blur-md p-5">
+        <h3 className="font-ps-display text-sm uppercase tracking-wider text-white mb-4">Cadastros — últimos 30 dias</h3>
         <div style={{ width: "100%", height: 220 }}>
           <ResponsiveContainer>
             <LineChart data={m.signupSeries}>
@@ -147,27 +147,27 @@ const MetricsDashboard = () => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="glass-panel p-5">
-          <h3 className="font-ps-display text-sm uppercase tracking-wider text-foreground mb-3">Top 10 — Compradores</h3>
-          {m.topBuyers.length === 0 ? <p className="text-muted-foreground text-xs">Sem compras ainda.</p> :
+        <div className="border border-white/10 bg-white/[0.02] rounded-3xl backdrop-blur-md p-5">
+          <h3 className="font-ps-display text-sm uppercase tracking-wider text-white mb-3">Top 10 — Compradores</h3>
+          {m.topBuyers.length === 0 ? <p className="text-white/50 text-xs">Sem compras ainda.</p> :
             <div className="space-y-1.5">
               {m.topBuyers.map((u, i) => (
                 <div key={i} className="flex items-center justify-between gap-2 text-xs">
-                  <span className="text-muted-foreground/60 w-5">{i + 1}.</span>
-                  <div className="flex-1 min-w-0"><p className="text-foreground truncate">{u.name}</p><p className="text-muted-foreground/60 text-[10px] truncate">{u.email}</p></div>
-                  <span className="text-primary font-bold">{u.credits} cr</span>
+                  <span className="text-white/30 w-5">{i + 1}.</span>
+                  <div className="flex-1 min-w-0"><p className="text-white truncate">{u.name}</p><p className="text-white/30 text-[10px] truncate">{u.email}</p></div>
+                  <span className="text-amber-500 font-bold">{u.credits} cr</span>
                 </div>
               ))}
             </div>}
         </div>
-        <div className="glass-panel p-5">
-          <h3 className="font-ps-display text-sm uppercase tracking-wider text-foreground mb-3">Top 10 — Quem mais gastou</h3>
-          {m.topSpenders.length === 0 ? <p className="text-muted-foreground text-xs">Sem gastos ainda.</p> :
+        <div className="border border-white/10 bg-white/[0.02] rounded-3xl backdrop-blur-md p-5">
+          <h3 className="font-ps-display text-sm uppercase tracking-wider text-white mb-3">Top 10 — Quem mais gastou</h3>
+          {m.topSpenders.length === 0 ? <p className="text-white/50 text-xs">Sem gastos ainda.</p> :
             <div className="space-y-1.5">
               {m.topSpenders.map((u, i) => (
                 <div key={i} className="flex items-center justify-between gap-2 text-xs">
-                  <span className="text-muted-foreground/60 w-5">{i + 1}.</span>
-                  <div className="flex-1 min-w-0"><p className="text-foreground truncate">{u.name}</p><p className="text-muted-foreground/60 text-[10px] truncate">{u.email}</p></div>
+                  <span className="text-white/30 w-5">{i + 1}.</span>
+                  <div className="flex-1 min-w-0"><p className="text-white truncate">{u.name}</p><p className="text-white/30 text-[10px] truncate">{u.email}</p></div>
                   <span className="text-destructive font-bold">{u.spent} cr</span>
                 </div>
               ))}

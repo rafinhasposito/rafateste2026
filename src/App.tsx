@@ -14,9 +14,10 @@ import Index from "./pages/Index";
 import AppleResultPrototype from "./pages/AppleResultPrototype";
 import AppleResultPreview from "./pages/AppleResultPreview";
 import AppleResultPreviewV3 from "./pages/AppleResultPreviewV3";
-import AppleResultPreviewV4 from "./pages/AppleResultPreviewV4";
+import HouseResult from "./pages/HouseResult";
 import HouseTrailer from "./pages/HouseTrailer";
 import HouseTrailerApp from "./pages/HouseTrailerApp";
+import DossierSandbox from "./pages/DossierSandbox";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Credits from "./pages/Credits";
@@ -105,8 +106,9 @@ const App = () => (
 
             <Route path="/v2-apple" element={<AppleResultPrototype />} />
             <Route path="/v2-preview" element={<AppleResultPreview />} />
-            <Route path="/v4-preview" element={<AppleResultPreviewV4 />} />
-        <Route path="/v3-preview" element={<AppleResultPreviewV3 />} />
+            <Route path="/v3-preview" element={<AppleResultPreviewV3 />} />
+            <Route path="/v3-preview/:houseId" element={<AppleResultPreviewV3 />} />
+        <Route path="/resultado/:houseId" element={<HouseResult />} />
             <Route path="/bloco3" element={<Block3Sandbox />} />
             <Route path="/bloco4" element={<Block4Sandbox />} />
             <Route path="/ritual" element={<RitualSandbox />} />
@@ -117,6 +119,7 @@ const App = () => (
             <Route path="/mantras" element={<MantraSandbox />} />
             <Route path="/alerts" element={<AlertSandbox />} />
             <Route path="/trailer" element={<HouseTrailer />} />
+            <Route path="/sandbox" element={<DossierSandbox />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

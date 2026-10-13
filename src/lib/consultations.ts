@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface SaveConsultationArgs {
@@ -42,6 +43,7 @@ export const saveConsultation = async (args: SaveConsultationArgs): Promise<stri
 
   if (error) {
     console.error("[saveConsultation] failed:", error);
+    toast.error("DB Error: " + error.message);
     return null;
   }
   return data?.id ?? null;

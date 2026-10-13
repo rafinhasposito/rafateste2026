@@ -1,10 +1,13 @@
 import React, { useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { DesktopWebChrome } from "@/layouts/DesktopWebChrome";
 import { MobileAppChrome } from "@/layouts/MobileAppChrome";
 import { cityDatabase } from "@/data/houses";
 import UnlockPremiumModal from "@/components/UnlockPremiumModal";
 import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, ShieldAlert, Eye, Clock, Hourglass, BookOpen, Plane, QrCode, Fingerprint, Hash, CreditCard, Compass, Plus, Unlock } from "lucide-react";
+import { REAL_HOUSES_DATA } from "../data/houses_content";
+import { HOUSE_RESULTS } from "@/data/houseResults";
 
 /* ══════════════════════════════════════════════════
    ANIMATION COMPONENTS
@@ -113,7 +116,7 @@ const LIFE_AREAS = [
       fase: "A ambição cede lugar à sabedoria prática. O objetivo astrológico agora não é a ostentação superficial, mas a construção definitiva de um porto seguro, previsibilidade e estabilidade real."
     },
     ritual: "Compre um item simbólico de alto valor (mesmo que pequeno) usando dinheiro físico. Este objeto será o seu amuleto. Durante a transação, afirme mentalmente que aquele é o último investimento do seu antigo ciclo de escassez.",
-    mantra: "Eu comando a minha autonomia. O dinheiro flui até mim não por sorte, mas como consequência inevitável da minha excelência.",
+    mantra: "Eu sei o valor do meu trabalho, cuido bem das minhas contas e faço meu dinheiro render.",
     pillars: [
       { icon: ArrowUpRight, title: "Aumento de Ganhos", text: "A energia favorece o faturamento e atrai novos clientes. O universo aqui não entrega por sorte, mas recompensa a sua coragem de faturar e expandir horizontes." },
       { icon: Crown, title: "Valorização do Trabalho", text: "A vibração do lugar convida à autoconfiança extrema. O cenário é perfeito para acabar com os descontos emocionais e cobrar o valor justo pelo seu talento." },
@@ -295,7 +298,37 @@ const LIFE_AREAS = [
   }
 ];
 
-export default function AppleResultPreviewV4() {
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, info: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    this.setState({ error, info });
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 50, background: 'red', color: 'white', minHeight: '100vh', zIndex: 9999 }}>
+          <h1>Something went wrong.</h1>
+          <pre>{this.state.error.toString()}</pre>
+          <pre>{this.state.info ? this.state.info.componentStack : "Loading stack..."}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function AppleResultPreviewV4Wrapper() {
+  return <ErrorBoundary><AppleResultPreviewV4 /></ErrorBoundary>;
+}
+
+function AppleResultPreviewV4() {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const vidScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
@@ -328,24 +361,37 @@ export default function AppleResultPreviewV4() {
   };
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   const [hoveredArea, setHoveredArea] = useState<string | null>("dinheiro");
-  const [activeRouteIndex, setActiveRouteIndex] = useState(1); // Default Casa 2
+  const [searchParams] = useSearchParams();
+  const initialHouse = searchParams.get('house') ? parseInt(searchParams.get('house')) - 1 : 1;
+  const [activeRouteIndex, setActiveRouteIndex] = useState(initialHouse >= 0 && initialHouse <= 11 ? initialHouse : 1); // Default Casa 2 ou via URL
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
   const [unlockedItems, setUnlockedItems] = useState<string[]>([]);
   
-  const activeRoute = ROUTES_MOCK_DATA[activeRouteIndex];
+  // Clean Architecture: Single Source of Truth
+  const houseModel = HOUSE_RESULTS[activeRouteIndex + 1] || HOUSE_RESULTS[1];
+  const dynamicCity = houseModel.city + ", " + houseModel.country;
+  const dynamicHouseNum = houseModel.id;
+  const dynamicHouseLabel = houseModel.focusLabel;
+  const dynamicHouseImg = houseModel.img;
+  const themeColor = houseModel.themeColor;
   
-  // Substitui os dados fixos do P pela rota ativa
-  const dynamicCity = activeRoute.city;
-  const dynamicHouseNum = activeRoute.house;
-  const dynamicHouseLabel = activeRoute.label;
-  const dynamicHouseImg = `https://images.unsplash.com/photo-${activeRoute.img}?auto=format&fit=crop&w=2000&q=80`;
-  const currentHouseData = REAL_HOUSES_DATA[activeRouteIndex];
-
-  const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
-  const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
+  // Legacy variables mapped to new model for Grid compatibility
+  const activeRoute = ROUTES_MOCK_DATA[activeRouteIndex];
+  const currentHouseData = houseModel;
+  const currentActiveData = {
+    icon: LIFE_AREAS.find(a => a.id === (hoveredArea || LIFE_AREAS[0].id))?.icon,
+    unlocked: true,
+    label: houseModel.focusLabel,
+    color: houseModel.themeColor,
+    score: houseModel.score,
+    city: houseModel.city,
+    image: houseModel.img,
+    pillars: LIFE_AREAS.find(a => a.id === (hoveredArea || LIFE_AREAS[0].id))?.pillars,
+    dna: LIFE_AREAS.find(a => a.id === (hoveredArea || LIFE_AREAS[0].id))?.dna
+  };
   
   // DEBUG HELPER
   React.useEffect(() => {
@@ -411,10 +457,10 @@ export default function AppleResultPreviewV4() {
         </motion.div>
         
         <motion.h2
-          style={{ scale: textScale, opacity: textOpacity, filter: textBlur }}
-          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[#10b981] to-emerald-200 origin-center uppercase text-center"
+          style={{ scale: textScale, opacity: textOpacity, filter: textBlur, backgroundImage: `linear-gradient(to bottom, ${themeColor}, ${themeColor}80)` }}
+          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[0.8] mb-8 text-transparent bg-clip-text origin-center uppercase text-center"
         >
-          {dynamicCity}
+          {houseModel.city}
         </motion.h2>
 
         <motion.div style={{ opacity: textOpacity }} className="flex flex-col items-center max-w-4xl text-center px-4 mt-2">
@@ -444,7 +490,7 @@ export default function AppleResultPreviewV4() {
                     <span>Seu Resultado Personalizado</span>
                   </div>
                   
-                  <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O foco é <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#10b981] to-emerald-300">{P.intention}</span>.</h3>
+                  <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O foco é <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(to right, ${themeColor}, ${themeColor}80)` }}>{currentActiveData.label}</span>.</h3>
                   <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
                     A Casa {P.house} foi calculada sob medida para ser a chave exata que destrava o seu objetivo no novo ciclo.
                   </p>
@@ -455,26 +501,26 @@ export default function AppleResultPreviewV4() {
                        {/* Header */}
                        <div 
                          onClick={() => setIsBoardingPassOpen(!isBoardingPassOpen)}
-                         className="bg-[#10b981]/10 border-b border-[#10b981]/20 px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:bg-[#10b981]/20 transition-colors select-none"
+                         className="px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer transition-colors select-none" style={{ backgroundColor: `${themeColor}15`, borderBottom: `1px solid ${themeColor}30` }}
                        >
                          <div className="flex items-center gap-3">
-                           <Plane className="w-5 h-5 text-[#10b981]" />
-                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-[#10b981] text-sm">Boarding Pass Solar</span>
+                           <Plane className="w-5 h-5" style={{ color: themeColor }} />
+                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-sm" style={{ color: themeColor }}>Boarding Pass Solar</span>
                          </div>
                          <div className="flex items-center gap-4 md:gap-6">
                            <div className="flex items-center gap-3 hidden md:flex">
-                             <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse shadow-[0_0_10px_#10b981]"></div>
-                             <span className="text-[#10b981]/90 font-sans text-xs tracking-widest">{P.hash} • ATIVO</span>
+                             <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: themeColor, boxShadow: `0 0 10px ${themeColor}` }}></div>
+                             <span className="font-sans text-xs tracking-widest" style={{ color: themeColor }}>{P.hash} • ATIVO</span>
                            </div>
                            
                            {!isBoardingPassOpen && (
-                             <span className="text-[#10b981] text-[10px] uppercase font-bold tracking-widest bg-[#10b981]/10 border border-[#10b981]/20 px-3 py-1.5 rounded-full animate-pulse">
+                             <span className="text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full animate-pulse" style={{ color: themeColor, backgroundColor: `${themeColor}15`, borderColor: `${themeColor}30`, borderWidth: 1 }}>
                                Ver Completo
                              </span>
                            )}
                            
-                           <div className={`p-1 rounded-full ${!isBoardingPassOpen ? 'bg-[#10b981]/10' : ''}`}>
-                             <ChevronDown className={`w-5 h-5 text-[#10b981] transition-transform duration-500 ${isBoardingPassOpen ? 'rotate-180' : ''}`} />
+                           <div className={`p-1 rounded-full`} style={{ backgroundColor: !isBoardingPassOpen ? `${themeColor}15` : 'transparent' }}>
+                             <ChevronDown className={`w-5 h-5 transition-transform duration-500 ${isBoardingPassOpen ? 'rotate-180' : ''}`} style={{ color: themeColor }} />
                            </div>
                          </div>
                        </div>
@@ -498,9 +544,9 @@ export default function AppleResultPreviewV4() {
                                   <span className="text-white/70">{P.sign}</span>
                                   
                                   <div className="ml-auto flex items-center gap-2">
-                                    <span className="text-[#10b981] font-bold flex items-center gap-2">
+                                    <span className="font-bold flex items-center gap-2" style={{ color: themeColor }}>
                                       <Star className="w-4 h-4" />
-                                      {P.match}% MATCH
+                                      {currentActiveData.score}% MATCH
                                     </span>
                                   </div>
                                </div>
@@ -527,7 +573,7 @@ export default function AppleResultPreviewV4() {
                          </div>
                          {/* Rota de Ancoragem */}
                          <div className="bg-white/[0.02] rounded-2xl p-6 md:p-8 border border-white/5 relative overflow-hidden">
-                           <div className="absolute top-0 right-0 w-64 h-64 bg-[#10b981]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+                           <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" style={{ backgroundColor: `${themeColor}0A` }}></div>
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-6">Rota de Ancoragem</p>
                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
                              <div className="flex-1">
@@ -538,16 +584,16 @@ export default function AppleResultPreviewV4() {
                                <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Origem Natal</p>
                              </div>
                              <div className="hidden md:flex flex-col items-center justify-center px-4 w-1/3">
-                               <Plane className="w-6 h-6 text-[#10b981] opacity-80" />
-                               <div className="w-full h-px bg-gradient-to-r from-transparent via-[#10b981]/50 to-transparent mt-3"></div>
+                               <Plane className="w-6 h-6 opacity-80" style={{ color: themeColor }} />
+                               <div className="w-full h-px mt-3" style={{ background: `linear-gradient(to right, transparent, ${themeColor}80, transparent)` }}></div>
                              </div>
-                             <div className="md:hidden flex items-center gap-4 text-[#10b981]/50 w-full">
-                               <div className="w-px h-8 bg-gradient-to-b from-transparent via-[#10b981]/50 to-transparent ml-2.5"></div>
+                             <div className="md:hidden flex items-center gap-4 w-full" style={{ color: `${themeColor}80` }}>
+                               <div className="w-px h-8 ml-2.5" style={{ background: `linear-gradient(to bottom, transparent, ${themeColor}80, transparent)` }}></div>
                                <Plane className="w-5 h-5 rotate-90" />
                              </div>
                              <div className="flex-1 md:text-right">
-                               <p className="text-[#10b981] font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2">
-                                 <span className="truncate">{dynamicCity}</span>
+                               <p className="font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2" style={{ color: themeColor }}>
+                                 <span className="truncate">{dynamicCity.split(",")[0]}</span>
                                  <MapPin className="w-6 h-6 shrink-0"/>
                                </p>
                                <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Destino do Aniversário</p>
@@ -559,19 +605,19 @@ export default function AppleResultPreviewV4() {
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4">Momento Exato da Ativação (Retorno Solar)</p>
                            <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white text-lg md:text-xl font-medium">
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                               <Calendar className="w-5 h-5 text-[#10b981]"/> 
+                               <Calendar className="w-5 h-5" style={{ color: themeColor }}/> 
                                09 de Agosto, 2027
                              </span>
                              <span className="text-white/20 hidden md:inline">|</span>
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
-                               <Clock className="w-5 h-5 text-[#10b981]"/> 
+                               <Clock className="w-5 h-5" style={{ color: themeColor }}/> 
                                {P.time}
                              </span>
                            </div>
                          </div>
                          {/* DNA vs Ativação */}
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                           <div className="bg-[#10b981]/5 border border-[#10b981]/10 rounded-2xl p-6">
+                           <div className="rounded-2xl p-6 border" style={{ backgroundColor: `${themeColor}0D`, borderColor: `${themeColor}1A` }}>
                              <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-5">DNA Astrológico</p>
                              <div className="space-y-4">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
@@ -582,15 +628,15 @@ export default function AppleResultPreviewV4() {
                                </p>
                              </div>
                            </div>
-                           <div className="bg-[#10b981]/10 border border-[#10b981]/20 rounded-2xl p-6 relative overflow-hidden">
-                             <div className="absolute inset-0 bg-gradient-to-br from-[#10b981]/10 to-transparent pointer-events-none"></div>
-                             <p className="text-[#10b981]/70 text-[10px] uppercase font-bold tracking-widest mb-5 relative z-10">Ativação Anual</p>
+                           <div className="rounded-2xl p-6 relative overflow-hidden border" style={{ backgroundColor: `${themeColor}1A`, borderColor: `${themeColor}33` }}>
+                             <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(to bottom right, ${themeColor}1A, transparent)` }}></div>
+                             <p className="text-[10px] uppercase font-bold tracking-widest mb-5 relative z-10" style={{ color: `${themeColor}B3` }}>Ativação Anual</p>
                              <div className="space-y-4 relative z-10">
                                <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Landmark className="w-5 h-5 text-[#10b981]"/> Casa {P.house}
+                                 <Landmark className="w-5 h-5" style={{ color: themeColor }}/> Casa {dynamicHouseNum}
                                </p>
-                               <p className="text-[#10b981] font-bold text-xl flex items-center gap-3">
-                                 <CircleDollarSign className="w-5 h-5"/> Dinheiro & Prosperidade
+                               <p className="font-bold text-xl flex items-center gap-3" style={{ color: themeColor }}>
+                                 <currentActiveData.icon className="w-5 h-5"/> {currentActiveData.label}
                                </p>
                              </div>
                            </div>
@@ -598,15 +644,15 @@ export default function AppleResultPreviewV4() {
                          {/* Compatibilidade */}
                          <div className="flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 pt-8 mt-2 gap-4">
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Compatibilidade da Escolha</p>
-                           <div className="flex items-center justify-center gap-3 bg-[#10b981]/20 px-6 py-3 rounded-full border border-[#10b981]/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                             <div className="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse"></div>
-                             <span className="text-[#10b981] font-bold tracking-widest text-lg">{P.match}% MATCH</span>
+                           <div className="flex items-center justify-center gap-3 px-6 py-3 rounded-full border" style={{ backgroundColor: `${themeColor}33`, borderColor: `${themeColor}4D`, boxShadow: `0 0 30px ${themeColor}33` }}>
+                             <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }}></div>
+                             <span className="font-bold tracking-widest text-lg" style={{ color: themeColor }}>{P.match}% MATCH</span>
                            </div>
                          </div>
                        </div>
                        {/* Footer Barcode */}
-                       <div className="bg-black/60 px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t border-[#10b981]/20">
-                         <div className="font-barcode text-5xl md:text-6xl tracking-[0.2em] text-[#10b981]/70 scale-y-150 py-2">||| || ||| | || || |||</div>
+                       <div className="bg-black/60 px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t" style={{ borderColor: `${themeColor}33` }}>
+                         <div className="font-barcode text-5xl md:text-6xl tracking-[0.2em] scale-y-150 py-2" style={{ color: `${themeColor}B3` }}>||| || ||| | || || |||</div>
                          <span className="font-sans text-[10px] md:text-xs text-white/50 tracking-[0.2em] uppercase text-center bg-black/40 px-4 py-2 rounded-lg border border-white/5">Protocolo Solar • 24h de Imantação na Cidade de Destino</span>
                        </div>
                      </motion.div>
@@ -621,8 +667,8 @@ export default function AppleResultPreviewV4() {
               <div
                 className="hidden lg:flex w-[72px] shrink-0 flex-col gap-2 items-stretch min-h-[700px]"
               >
-                {sortedAreas.map((area) => {
-                  const currentActive = hoveredArea || sortedAreas[0].id;
+                {LIFE_AREAS.map((area) => {
+                  const currentActive = hoveredArea || LIFE_AREAS[0].id;
                   const isActive = currentActive === area.id;
                   const isUnlockedLocally = area.unlocked || unlockedItems.includes(area.id);
 
@@ -667,8 +713,8 @@ export default function AppleResultPreviewV4() {
 
               {/* MOBILE: ACCORDION — tap item → barra anima + painel expande inline */}
               <div className="w-full lg:hidden flex flex-col gap-3">
-                {sortedAreas.map((area) => {
-                  const currentActive = hoveredArea || sortedAreas[0].id;
+                {LIFE_AREAS.map((area) => {
+                  const currentActive = hoveredArea || LIFE_AREAS[0].id;
                   const isActive = currentActive === area.id;
                   const isUnlockedLocally = area.unlocked || unlockedItems.includes(area.id);
 
@@ -794,7 +840,7 @@ export default function AppleResultPreviewV4() {
                 className="flex-1 h-[600px] lg:min-h-[700px] relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${currentActiveData?.color || '#10b981'} 12%, #000000)` }}
               >
                 <AnimatePresence mode="wait">
-                  {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
+                  {LIFE_AREAS.filter(a => a.id === (hoveredArea || LIFE_AREAS[0].id)).map((activeArea) => (
                     <motion.div
                       key={activeArea.id}
                       initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -993,7 +1039,7 @@ export default function AppleResultPreviewV4() {
                           style={{ y: parallaxY }}
                           className="absolute -inset-[20%] w-[140%] h-[140%] left-0 z-0 pointer-events-none"
                         >
-                          <img src={currentActiveData.image} alt={currentActiveData.city} className="w-full h-full object-cover opacity-90 transition-all duration-1000" />
+                          <img src={dynamicHouseImg} alt={dynamicCity.split(",")[0]} className="w-full h-full object-cover opacity-90 transition-all duration-1000" />
                         </motion.div>
                         
                         {/* Gradiente protegendo o texto */}
@@ -1006,11 +1052,11 @@ export default function AppleResultPreviewV4() {
                             {/* Selo de Localização */}
                             <div className="flex items-center gap-2 mb-6 px-5 py-2.5 bg-black/40 rounded-full border border-white/10 w-fit backdrop-blur-md">
                                 <MapPin className="w-5 h-5" style={{ color: currentActiveData?.color || '#34d399' }} />
-                                <span className="font-sans text-sm tracking-widest uppercase text-white font-semibold">{currentActiveData.city}</span>
+                                <span className="font-sans text-sm tracking-widest uppercase text-white font-semibold">{houseModel.city}</span>
                             </div>
                             
                             <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
-                              {currentActiveData.cityDesc}
+                              A frequência magnética de {houseModel.city} entra em ressonância exata com a área de <strong>{currentActiveData.label}</strong> do seu mapa. Este destino afasta as distrações e cria o ambiente biológico e energético perfeito para suportar os objetivos do seu novo ciclo.
                             </p>
                           </div>
                         </div>
@@ -1023,8 +1069,8 @@ export default function AppleResultPreviewV4() {
                         {/* O Tema */}
                         <div className="mb-12 relative z-10">
                           <span className="font-sans text-xs md:text-sm tracking-[0.2em] uppercase block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>O Tema do Seu Ano</span>
-                          <p className="text-white text-2xl md:text-4xl font-ps-display font-medium leading-tight">
-                            Consolidação e Crescimento Material
+                          <p className="text-white text-xl md:text-2xl font-ps-display font-medium leading-tight">
+                            {currentHouseData?.tema}
                           </p>
                         </div>
 
@@ -1033,8 +1079,8 @@ export default function AppleResultPreviewV4() {
                         {/* O Segredo */}
                         <div className="mb-12 relative z-10">
                           <span className="font-sans text-xs md:text-sm tracking-[0.2em] uppercase block mb-4" style={{ color: currentActiveData?.color || '#10b981' }}>O Segredo Deste Ano</span>
-                          <p className="text-white/70 text-lg md:text-xl font-light leading-relaxed">
-                            A verdadeira prosperidade neste ciclo não virá do esforço exaustivo, mas do posicionamento estratégico. O universo pede que você pare de trocar tempo por dinheiro e comece a ancorar o seu valor. A cidade destino ativa a frequência da abundância: o dinheiro que trabalha para você.
+                          <p className="text-white/70 text-lg md:text-xl font-light leading-relaxed whitespace-pre-wrap">
+                            {currentHouseData?.segredo}
                           </p>
                         </div>
 
@@ -1047,7 +1093,7 @@ export default function AppleResultPreviewV4() {
                             <div className="flex items-start gap-6">
                               <span className="font-sans text-xl font-bold mt-1" style={{ color: currentActiveData?.color || '#10b981' }}>1.</span>
                               <p className="text-white/80 text-lg md:text-xl font-light leading-relaxed">
-                                Compre um item simbólico de alto valor (mesmo que pequeno) usando dinheiro físico. Este objeto será o seu amuleto financeiro.
+                                {currentHouseData?.ritual}
                               </p>
                             </div>
                             <div className="flex items-start gap-6">
@@ -1079,7 +1125,7 @@ export default function AppleResultPreviewV4() {
                           
                           <p className="text-4xl md:text-6xl lg:text-7xl font-ps-display font-bold tracking-tighter leading-[1.1] md:leading-[1.15] bg-clip-text text-transparent pb-2 max-w-5xl"
                              style={{ backgroundImage: `linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.9) 40%, ${currentActiveData?.color || '#10b981'} 100%)` }}>
-                            "{currentActiveData?.mantra}"
+                            "{currentHouseData?.mantra}"
                           </p>
                         </div>
                       </div>
@@ -1094,7 +1140,11 @@ export default function AppleResultPreviewV4() {
                         </div>
 
                         <div className="flex flex-col border-t border-white/10">
-                          {currentActiveData.timeline?.map((phase, index) => {
+                          {[
+                            { phase: "Fase 1: Primeiros Passos", period: "Meses 1 a 4", text: currentHouseData?.fase1 },
+                            { phase: "Fase 2: Expansão", period: "Meses 5 a 8", text: currentHouseData?.fase2 },
+                            { phase: "Fase 3: Colheita", period: "Meses 9 a 12", text: currentHouseData?.fase3 }
+                          ].map((phase, index) => {
                             const isOpen = openTimelinePhase === index;
                             return (
                               <div key={index} className="border-b border-white/10 flex flex-col group">
@@ -1292,7 +1342,7 @@ export default function AppleResultPreviewV4() {
                         <>
                           {/* FOTO TOP (Corte Seco) */}
                           <div className="relative h-[130px] w-full shrink-0 overflow-hidden bg-[#050505]">
-                            <img src={isCurrent ? currentActiveData.image : imageForThisHouse} alt={cityForThisHouse} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                            <img src={isCurrent ? dynamicHouseImg : imageForThisHouse} alt={cityForThisHouse} className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
                             {isCurrent && (
                               <div className="absolute inset-0 bg-white/5 mix-blend-overlay"></div>
                             )}
@@ -1362,6 +1412,10 @@ export default function AppleResultPreviewV4() {
             setUnlockedItems(allIds);
             if (targetLockedArea?.type === 'foco') {
               setHoveredArea(id);
+            } else if (targetLockedArea?.type === 'rota') {
+              setActiveRouteIndex(parseInt(id) - 1);
+              setHoveredArea(ROUTES_MOCK_DATA[parseInt(id) - 1].focusId);
+              setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 300);
             }
           }
         }}

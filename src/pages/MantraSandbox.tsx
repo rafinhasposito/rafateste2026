@@ -4,7 +4,7 @@ import { Sparkles, Command, Fingerprint, Quote } from 'lucide-react';
 
 export default function MantraSandbox() {
   const color = "#10b981"; // Casa Dinheiro
-  const mantra = "Eu comando a minha autonomia. O dinheiro flui até mim não por sorte, mas como consequência inevitável da minha excelência.";
+  const mantra = "Eu sei o valor do meu trabalho, cuido bem das minhas contas e faço meu dinheiro render.";
 
   return (
     <div className="min-h-screen bg-[#03100B] text-white font-sans overflow-x-hidden pb-40">

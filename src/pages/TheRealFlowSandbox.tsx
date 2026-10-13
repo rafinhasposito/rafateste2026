@@ -8,7 +8,7 @@ export default function TheRealFlowSandbox() {
   const cityDesc = "Uma metrópole onde a eficiência cirúrgica encontra o caos vibrante. Tóquio pulsa com uma energia de disciplina e hiperprodutividade, criando o terreno magnético exato para quem precisa organizar a própria ambição e transformar metas dispersas em lucro previsível.";
   
   const ritualText = "Compre um item simbólico de alto valor (mesmo que pequeno) usando dinheiro físico. Este objeto será o seu amuleto de ancoragem. Durante a transação, afirme mentalmente que aquele é o último investimento do seu antigo ciclo de escassez.";
-  const mantraText = "Eu comando a minha autonomia. O dinheiro flui até mim não por sorte, mas como consequência inevitável da minha excelência.";
+  const mantraText = "Eu sei o valor do meu trabalho, cuido bem das minhas contas e faço meu dinheiro render.";
 
   const imgUrl = "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1994&auto=format&fit=crop";
 

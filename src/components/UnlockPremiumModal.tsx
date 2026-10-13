@@ -106,21 +106,23 @@ export default function UnlockPremiumModal({ isOpen, onClose, onSuccess, targetA
             </div>
 
             {/* Opção 2 */}
-            <div onClick={() => handleUnlock('full')} className="relative bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border rounded-2xl p-6 hover:brightness-110 transition-all cursor-pointer group" style={{ borderColor: `${color}50` }}>
-              <div className="absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full">
-                <span className="font-mono text-[9px] uppercase font-bold text-black tracking-widest flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> Melhor Custo-Benefício
-                </span>
+            {!isFoco && (
+              <div onClick={() => handleUnlock('full')} className="relative bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border rounded-2xl p-6 hover:brightness-110 transition-all cursor-pointer group" style={{ borderColor: `${color}50` }}>
+                <div className="absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full">
+                  <span className="font-mono text-[9px] uppercase font-bold text-black tracking-widest flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" /> Melhor Custo-Benefício
+                  </span>
+                </div>
+                <div className="flex justify-between items-start mb-2 mt-2">
+                  <h4 className="text-white font-bold text-xl">{isFoco ? 'Todas as Intenções' : 'Visão 360º Completa'}</h4>
+                  <div className="font-mono font-bold" style={{ color }}>{isFoco ? allFocusesCost : fullMapCost} Créditos</div>
+                </div>
+                <p className="text-white/50 text-sm mb-6">{isFoco ? 'Desbloqueia todas as Intenções desta mesma Casa de uma vez.' : 'Desbloqueia as 11 Rotas restantes do seu mapa de uma só vez.'}</p>
+                <button className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-white border transition-colors shadow-2xl pointer-events-none" style={{ backgroundColor: `${color}20`, borderColor: `${color}50` }}>
+                  <Compass className="w-4 h-4" /> {isFoco ? 'Expandir Todas' : 'Expandir Mapa Inteiro'}
+                </button>
               </div>
-              <div className="flex justify-between items-start mb-2 mt-2">
-                <h4 className="text-white font-bold text-xl">{isFoco ? 'Todas as Intenções' : 'Visão 360º Completa'}</h4>
-                <div className="font-mono font-bold" style={{ color }}>{isFoco ? allFocusesCost : fullMapCost} Créditos</div>
-              </div>
-              <p className="text-white/50 text-sm mb-6">{isFoco ? 'Desbloqueia todas as Intenções desta mesma Casa de uma vez.' : 'Desbloqueia as 11 Rotas restantes do seu mapa de uma só vez.'}</p>
-              <button className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-white border transition-colors shadow-2xl pointer-events-none" style={{ backgroundColor: `${color}20`, borderColor: `${color}50` }}>
-                <Compass className="w-4 h-4" /> {isFoco ? 'Expandir Todas' : 'Expandir Mapa Inteiro'}
-              </button>
-            </div>
+            )}
 
             <p className="text-center text-white/30 text-xs mt-6">
               Você possui <span className="text-white/60 font-bold">{userCredits ?? 0} Créditos</span> na sua conta.

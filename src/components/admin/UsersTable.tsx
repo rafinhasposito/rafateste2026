@@ -107,30 +107,30 @@ const UsersTable = () => {
     <div className="space-y-6">
       {/* Search Header */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <h2 className="font-ps-display text-xl text-foreground uppercase tracking-wider">Gestão de Usuários</h2>
+        <h2 className="font-ps-display text-xl text-white uppercase tracking-wider">Gestão de Usuários</h2>
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
           <input
             type="text"
             placeholder="Buscar por nome ou email..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-background/50 border border-border text-foreground px-10 py-2.5 rounded-xl focus:outline-none focus:border-primary/50 font-ps-ui text-sm placeholder:text-muted-foreground/50 transition-colors"
+            className="w-full bg-background/50 border border-white/10 text-white px-10 py-2.5 rounded-xl focus:outline-none focus:border-primary/50 font-ps-ui text-sm placeholder:text-white/50/50 transition-colors"
           />
         </div>
       </div>
 
       {/* Users List */}
-      <div className="border border-border rounded-xl bg-card/20 overflow-hidden">
+      <div className="border border-white/10 rounded-xl bg-[#0a0a0a]/20 overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-muted-foreground font-ps-ui animate-pulse">Carregando base de usuários...</div>
+          <div className="p-12 text-center text-white/50 font-ps-ui animate-pulse">Carregando base de usuários...</div>
         ) : filteredUsers.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground font-ps-ui">Nenhum usuário encontrado.</div>
+          <div className="p-12 text-center text-white/50 font-ps-ui">Nenhum usuário encontrado.</div>
         ) : (
           <div className="overflow-x-auto">
             {/* Desktop Table (hidden on small screens) */}
             <table className="w-full text-left hidden md:table font-ps-ui text-sm">
-              <thead className="bg-muted/30 text-muted-foreground border-b border-border uppercase tracking-widest text-[10px]">
+              <thead className="bg-muted/30 text-white/50 border-b border-white/10 uppercase tracking-widest text-[10px]">
                 <tr>
                   <th className="px-6 py-4 font-medium">Usuário</th>
                   <th className="px-6 py-4 font-medium">Data de Cadastro</th>
@@ -140,30 +140,30 @@ const UsersTable = () => {
               </thead>
               <tbody className="divide-y divide-border/50">
                 {filteredUsers.map(user => (
-                  <tr key={user.user_id} className="hover:bg-muted/10 transition-colors group">
+                  <tr key={user.user_id} className="hover:bg-white/5 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-amber-500">
                           <User size={18} />
                         </div>
                         <div>
-                          <div className="font-bold text-foreground">{user.full_name || user.display_name || "Sem Nome"}</div>
-                          <div className="text-muted-foreground text-xs">{user.email || "Sem e-mail"}</div>
+                          <div className="font-bold text-white">{user.full_name || user.display_name || "Sem Nome"}</div>
+                          <div className="text-white/50 text-xs">{user.email || "Sem e-mail"}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-muted-foreground/80">
+                    <td className="px-6 py-4 text-white/50/80">
                       {new Date(user.created_at).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <span className={`font-bold ${user.credits > 0 ? "text-[#C9A227]" : "text-muted-foreground"}`}>
+                      <span className={`font-bold ${user.credits > 0 ? "text-[#C9A227]" : "text-white/50"}`}>
                         {user.credits} cr
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => openModal(user)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-3 py-1.5 border border-primary/30 text-primary hover:bg-primary/10 rounded-lg text-xs uppercase tracking-widest font-bold"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-3 py-1.5 border border-primary/30 text-amber-500 hover:bg-primary/10 rounded-lg text-xs uppercase tracking-widest font-bold"
                       >
                         <Coins size={14} /> Ajustar
                       </button>
@@ -179,21 +179,21 @@ const UsersTable = () => {
                 <div key={user.user_id} className="p-4 flex flex-col gap-3">
                   <div className="flex justify-between items-start">
                     <div className="min-w-0 flex-1">
-                      <div className="font-bold text-foreground truncate">{user.full_name || user.display_name || "Sem Nome"}</div>
-                      <div className="text-muted-foreground text-xs truncate">{user.email || "Sem e-mail"}</div>
+                      <div className="font-bold text-white truncate">{user.full_name || user.display_name || "Sem Nome"}</div>
+                      <div className="text-white/50 text-xs truncate">{user.email || "Sem e-mail"}</div>
                     </div>
                     <div className="text-right shrink-0 ml-4">
-                      <div className={`font-bold ${user.credits > 0 ? "text-[#C9A227]" : "text-muted-foreground"}`}>
+                      <div className={`font-bold ${user.credits > 0 ? "text-[#C9A227]" : "text-white/50"}`}>
                         {user.credits} cr
                       </div>
-                      <div className="text-muted-foreground/50 text-[10px]">
+                      <div className="text-white/50/50 text-[10px]">
                         {new Date(user.created_at).toLocaleDateString('pt-BR')}
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => openModal(user)}
-                    className="w-full flex justify-center items-center gap-2 py-2.5 border border-border bg-background text-foreground hover:bg-muted/50 rounded-lg text-xs uppercase tracking-widest font-bold mt-1"
+                    className="w-full flex justify-center items-center gap-2 py-2.5 border border-white/10 bg-background text-white hover:bg-muted/50 rounded-lg text-xs uppercase tracking-widest font-bold mt-1"
                   >
                     <Coins size={14} /> Ajustar Créditos
                   </button>
