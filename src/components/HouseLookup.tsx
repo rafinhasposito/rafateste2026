@@ -111,8 +111,6 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       return;
     }
     await refreshProfile();
-    if (!isAdmin) showAlert("Consulta iniciada. 1 crédito debitado.");
-
 
     setLoadingState(true);
     setResult(null);
@@ -180,6 +178,9 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
           ascendant: data?.ascendant || null,
         },
       }) ?? undefined;
+
+      // Transição suave para contemplação cósmica
+      await new Promise((resolve) => setTimeout(resolve, 900));
 
       if (consultationId) navigate("/dashboard?id=" + consultationId);
       if (target) onHouseSelected?.(target);

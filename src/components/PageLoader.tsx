@@ -1,27 +1,20 @@
-import StarryBackground from "@/components/StarryBackground";
+import ScanningOverlay from "@/components/ScanningOverlay";
 
 interface PageLoaderProps {
   label?: string;
 }
 
 /**
- * Loader de página inteira, padronizado.
+ * Loader de página inteira, padronizado com anéis orbitais e estética cósmica Apple.
  * Usado em rotas que carregam dados críticos antes de renderizar conteúdo.
  */
-const PageLoader = ({ label = "Carregando..." }: PageLoaderProps) => {
+const PageLoader = ({ label = "Carregando mapa estelar..." }: PageLoaderProps) => {
   return (
-    <>
-      <StarryBackground />
-      <div className="min-h-dvh flex items-center justify-center px-4">
-        <p
-          className="text-primary font-ps-display text-lg md:text-xl uppercase tracking-[0.2em] animate-pulse"
-          role="status"
-          aria-live="polite"
-        >
-          {label}
-        </p>
-      </div>
-    </>
+    <ScanningOverlay
+      visible={true}
+      title={label}
+      mode="futuro"
+    />
   );
 };
 

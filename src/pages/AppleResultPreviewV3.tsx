@@ -673,7 +673,6 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       "seul": "seoul.mp4",
       "genebra": "geneva.mp4",
       "berlim": "berlin.mp4",
-      "jerusalem": "jerusalem.mp4",
       "copenhague": "singapore.mp4",
       "amsterda": "berlin.mp4",
       "monte carlo": "monaco.mp4",

@@ -10,6 +10,7 @@ import { saveConsultation } from "@/lib/consultations";
 import { cityDatabase } from "@/data/houses";
 import { toast } from "sonner";
 import { houseThemes } from "@/data/houseThemes";
+import ScanningOverlay from "@/components/ScanningOverlay";
 
 const P = {
   name: "Rafael",
@@ -129,7 +130,6 @@ export default function HouseTrailerApp() {
       }
       
       await refreshProfile();
-      if (!isAdmin) toast.success("Consulta iniciada. Calculando astrologia...");
 
       const [ano, mes, dia] = birthdate.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
@@ -176,6 +176,9 @@ export default function HouseTrailerApp() {
         intent: selectedIntention || houseIntent,
         result: { results: allResults, house: target },
       });
+
+      // Transição suave para contemplação cósmica
+      await new Promise((resolve) => setTimeout(resolve, 900));
 
       if (consultationId) {
         navigate("/dashboard?id=" + consultationId);
@@ -642,6 +645,8 @@ export default function HouseTrailerApp() {
           );
         })()}
       </AnimatePresence>
+
+      <ScanningOverlay visible={isProcessing} mode="futuro" />
     </div>
   );
 }

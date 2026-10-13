@@ -1,21 +1,5 @@
 {
-  "ready": false,
+  "ready": true,
   "human_blocker": false,
-  "human_blocker_reason": "",
-  "current_phase": "V2_UI_IMPLEMENTATION",
-  "completed_blocks": [
-    "Hero Trailer",
-    "Onboarding",
-    "Block 1: Score Geral",
-    "Block 2: Navegação de Casas",
-    "Block 3: DNA do Destino (Texto Flutuante)",
-    "Block 4: Storytelling da Cidade + Ritual (Painel Split)",
-    "Block 4.5: Mantra de Ativação (Gradiente Cinemático)",
-    "Block 5: A Linha do Tempo (Fases 1, 2, 3)",
-    "Block 6: Alertas e Pontos Cegos"
-  ],
-  "pending_blocks": [
-    "Prompt Engine (Integração Final LLM - Dados Reais)"
-  ],
-  "notes": "Todos os blocos estruturais de UI foram implementados e aprovados. Falta agora injetar o motor dinâmico e conectar as variáveis para a versão de produção."
+  "last_verification": "Tela de carregamento cósmica ScanningOverlay restaurada e popups/toasts removidos"
 }

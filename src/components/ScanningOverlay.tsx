@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface ScanningOverlayProps {
   visible: boolean;
-  mode: "futuro" | "passado" | "presente";
+  mode?: "futuro" | "passado" | "presente";
   year?: string;
+  title?: string;
+  subtitle?: string;
 }
 
 const futureTexts = [
@@ -17,7 +19,7 @@ const futureTexts = [
   "Mapeando Coordenadas de Destino...",
 ];
 
-const ScanningOverlay = ({ visible, mode, year }: ScanningOverlayProps) => {
+const ScanningOverlay = ({ visible, mode = "futuro", year, title, subtitle }: ScanningOverlayProps) => {
   const [logText, setLogText] = useState(futureTexts[0]);
   const [progress, setProgress] = useState(0);
 
@@ -140,7 +142,7 @@ const ScanningOverlay = ({ visible, mode, year }: ScanningOverlayProps) => {
             transition={{ delay: 0.2 }}
             className="font-ps-display text-xl md:text-3xl text-foreground tracking-[0.3em] uppercase mb-3 text-center"
           >
-            {mode === "futuro" ? "Calculando Rota Estelar" : "Resgate da Linha do Tempo"}
+            {title || (mode === "futuro" ? "Calculando Rota Estelar" : mode === "presente" ? "Sintonizando Ciclo Atual" : "Resgate da Linha do Tempo")}
           </motion.h2>
 
           <motion.p
@@ -149,7 +151,7 @@ const ScanningOverlay = ({ visible, mode, year }: ScanningOverlayProps) => {
             transition={{ delay: 0.4 }}
             className="text-muted-foreground text-[10px] md:text-xs uppercase tracking-[0.25em] mb-8 text-center"
           >
-            {mode === "futuro" ? "Sincronizando malha geográfica..." : `Rebobinando até ${year}...`}
+            {subtitle || (mode === "futuro" ? "Sincronizando malha geográfica..." : mode === "presente" ? "Calculando alinhamento estelar..." : (year ? `Rebobinando até ${year}...` : "Acessando memória estelar..."))}
           </motion.p>
 
           {/* Progress bar */}

@@ -215,7 +215,6 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         }
         consultationId = savedId;
         await refreshProfile();
-        showAlert("Consulta finalizada. 1 crédito debitado.");
       } else {
         const savedId = await saveConsultation({
           id: consultationIdToUse,
@@ -232,6 +231,9 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         });
         if (savedId) consultationId = savedId;
       }
+
+      // Transição suave para contemplação cósmica
+      await new Promise((resolve) => setTimeout(resolve, 900));
 
       if (consultationId) navigate("/dashboard?id=" + consultationId);
       onHouseFound?.(houseNum, city);
