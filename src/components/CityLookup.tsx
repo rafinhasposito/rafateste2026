@@ -158,6 +158,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
           if (enrichData?.results) {
             for (const [k, v] of Object.entries(enrichData.results)) allResults[k] = v;
           }
+          if (enrichData?.return_time_utc) (window as any).__solar_return_time = enrichData.return_time_utc;
         }
       } catch (e) {
         console.warn("[CityLookup] enrich failed (non-fatal)", e);
@@ -189,7 +190,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
           mode,
           goal: houseNum,
           origin: city.trim(),
-          result: { results: allResults, house: houseNum },
+          result: { results: allResults, house: houseNum, return_time_utc: (window as any).__solar_return_time || null },
         });
         
         if (!savedId) {

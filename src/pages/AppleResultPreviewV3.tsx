@@ -353,6 +353,7 @@ export interface HouseResult {
 
 export interface DestinyResultsProps {
   birthDate?: string;
+  returnTimeUtc?: string;
   userName?: string;
   originName?: string;
   targetYear?: string;
@@ -442,6 +443,33 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
   return <img src={imgSrc} alt={alt} className={className} onError={(e) => { e.currentTarget.src = fallbackSrc; }} />;
 };
 
+
+function getSunSign(birthdate: string | undefined): string {
+  if (!birthdate) return "Seu Sol";
+  // birthdate pode ser "1986-10-08" ou "08/10/1986"
+  let day: number, month: number;
+  if (birthdate.includes("-")) {
+    const parts = birthdate.split("-");
+    month = parseInt(parts[1]); day = parseInt(parts[2]);
+  } else {
+    const parts = birthdate.split("/");
+    day = parseInt(parts[0]); month = parseInt(parts[1]);
+  }
+  if (isNaN(day) || isNaN(month)) return "Seu Sol";
+  const signs = [
+    [1,20,"Capricórnio"],[2,19,"Aquário"],[3,20,"Peixes"],[4,20,"Áries"],
+    [5,21,"Touro"],[6,21,"Gêmeos"],[7,22,"Câncer"],[8,23,"Leão"],
+    [9,23,"Virgem"],[10,23,"Libra"],[11,22,"Escorpião"],[12,22,"Sagitário"],[1,19,"Capricórnio"]
+  ];
+  for (const [m, d, sign] of signs) {
+    if (month === m && day <= (d as number)) return sign as string;
+    if (month === (m as number) + 1 && day > 0) continue;
+  }
+  // fallback lookup
+  const map: Record<number,string> = {1:"Capricórnio",2:"Aquário",3:"Peixes",4:"Áries",5:"Touro",6:"Gêmeos",7:"Câncer",8:"Leão",9:"Virgem",10:"Libra",11:"Escorpião",12:"Sagitário"};
+  return map[month] || "Seu Sol";
+}
+
 export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -466,8 +494,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     firstName: _realName.split(" ")[0],   // ← derruba o "Rafael" hardcoded do P
     origin: props.originName || props.birthPlace || "Origem não informada",
     year: props.targetYear || P.year,
-    time: "--:-- (UTC)",                   // ← derruba o "05:30 (UTC)" hardcoded do P
-    sign: "Seu Sol",
+    time: props.returnTimeUtc || "--:-- (UTC)",                   // ← derruba o "05:30 (UTC)" hardcoded do P
+    sign: getSunSign(props.birthDate),
     ascendant: "Seu Ascendente",
     house: urlHouseIndex,
     houseLabel: props.houseName || "Casa",

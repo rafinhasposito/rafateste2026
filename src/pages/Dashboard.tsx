@@ -452,6 +452,7 @@ const Dashboard = () => {
             userName={consultation.name || profile?.display_name || undefined}
             originName={consultation.origin || undefined}
             targetYear={consultation.year}
+            returnTimeUtc={(consultation.result as any)?.return_time_utc || undefined}
             birthPlace={consultation.birth_place}
             intent={consultation.intent}
             house={selectedHouse}

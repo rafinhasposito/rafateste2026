@@ -119,6 +119,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
+      if (data?.return_time_utc) (window as any).__solar_return_time = data.return_time_utc;
 
       const houseResult = data.results?.[String(selectedHouse)];
       const rawOptions = houseResult?.options || {};
@@ -152,7 +153,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         mode,
         goal: selectedHouse,
         intent: houseData.intent,
-        result: { results: allResults, house: selectedHouse },
+        result: { results: allResults, house: selectedHouse, return_time_utc: (window as any).__solar_return_time || null },
       }) ?? undefined;
 
       if (consultationId) navigate("/dashboard?id=" + consultationId);
