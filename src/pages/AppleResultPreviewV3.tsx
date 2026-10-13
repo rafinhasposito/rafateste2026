@@ -458,12 +458,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const cityStr = bestCity ? `${bestCity.city}, ${bestCity.country}` : "Nova York, EUA";
 
   // P_DYNAMIC uses real user profile data if available
+  const _realName = props.userName || "Viajante";
   const P_DYNAMIC = {
     birthDate: props.birthDate || "Data Não Informada",
     ...P,
-    name: props.userName || "Viajante",
+    name: _realName,
+    firstName: _realName.split(" ")[0],   // ← derruba o "Rafael" hardcoded do P
     origin: props.originName || props.birthPlace || "Origem não informada",
     year: props.targetYear || P.year,
+    time: "--:-- (UTC)",                   // ← derruba o "05:30 (UTC)" hardcoded do P
     sign: "Seu Sol",
     ascendant: "Seu Ascendente",
     house: urlHouseIndex,
