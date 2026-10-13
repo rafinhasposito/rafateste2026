@@ -111,7 +111,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       };
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout para suportar cold-starts
 
       const auditResp = await fetch(`${API_URL}/audit_past`, {
         method: "POST",
