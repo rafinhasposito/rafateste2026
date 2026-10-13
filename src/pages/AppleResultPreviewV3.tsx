@@ -1608,10 +1608,11 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 {/* BLOCO 4: O PLANO DE ATIVAÇÃO MESTRE (SIMÉTRICO & DIGESTÍVEL) */}
                       <div ref={block4Ref} className="w-full mt-40 max-w-[1400px] mx-auto mb-32 relative px-4 md:px-8">
                         {(() => {
-                          const sentences = (houseBaseData?.understand || currentActiveData.cityDesc || "").split(". ").filter(Boolean);
-                          const quote = sentences[0] ? sentences[0].trim() + (sentences[0].endsWith('.') ? '' : '.') : "";
-                          const beneficios = sentences[1] ? sentences[1].trim() + (sentences[1].endsWith('.') ? '' : '.') : "";
-                          const paraQuem = sentences[2] ? sentences[2].trim() + (sentences[2].endsWith('.') ? '' : '.') : "";
+                          const sentences = (houseBaseData?.understand || "").split(". ").filter(Boolean);
+                          const quote = currentActiveData.full || currentActiveData.teaser || currentActiveData.headline || sentences[0] || "";
+                          const beneficios = currentActiveData.pillars?.[0]?.text || currentActiveData.themeData || sentences[1] || "";
+                          const paraQuem = currentActiveData.pillars?.[1]?.text || sentences[2] || "";
+                          const naPratica = currentActiveData.pillars?.[2]?.text || houseBaseData?.realDynamics || "O cotidiano se alinha perfeitamente com a energia do local.";
                           const activeColor = currentActiveData?.color || '#C9A227';
                           
                           // Animações
@@ -1727,7 +1728,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                               
                                               {/* Texto Principal (Manchete Apple) */}
                                               <p className="font-ps-display text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/40 text-[20px] md:text-[24px] leading-[1.2] tracking-tight pr-2">
-                                                <AppleHighlightText text={houseBaseData?.realDynamics || "O cotidiano se alinha perfeitamente com a energia do local."} activeColor={activeColor} gradientParent={true} />
+                                                <AppleHighlightText text={naPratica} activeColor={activeColor} gradientParent={true} />
                                               </p>
                                             </div>
                                           </div>
