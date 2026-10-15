@@ -47,9 +47,37 @@ const Credits = () => {
 
     setBusyPkg(pkg.key);
     try {
-      // Buscar sessão explicitamente para evitar race condition com Navigator LockManager
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData?.session?.access_token;
+      // Lê o token direto do localStorage para contornar o NavigatorLock race condition.
+      // O lock do Supabase auth-js pode falhar no startup quando múltiplos componentes
+      // tentam acessar a sessão simultaneamente.
+      let accessToken: string | null = null;
+
+      // Tentativa 1: localStorage direto (sem lock)
+      try {
+        const storageKey = `sb-gvqdlsflrbctfiorimcl-auth-token`;
+        const raw = localStorage.getItem(storageKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          accessToken = parsed?.access_token
+            ?? parsed?.data?.session?.access_token
+            ?? parsed?.session?.access_token
+            ?? null;
+          console.log("[Checkout] token via localStorage:", accessToken ? "ok" : "null");
+        }
+      } catch (e) {
+        console.warn("[Checkout] localStorage read failed:", e);
+      }
+
+      // Tentativa 2: getSession() como fallback
+      if (!accessToken) {
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          accessToken = sessionData?.session?.access_token ?? null;
+          console.log("[Checkout] token via getSession:", accessToken ? "ok" : "null");
+        } catch (e) {
+          console.warn("[Checkout] getSession failed:", e);
+        }
+      }
 
       if (!accessToken) {
         toast.error("Sessão expirada. Faça login novamente.");
@@ -62,10 +90,9 @@ const Credits = () => {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
 
-      console.log("[Checkout] response data:", data, "error:", error);
+      console.log("[Checkout] response:", data, "error:", error);
 
       if (error) {
-        // Tenta extrair mensagem de erro do corpo da resposta
         let detail = error.message;
         try {
           const context = (error as any).context;
