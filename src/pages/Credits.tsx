@@ -118,11 +118,9 @@ const Credits = () => {
     } catch (err: any) {
       console.error("[Checkout] Error:", err);
       const msg = err?.message || "";
-      if (msg.toLowerCase().includes("unauthorized")) {
-        toast.error("Sessão expirada. Faça login novamente.");
-        navigate("/auth");
-      } else {
-        toast.error(msg || "Erro ao iniciar pagamento. Tente novamente.");
+      toast.error(msg || "Erro ao iniciar pagamento. Tente novamente.");
+      if (msg.toLowerCase().includes("unauthorized") || msg.toLowerCase().includes("missing authorization")) {
+        setTimeout(() => navigate("/auth"), 1500);
       }
     } finally {
       setBusyPkg(null);
