@@ -131,11 +131,14 @@ serve(async (req) => {
       .eq('id', order.id);
 
     // 6. Return Checkout URL
-    // sandbox_init_point para ambiente de teste. Em prod, use init_point.
-    // Você pode usar Deno.env.get('MP_ENVIRONMENT') === 'production' para alternar.
-    const checkoutUrl = Deno.env.get('MP_ENVIRONMENT') === 'production' 
+    // Se o token for de produção (inicia com APP_USR) ou MP_ENVIRONMENT for production, usa init_point real.
+    const isProduction = mpAccessToken.startsWith('APP_USR-') || 
+                         Deno.env.get('MP_ENVIRONMENT')?.trim().toLowerCase() === 'production';
+    const checkoutUrl = isProduction 
       ? preferenceData.init_point 
       : preferenceData.sandbox_init_point;
+
+    console.log(`[create-checkout] Created preference ${preferenceData.id}, isProduction: ${isProduction}`);
 
     return new Response(JSON.stringify({ checkoutUrl, orderId: order.id }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
