@@ -13,28 +13,36 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // 1. Check Auth
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    // 1. Extract Bearer Token & Check Auth explicitly
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    const token = authHeader?.replace(/^Bearer\s+/i, '')?.trim();
+
+    if (!token) {
+      console.error("[create-checkout] No Authorization header provided");
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      console.error("[create-checkout] Auth verification error:", authError);
+      return new Response(
+        JSON.stringify({ error: `Unauthorized: ${authError?.message || 'Invalid session'}` }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const { pricing_config_id } = await req.json();
     if (!pricing_config_id) {
       return new Response(JSON.stringify({ error: 'pricing_config_id is required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-
-    // Use Service Role to read pricing config and insert order
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
 
     // 2. Fetch Pricing Config
     const { data: pricingConfig, error: pricingError } = await supabaseAdmin
