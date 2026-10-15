@@ -47,11 +47,36 @@ const Credits = () => {
 
     setBusyPkg(pkg.key);
     try {
+      // Buscar sessão explicitamente para evitar race condition com Navigator LockManager
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      if (!accessToken) {
+        toast.error("Sessão expirada. Faça login novamente.");
+        navigate("/auth");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("create-mercadopago-checkout", {
-        body: { pricing_config_id: pkg.key }
+        body: { pricing_config_id: pkg.key },
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
 
-      if (error) throw new Error(error.message);
+      console.log("[Checkout] response data:", data, "error:", error);
+
+      if (error) {
+        // Tenta extrair mensagem de erro do corpo da resposta
+        let detail = error.message;
+        try {
+          const context = (error as any).context;
+          if (context) {
+            const text = await context.text?.();
+            const parsed = JSON.parse(text || "{}");
+            if (parsed?.error) detail = parsed.error;
+          }
+        } catch {}
+        throw new Error(detail);
+      }
       if (data?.error) throw new Error(data.error);
 
       if (data?.checkoutUrl) {
@@ -60,8 +85,14 @@ const Credits = () => {
         throw new Error("Checkout URL não recebida do servidor.");
       }
     } catch (err: any) {
-      console.error(err);
-      toast.error(err?.message || "Ocorreu um erro ao iniciar o checkout do Mercado Pago. Tente novamente.");
+      console.error("[Checkout] Error:", err);
+      const msg = err?.message || "";
+      if (msg.toLowerCase().includes("unauthorized")) {
+        toast.error("Sessão expirada. Faça login novamente.");
+        navigate("/auth");
+      } else {
+        toast.error(msg || "Erro ao iniciar pagamento. Tente novamente.");
+      }
     } finally {
       setBusyPkg(null);
     }
