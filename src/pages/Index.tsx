@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, User, Edit2 } from "lucide-react";
+import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, ChevronRight, User, Edit2 } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -273,41 +273,39 @@ const Index = () => {
 
         {/* ===== STEP 2: Method Selection ===== */}
         {step === 2 && (
-          <motion.div key="step2-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-24 md:pt-28 pb-40 md:pb-16 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
-            
-            {/* Cinematic Animated Background (Vídeo Dinâmico) */}
+          <motion.div 
+            key="step2-root" 
+            initial={{ opacity: 0, y: 15 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -15 }} 
+            transition={{ duration: 0.3 }} 
+            className="pt-24 md:pt-32 pb-40 md:pb-20 flex flex-col items-center w-full px-6 sm:px-8 max-w-lg md:max-w-5xl mx-auto min-h-[100svh] relative"
+          >
+            {/* Fundo Celestial Limpo — Sem cor de pântano */}
             {(() => {
               const theme = mode ? modeThemes[mode] : null;
-              if (!theme) return null;
               return (
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                  <video 
-                    key={theme.video}
-                    autoPlay loop muted playsInline 
-                    className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-30" 
-                    src={theme.video} 
-                  />
-                  {/* Máscara de cor para tingir a aura fluida com a cor do Tempo */}
+                  {/* Gradiente sutil escuro */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#02050A] via-[#040814] to-[#02050A]" />
+                  {/* Aura suave cósmica */}
                   <div 
-                    className="absolute inset-0 mix-blend-color opacity-50 transition-colors duration-1000" 
-                    style={{ backgroundColor: `rgb(${theme.rgb})` }} 
+                    className="absolute top-[8%] left-1/2 -translate-x-1/2 w-[100vw] max-w-[800px] h-[450px] opacity-20 blur-[130px] rounded-full pointer-events-none transition-colors duration-1000"
+                    style={{ backgroundColor: theme ? `rgb(${theme.rgb})` : '#C9A227' }} 
                   />
-                  {/* Gradiente adicional para garantir que as bordas da tela continuem bem escuras */}
-                  <div className="absolute inset-0 bg-[#030303] mask-radial-fade opacity-80" style={{ background: `radial-gradient(ellipse at top, transparent 0%, #030303 70%)` }} />
                 </div>
               );
             })()}
 
             {/* Wrapper Centralizado */}
-            <div className="w-full max-w-5xl mx-auto flex flex-col items-center relative z-10">
+            <div className="w-full flex flex-col items-center relative z-10">
               
-              {/* Header da Seção (Voltar + Badge) em linha balanceada */}
-              <div className="w-full flex items-center justify-between mb-8 md:mb-10">
-                
+              {/* Header da Seção: Voltar + Badge em harmonia */}
+              <div className="w-full flex items-center justify-between mb-8 sm:mb-10">
                 {/* Botão Voltar */}
                 <button 
                   onClick={() => setStep(1)} 
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-md transition-colors text-white/70 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold active:scale-95"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl transition-all text-white/70 hover:text-white text-[11px] tracking-[0.18em] uppercase font-medium active:scale-95"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" /> Voltar
                 </button>
@@ -317,10 +315,11 @@ const Index = () => {
                   const theme = mode ? modeThemes[mode] : null;
                   const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Compass;
                   return (
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-md"
-                      style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : 'rgba(255,255,255,0.1)', background: theme ? `rgba(${theme.rgb}, 0.08)` : 'transparent' }}>
-                      <ModeIcon className="w-3.5 h-3.5" style={{ color: theme ? `rgb(${theme.rgb})` : '#fff' }} />
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: theme ? `rgb(${theme.rgb})` : '#fff' }}>
+                    <div 
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#C9A227]/30 bg-[#C9A227]/10 backdrop-blur-xl"
+                    >
+                      <ModeIcon className="w-3.5 h-3.5 text-[#E5C158]" />
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#E5C158]">
                         {modeOptions.find(m => m.id === mode)?.title}
                       </span>
                     </div>
@@ -328,51 +327,59 @@ const Index = () => {
                 })()}
               </div>
 
-              {/* Headings - Apple Scale */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-ps-display text-white mb-3 text-center leading-tight drop-shadow-lg">
-                Pronto, {profile?.full_name?.split(' ')[0] || profile?.display_name?.split(' ')[0] || user?.user_metadata?.name?.split(' ')[0] || 'Viajante'}?
-              </h1>
-              <p className="text-white/50 text-sm md:text-base font-ps-ui max-w-lg text-center mb-8 md:mb-14 leading-relaxed">
-                O sistema já processou os seus dados natais. Escolha o método que deseja usar para calcular sua próxima Revolução.
-              </p>
+              {/* Headings - Tipografia com respiro */}
+              <div className="text-center mb-8 sm:mb-12">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-ps-display text-white mb-3 tracking-tight leading-tight">
+                  Pronto, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5DE98] to-[#C9A227]">{profile?.full_name?.split(' ')[0] || profile?.display_name?.split(' ')[0] || user?.user_metadata?.name?.split(' ')[0] || 'Viajante'}</span>?
+                </h1>
+                <p className="text-white/55 text-sm sm:text-base font-ps-ui max-w-md mx-auto font-light leading-relaxed">
+                  Escolha como prefere explorar as coordenadas da sua próxima Revolução Solar.
+                </p>
+              </div>
 
-              {/* Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full">
+              {/* Cards: Lista Nativa Mobile / Grid no Desktop */}
+              <div className="flex flex-col gap-3.5 sm:gap-4 md:grid md:grid-cols-3 md:gap-6 w-full">
                 {(() => {
-                   const theme = mode ? modeThemes[mode] : null;
                    return pathOptions.map((opt) => {
                      const Icon = opt.icon;
                      const cardDesc = 
-                        opt.id === "cidade" ? "Já tenho um destino em mente." :
-                        opt.id === "casa" ? "Quero escolher uma área da vida." :
-                        "Sei o que quero mudar, mas não sei qual Casa escolher.";
+                        opt.id === "cidade" ? "Já tenho um destino em mente para o aniversário." :
+                        opt.id === "casa" ? "Quero focar em uma área específica da minha vida." :
+                        "Sei o que quero mudar, mas preciso descobrir onde ir.";
 
                      return (
                         <motion.button
                           key={opt.id}
-                          whileHover={{ scale: 1.02 }}
+                          whileHover={{ scale: 1.015 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectPath(opt.id)}
-                          className="relative w-full overflow-hidden rounded-2xl md:rounded-[28px] border backdrop-blur-2xl transition-all duration-500 group flex flex-col items-center p-6 md:p-10"
-                          style={{ 
-                            backgroundColor: theme ? `color-mix(in srgb, rgb(${theme.rgb}) 12%, rgba(0,0,0,0.7))` : 'rgba(10,10,12,0.8)',
-                            borderColor: theme ? `color-mix(in srgb, rgb(${theme.rgb}) 25%, transparent)` : 'rgba(255,255,255,0.05)'
-                          }}
+                          className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/[0.08] hover:border-[#C9A227]/40 bg-[#080D18]/85 hover:bg-[#0D1526]/95 backdrop-blur-2xl transition-all duration-300 group flex md:flex-col items-center text-left md:text-center p-4 sm:p-5 md:p-8 gap-4 md:gap-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_10px_30px_rgba(0,0,0,0.5)]"
                         >
-                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style={{ backgroundColor: theme ? `color-mix(in srgb, rgb(${theme.rgb}) 5%, transparent)` : 'rgba(255,255,255,0.02)' }} />
-                          <div className="absolute top-0 inset-x-0 h-[1px] opacity-30 group-hover:opacity-100 transition-opacity duration-500" style={{ background: theme ? `linear-gradient(90deg, transparent, rgba(${theme.rgb}, 1), transparent)` : 'linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)' }} />
-                          <div className="absolute top-0 inset-x-0 h-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none" style={{ background: theme ? `radial-gradient(ellipse at top, rgba(${theme.rgb}, 1), transparent 70%)` : 'none' }} />
+                          {/* Filete superior de luz */}
+                          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 group-hover:via-[#E5C158]/50 to-transparent transition-colors duration-500" />
                           
-                          <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border mb-4 md:mb-6 flex items-center justify-center transition-all duration-500 relative z-10" style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.2)` : 'rgba(255,255,255,0.2)', color: theme ? `rgb(${theme.rgb})` : '#fff', background: theme ? `rgba(${theme.rgb}, 0.05)` : 'transparent' }}>
-                            <Icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
+                          {/* Ícone nobre em cápsula */}
+                          <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-[#C9A227]/10 group-hover:bg-[#C9A227]/20 border border-[#C9A227]/25 group-hover:border-[#C9A227]/40 shrink-0 md:mb-5 flex items-center justify-center text-[#E5C158] transition-all duration-300 shadow-[0_0_15px_rgba(201,162,39,0.12)]">
+                            <Icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
                           </div>
 
-                          <h3 className="font-ps-display text-lg md:text-xl text-white mb-1.5 md:mb-2 text-center relative z-10">{opt.title}</h3>
-                          <p className="font-ps-ui text-white/50 text-xs md:text-sm font-light text-center leading-relaxed mb-6 md:mb-8 min-h-[36px] relative z-10">
-                            {cardDesc}
-                          </p>
+                          {/* Conteúdo textual */}
+                          <div className="flex-1 md:w-full">
+                            <h3 className="font-ps-display text-base md:text-xl text-white font-medium mb-1 md:mb-2 tracking-wide">
+                              {opt.title}
+                            </h3>
+                            <p className="font-ps-ui text-white/50 text-xs md:text-sm font-light leading-relaxed md:min-h-[44px]">
+                              {cardDesc}
+                            </p>
+                          </div>
 
-                          <div className="mt-auto flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] font-bold opacity-100 md:opacity-0 md:group-hover:opacity-100 md:translate-y-2 md:group-hover:translate-y-0 transition-all duration-500 relative z-10" style={{ color: theme ? `rgb(${theme.rgb})` : '#fff' }}>
+                          {/* Seta lateral nativa Mobile */}
+                          <div className="md:hidden w-8 h-8 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/40 group-hover:text-[#E5C158] group-hover:border-[#C9A227]/30 shrink-0 transition-colors">
+                            <ChevronRight className="w-4 h-4" />
+                          </div>
+
+                          {/* Botão de ação Desktop */}
+                          <div className="hidden md:flex mt-auto items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-[#E5C158] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 pt-4">
                              Configurar Rota <span className="text-sm leading-none">→</span>
                           </div>
                         </motion.button>
