@@ -18,7 +18,7 @@ const ICONS: Record<string, any> = {
 };
 
 const Credits = () => {
-  const { profile } = useAuth();
+  const { profile, session } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { packages, costs, loading } = usePricing();
@@ -47,35 +47,39 @@ const Credits = () => {
 
     setBusyPkg(pkg.key);
     try {
-      // Lê o token direto do localStorage para contornar o NavigatorLock race condition.
-      // O lock do Supabase auth-js pode falhar no startup quando múltiplos componentes
-      // tentam acessar a sessão simultaneamente.
-      let accessToken: string | null = null;
+      // 1. Prioriza token da sessão ativa no contexto
+      let accessToken: string | null = session?.access_token || null;
 
-      // Tentativa 1: localStorage direto (sem lock)
-      try {
-        const storageKey = `sb-gvqdlsflrbctfiorimcl-auth-token`;
-        const raw = localStorage.getItem(storageKey);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          accessToken = parsed?.access_token
-            ?? parsed?.data?.session?.access_token
-            ?? parsed?.session?.access_token
-            ?? null;
-          console.log("[Checkout] token via localStorage:", accessToken ? "ok" : "null");
-        }
-      } catch (e) {
-        console.warn("[Checkout] localStorage read failed:", e);
-      }
-
-      // Tentativa 2: getSession() como fallback
+      // 2. Se não estiver no contexto, tenta getSession() (agora seguro sem lock do browser)
       if (!accessToken) {
         try {
           const { data: sessionData } = await supabase.auth.getSession();
           accessToken = sessionData?.session?.access_token ?? null;
-          console.log("[Checkout] token via getSession:", accessToken ? "ok" : "null");
         } catch (e) {
           console.warn("[Checkout] getSession failed:", e);
+        }
+      }
+
+      // 3. Fallback: varre chaves do localStorage para encontrar o token
+      if (!accessToken) {
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith("sb-") || key.includes("auth-token"))) {
+              const raw = localStorage.getItem(key);
+              if (raw) {
+                const parsed = JSON.parse(raw);
+                const found = parsed?.access_token ?? parsed?.session?.access_token ?? parsed?.data?.session?.access_token;
+                if (found) {
+                  accessToken = found;
+                  console.log("[Checkout] token found in localStorage key:", key);
+                  break;
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("[Checkout] localStorage search failed:", e);
         }
       }
 
