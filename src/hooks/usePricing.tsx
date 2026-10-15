@@ -34,8 +34,8 @@ export const usePricing = () => {
     return i?.credits ?? fallback;
   };
 
-  const packages = items.filter(i => i.category === "package" && i.active);
-  const costs = items.filter(i => i.category === "cost" && i.active);
+  const packages = items.filter(i => i.category === "package" && (i.active ?? true));
+  const costs = items.filter(i => i.category === "cost" && (i.active ?? true));
 
   return { items, packages, costs, loading, refresh, getCost };
 };
