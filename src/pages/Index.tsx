@@ -273,7 +273,7 @@ const Index = () => {
 
         {/* ===== STEP 2: Method Selection ===== */}
         {step === 2 && (
-          <motion.div key="step2-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-20 md:pt-24 pb-32 md:pb-12 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
+          <motion.div key="step2-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} className="pt-24 md:pt-28 pb-40 md:pb-16 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
             
             {/* Cinematic Animated Background (Vídeo Dinâmico) */}
             {(() => {
@@ -301,23 +301,24 @@ const Index = () => {
             {/* Wrapper Centralizado */}
             <div className="w-full max-w-5xl mx-auto flex flex-col items-center relative z-10">
               
-              {/* Header da Seção (Voltar + Badge) */}
-              <div className="w-full relative flex flex-col md:flex-row items-center justify-center mb-6 md:mb-8">
+              {/* Header da Seção (Voltar + Badge) em linha balanceada */}
+              <div className="w-full flex items-center justify-between mb-8 md:mb-10">
                 
-                {/* Botão Voltar (Absolute no Desktop para não empurrar o layout) */}
-                <div className="w-full md:w-auto flex justify-start md:absolute md:left-0 md:top-0 mb-6 md:mb-0">
-                   <button onClick={() => setStep(1)} className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-white/60 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold">
-                     <ChevronLeft className="w-4 h-4" /> Voltar
-                   </button>
-                </div>
+                {/* Botão Voltar */}
+                <button 
+                  onClick={() => setStep(1)} 
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-md transition-colors text-white/70 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold active:scale-95"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" /> Voltar
+                </button>
 
                 {/* Badge Topo */}
                 {(() => {
                   const theme = mode ? modeThemes[mode] : null;
                   const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Compass;
                   return (
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border"
-                      style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : 'rgba(255,255,255,0.1)', background: theme ? `rgba(${theme.rgb}, 0.05)` : 'transparent' }}>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-md"
+                      style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.3)` : 'rgba(255,255,255,0.1)', background: theme ? `rgba(${theme.rgb}, 0.08)` : 'transparent' }}>
                       <ModeIcon className="w-3.5 h-3.5" style={{ color: theme ? `rgb(${theme.rgb})` : '#fff' }} />
                       <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: theme ? `rgb(${theme.rgb})` : '#fff' }}>
                         {modeOptions.find(m => m.id === mode)?.title}
@@ -328,15 +329,15 @@ const Index = () => {
               </div>
 
               {/* Headings - Apple Scale */}
-              <h1 className="text-4xl md:text-5xl font-ps-display text-white mb-4 text-center leading-tight drop-shadow-lg">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-ps-display text-white mb-3 text-center leading-tight drop-shadow-lg">
                 Pronto, {profile?.full_name?.split(' ')[0] || profile?.display_name?.split(' ')[0] || user?.user_metadata?.name?.split(' ')[0] || 'Viajante'}?
               </h1>
-              <p className="text-white/50 text-base font-ps-ui max-w-lg text-center mb-16 leading-relaxed">
+              <p className="text-white/50 text-sm md:text-base font-ps-ui max-w-lg text-center mb-8 md:mb-14 leading-relaxed">
                 O sistema já processou os seus dados natais. Escolha o método que deseja usar para calcular sua próxima Revolução.
               </p>
 
               {/* Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full">
                 {(() => {
                    const theme = mode ? modeThemes[mode] : null;
                    return pathOptions.map((opt) => {
@@ -352,7 +353,7 @@ const Index = () => {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectPath(opt.id)}
-                          className="relative w-full overflow-hidden rounded-[28px] border backdrop-blur-2xl transition-all duration-500 group flex flex-col items-center p-10"
+                          className="relative w-full overflow-hidden rounded-2xl md:rounded-[28px] border backdrop-blur-2xl transition-all duration-500 group flex flex-col items-center p-6 md:p-10"
                           style={{ 
                             backgroundColor: theme ? `color-mix(in srgb, rgb(${theme.rgb}) 12%, rgba(0,0,0,0.7))` : 'rgba(10,10,12,0.8)',
                             borderColor: theme ? `color-mix(in srgb, rgb(${theme.rgb}) 25%, transparent)` : 'rgba(255,255,255,0.05)'
@@ -362,16 +363,16 @@ const Index = () => {
                           <div className="absolute top-0 inset-x-0 h-[1px] opacity-30 group-hover:opacity-100 transition-opacity duration-500" style={{ background: theme ? `linear-gradient(90deg, transparent, rgba(${theme.rgb}, 1), transparent)` : 'linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)' }} />
                           <div className="absolute top-0 inset-x-0 h-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none" style={{ background: theme ? `radial-gradient(ellipse at top, rgba(${theme.rgb}, 1), transparent 70%)` : 'none' }} />
                           
-                          <div className="w-14 h-14 rounded-full border mb-6 flex items-center justify-center transition-all duration-500 relative z-10" style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.2)` : 'rgba(255,255,255,0.2)', color: theme ? `rgb(${theme.rgb})` : '#fff', background: theme ? `rgba(${theme.rgb}, 0.05)` : 'transparent' }}>
+                          <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border mb-4 md:mb-6 flex items-center justify-center transition-all duration-500 relative z-10" style={{ borderColor: theme ? `rgba(${theme.rgb}, 0.2)` : 'rgba(255,255,255,0.2)', color: theme ? `rgb(${theme.rgb})` : '#fff', background: theme ? `rgba(${theme.rgb}, 0.05)` : 'transparent' }}>
                             <Icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
                           </div>
 
-                          <h3 className="font-ps-display text-xl text-white mb-2 text-center relative z-10">{opt.title}</h3>
-                          <p className="font-ps-ui text-white/40 text-sm font-light text-center leading-relaxed mb-8 min-h-[40px] relative z-10">
+                          <h3 className="font-ps-display text-lg md:text-xl text-white mb-1.5 md:mb-2 text-center relative z-10">{opt.title}</h3>
+                          <p className="font-ps-ui text-white/50 text-xs md:text-sm font-light text-center leading-relaxed mb-6 md:mb-8 min-h-[36px] relative z-10">
                             {cardDesc}
                           </p>
 
-                          <div className="mt-auto flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] font-bold opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 relative z-10" style={{ color: theme ? `rgb(${theme.rgb})` : '#fff' }}>
+                          <div className="mt-auto flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] font-bold opacity-100 md:opacity-0 md:group-hover:opacity-100 md:translate-y-2 md:group-hover:translate-y-0 transition-all duration-500 relative z-10" style={{ color: theme ? `rgb(${theme.rgb})` : '#fff' }}>
                              Configurar Rota <span className="text-sm leading-none">→</span>
                           </div>
                         </motion.button>
@@ -386,7 +387,7 @@ const Index = () => {
         {/* ===== STEP 3 ===== */}
         {step === 3 && (
           <motion.div key="step3-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 15 }} transition={{ duration: 0.3 }}
-            className="pb-32 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
+            className="pt-24 md:pt-28 pb-40 md:pb-24 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative">
 
             {/* ── Fundo Premium Luxuoso (Ouro/Prata/Esmeralda) ── */}
             {(() => {
@@ -408,14 +409,14 @@ const Index = () => {
               );
             })()}
 
-            <div className="w-full max-w-4xl mx-auto flex flex-col items-center relative z-10 pt-6 md:pt-10">
+            <div className="w-full max-w-4xl mx-auto flex flex-col items-center relative z-10 pt-2 md:pt-6">
 
               {/* ── Nav Row — Voltar ── */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
-                className="w-full flex justify-start mb-8 md:mb-12">
+                className="w-full flex justify-start mb-6 md:mb-10">
                 <button onClick={() => setStep(2)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl transition-all duration-300 text-white/70 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold">
-                  <ChevronLeft className="w-4 h-4" /> Voltar
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-xl transition-all duration-300 text-white/70 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold active:scale-95">
+                  <ChevronLeft className="w-3.5 h-3.5" /> Voltar
                 </button>
               </motion.div>
 

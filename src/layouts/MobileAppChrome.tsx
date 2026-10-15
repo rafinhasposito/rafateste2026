@@ -40,23 +40,25 @@ export function MobileAppChrome() {
   return (
     <>
       {/* Top Header — Contextual */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center px-5 pt-8 pb-4 bg-gradient-to-b from-[#02050A]/90 to-transparent pointer-events-none">
+      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 pt-4 pb-2 bg-gradient-to-b from-[#02050A]/95 via-[#02050A]/60 to-transparent pointer-events-none">
         {!showBottomBar ? (
           /* Sub-page: show Back button */
           <button
             onClick={() => navigate(-1)}
-            className="pointer-events-auto w-10 h-10 flex items-center justify-center rounded-full bg-[#0C1826]/80 backdrop-blur-md border border-white/10 text-white"
+            className="pointer-events-auto w-9 h-9 flex items-center justify-center rounded-full bg-[#0C1826]/80 backdrop-blur-md border border-white/10 text-white active:scale-95 transition-transform"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
         ) : (
           /* Main tabs: show logo */
-          <img
-            src="/brand/protocolo-solar-logo-horizontal.svg"
-            alt="Protocolo Solar"
-            className="w-[280px] h-auto pointer-events-auto opacity-95 drop-shadow-sm"
-            draggable={false}
-          />
+          <Link to="/" className="pointer-events-auto">
+            <img
+              src="/brand/protocolo-solar-logo-horizontal.svg"
+              alt="Protocolo Solar"
+              className="w-[160px] h-auto opacity-95 drop-shadow-sm"
+              draggable={false}
+            />
+          </Link>
         )}
       </header>
 
