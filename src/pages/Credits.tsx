@@ -139,7 +139,6 @@ const Credits = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <BackButton label="Voltar" to="/" className="mb-8 mx-auto" />
           <h1 className="font-ps-display text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight drop-shadow-xl leading-none">
             Créditos de Acesso
           </h1>

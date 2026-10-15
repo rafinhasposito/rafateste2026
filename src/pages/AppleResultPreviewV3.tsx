@@ -986,7 +986,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         
         <motion.h2
           style={{ scale: textScale, opacity: textOpacity, filter: textBlur, color: houseColor, backgroundImage: `linear-gradient(to bottom, ${houseColor}, #a7f3d0)` }}
-          className="font-ps-display text-[20vw] md:text-[160px] font-bold tracking-tighter leading-[1] mb-8 pt-2 text-transparent bg-clip-text origin-center uppercase text-center break-words whitespace-normal break-all sm:break-normal px-2"
+          className="font-ps-display text-[15vw] sm:text-[18vw] md:text-[160px] font-bold tracking-tighter leading-[1] mb-8 pt-2 text-transparent bg-clip-text origin-center uppercase text-center break-words whitespace-normal px-2"
         >
           {P_DYNAMIC.city.split(', ')[0]}
         </motion.h2>
