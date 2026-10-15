@@ -163,7 +163,7 @@ const Credits = () => {
                     disabled={busyPkg === pkg.key}
                   >
                     <CreditCard className="w-4 h-4 shrink-0" />
-                    <span>{busyPkg === pkg.key ? "Iniciando..." : "Adquirir Pacote"}</span>
+                    <span>{busyPkg === pkg.key ? "Iniciando..." : "Comprar"}</span>
                     <ChevronRight className="w-3.5 h-3.5 opacity-60" />
                   </button>
                 </motion.div>
