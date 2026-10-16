@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, ChevronRight, User, Edit2 } from "lucide-react";
+import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, ChevronRight, User, Edit2, Sparkles } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -337,55 +337,91 @@ const Index = () => {
                 </p>
               </div>
 
-              {/* Cards: Lista Nativa Mobile / Grid no Desktop */}
-              <div className="flex flex-col gap-3.5 sm:gap-4 md:grid md:grid-cols-3 md:gap-6 w-full">
+              {/* Cards: Luxury Majestic Cards with Generous Breathing Room */}
+              <div className="flex flex-col gap-6 md:grid md:grid-cols-3 md:gap-6 w-full">
                 {(() => {
                    return pathOptions.map((opt) => {
                      const Icon = opt.icon;
                      const cardDesc = 
-                        opt.id === "cidade" ? "Já tenho um destino em mente para o aniversário." :
-                        opt.id === "casa" ? "Quero focar em uma área específica da minha vida." :
-                        "Sei o que quero mudar, mas preciso descobrir onde ir.";
+                        opt.id === "cidade" ? "Já tem um destino em mente? O sistema calcula a casa solar exata que você ativará nessa localização geográfica." :
+                        opt.id === "casa" ? "Foque na área da sua vida que mais precisa de impulso: dinheiro, carreira, novos começos, saúde ou expansão." :
+                        "Defina seu objetivo central para o novo ciclo. A inteligência do Protocolo cruza as efemérides para encontrar a sua coordenada.";
+                     
+                     const cardTag =
+                        opt.id === "cidade" ? "Destino Fixo" :
+                        opt.id === "casa" ? "Casas 1 a 12" :
+                        "Intenção & Metas";
+
+                     const cardAction =
+                        opt.id === "cidade" ? "Simular Minha Cidade" :
+                        opt.id === "casa" ? "Escolher Área da Vida" :
+                        "Definir Minha Intenção";
 
                      return (
                         <motion.button
                           key={opt.id}
-                          whileHover={{ scale: 1.015 }}
+                          whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectPath(opt.id)}
-                          className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl border border-white/[0.08] hover:border-[#C9A227]/40 bg-[#080D18]/85 hover:bg-[#0D1526]/95 backdrop-blur-2xl transition-all duration-300 group flex md:flex-col items-center text-left md:text-center p-4 sm:p-5 md:p-8 gap-4 md:gap-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_10px_30px_rgba(0,0,0,0.5)]"
+                          className="relative w-full overflow-hidden rounded-3xl border border-[#C9A227]/30 hover:border-[#C9A227]/70 bg-gradient-to-b from-[#0F1C36]/90 via-[#091222]/95 to-[#040812]/98 backdrop-blur-2xl transition-all duration-300 group flex flex-col justify-between text-left p-6 sm:p-7 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_16px_40px_rgba(0,0,0,0.6)]"
                         >
-                          {/* Filete superior de luz */}
-                          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 group-hover:via-[#E5C158]/50 to-transparent transition-colors duration-500" />
+                          {/* Filete superior de luz dourada */}
+                          <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#E5C158]/50 to-transparent transition-opacity duration-500" />
                           
-                          {/* Ícone nobre em cápsula */}
-                          <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-[#C9A227]/10 group-hover:bg-[#C9A227]/20 border border-[#C9A227]/25 group-hover:border-[#C9A227]/40 shrink-0 md:mb-5 flex items-center justify-center text-[#E5C158] transition-all duration-300 shadow-[0_0_15px_rgba(201,162,39,0.12)]">
-                            <Icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
+                          {/* Top Row: Ícone + Categoria Tag */}
+                          <div className="w-full flex items-center justify-between mb-5">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C9A227]/20 to-[#C9A227]/5 border border-[#C9A227]/40 flex items-center justify-center text-[#F5DE98] shadow-[0_0_20px_rgba(201,162,39,0.18)] group-hover:scale-105 transition-transform duration-300">
+                              <Icon className="w-6 h-6" strokeWidth={1.75} />
+                            </div>
+
+                            <span className="px-3 py-1 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 text-[#F5DE98] text-[9px] uppercase tracking-[0.2em] font-semibold">
+                              {cardTag}
+                            </span>
                           </div>
 
-                          {/* Conteúdo textual */}
-                          <div className="flex-1 md:w-full">
-                            <h3 className="font-ps-display text-base md:text-xl text-white font-medium mb-1 md:mb-2 tracking-wide">
+                          {/* Conteúdo textual com respiro nobre */}
+                          <div className="flex-1 w-full mb-6">
+                            <h3 className="font-ps-display text-2xl md:text-2xl text-white font-medium mb-2.5 tracking-wide group-hover:text-[#F5DE98] transition-colors">
                               {opt.title}
                             </h3>
-                            <p className="font-ps-ui text-white/50 text-xs md:text-sm font-light leading-relaxed md:min-h-[44px]">
+                            <p className="font-ps-ui text-white/70 text-sm font-light leading-relaxed">
                               {cardDesc}
                             </p>
                           </div>
 
-                          {/* Seta lateral nativa Mobile */}
-                          <div className="md:hidden w-8 h-8 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/40 group-hover:text-[#E5C158] group-hover:border-[#C9A227]/30 shrink-0 transition-colors">
-                            <ChevronRight className="w-4 h-4" />
-                          </div>
-
-                          {/* Botão de ação Desktop */}
-                          <div className="hidden md:flex mt-auto items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-[#E5C158] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 pt-4">
-                             Configurar Rota <span className="text-sm leading-none">→</span>
+                          {/* Botão de ação explícito luxuoso */}
+                          <div className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#C9A227]/15 via-[#C9A227]/8 to-[#C9A227]/15 border border-[#C9A227]/30 group-hover:border-[#C9A227]/60 group-hover:from-[#C9A227]/25 group-hover:to-[#C9A227]/20 flex items-center justify-between text-[#F5DE98] text-xs font-ps-ui uppercase tracking-[0.18em] font-semibold transition-all shadow-[0_4px_16px_rgba(201,162,39,0.08)]">
+                            <span>{cardAction}</span>
+                            <ChevronRight className="w-4 h-4 text-[#E5C158] group-hover:translate-x-1 transition-transform" />
                           </div>
                         </motion.button>
                      );
                    });
                 })()}
+              </div>
+
+              {/* Guia / Onboarding Banner de Apoio */}
+              <div className="w-full mt-10 p-5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-lg">
+                <div>
+                  <h4 className="text-sm font-ps-display text-white tracking-wide">Dúvida sobre qual caminho escolher?</h4>
+                  <p className="text-xs font-ps-ui text-white/55 mt-0.5">Veja o onboarding completo ou entenda o cálculo astrofísico.</p>
+                </div>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <Link 
+                    to="/app/onboarding" 
+                    className="px-3.5 py-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-ps-ui font-medium transition-all active:scale-95 flex items-center gap-1.5"
+                  >
+                    <Compass className="w-3.5 h-3.5 text-[#C9A227]" /> 
+                    <span>Ver Onboarding</span>
+                  </Link>
+                  <Link 
+                    to="/tecnologia" 
+                    className="px-3.5 py-2 rounded-xl border border-[#C9A227]/40 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#F5DE98] text-xs font-ps-ui font-medium transition-all active:scale-95 flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#E5C158]" /> 
+                    <span>Como Funciona</span>
+                  </Link>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -524,17 +560,17 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Trust badges — visible on steps 2 and 3 */}
+      {/* Trust badges — in-flow at the bottom of steps 2 and 3 */}
       {(step === 2 || step === 3) && (
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-          className="fixed bottom-4 left-0 right-0 flex flex-wrap justify-center gap-6 md:gap-10 px-4 z-20 pointer-events-none">
+          className="w-full flex flex-wrap justify-center gap-6 md:gap-10 px-4 pt-6 pb-24 md:pb-12 z-10 relative">
           {[
             { text: "Dados 100% Privados" },
             { text: "Efemérides Suíças (JPL)" },
             { text: "IA Mestre Astrólogo" },
           ].map((b, i) => (
-            <div key={i} className="flex items-center gap-2 text-muted-foreground/50">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+            <div key={i} className="flex items-center gap-2 text-white/40">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#C9A227]/60" />
               <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
             </div>
           ))}

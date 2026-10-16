@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BackButton } from '@/components/ui/BackButton';
 import { motion } from "framer-motion";
-import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft } from "lucide-react";
+import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft, Compass, Sparkles } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import PageLoader from "@/components/PageLoader";
 
@@ -145,9 +145,35 @@ const Profile = () => {
               </div>
               <button
                 onClick={() => navigate("/credits")}
-                className="w-full py-3 bg-[#C9A227]/10 text-[#C9A227] border border-[#C9A227]/30 hover:bg-[#C9A227]/20 transition-all font-sans text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2"
+                className="w-full py-3 bg-[#C9A227]/10 text-[#C9A227] border border-[#C9A227]/30 hover:bg-[#C9A227]/20 transition-all font-sans text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2 rounded-xl"
               >
                 <CreditCard className="w-4 h-4" /> Adquirir Mais Créditos
+              </button>
+            </motion.div>
+
+            {/* Guias Rápidos & Documentação */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="space-y-2.5">
+              <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-white/40 block mb-2">Guias & Conhecimento</span>
+              <button
+                onClick={() => navigate("/app/onboarding")}
+                className="w-full py-2.5 px-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 rounded-xl text-white/80 hover:text-white transition-all text-xs font-ps-ui flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Compass className="w-4 h-4 text-[#C9A227]" />
+                  <span>Ver Onboarding (6 Telas)</span>
+                </div>
+                <span className="text-white/40 text-xs">→</span>
+              </button>
+
+              <button
+                onClick={() => navigate("/tecnologia")}
+                className="w-full py-2.5 px-3 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 border border-[#C9A227]/30 rounded-xl text-[#F5DE98] transition-all text-xs font-ps-ui flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#E5C158]" />
+                  <span>Como Funciona a Tecnologia</span>
+                </div>
+                <span className="text-[#C9A227] text-xs">→</span>
               </button>
             </motion.div>
             

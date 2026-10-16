@@ -19,13 +19,13 @@ const Technology = () => {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
       </div>
 
-      {/* HEADER NAVBAR */}
-      <div className="relative z-50 w-full max-w-7xl mx-auto px-6 py-8">
+      {/* HEADER NAVBAR (Desktop only, mobile handled by MobileAppChrome) */}
+      <div className="hidden lg:block relative z-50 w-full max-w-7xl mx-auto px-6 py-8">
         <BackButton />
       </div>
 
       {/* HERO SECTION - CINEMATIC */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-10 pb-32 flex flex-col items-center text-center">
+      <section className="relative z-10 max-w-5xl mx-auto px-6 pt-20 lg:pt-10 pb-32 flex flex-col items-center text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}

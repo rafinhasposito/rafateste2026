@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 type Mode = "futuro" | "passado" | "presente" | "cidade";
 
@@ -94,12 +95,12 @@ function DesktopScene({ onSelectMode }: Props) {
                 <button
                   key={opt.id}
                   onClick={() => onSelectMode(opt.id)}
-                  className="flex-1 px-5 py-4 rounded-xl text-left bg-[#E8ECEF] hover:bg-white transition-all group shadow-md"
+                  className="flex-1 px-5 py-4 rounded-xl text-left bg-[#0A1424]/85 hover:bg-[#102038]/95 border border-[#C9A227]/30 hover:border-[#C9A227]/60 transition-all group shadow-lg backdrop-blur-xl"
                 >
-                  <span className="block font-ps-display text-[#02050A] text-lg mb-1">
+                  <span className="block font-ps-display text-[#F5DE98] text-lg mb-1 group-hover:text-white transition-colors">
                     {opt.label}
                   </span>
-                  <span className="block font-ps-ui text-[#02050A]/70 text-[11px] leading-tight">
+                  <span className="block font-ps-ui text-white/60 text-[11px] leading-tight font-light">
                     {opt.sub}
                   </span>
                 </button>
@@ -205,16 +206,27 @@ function MobileTimeline({ onSelectMode }: Props) {
                 <button
                   key={opt.id}
                   onClick={() => onSelectMode(opt.id)}
-                  className="flex-1 py-4 px-2 rounded-xl flex flex-col items-center justify-center bg-[#E8ECEF] active:bg-white transition-all group shadow-md"
+                  className="flex-1 py-4 px-3 rounded-2xl flex flex-col items-center justify-center bg-gradient-to-b from-[#0F1C36]/90 to-[#060D1A]/95 border border-[#C9A227]/30 hover:border-[#C9A227]/60 active:scale-95 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.6)] backdrop-blur-xl group"
                 >
-                  <span className="block font-ps-display text-[#02050A] text-[15px] mb-1">
+                  <span className="block font-ps-display text-[#F5DE98] text-[15px] mb-1 font-medium group-hover:text-white transition-colors">
                     {opt.label}
                   </span>
-                  <span className="block font-ps-ui text-[#02050A]/70 text-[9px] text-center uppercase tracking-wider leading-tight">
+                  <span className="block font-ps-ui text-white/60 text-[9px] text-center uppercase tracking-[0.18em] leading-tight font-light">
                     {opt.sub}
                   </span>
                 </button>
               ))}
+            </div>
+
+            {/* Quick Link to Onboarding Guide */}
+            <div className="mt-4 flex items-center justify-center">
+              <Link
+                to="/app/onboarding"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-[#F5DE98]/80 hover:text-[#F5DE98] text-[11px] font-ps-ui tracking-wide transition-all active:scale-95"
+              >
+                <span>✨ Ver Onboarding de 6 Passos</span>
+                <span className="text-xs">→</span>
+              </Link>
             </div>
           </motion.div>
         </div>

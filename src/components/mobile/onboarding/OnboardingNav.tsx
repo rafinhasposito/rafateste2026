@@ -1,4 +1,5 @@
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface OnboardingNavProps {
   step: number; // 1‑6
@@ -21,6 +22,8 @@ export function OnboardingNav({
   onPrev,
   isFinal = false,
 }: OnboardingNavProps) {
+  const navigate = useNavigate();
+
   return (
     <>
       {/* Top bar */}
@@ -42,7 +45,21 @@ export function OnboardingNav({
               draggable={false}
             />
           )}
-          <p className="font-mono text-[10px] md:text-[11px] text-white/40 tracking-[0.2em]">{step} de {totalSteps}</p>
+
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[10px] md:text-[11px] text-white/40 tracking-[0.2em]">{step} de {totalSteps}</span>
+            <button
+              onClick={() => {
+                localStorage.setItem('ps_onboarding_completed', 'true');
+                navigate('/');
+              }}
+              className="h-8 w-8 flex items-center justify-center border border-white/15 hover:border-white/30 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-full transition-all active:scale-95"
+              aria-label="Fechar Onboarding"
+              title="Fechar"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 

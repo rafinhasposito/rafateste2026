@@ -1,5 +1,7 @@
 {
-  "ready": true,
+  "ready": false,
   "human_blocker": false,
-  "last_verification": "Nome do Foco colocado em destaque absoluto no UnlockPremiumModal com badge, título hero e card de confirmação com saldo de créditos"
+  "last_verification": "UX Mobile Luxury concluída: Header com 'Como Funciona' e 'Onboarding', 4 abas no footer, Cards de Destino épicos e espaçosos no Step 2, saída facilitada no Onboarding, build PASS",
+  "build_status": "PASS",
+  "deploy_target": "Vercel"
 }
