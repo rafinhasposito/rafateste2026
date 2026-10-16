@@ -1,7 +1,7 @@
 {
-  "ready": false,
+  "ready": true,
   "human_blocker": false,
-  "last_verification": "UX Mobile Luxury concluída: Header com 'Como Funciona' e 'Onboarding', 4 abas no footer, Cards de Destino épicos e espaçosos no Step 2, saída facilitada no Onboarding, build PASS",
+  "last_verification": "UX Mobile Luxury finalizada e aprovada: Header com 'Como Funciona' e 'Onboarding', 4 abas no footer, Cards de Destino majestosos no Step 2, saída facilitada no Onboarding, build PASS limpo",
   "build_status": "PASS",
   "deploy_target": "Vercel"
 }
