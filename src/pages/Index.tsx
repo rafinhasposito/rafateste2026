@@ -466,23 +466,23 @@ const Index = () => {
               {/* ── Dados Natais — Apple Glass Card ── */}
               {isNatalProfileComplete(profile) && (
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-6 px-8 py-5 rounded-3xl border mb-16 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+                  className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-12 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
                   style={{
                     borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.15)` : 'rgba(255,255,255,0.08)',
                     background: activeTheme ? `color-mix(in srgb, rgb(${activeTheme.rgb}) 4%, rgba(10,10,12,0.6))` : 'rgba(10,10,12,0.6)'
                   }}>
-                  <div className="flex flex-wrap gap-10">
+                  <div className="flex flex-wrap gap-6 sm:gap-10">
                     <div className="flex flex-col gap-1">
                       <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/40">Passageiro</span>
-                      <span className="font-ps-display text-white/90 text-lg tracking-wide">{profile?.full_name}</span>
+                      <span className="font-ps-display text-white/90 text-base sm:text-lg tracking-wide">{profile?.full_name}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/40">Origem</span>
-                      <span className="font-ps-ui text-white/70 text-sm">{profile?.birth_city}</span>
+                      <span className="font-ps-ui text-white/70 text-xs sm:text-sm">{profile?.birth_city}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/40">Momento</span>
-                      <span className="font-ps-ui text-white/70 text-sm">{profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}</span>
+                      <span className="font-ps-ui text-white/70 text-xs sm:text-sm">{profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}</span>
                     </div>
                   </div>
                   <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
@@ -495,15 +495,15 @@ const Index = () => {
 
               {/* ── ANO HERO — Design Apple Vision Pro ── */}
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-                className="flex flex-col items-center mb-12 relative w-full">
-                <span className="text-[10px] uppercase tracking-[0.5em] font-bold mb-4 opacity-80"
+                className="flex flex-col items-center mb-6 md:mb-10 relative w-full">
+                <span className="text-[10px] uppercase tracking-[0.5em] font-bold mb-3 md:mb-4 opacity-80"
                   style={{ color: activeTheme ? `rgb(${activeTheme.rgb})` : '#C9A227' }}>
                   Ano do Destino
                 </span>
                 <div className="relative flex justify-center w-full">
                   <input
                     type="number"
-                    className="text-center text-8xl md:text-[140px] font-ps-display bg-transparent border-none outline-none font-bold tracking-tighter leading-none w-full"
+                    className="text-center text-6xl sm:text-8xl md:text-[140px] font-ps-display bg-transparent border-none outline-none font-bold tracking-tighter leading-none w-full"
                     style={{
                       color: activeTheme ? `rgb(${activeTheme.rgb})` : '#C9A227',
                       textShadow: activeTheme ? `0 0 80px rgba(${activeTheme.rgb}, 0.5)` : 'none',
@@ -523,8 +523,8 @@ const Index = () => {
 
               {/* ── Pergunta ── */}
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="w-full text-center mb-12 max-w-3xl">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-ps-display text-white leading-tight tracking-tight drop-shadow-2xl">
+                className="w-full text-center mb-6 md:mb-10 max-w-3xl">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-ps-display text-white leading-tight tracking-tight drop-shadow-2xl">
                   {searchPath === 'cidade' ? 'Onde você vai passar o seu aniversário?'
                     : searchPath === 'casa' ? 'Qual energia você quer ativar?'
                     : 'O que você quer destravar no seu ano?'}
