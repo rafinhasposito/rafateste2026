@@ -385,12 +385,12 @@
     color: rgba(255, 255, 255, 0.20);
   }
 
-  /* Prevent iOS zoom */
+  /* Prevent iOS zoom on standard form inputs without shrinking hero display inputs */
   @media (max-width: 767px) {
     input[type="text"],
     input[type="date"],
     input[type="time"],
-    input[type="number"],
+    input[type="number"]:not(.year-hero-input),
     select,
     textarea {
       font-size: 16px !important;

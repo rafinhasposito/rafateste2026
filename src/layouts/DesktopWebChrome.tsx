@@ -113,8 +113,8 @@ export function DesktopWebChrome() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-surface-border" />
                   <DropdownMenuItem onClick={() => navigate("/app/onboarding")} className="text-brand-primary hover:bg-surface focus:bg-surface cursor-pointer flex justify-between">
-                    <span>Ver Onboarding</span>
-                    <span className="text-[9px] uppercase opacity-60">6 telas</span>
+                    <span>Guia Rápido</span>
+                    <span className="text-[9px] uppercase opacity-60">6 passos</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/perfil")} className="text-foundation-fg hover:bg-surface focus:bg-surface cursor-pointer">
                     <Settings className="w-4 h-4 mr-2" />

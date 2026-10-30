@@ -251,16 +251,18 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
 
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
-      {/* Apple Spotlight Search Bar */}
-      <p className="font-ps-ui text-white/50 text-base md:text-lg italic mb-8 text-center drop-shadow-md">"A posição geográfica dita a frequência do seu ano."</p>
-      <div className="w-full relative group mb-8 mt-0">
+      {/* Luxury Spotlight Search Bar */}
+      <p className="font-ps-ui text-white/65 text-sm md:text-base font-light mb-6 text-center max-w-md leading-relaxed">
+        Digite a cidade onde você pensa em comemorar (ou onde passou) para ver o que ela ativa no seu ano.
+      </p>
+      <div className="w-full relative group mb-6 mt-0">
         {/* Glow de fundo da barra de busca */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-[32px] blur-xl opacity-0 group-hover:opacity-100 transition duration-1000 group-focus-within:opacity-100" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-[#C9A227]/15 to-transparent rounded-2xl md:rounded-[32px] blur-xl opacity-60 group-hover:opacity-100 transition duration-700 group-focus-within:opacity-100" />
         
-        <div className="relative flex flex-col items-center bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[32px] p-2 transition-all duration-500 focus-within:border-white/30 focus-within:bg-white/[0.05] shadow-2xl">
+        <div className="relative flex flex-col items-center bg-[#07101C]/90 backdrop-blur-3xl border border-[#C9A227]/35 rounded-2xl md:rounded-[32px] p-1.5 md:p-2 transition-all duration-500 focus-within:border-[#C9A227]/75 focus-within:bg-[#0B1728]/95 shadow-[0_14px_38px_rgba(0,0,0,0.65)]">
           
-          <div className="w-full flex items-center px-6 py-4">
-            <Search className="w-6 h-6 text-white/40 mr-4 shrink-0" />
+          <div className="w-full flex items-center px-4 md:px-6 py-3 md:py-4">
+            <Search className="w-5 h-5 md:w-6 md:h-6 text-[#C9A227]/80 mr-3.5 md:mr-4 shrink-0" />
             <div className="flex-1">
               <CityAutocomplete
                 value={city}
@@ -270,12 +272,12 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
                   setCityCoords(coords ?? null);
                   setResult(null);
                 }}
-                placeholder="Digite a cidade de destino..."
-                className="w-full text-2xl md:text-3xl font-ps-display placeholder:font-ps-display placeholder:font-light placeholder:text-white/20 bg-transparent border-none outline-none text-white focus:ring-0 px-0 h-auto"
+                placeholder="Ex: Lisboa, Paris, Rio de Janeiro..."
+                className="w-full text-lg sm:text-2xl md:text-3xl font-ps-display placeholder:font-ps-ui placeholder:font-light placeholder:text-white/35 bg-transparent border-none outline-none text-white focus:ring-0 px-0 h-auto"
               />
             </div>
             {cityValid && (
-              <div className="w-2 h-2 rounded-full bg-[#10B981] ml-4 shrink-0 shadow-[0_0_10px_#10B981]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#10B981] ml-3 shrink-0 shadow-[0_0_10px_#10B981]" />
             )}
           </div>
         </div>
@@ -288,29 +290,29 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
             initial={{ opacity: 0, y: 10, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: 10, height: 0 }}
-            className="flex flex-col items-center w-full mt-6 overflow-hidden"
+            className="flex flex-col items-center w-full mt-4 overflow-hidden"
           >
-            <div className="flex flex-col md:flex-row items-center justify-between w-full p-4 md:p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl md:rounded-3xl backdrop-blur-md gap-6">
+            <div className="flex flex-col md:flex-row items-center justify-between w-full p-4 md:p-6 bg-[#07101C]/90 border border-[#C9A227]/30 rounded-2xl md:rounded-3xl backdrop-blur-md gap-5 shadow-xl">
               
               <div className="flex items-center gap-4 w-full md:w-auto">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
-                  style={{ backgroundColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}15`, borderColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}30` }}>
-                  <MapPin className="w-5 h-5" style={{ color: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15' }} />
+                  style={{ backgroundColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}15`, borderColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}40` }}>
+                  <MapPin className="w-5 h-5" style={{ color: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#F5DE98' }} />
                 </div>
                 <div className="text-left">
-                  <h4 className="text-white font-ps-display text-lg md:text-xl font-bold">Destino Selecionado</h4>
-                  <p className="text-white/60 text-xs md:text-sm">Confirme para traçar sua rota astrofísica.</p>
+                  <h4 className="text-white font-ps-display text-lg md:text-xl font-bold">Cidade Selecionada</h4>
+                  <p className="text-white/65 text-xs md:text-sm">Confirme para ver a leitura completa dessa cidade no seu ano.</p>
                 </div>
               </div>
 
-              <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
+              <div className="flex flex-col items-center md:items-end gap-2.5 w-full md:w-auto">
                 <button
                   onClick={handleLookup}
                   disabled={loading}
-                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[10px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-black shadow-lg"
+                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-black shadow-lg"
                   style={{
-                    backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15',
-                    boxShadow: `0 0 30px ${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15'}40`,
+                    backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227',
+                    boxShadow: `0 0 30px ${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}40`,
                   }}
                 >
                   {loading ? (
@@ -318,11 +320,11 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
                   ) : (
                     <Globe className="w-4 h-4" />
                   )}
-                  {loading ? "Calculando Rota..." : "Confirmar Destino"}
+                  {loading ? "Analisando Destino..." : "Ver Leitura desta Cidade"}
                 </button>
-                <p className="font-ps-ui text-[8px] uppercase tracking-[0.2em] text-white/40 font-semibold flex items-center justify-center">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15' }} />
-                  Custo da Operação: 1 Crédito
+                <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/50 font-semibold flex items-center justify-center">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227' }} />
+                  Consome 1 crédito • Leitura completa
                 </p>
               </div>
 

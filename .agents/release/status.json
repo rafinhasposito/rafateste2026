@@ -1,7 +1,7 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "UX Mobile Luxury finalizada e aprovada: Header com 'Como Funciona' e 'Onboarding', 4 abas no footer, Cards de Destino majestosos no Step 2, saída facilitada no Onboarding, build PASS limpo",
+  "last_verification": "Human UX + Google SEO V1 aprovada: copy 100% humana (zero jargão de IA/dev/efemérides), Step 3 corrigido (ano 2026 com botões -/+ sem caixa escura, fundo cósmico limpo, busca sem borda dupla, card acolhedor de dados de nascimento), página Como Funciona traduzida + Schema FAQPage, SEO completo (index.html pt-BR, Open Graph, JSON-LD WebApplication, robots.txt, sitemap.xml, proteção Googlebot sem redirect para onboarding e H1 único), build PASS",
   "build_status": "PASS",
   "deploy_target": "Vercel"
 }

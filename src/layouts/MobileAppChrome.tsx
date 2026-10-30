@@ -59,7 +59,7 @@ export function MobileAppChrome() {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#C9A227]/40 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#F5DE98] text-[10px] font-ps-ui uppercase tracking-[0.14em] font-semibold active:scale-95 transition-all shadow-[0_0_12px_rgba(201,162,39,0.18)] backdrop-blur-xl"
             >
               <BookOpen className="w-3.5 h-3.5 text-[#E5C158]" />
-              <span>Ver Onboarding</span>
+              <span>Guia rápido</span>
             </Link>
           )}
         </div>

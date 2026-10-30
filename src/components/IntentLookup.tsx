@@ -259,9 +259,9 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                   <Search className="w-4 h-4" />
                   Revelar Cidades
                 </button>
-                <p className="font-ps-ui text-[8px] uppercase tracking-[0.2em] text-white/40 font-semibold flex items-center justify-center">
+                <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/50 font-semibold flex items-center justify-center">
                   <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: hexColor }} />
-                  Custo da Operação: 1 Crédito
+                  Consome 1 crédito • Leitura completa
                 </p>
               </div>
 
@@ -273,7 +273,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       {loading && (
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
           <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <p className="text-white/60 font-ps-display text-sm animate-pulse">Cruzando dados natais...</p>
+          <p className="text-white/60 font-ps-display text-sm animate-pulse">Calculando as melhores cidades para o seu ano...</p>
         </div>
       )}
 

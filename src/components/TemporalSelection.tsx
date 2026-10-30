@@ -19,6 +19,7 @@ function DesktopScene({ onSelectMode }: Props) {
           loop
           muted
           playsInline
+          poster="/earth-orbital-hires.jpg"
           className="w-full h-full object-cover object-center"
           style={{ filter: "brightness(0.8) contrast(1.1) saturate(1.2)" }}
         >
@@ -33,7 +34,7 @@ function DesktopScene({ onSelectMode }: Props) {
         <div className="max-w-2xl">
           {/* Label */}
           <motion.span
-            className="block font-ps-ui text-[11px] tracking-[0.35em] text-ps-gold uppercase mb-5"
+            className="block font-ps-ui text-[11px] font-semibold tracking-[0.35em] text-[#F5DE98] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] uppercase mb-5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.6 }}
@@ -123,6 +124,7 @@ function MobileTimeline({ onSelectMode }: Props) {
           loop
           muted
           playsInline
+          poster="/earth-orbital-hires.jpg"
           className="w-full h-full object-cover object-center"
           style={{ filter: "brightness(0.85) contrast(1.1) saturate(1.1)" }}
         >
@@ -142,7 +144,7 @@ function MobileTimeline({ onSelectMode }: Props) {
         <div className="px-6 pb-8" style={{ paddingBottom: "max(env(safe-area-inset-bottom, 32px), 96px)" }}>
           {/* Label */}
           <motion.span
-            className="block font-ps-ui text-[10px] tracking-[0.32em] text-ps-gold uppercase mb-4"
+            className="block font-ps-ui text-[10px] font-semibold tracking-[0.32em] text-[#F5DE98] drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] uppercase mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.6 }}
@@ -150,8 +152,8 @@ function MobileTimeline({ onSelectMode }: Props) {
             O GPS do Seu Novo Ano
           </motion.span>
 
-          {/* Headline */}
-          <motion.h1
+          {/* Headline (styled identically, avoids duplicate H1 in DOM for SEO) */}
+          <motion.p
             className="font-ps-display text-white leading-[1.05] mb-5 drop-shadow-xl"
             style={{ fontSize: "clamp(2rem, 9vw, 2.8rem)" }}
             initial={{ opacity: 0, y: 18 }}
@@ -159,7 +161,7 @@ function MobileTimeline({ onSelectMode }: Props) {
             transition={{ delay: 0.1, duration: 0.85, ease: "easeOut" }}
           >
             Descubra onde comemorar seu próximo aniversário.
-          </motion.h1>
+          </motion.p>
 
           {/* Subcopy */}
           <motion.p
@@ -224,7 +226,7 @@ function MobileTimeline({ onSelectMode }: Props) {
                 to="/app/onboarding"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-[#F5DE98]/80 hover:text-[#F5DE98] text-[11px] font-ps-ui tracking-wide transition-all active:scale-95"
               >
-                <span>✨ Ver Onboarding de 6 Passos</span>
+                <span>Como funciona, em 1 minuto</span>
                 <span className="text-xs">→</span>
               </Link>
             </div>

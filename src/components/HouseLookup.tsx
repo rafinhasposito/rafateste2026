@@ -245,9 +245,9 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
                   )}
                   {loading ? "Calculando..." : "Revelar Cidades"}
                 </button>
-                <p className="font-ps-ui text-[8px] uppercase tracking-[0.2em] text-white/40 font-semibold flex items-center justify-center">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15' }} />
-                  Custo da Operação: 1 Crédito
+                <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/50 font-semibold flex items-center justify-center">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227' }} />
+                  Consome 1 crédito • Leitura completa
                 </p>
               </div>
 

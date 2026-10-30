@@ -160,7 +160,7 @@ const Profile = () => {
               >
                 <div className="flex items-center gap-2">
                   <Compass className="w-4 h-4 text-[#C9A227]" />
-                  <span>Ver Onboarding (6 Telas)</span>
+                  <span>Guia rápido (6 passos)</span>
                 </div>
                 <span className="text-white/40 text-xs">→</span>
               </button>

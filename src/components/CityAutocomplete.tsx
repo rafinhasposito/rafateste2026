@@ -82,6 +82,8 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
+  const isUnstyled = Boolean(className?.includes("bg-transparent"));
+
   return (
     <div ref={containerRef} className="relative">
       <input
@@ -90,7 +92,11 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
         onChange={(e) => handleInput(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className={`w-full h-full bg-white/5 border rounded-xl px-4 text-white placeholder:text-white/30 text-sm focus:outline-none focus:bg-white/[0.08] transition-all duration-300 ${invalid && !isValid ? "border-red-500/50" : "border-white/10 focus:border-[#C9A227]/50"} ${className || ""}`}
+        className={
+          isUnstyled
+            ? `w-full h-full text-white focus:outline-none transition-all duration-300 ${className || ""}`
+            : `w-full h-full bg-white/5 border rounded-xl px-4 text-white placeholder:text-white/30 text-sm focus:outline-none focus:bg-white/[0.08] transition-all duration-300 ${invalid && !isValid ? "border-red-500/50" : "border-white/10 focus:border-[#C9A227]/50"} ${className || ""}`
+        }
         autoComplete="off"
       />
       {showSuggestions && suggestions.length > 0 && (
