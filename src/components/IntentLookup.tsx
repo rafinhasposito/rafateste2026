@@ -177,12 +177,13 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
   };
 
 
-  const hexColor = mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#FACC15';
+  const hexColor = mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227';
+  const softHex = mode === 'passado' ? '#E2E8F0' : mode === 'presente' ? '#A7F3D0' : '#F5DE98';
 
   return (
     <div className="space-y-6">
       {!result && !loading && (
-        <div className="flex flex-col gap-4 pb-12">
+        <div className="flex flex-col gap-3.5 pb-12">
           {Object.values(cityDatabase).map((house, index) => {
             const isSelected = selectedHouse === house.id;
             return (
@@ -190,33 +191,33 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                 key={house.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
+                transition={{ duration: 0.45, delay: index * 0.04 }}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 onClick={() => handleSelectIntent(house.id)}
-                className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 group flex items-start justify-between gap-4 ${
-                  isSelected ? "bg-white/[0.05]" : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05]"
+                className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 group flex items-start justify-between gap-4 backdrop-blur-md ${
+                  isSelected ? "bg-[#0D1A2F]/95" : "bg-[#08111F]/80 border-white/[0.08] hover:bg-[#0C182B]/90 hover:border-white/20"
                 }`}
                 style={{
-                  borderColor: isSelected ? `${hexColor}40` : undefined,
-                  boxShadow: isSelected ? `0 0 20px ${hexColor}10` : 'none',
+                  borderColor: isSelected ? `${hexColor}65` : undefined,
+                  boxShadow: isSelected ? `0 0 28px ${hexColor}1F` : 'none',
                 }}
               >
                 <div className="flex-1">
-                  <h3 className="md:text-sm font-medium mb-1 transition-colors leading-snug group-hover:opacity-100"
-                      style={{ color: isSelected ? hexColor : 'white' }}>
+                  <h3 className="text-sm sm:text-base font-medium mb-1 transition-colors leading-snug group-hover:opacity-100"
+                      style={{ color: isSelected ? softHex : 'white' }}>
                     {house.intent}
                   </h3>
-                  <p className="text-white/50 text-[11px] font-light">
+                  <p className="text-white/60 text-xs font-light leading-relaxed">
                     {house.realLife}
                   </p>
                 </div>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-all"
+                <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all mt-0.5"
                      style={{ 
-                       backgroundColor: isSelected ? `${hexColor}15` : 'rgba(255,255,255,0.02)',
-                       borderColor: isSelected ? `${hexColor}30` : 'rgba(255,255,255,0.1)',
+                       backgroundColor: isSelected ? `${hexColor}20` : 'rgba(255,255,255,0.03)',
+                       borderColor: isSelected ? `${hexColor}50` : 'rgba(255,255,255,0.1)',
                      }}>
-                  <ArrowRight className="w-4 h-4 transition-colors" style={{ color: isSelected ? hexColor : 'rgba(255,255,255,0.3)' }} />
+                  <ArrowRight className="w-4 h-4 transition-colors" style={{ color: isSelected ? softHex : 'rgba(255,255,255,0.4)' }} />
                 </div>
               </motion.button>
             );
@@ -224,7 +225,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         </div>
       )}
 
-      {/* Progressive Disclosure: Card de Confirmação no Estilo Apple (igual aos outros) */}
+      {/* Card de Confirmação Unificado */}
       <AnimatePresence>
         {selectedHouse && !loading && (
           <motion.div
@@ -233,16 +234,16 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
             exit={{ opacity: 0, y: 10, height: 0 }}
             className="flex flex-col items-center w-full mt-6 overflow-hidden"
           >
-            <div className="flex flex-col md:flex-row items-center justify-between w-full p-4 md:p-6 bg-white/[0.03] border border-white/[0.08] rounded-2xl md:rounded-3xl backdrop-blur-md gap-6">
+            <div className="flex flex-col md:flex-row items-center justify-between w-full p-5 md:p-6 bg-[#08111F]/90 border border-white/[0.1] rounded-2xl md:rounded-3xl backdrop-blur-xl gap-6 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
               
               <div className="flex items-center gap-4 w-full md:w-auto">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
-                  style={{ backgroundColor: `${hexColor}15`, borderColor: `${hexColor}30` }}>
-                  <Sparkles className="w-5 h-5" style={{ color: hexColor }} />
+                  style={{ backgroundColor: `${hexColor}18`, borderColor: `${hexColor}40` }}>
+                  <Sparkles className="w-5 h-5" style={{ color: softHex }} />
                 </div>
                 <div className="text-left">
                   <h4 className="text-white font-ps-display text-lg md:text-xl font-bold">Foco Definido</h4>
-                  <p className="text-white/60 text-xs md:text-sm">Agora veja as cidades que combinam com você.</p>
+                  <p className="text-white/60 text-xs md:text-sm">Agora veja as cidades que ativam essa área para você.</p>
                 </div>
               </div>
 
@@ -250,16 +251,16 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                 <button
                   onClick={handleConfirmIntent}
                   disabled={loading}
-                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[10px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-black shadow-lg"
+                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-[#02050A] shadow-lg"
                   style={{
-                    backgroundColor: hexColor,
+                    backgroundColor: mode === 'passado' ? '#CBD5E1' : hexColor,
                     boxShadow: `0 0 30px ${hexColor}40`,
                   }}
                 >
                   <Search className="w-4 h-4" />
                   Revelar Cidades
                 </button>
-                <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/50 font-semibold flex items-center justify-center">
+                <p className="font-ps-ui text-[10px] uppercase tracking-[0.14em] text-white/55 font-semibold flex items-center justify-center">
                   <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: hexColor }} />
                   Consome 1 crédito • Leitura completa
                 </p>

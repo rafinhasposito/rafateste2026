@@ -93,170 +93,227 @@ const Profile = () => {
   }
 
   return (
-    <>
-      <StarryBackground />
+    <div className="min-h-[100dvh] px-4 sm:px-6 pt-20 lg:pt-10 pb-28 lg:pb-16 max-w-5xl mx-auto relative z-10">
+      <div className={`justify-between items-center mb-6 ${returnTo ? "flex" : "hidden lg:flex"}`}>
+        <BackButton label={returnTo ? "Voltar para a Consulta" : "Descobrir"} to={returnTo || "/"} />
+      </div>
 
-      <div className="min-h-[100dvh] px-4 py-16 md:py-24 max-w-4xl mx-auto relative">
-        <div className="flex justify-between items-center mb-8">
-          <BackButton label={returnTo ? "Voltar" : "Início"} to={returnTo || "/"} />
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+        <span className="inline-block text-[10px] uppercase tracking-[0.25em] font-semibold text-[#F5DE98]/80 mb-2">
+          Minha Conta
+        </span>
+        <h1 className="font-ps-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">
+          Seu Perfil & Dados de Nascimento
+        </h1>
+        <p className="font-ps-ui text-white/60 text-sm md:text-base max-w-2xl">
+          Salve seus dados natais uma única vez para calcular qualquer cidade ou aniversário em segundos.
+        </p>
+      </motion.div>
 
-          <motion.button
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            onClick={signOut}
-            className="flex items-center gap-2 text-red-400/80 text-[10px] font-sans uppercase tracking-[0.2em] hover:text-red-400 transition-colors border border-red-400/20 px-3 py-1.5 rounded-full"
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        
+        {/* Lado Esquerdo: Identidade, Créditos e Atalhos */}
+        <div className="lg:col-span-4 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-6 rounded-3xl bg-[#08111F]/90 border border-[#C9A227]/20 backdrop-blur-xl shadow-[0_18px_45px_rgba(0,0,0,0.45)] space-y-6"
           >
-            Sair
-          </motion.button>
-        </div>
-
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
-          <h1 className="font-ps-display text-4xl md:text-5xl font-bold text-white mb-2 leading-tight">
-            Seu Arquivo Cósmico
-          </h1>
-          <p className="font-ps-ui text-white/50 text-sm">Gerencie sua identidade astrológica e acessos ao Protocolo.</p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          
-          {/* Lado Esquerdo: Identidade e Créditos */}
-          <div className="md:col-span-1 space-y-10">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-              <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#C9A227] block mb-4">Acesso Oficial</span>
-              <div className="flex items-center gap-4">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover grayscale opacity-80" />
-                ) : (
-                  <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                    <User className="w-6 h-6 text-white/40" />
-                  </div>
-                )}
-                <div>
-                  <p className="text-white font-ps-display text-lg">{fullName || profile?.display_name || "Membro"}</p>
-                  <p className="text-white/40 font-ps-ui text-xs">{profile?.email}</p>
+            <div className="flex items-center gap-4">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover ring-2 ring-[#C9A227]/40" />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-[#0E1B30] border border-[#C9A227]/35 flex items-center justify-center">
+                  <User className="w-6 h-6 text-[#F5DE98]" />
                 </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-white font-ps-display text-lg font-bold truncate">{fullName || profile?.display_name || "Membro"}</p>
+                <p className="text-white/50 font-ps-ui text-xs truncate">{profile?.email}</p>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-white/40 block mb-2">Créditos de Consulta</span>
+            <div className="pt-5 border-t border-white/[0.08]">
+              <span className="text-[10px] font-ps-ui font-semibold uppercase tracking-[0.2em] text-white/50 block mb-2">
+                Saldo Disponível
+              </span>
               <div className="flex items-baseline gap-2 mb-4">
-                <span className="font-ps-display text-5xl text-[#C9A227] leading-none">{profile?.credits ?? 0}</span>
-                <span className="font-ps-ui text-xs text-[#C9A227]/60 uppercase tracking-widest">Saldo Atual</span>
+                <span className="font-ps-display text-5xl text-[#F5DE98] font-bold leading-none">{profile?.credits ?? 0}</span>
+                <span className="font-ps-ui text-xs text-[#F5DE98]/70 uppercase tracking-widest">
+                  crédito{profile?.credits === 1 ? "" : "s"}
+                </span>
               </div>
               <button
                 onClick={() => navigate("/credits")}
-                className="w-full py-3 bg-[#C9A227]/10 text-[#C9A227] border border-[#C9A227]/30 hover:bg-[#C9A227]/20 transition-all font-sans text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2 rounded-xl"
+                className="w-full py-3.5 bg-[#C9A227]/15 text-[#F5DE98] border border-[#C9A227]/40 hover:bg-[#C9A227]/25 transition-all font-ps-ui text-[11px] uppercase tracking-[0.16em] font-bold flex items-center justify-center gap-2 rounded-xl"
               >
-                <CreditCard className="w-4 h-4" /> Adquirir Mais Créditos
+                <CreditCard className="w-4 h-4 text-[#E5C158]" /> Comprar Créditos
               </button>
-            </motion.div>
+            </div>
 
-            {/* Guias Rápidos & Documentação */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="space-y-2.5">
-              <span className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-white/40 block mb-2">Guias & Conhecimento</span>
+            {/* Guias Rápidos & Como Funciona */}
+            <div className="pt-5 border-t border-white/[0.08] space-y-2.5">
+              <span className="text-[10px] font-ps-ui font-semibold uppercase tracking-[0.2em] text-white/45 block mb-2">
+                Ajuda & Entendimento
+              </span>
               <button
                 onClick={() => navigate("/app/onboarding")}
-                className="w-full py-2.5 px-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 rounded-xl text-white/80 hover:text-white transition-all text-xs font-ps-ui flex items-center justify-between"
+                className="w-full py-3 px-3.5 bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 rounded-xl text-white/85 hover:text-white transition-all text-xs font-ps-ui flex items-center justify-between"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <Compass className="w-4 h-4 text-[#C9A227]" />
-                  <span>Guia rápido (6 passos)</span>
+                  <span>Ver Guia Rápido (6 passos)</span>
                 </div>
                 <span className="text-white/40 text-xs">→</span>
               </button>
 
               <button
                 onClick={() => navigate("/tecnologia")}
-                className="w-full py-2.5 px-3 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 border border-[#C9A227]/30 rounded-xl text-[#F5DE98] transition-all text-xs font-ps-ui flex items-center justify-between"
+                className="w-full py-3 px-3.5 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 border border-[#C9A227]/30 rounded-xl text-[#F5DE98] transition-all text-xs font-ps-ui flex items-center justify-between"
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <Sparkles className="w-4 h-4 text-[#E5C158]" />
-                  <span>Como Funciona a Tecnologia</span>
+                  <span>Como Funciona a Revolução Solar</span>
                 </div>
                 <span className="text-[#C9A227] text-xs">→</span>
               </button>
-            </motion.div>
-            
-            <button onClick={signOut} className="text-white/30 hover:text-white transition-colors text-[10px] font-sans uppercase tracking-[0.2em] pt-4 border-t border-white/10 w-full text-left">
-              Sair do Sistema
-            </button>
-          </div>
+            </div>
 
-          {/* Lado Direito: Formulário Natal e Histórico */}
-          <div className="md:col-span-2 space-y-12">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-              <div className="flex items-center gap-4 mb-6">
-                 <h2 className="font-ps-display text-2xl text-white">Coordenadas de Nascimento</h2>
-                 <div className="flex-1 h-px bg-white/10" />
+            <div className="pt-4 border-t border-white/[0.08]">
+              <button
+                onClick={signOut}
+                className="w-full py-2.5 px-3 rounded-xl text-red-300/80 hover:text-red-200 hover:bg-red-500/10 border border-transparent hover:border-red-400/20 transition-all text-[11px] font-ps-ui uppercase tracking-[0.18em] font-semibold text-center"
+              >
+                Sair da Conta
+              </button>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Lado Direito: Formulário Natal e Histórico Recente */}
+        <div className="lg:col-span-8 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="p-6 sm:p-8 rounded-3xl bg-[#08111F]/90 border border-[#C9A227]/25 backdrop-blur-xl shadow-[0_18px_45px_rgba(0,0,0,0.45)]"
+          >
+            <div className="mb-6">
+              <h2 className="font-ps-display text-2xl text-white font-bold mb-1.5">Dados de Nascimento</h2>
+              <p className="text-white/55 font-ps-ui text-xs sm:text-sm leading-relaxed">
+                A hora e a cidade exatas em que você nasceu são essenciais para calcular o seu Ascendente anual em cada cidade do mundo.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="text-[11px] font-ps-ui font-semibold uppercase tracking-[0.16em] text-[#F5DE98] mb-2 block">
+                  Seu Nome
+                </label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                  placeholder="Seu nome completo"
+                  className="w-full rounded-xl border border-white/15 bg-[#040914]/90 px-4 py-3.5 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#C9A227] transition-colors"
+                />
               </div>
-              <p className="text-white/50 font-ps-ui text-xs mb-8">Defina seus dados uma vez. O sistema carregará sua identidade astral automaticamente em todas as próximas consultas.</p>
 
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-2 block">Nome para a Consulta</label>
-                  <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Seu nome completo" className="quantum-input w-full border-b border-white/20 pb-3 pt-2 text-lg text-white placeholder:text-white/20 focus:border-[#C9A227] bg-transparent" />
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-2 block">Data</label>
-                    <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} className="quantum-input w-full border-b border-white/20 pb-3 pt-2 text-lg text-white focus:border-[#C9A227] bg-transparent" />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-2 block">Hora Exata</label>
-                    <input type="time" value={birthTime} onChange={e => setBirthTime(e.target.value)} className="quantum-input w-full border-b border-white/20 pb-3 pt-2 text-lg text-white focus:border-[#C9A227] bg-transparent" />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-[10px] font-sans font-semibold uppercase tracking-[0.2em] text-[#C9A227] mb-2 block">Cidade de Origem</label>
-                  <CityAutocomplete
-                    value={birthCity}
-                    onChange={(v, valid, coords) => {
-                      setBirthCity(v);
-                      setBirthCityValid(valid);
-                      if (coords) setBirthCoords(coords);
-                    }}
-                    placeholder="Digite e selecione na lista"
-                    className="w-full text-lg border-b border-white/20 bg-transparent pb-3 pt-2 text-white focus:border-[#C9A227] focus:ring-0 transition-colors rounded-none"
+                  <label className="text-[11px] font-ps-ui font-semibold uppercase tracking-[0.16em] text-[#F5DE98] mb-2 block">
+                    Data de Nascimento
+                  </label>
+                  <input
+                    type="date"
+                    value={birthDate}
+                    onChange={e => setBirthDate(e.target.value)}
+                    className="w-full rounded-xl border border-white/15 bg-[#040914]/90 px-4 py-3.5 text-base text-white focus:outline-none focus:border-[#C9A227] transition-colors [color-scheme:dark]"
                   />
                 </div>
-                
+                <div>
+                  <label className="text-[11px] font-ps-ui font-semibold uppercase tracking-[0.16em] text-[#F5DE98] mb-2 block">
+                    Hora Exata (Certidão)
+                  </label>
+                  <input
+                    type="time"
+                    value={birthTime}
+                    onChange={e => setBirthTime(e.target.value)}
+                    className="w-full rounded-xl border border-white/15 bg-[#040914]/90 px-4 py-3.5 text-base text-white focus:outline-none focus:border-[#C9A227] transition-colors [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-ps-ui font-semibold uppercase tracking-[0.16em] text-[#F5DE98] mb-2 block">
+                  Cidade Onde Você Nasceu
+                </label>
+                <CityAutocomplete
+                  value={birthCity}
+                  onChange={(v, valid, coords) => {
+                    setBirthCity(v);
+                    setBirthCityValid(valid);
+                    if (coords) setBirthCoords(coords);
+                  }}
+                  placeholder="Digite sua cidade natal e selecione na lista"
+                  className="w-full rounded-xl border border-white/15 bg-[#040914]/90 px-4 py-3.5 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#C9A227] transition-colors"
+                />
+              </div>
+              
+              <div className="pt-2">
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="w-full md:w-auto mt-4 px-8 py-4 bg-white text-black hover:bg-gray-200 disabled:bg-white/10 disabled:text-white/30 transition-all font-sans text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#C9A227] text-[#02050A] hover:bg-[#E5C158] disabled:opacity-40 transition-all font-ps-ui text-xs uppercase tracking-[0.18em] font-bold flex items-center justify-center gap-2.5 shadow-[0_10px_28px_rgba(201,162,39,0.28)]"
                 >
-                  <Save className="w-4 h-4" /> {saving ? "Salvando..." : "Gravar Coordenadas"}
+                  <Save className="w-4 h-4" />
+                  {saving ? "Salvando..." : returnTo ? "Salvar e Continuar Consulta" : "Salvar Dados de Nascimento"}
                 </button>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="pt-8 border-t border-white/10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-ps-display text-xl text-white">Consultas Recentes</h2>
-                <button onClick={() => navigate("/history")} className="text-[#C9A227] text-[10px] uppercase tracking-widest hover:text-white transition-colors">Acessar Arquivo →</button>
-              </div>
-              
-              {recent.length === 0 ? (
-                <p className="text-white/40 text-sm font-ps-ui">Nenhum dossiê gerado ainda.</p>
-              ) : (
-                <div className="space-y-3">
-                  {recent.map(c => (
-                    <div key={c.id} className="flex items-center justify-between p-4 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-colors rounded-lg group">
-                      <div>
-                        <p className="text-white font-ps-display text-sm group-hover:text-[#C9A227] transition-colors">{c.name} · {c.year}</p>
-                        <p className="text-white/40 font-ps-ui text-[10px] uppercase tracking-widest mt-1">{c.mode}{c.origin ? ` · ${c.origin}` : ""}</p>
-                      </div>
-                      <p className="text-white/30 font-ps-ui text-[10px]">{new Date(c.created_at).toLocaleDateString("pt-BR")}</p>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.16 }}
+            className="p-6 sm:p-8 rounded-3xl bg-[#08111F]/90 border border-white/[0.08] backdrop-blur-xl shadow-[0_18px_45px_rgba(0,0,0,0.45)]"
+          >
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-ps-display text-xl text-white font-bold">Consultas Recentes</h2>
+              <button onClick={() => navigate("/history")} className="text-[#F5DE98] text-[11px] uppercase tracking-[0.16em] font-semibold hover:text-white transition-colors">
+                Ver Todas →
+              </button>
+            </div>
+            
+            {recent.length === 0 ? (
+              <p className="text-white/45 text-sm font-ps-ui">Você ainda não realizou nenhuma consulta.</p>
+            ) : (
+              <div className="space-y-3">
+                {recent.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => navigate(`/dashboard?id=${c.id}`)}
+                    className="w-full text-left flex items-center justify-between p-4 border border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.06] hover:border-[#C9A227]/30 transition-all rounded-2xl group"
+                  >
+                    <div>
+                      <p className="text-white font-ps-display text-base font-semibold group-hover:text-[#F5DE98] transition-colors">
+                        {c.name} · {c.year}
+                      </p>
+                      <p className="text-white/45 font-ps-ui text-[10px] uppercase tracking-[0.16em] mt-1">
+                        {c.mode}{c.origin ? ` · ${c.origin}` : ""}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
+                    <p className="text-white/40 font-ps-ui text-xs">{new Date(c.created_at).toLocaleDateString("pt-BR")}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
 
-          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

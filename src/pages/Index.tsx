@@ -17,16 +17,40 @@ import { detectUserLocation } from "@/lib/astro";
 type Mode = "futuro" | "passado" | "presente";
 type SearchPath = "cidade" | "casa" | "intencao" | null;
 
-const modeThemes: Record<Mode, { accent: string; rgb: string; glow: string; border: string; bg: string; video: string }> = {
-  passado: { accent: "#94A3B8", rgb: "148, 163, 184", glow: "rgba(148,163,184,0.3)", border: "rgba(148,163,184,0.4)", bg: "rgba(148,163,184,0.08)", video: "/videos/passado.mp4" },
-  presente: { accent: "#10B981", rgb: "16, 185, 129", glow: "rgba(16,185,129,0.3)", border: "rgba(16,185,129,0.4)", bg: "rgba(16,185,129,0.08)", video: "/videos/presente.mp4?v=2" },
-  futuro: { accent: "#FACC15", rgb: "250, 204, 21", glow: "rgba(250,204,21,0.3)", border: "rgba(250,204,21,0.4)", bg: "rgba(250,204,21,0.08)", video: "/videos/futuro.mp4?v=2" },
-};
-
-const modeCardColors: Record<Mode, { rgb: string }> = {
-  passado: { rgb: "148, 163, 184" },
-  presente: { rgb: "16, 185, 129" },
-  futuro: { rgb: "250, 204, 21" },
+const modeThemes: Record<
+  Mode,
+  { accent: string; light: string; rgb: string; glow: string; border: string; bg: string; cardBg: string; video: string }
+> = {
+  passado: {
+    accent: "#94A3B8",
+    light: "#E2E8F0",
+    rgb: "148, 163, 184",
+    glow: "rgba(148,163,184,0.28)",
+    border: "rgba(148,163,184,0.38)",
+    bg: "rgba(148,163,184,0.10)",
+    cardBg: "linear-gradient(180deg, rgba(16,24,38,0.92) 0%, rgba(9,14,24,0.96) 55%, rgba(4,7,14,0.98) 100%)",
+    video: "/videos/passado.mp4",
+  },
+  presente: {
+    accent: "#10B981",
+    light: "#A7F3D0",
+    rgb: "16, 185, 129",
+    glow: "rgba(16,185,129,0.28)",
+    border: "rgba(16,185,129,0.38)",
+    bg: "rgba(16,185,129,0.10)",
+    cardBg: "linear-gradient(180deg, rgba(9,28,27,0.92) 0%, rgba(6,17,19,0.96) 55%, rgba(3,8,11,0.98) 100%)",
+    video: "/videos/presente.mp4?v=2",
+  },
+  futuro: {
+    accent: "#C9A227",
+    light: "#F5DE98",
+    rgb: "201, 162, 39",
+    glow: "rgba(201,162,39,0.28)",
+    border: "rgba(201,162,39,0.38)",
+    bg: "rgba(201,162,39,0.10)",
+    cardBg: "linear-gradient(180deg, rgba(15,28,52,0.92) 0%, rgba(9,17,32,0.96) 55%, rgba(4,8,18,0.98) 100%)",
+    video: "/videos/futuro.mp4?v=2",
+  },
 };
 
 const mantras = [
@@ -158,6 +182,8 @@ const Index = () => {
       }
       setMode(targetMode);
       if (targetMode === "presente") setYear(currentYear);
+      else if (targetMode === "passado") setYear(String(Number(currentYear) - 1));
+      else setYear("2026");
       
       if (targetPath && ["cidade", "casa", "intencao"].includes(targetPath)) {
         setSearchPath(targetPath);
@@ -219,6 +245,8 @@ const Index = () => {
     setMode(m);
     setSearchPath(null);
     if (m === "presente") setYear(currentYear);
+    else if (m === "passado") setYear(String(Number(currentYear) - 1));
+    else setYear("2026");
     setStep(2);
   };
 
@@ -284,47 +312,52 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }} 
             exit={{ opacity: 0, y: -15 }} 
             transition={{ duration: 0.3 }} 
-            className="pt-24 md:pt-32 pb-40 md:pb-20 flex flex-col items-center w-full px-6 sm:px-8 max-w-lg md:max-w-5xl mx-auto min-h-[100svh] relative"
+            className="pt-20 lg:pt-12 pb-28 lg:pb-16 flex flex-col items-center w-full relative"
           >
-            {/* Fundo Celestial Limpo — Sem cor de pântano */}
+            {/* Fundo Full-Bleed (100% da janela, sem retângulo cortado nas laterais!) */}
             {(() => {
-              const theme = mode ? modeThemes[mode] : null;
+              const theme = mode ? modeThemes[mode] : modeThemes.futuro;
               return (
-                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                  {/* Gradiente sutil escuro */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-[#02050A] via-[#040814] to-[#02050A]" />
-                  {/* Aura suave cósmica */}
+                <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                  <div
+                    className="absolute inset-0 transition-all duration-700"
+                    style={{
+                      background: `radial-gradient(ellipse 90% 55% at 50% 0%, rgba(${theme.rgb}, 0.14) 0%, rgba(7, 16, 30, 0.35) 55%, transparent 100%)`,
+                    }}
+                  />
                   <div 
-                    className="absolute top-[8%] left-1/2 -translate-x-1/2 w-[100vw] max-w-[800px] h-[450px] opacity-20 blur-[130px] rounded-full pointer-events-none transition-colors duration-1000"
-                    style={{ backgroundColor: theme ? `rgb(${theme.rgb})` : '#C9A227' }} 
+                    className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[90vw] max-w-[900px] h-[420px] opacity-15 blur-[140px] rounded-full pointer-events-none transition-colors duration-700"
+                    style={{ backgroundColor: `rgb(${theme.rgb})` }} 
                   />
                 </div>
               );
             })()}
 
             {/* Wrapper Centralizado */}
-            <div className="w-full flex flex-col items-center relative z-10">
+            <div className="w-full max-w-lg md:max-w-5xl mx-auto px-5 sm:px-8 flex flex-col items-center relative z-10">
               
-              {/* Header da Seção: Voltar + Badge em harmonia */}
-              <div className="w-full flex items-center justify-between mb-8 sm:mb-10">
-                {/* Botão Voltar */}
+              {/* Header da Seção: Voltar + Badge do Modo Ativo */}
+              <div className="w-full flex items-center justify-between mb-6 sm:mb-9">
                 <button 
                   onClick={() => setStep(1)} 
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl transition-all text-white/70 hover:text-white text-[11px] tracking-[0.18em] uppercase font-medium active:scale-95"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/12 bg-white/[0.04] hover:bg-white/[0.09] backdrop-blur-xl transition-all text-white/75 hover:text-white text-[11px] tracking-[0.18em] uppercase font-medium active:scale-95"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" /> Voltar
                 </button>
 
-                {/* Badge Topo */}
                 {(() => {
-                  const theme = mode ? modeThemes[mode] : null;
+                  const theme = mode ? modeThemes[mode] : modeThemes.futuro;
                   const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Compass;
                   return (
                     <div 
-                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#C9A227]/30 bg-[#C9A227]/10 backdrop-blur-xl"
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-xl transition-colors"
+                      style={{
+                        borderColor: `rgba(${theme.rgb}, 0.4)`,
+                        backgroundColor: `rgba(${theme.rgb}, 0.12)`,
+                      }}
                     >
-                      <ModeIcon className="w-3.5 h-3.5 text-[#E5C158]" />
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#E5C158]">
+                      <ModeIcon className="w-3.5 h-3.5" style={{ color: theme.light }} />
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: theme.light }}>
                         {modeOptions.find(m => m.id === mode)?.title}
                       </span>
                     </div>
@@ -332,35 +365,80 @@ const Index = () => {
                 })()}
               </div>
 
-              {/* Headings - Tipografia com respiro */}
-              <div className="text-center mb-6 sm:mb-10">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-ps-display text-white mb-2.5 tracking-tight leading-tight">
-                  Pronto, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5DE98] to-[#C9A227]">{profile?.full_name?.split(' ')[0] || profile?.display_name?.split(' ')[0] || user?.user_metadata?.name?.split(' ')[0] || 'Viajante'}</span>?
-                </h1>
-                <p className="text-white/65 text-sm sm:text-base font-ps-ui max-w-md mx-auto font-light leading-relaxed">
-                  Escolha por onde você prefere começar a planejar seu próximo aniversário.
-                </p>
-              </div>
+              {/* Headings - Adaptados ao Tempo Escolhido (Passado / Presente / Futuro) */}
+              {(() => {
+                const theme = mode ? modeThemes[mode] : modeThemes.futuro;
+                const firstName =
+                  profile?.full_name?.split(' ')[0] ||
+                  profile?.display_name?.split(' ')[0] ||
+                  user?.user_metadata?.name?.split(' ')[0] ||
+                  'Viajante';
+                const step2Subtitle =
+                  mode === "passado"
+                    ? "Reveja um aniversário anterior e comprove o que aquela virada ativou no seu ano."
+                    : mode === "presente"
+                    ? "Escolha como você quer ler as energias que estão regendo o seu ciclo atual."
+                    : "Escolha por onde você prefere começar a planejar seu próximo aniversário.";
 
-              {/* Cards: Luxury Majestic Cards with Generous Breathing Room */}
+                return (
+                  <div className="text-center mb-6 sm:mb-10">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-ps-display text-white mb-2.5 tracking-tight leading-tight">
+                      Pronto,{" "}
+                      <span
+                        className="text-transparent bg-clip-text"
+                        style={{
+                          backgroundImage: `linear-gradient(90deg, ${theme.light} 0%, ${theme.accent} 100%)`,
+                        }}
+                      >
+                        {firstName}
+                      </span>
+                      ?
+                    </h1>
+                    <p className="text-white/65 text-sm sm:text-base font-ps-ui max-w-md mx-auto font-light leading-relaxed">
+                      {step2Subtitle}
+                    </p>
+                  </div>
+                );
+              })()}
+
+              {/* Cards: Luxury Majestic Cards Adaptados ao Modo e com Respiro Mobile/Web */}
               <div className="flex flex-col gap-4 sm:gap-5 md:grid md:grid-cols-3 md:gap-6 w-full">
                 {(() => {
+                   const theme = mode ? modeThemes[mode] : modeThemes.futuro;
                    return pathOptions.map((opt) => {
                      const Icon = opt.icon;
-                     const cardDesc = 
-                        opt.id === "cidade" ? "Já tem uma viagem ou cidade em mente? Veja o que passar a virada do seu aniversário lá ativa no seu ano." :
-                        opt.id === "casa" ? "Escolha a área que você quer priorizar agora: dinheiro, amor, carreira, saúde, visibilidade ou recomeço." :
-                        "Diga o que você quer destravar nos próximos 12 meses e descubra as melhores cidades do mundo para isso.";
+                     const cardDesc =
+                        mode === "passado"
+                          ? opt.id === "cidade"
+                            ? "Digite a cidade onde você passou um aniversário anterior e veja qual área da sua vida ela ativou naquele ano."
+                            : opt.id === "casa"
+                            ? "Descubra quais cidades teriam ativado dinheiro, amor, carreira ou saúde naquele ano específico."
+                            : "Veja onde teria sido o melhor lugar do mundo para destravar o que você buscava naquele ciclo."
+                          : mode === "presente"
+                          ? opt.id === "cidade"
+                            ? "Informe a cidade onde você passou seu último aniversário para revelar a leitura do seu ano atual."
+                            : opt.id === "casa"
+                            ? "Veja quais cidades ativam dinheiro, amor, carreira ou saúde na configuração do seu ciclo atual."
+                            : "Compare onde seus objetivos atuais estariam mais favorecidos na virada deste ciclo."
+                          : opt.id === "cidade"
+                          ? "Já tem uma viagem ou cidade em mente? Veja o que passar a virada do seu aniversário lá ativa no seu ano."
+                          : opt.id === "casa"
+                          ? "Escolha a área que você quer priorizar agora: dinheiro, amor, carreira, saúde, visibilidade ou recomeço."
+                          : "Diga o que você quer destravar nos próximos 12 meses e descubra as melhores cidades do mundo para isso.";
                      
                      const cardTag =
-                        opt.id === "cidade" ? "Já tenho destino" :
-                        opt.id === "casa" ? "12 Áreas (Casas)" :
-                        "Metas & Desejos";
+                        opt.id === "cidade"
+                          ? mode === "passado" ? "Cidade onde passei" : mode === "presente" ? "Último aniversário" : "Já tenho destino"
+                          : opt.id === "casa"
+                          ? "12 Áreas (Casas)"
+                          : "Metas & Desejos";
 
                      const cardAction =
-                        opt.id === "cidade" ? "Testar uma Cidade" :
-                        opt.id === "casa" ? "Escolher Área da Vida" :
-                        "Definir Objetivo";
+                        opt.id === "cidade"
+                          ? mode === "passado" ? "Rever Cidade" : mode === "presente" ? "Ler Meu Ano Atual" : "Testar uma Cidade"
+                          : opt.id === "casa"
+                          ? "Escolher Área da Vida"
+                          : "Definir Objetivo";
 
                      return (
                         <motion.button
@@ -368,25 +446,49 @@ const Index = () => {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectPath(opt.id)}
-                          className="relative w-full overflow-hidden rounded-3xl border border-[#C9A227]/35 hover:border-[#C9A227]/75 bg-gradient-to-b from-[#0F1C36]/90 via-[#091222]/95 to-[#040812]/98 backdrop-blur-2xl transition-all duration-300 group flex flex-col justify-between text-left p-5 sm:p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_16px_40px_rgba(0,0,0,0.6)]"
+                          className="relative w-full overflow-hidden rounded-3xl border backdrop-blur-2xl transition-all duration-300 group flex flex-col justify-between text-left p-5 sm:p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.10),0_16px_40px_rgba(0,0,0,0.65)]"
+                          style={{
+                            borderColor: `rgba(${theme.rgb}, 0.36)`,
+                            background: theme.cardBg,
+                          }}
                         >
-                          {/* Filete superior de luz dourada */}
-                          <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#E5C158]/50 to-transparent transition-opacity duration-500" />
+                          {/* Filete superior de luz do modo ativo */}
+                          <div
+                            className="absolute top-0 inset-x-0 h-[1.5px] transition-opacity duration-500"
+                            style={{
+                              background: `linear-gradient(90deg, transparent 0%, rgba(${theme.rgb}, 0.65) 50%, transparent 100%)`,
+                            }}
+                          />
                           
                           {/* Top Row: Ícone + Categoria Tag */}
                           <div className="w-full flex items-center justify-between mb-3.5 md:mb-5">
-                            <div className="w-11 h-11 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-[#C9A227]/20 to-[#C9A227]/5 border border-[#C9A227]/40 flex items-center justify-center text-[#F5DE98] shadow-[0_0_20px_rgba(201,162,39,0.18)] group-hover:scale-105 transition-transform duration-300">
+                            <div
+                              className="w-11 h-11 md:w-14 md:h-14 rounded-2xl border flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
+                              style={{
+                                borderColor: `rgba(${theme.rgb}, 0.42)`,
+                                background: `linear-gradient(135deg, rgba(${theme.rgb}, 0.22) 0%, rgba(${theme.rgb}, 0.05) 100%)`,
+                                color: theme.light,
+                                boxShadow: `0 0 20px rgba(${theme.rgb}, 0.16)`,
+                              }}
+                            >
                               <Icon className="w-5 h-5 md:w-6 md:h-6" strokeWidth={1.75} />
                             </div>
 
-                            <span className="px-3 py-1 rounded-full border border-[#C9A227]/25 bg-[#C9A227]/10 text-[#F5DE98] text-[9px] uppercase tracking-[0.18em] font-semibold">
+                            <span
+                              className="px-3 py-1 rounded-full border text-[9px] uppercase tracking-[0.18em] font-semibold"
+                              style={{
+                                borderColor: `rgba(${theme.rgb}, 0.28)`,
+                                backgroundColor: `rgba(${theme.rgb}, 0.10)`,
+                                color: theme.light,
+                              }}
+                            >
                               {cardTag}
                             </span>
                           </div>
 
                           {/* Conteúdo textual com respiro nobre */}
                           <div className="flex-1 w-full mb-4 md:mb-6">
-                            <h3 className="font-ps-display text-xl sm:text-2xl md:text-2xl text-white font-medium mb-1.5 md:mb-2.5 tracking-wide group-hover:text-[#F5DE98] transition-colors">
+                            <h3 className="font-ps-display text-xl sm:text-2xl md:text-2xl text-white font-medium mb-1.5 md:mb-2.5 tracking-wide transition-colors">
                               {opt.title}
                             </h3>
                             <p className="font-ps-ui text-white/75 text-xs sm:text-sm font-light leading-relaxed">
@@ -395,9 +497,16 @@ const Index = () => {
                           </div>
 
                           {/* Botão de ação explícito luxuoso */}
-                          <div className="w-full py-2.5 md:py-3 px-4 rounded-xl bg-gradient-to-r from-[#C9A227]/15 via-[#C9A227]/8 to-[#C9A227]/15 border border-[#C9A227]/30 group-hover:border-[#C9A227]/60 group-hover:from-[#C9A227]/25 group-hover:to-[#C9A227]/20 flex items-center justify-between text-[#F5DE98] text-[11px] md:text-xs font-ps-ui uppercase tracking-[0.16em] font-semibold transition-all shadow-[0_4px_16px_rgba(201,162,39,0.08)]">
+                          <div
+                            className="w-full py-2.5 md:py-3 px-4 rounded-xl border flex items-center justify-between text-[11px] md:text-xs font-ps-ui uppercase tracking-[0.16em] font-semibold transition-all"
+                            style={{
+                              borderColor: `rgba(${theme.rgb}, 0.34)`,
+                              background: `linear-gradient(90deg, rgba(${theme.rgb}, 0.16) 0%, rgba(${theme.rgb}, 0.08) 50%, rgba(${theme.rgb}, 0.16) 100%)`,
+                              color: theme.light,
+                            }}
+                          >
                             <span>{cardAction}</span>
-                            <ChevronRight className="w-4 h-4 text-[#E5C158] group-hover:translate-x-1 transition-transform" />
+                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ color: theme.light }} />
                           </div>
                         </motion.button>
                      );
@@ -406,7 +515,7 @@ const Index = () => {
               </div>
 
               {/* Guia / Onboarding Banner de Apoio */}
-              <div className="w-full mt-8 p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-lg">
+              <div className="w-full mt-8 p-4 sm:p-5 rounded-2xl border border-white/10 bg-[#070E1A]/80 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-lg">
                 <div>
                   <h4 className="text-sm font-ps-display text-white tracking-wide">Primeira vez por aqui?</h4>
                   <p className="text-xs font-ps-ui text-white/60 mt-0.5">Veja o guia rápido de 1 minuto ou entenda como funciona o cálculo.</p>
@@ -435,47 +544,63 @@ const Index = () => {
         {/* ===== STEP 3 ===== */}
         {step === 3 && (
           <motion.div key="step3-root" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 15 }} transition={{ duration: 0.3 }}
-            className="pt-20 md:pt-28 pb-36 md:pb-24 flex flex-col items-center w-full px-4 md:px-5 min-h-[100svh] relative overflow-hidden">
+            className="pt-20 lg:pt-12 pb-28 lg:pb-16 flex flex-col items-center w-full relative">
 
-            {/* ── Fundo Cósmico Profundo (Mesma linguagem de luxo do Step 2) ── */}
+            {/* ── Fundo Full-Bleed (100% da tela, sem borda/caixa cortada) ── */}
             {(() => {
-              const theme = mode ? modeThemes[mode] : null;
-              const rgb = theme ? theme.rgb : "201, 162, 39";
+              const theme = mode ? modeThemes[mode] : modeThemes.futuro;
               return (
-                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                  <div className="absolute inset-0 bg-gradient-to-b from-[#040914] via-[#060D1A] to-[#02050A]" />
+                <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
                   <div
-                    className="absolute inset-0"
+                    className="absolute inset-0 transition-all duration-700"
                     style={{
-                      background: `radial-gradient(ellipse 80% 50% at 50% 0%, rgba(${rgb}, 0.16) 0%, rgba(14, 28, 54, 0.35) 55%, transparent 100%)`,
+                      background: `radial-gradient(ellipse 90% 55% at 50% 0%, rgba(${theme.rgb}, 0.16) 0%, rgba(7, 16, 30, 0.35) 55%, transparent 100%)`,
                     }}
                   />
                   <div
-                    className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[90vw] max-w-[850px] h-[45vh] opacity-15 blur-[130px] rounded-full"
-                    style={{ backgroundColor: `rgb(${rgb})` }}
+                    className="absolute top-[14%] left-1/2 -translate-x-1/2 w-[90vw] max-w-[880px] h-[45vh] opacity-15 blur-[140px] rounded-full transition-colors duration-700"
+                    style={{ backgroundColor: `rgb(${theme.rgb})` }}
                   />
                 </div>
               );
             })()}
 
-            <div className="w-full max-w-4xl mx-auto flex flex-col items-center relative z-10 pt-2 md:pt-6">
+            <div className="w-full max-w-4xl mx-auto px-5 sm:px-8 flex flex-col items-center relative z-10">
 
-              {/* ── Nav Row — Voltar ── */}
+              {/* ── Nav Row — Voltar + Modo Ativo ── */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
-                className="w-full flex justify-start mb-5 md:mb-10">
+                className="w-full flex items-center justify-between mb-6 md:mb-9">
                 <button onClick={() => setStep(2)}
                   className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.05] hover:bg-white/[0.1] backdrop-blur-xl transition-all duration-300 text-white/80 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold active:scale-95">
                   <ChevronLeft className="w-3.5 h-3.5" /> Voltar
                 </button>
+                {(() => {
+                  const theme = mode ? modeThemes[mode] : modeThemes.futuro;
+                  const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Compass;
+                  return (
+                    <div
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-xl"
+                      style={{
+                        borderColor: `rgba(${theme.rgb}, 0.4)`,
+                        backgroundColor: `rgba(${theme.rgb}, 0.12)`,
+                      }}
+                    >
+                      <ModeIcon className="w-3.5 h-3.5" style={{ color: theme.light }} />
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: theme.light }}>
+                        {modeOptions.find(m => m.id === mode)?.title}
+                      </span>
+                    </div>
+                  );
+                })()}
               </motion.div>
 
               {/* ── Dados de Nascimento — Apple Glass Card ── */}
               {isNatalProfileComplete(profile) && (
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-10 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
+                  className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-10 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
                   style={{
-                    borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.25)` : 'rgba(201,162,39,0.25)',
-                    background: 'rgba(8, 16, 30, 0.75)'
+                    borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.30)` : 'rgba(201,162,39,0.30)',
+                    background: 'rgba(8, 15, 28, 0.80)'
                   }}>
                   <div className="flex flex-wrap gap-6 sm:gap-10">
                     <div className="flex flex-col gap-1">
@@ -493,70 +618,94 @@ const Index = () => {
                   </div>
                   <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
                     className="text-[10px] uppercase tracking-[0.2em] font-bold hover:scale-105 transition-transform"
-                    style={{ color: activeTheme ? `rgb(${activeTheme.rgb})` : '#F5DE98' }}>
+                    style={{ color: activeTheme ? activeTheme.light : '#F5DE98' }}>
                     Editar
                   </button>
                 </motion.div>
               )}
 
-              {/* ── ANO HERO — Design Luxo com Controles Claros ── */}
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-                className="flex flex-col items-center mb-6 md:mb-10 relative w-full">
-                <span className="text-[10px] uppercase tracking-[0.42em] font-bold mb-2 md:mb-3 text-[#F5DE98]">
-                  {mode === "passado" ? "Ano que Você Quer Rever" : mode === "presente" ? "Seu Ciclo Atual" : "Ano do Seu Aniversário"}
-                </span>
-                <div className="relative flex items-center justify-center gap-3 sm:gap-6">
-                  {mode !== "presente" && (
-                    <button
-                      type="button"
-                      aria-label="Ano anterior"
-                      onClick={() => setYear(String((parseInt(year, 10) || new Date().getFullYear()) - 1))}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[#C9A227]/35 bg-[#091324]/90 hover:bg-[#10203A] hover:border-[#C9A227]/70 text-[#F5DE98] flex items-center justify-center text-xl font-light transition-all active:scale-90 shadow-lg shrink-0"
-                    >
-                      −
-                    </button>
-                  )}
-                  <input
-                    type="number"
-                    aria-label="Ano do aniversário"
-                    className="year-hero-input text-center text-6xl sm:text-8xl md:text-[120px] font-ps-display bg-transparent border-b border-[#C9A227]/30 focus:border-[#C9A227] outline-none font-bold tracking-tight leading-none w-44 sm:w-64 md:w-80 py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    style={{
-                      background: 'transparent',
-                      color: '#F5DE98',
-                      textShadow: '0 4px 32px rgba(201, 162, 39, 0.35)',
-                    }}
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                    disabled={mode === "presente"}
-                  />
-                  {mode !== "presente" && (
-                    <button
-                      type="button"
-                      aria-label="Próximo ano"
-                      onClick={() => setYear(String((parseInt(year, 10) || new Date().getFullYear()) + 1))}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[#C9A227]/35 bg-[#091324]/90 hover:bg-[#10203A] hover:border-[#C9A227]/70 text-[#F5DE98] flex items-center justify-center text-xl font-light transition-all active:scale-90 shadow-lg shrink-0"
-                    >
-                      +
-                    </button>
-                  )}
-                </div>
-                {mode === "presente" ? (
-                  <div className="mt-3 px-4 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
-                    <span className="text-[9px] uppercase tracking-widest text-white/60">Ciclo Atual Fixado</span>
-                  </div>
-                ) : (
-                  <span className="mt-2 text-[10px] font-ps-ui text-white/45 tracking-wide">
-                    Use os botões ou toque no número para mudar o ano
-                  </span>
-                )}
-              </motion.div>
+              {/* ── ANO HERO — Design Luxo Adaptado à Cor do Modo ── */}
+              {(() => {
+                const theme = mode ? modeThemes[mode] : modeThemes.futuro;
+                return (
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+                    className="flex flex-col items-center mb-6 md:mb-10 relative w-full">
+                    <span className="text-[10px] uppercase tracking-[0.42em] font-bold mb-2 md:mb-3" style={{ color: theme.light }}>
+                      {mode === "passado" ? "Ano que Você Quer Rever" : mode === "presente" ? "Seu Ciclo Atual" : "Ano do Seu Aniversário"}
+                    </span>
+                    <div className="relative flex items-center justify-center gap-3 sm:gap-6">
+                      {mode !== "presente" && (
+                        <button
+                          type="button"
+                          aria-label="Ano anterior"
+                          onClick={() => setYear(String((parseInt(year, 10) || new Date().getFullYear()) - 1))}
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border bg-[#081120]/90 hover:bg-[#101F38] flex items-center justify-center text-xl font-light transition-all active:scale-90 shadow-lg shrink-0"
+                          style={{
+                            borderColor: `rgba(${theme.rgb}, 0.40)`,
+                            color: theme.light,
+                          }}
+                        >
+                          −
+                        </button>
+                      )}
+                      <input
+                        type="number"
+                        aria-label="Ano do aniversário"
+                        className="year-hero-input text-center text-6xl sm:text-8xl md:text-[120px] font-ps-display bg-transparent border-b outline-none font-bold tracking-tight leading-none w-44 sm:w-64 md:w-80 py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        style={{
+                          background: 'transparent',
+                          color: theme.light,
+                          borderColor: `rgba(${theme.rgb}, 0.35)`,
+                          textShadow: `0 4px 32px rgba(${theme.rgb}, 0.35)`,
+                        }}
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                        disabled={mode === "presente"}
+                      />
+                      {mode !== "presente" && (
+                        <button
+                          type="button"
+                          aria-label="Próximo ano"
+                          onClick={() => setYear(String((parseInt(year, 10) || new Date().getFullYear()) + 1))}
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border bg-[#081120]/90 hover:bg-[#101F38] flex items-center justify-center text-xl font-light transition-all active:scale-90 shadow-lg shrink-0"
+                          style={{
+                            borderColor: `rgba(${theme.rgb}, 0.40)`,
+                            color: theme.light,
+                          }}
+                        >
+                          +
+                        </button>
+                      )}
+                    </div>
+                    {mode === "presente" ? (
+                      <div className="mt-3 px-4 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+                        <span className="text-[9px] uppercase tracking-widest text-white/60">Ciclo Atual Fixado</span>
+                      </div>
+                    ) : (
+                      <span className="mt-2 text-[10px] font-ps-ui text-white/45 tracking-wide">
+                        Use os botões ou toque no número para mudar o ano
+                      </span>
+                    )}
+                  </motion.div>
+                );
+              })()}
 
-              {/* ── Pergunta ── */}
+              {/* ── Pergunta Adaptada ao Modo ── */}
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
                 className="w-full text-center mb-6 md:mb-10 max-w-3xl">
                 <h1 className="text-2xl sm:text-4xl md:text-5xl font-ps-display text-white leading-tight tracking-tight drop-shadow-2xl">
-                  {searchPath === 'cidade' ? 'Qual cidade você quer consultar?'
-                    : searchPath === 'casa' ? 'Qual área da vida você quer priorizar?'
+                  {searchPath === 'cidade'
+                    ? mode === 'passado'
+                      ? `Onde você passou seu aniversário em ${year}?`
+                      : mode === 'presente'
+                      ? 'Onde você passou seu último aniversário?'
+                      : 'Qual cidade você quer consultar?'
+                    : searchPath === 'casa'
+                    ? mode === 'passado'
+                      ? `Qual área da vida você quer conferir em ${year}?`
+                      : 'Qual área da vida você quer priorizar?'
+                    : mode === 'passado'
+                    ? `Qual objetivo você buscava viver em ${year}?`
                     : 'O que você quer viver neste novo ciclo?'}
                 </h1>
               </motion.div>
@@ -575,10 +724,18 @@ const Index = () => {
                 )}
               </motion.div>
 
-              {/* Perfil de nascimento incompleto — Card convidativo em vez de erro vermelho */}
+              {/* Perfil de nascimento incompleto — Card convidativo */}
               {!isNatalProfileComplete(profile) && (
-                <div className="mt-6 w-full max-w-2xl rounded-2xl border border-[#C9A227]/35 bg-[#081222]/90 backdrop-blur-xl p-5 text-center shadow-[0_12px_32px_rgba(0,0,0,0.5)]">
-                  <p className="text-[#F5DE98] font-ps-display text-sm sm:text-base mb-1">
+                <div
+                  className="mt-6 w-full max-w-2xl rounded-2xl border bg-[#081222]/90 backdrop-blur-xl p-5 text-center shadow-[0_12px_32px_rgba(0,0,0,0.5)]"
+                  style={{
+                    borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.38)` : 'rgba(201,162,39,0.38)',
+                  }}
+                >
+                  <p
+                    className="font-ps-display text-sm sm:text-base mb-1"
+                    style={{ color: activeTheme ? activeTheme.light : '#F5DE98' }}
+                  >
                     Falta só um detalhe: seus dados de nascimento
                   </p>
                   <p className="text-white/65 font-ps-ui text-xs mb-3.5 max-w-md mx-auto leading-relaxed">
@@ -586,7 +743,12 @@ const Index = () => {
                   </p>
                   <button
                     onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
-                    className="px-5 py-2.5 rounded-xl bg-[#C9A227]/15 hover:bg-[#C9A227]/25 border border-[#C9A227]/45 text-[#F5DE98] text-[11px] font-ps-ui uppercase tracking-[0.16em] font-semibold transition-all active:scale-95"
+                    className="px-5 py-2.5 rounded-xl border text-[11px] font-ps-ui uppercase tracking-[0.16em] font-semibold transition-all active:scale-95"
+                    style={{
+                      borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.45)` : 'rgba(201,162,39,0.45)',
+                      backgroundColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.15)` : 'rgba(201,162,39,0.15)',
+                      color: activeTheme ? activeTheme.light : '#F5DE98',
+                    }}
                   >
                     Preencher Dados de Nascimento →
                   </button>
@@ -601,14 +763,17 @@ const Index = () => {
       {/* Trust badges — in-flow at the bottom of steps 2 and 3 */}
       {(step === 2 || step === 3) && (
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-          className="w-full flex flex-wrap justify-center gap-6 md:gap-10 px-4 pt-6 pb-24 md:pb-12 z-10 relative">
+          className="w-full flex flex-wrap justify-center gap-6 md:gap-10 px-4 pt-4 pb-24 lg:pb-12 z-10 relative">
           {[
             { text: "Dados 100% Privados" },
             { text: "Cálculo Astronômico de Precisão" },
             { text: "Leitura Personalizada do Seu Ano" },
           ].map((b, i) => (
             <div key={i} className="flex items-center gap-2 text-white/45">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#C9A227]/70" />
+              <div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: activeTheme ? activeTheme.accent : '#C9A227' }}
+              />
               <span className="text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium">{b.text}</span>
             </div>
           ))}

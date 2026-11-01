@@ -249,20 +249,41 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
     }
   };
 
+  const modeColor =
+    mode === "passado"
+      ? { accent: "#94A3B8", light: "#E2E8F0", rgb: "148, 163, 184" }
+      : mode === "presente"
+      ? { accent: "#10B981", light: "#A7F3D0", rgb: "16, 185, 129" }
+      : { accent: "#C9A227", light: "#F5DE98", rgb: "201, 162, 39" };
+
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
-      {/* Luxury Spotlight Search Bar */}
+      {/* Luxury Spotlight Search Bar — Mode-Adaptive */}
       <p className="font-ps-ui text-white/65 text-sm md:text-base font-light mb-6 text-center max-w-md leading-relaxed">
-        Digite a cidade onde você pensa em comemorar (ou onde passou) para ver o que ela ativa no seu ano.
+        {mode === "passado"
+          ? "Digite a cidade onde você estava naquele aniversário para conferir o que ela ativou no seu ano."
+          : mode === "presente"
+          ? "Digite a cidade onde você passou seu último aniversário para revelar a leitura do seu ciclo atual."
+          : "Digite a cidade onde você pensa em comemorar para ver o que ela ativa no seu próximo ano."}
       </p>
       <div className="w-full relative group mb-6 mt-0">
         {/* Glow de fundo da barra de busca */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-[#C9A227]/15 to-transparent rounded-2xl md:rounded-[32px] blur-xl opacity-60 group-hover:opacity-100 transition duration-700 group-focus-within:opacity-100" />
+        <div
+          className="absolute -inset-1 rounded-2xl md:rounded-[32px] blur-xl opacity-50 group-hover:opacity-100 transition duration-700 group-focus-within:opacity-100"
+          style={{
+            background: `linear-gradient(90deg, transparent 0%, rgba(${modeColor.rgb}, 0.18) 50%, transparent 100%)`,
+          }}
+        />
         
-        <div className="relative flex flex-col items-center bg-[#07101C]/90 backdrop-blur-3xl border border-[#C9A227]/35 rounded-2xl md:rounded-[32px] p-1.5 md:p-2 transition-all duration-500 focus-within:border-[#C9A227]/75 focus-within:bg-[#0B1728]/95 shadow-[0_14px_38px_rgba(0,0,0,0.65)]">
+        <div
+          className="relative flex flex-col items-center bg-[#07101C]/90 backdrop-blur-3xl border rounded-2xl md:rounded-[32px] p-1.5 md:p-2 transition-all duration-500 shadow-[0_14px_38px_rgba(0,0,0,0.65)]"
+          style={{
+            borderColor: `rgba(${modeColor.rgb}, 0.40)`,
+          }}
+        >
           
           <div className="w-full flex items-center px-4 md:px-6 py-3 md:py-4">
-            <Search className="w-5 h-5 md:w-6 md:h-6 text-[#C9A227]/80 mr-3.5 md:mr-4 shrink-0" />
+            <Search className="w-5 h-5 md:w-6 md:h-6 mr-3.5 md:mr-4 shrink-0" style={{ color: modeColor.light }} />
             <div className="flex-1">
               <CityAutocomplete
                 value={city}
