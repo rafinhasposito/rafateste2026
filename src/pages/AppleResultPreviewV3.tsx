@@ -395,11 +395,28 @@ export interface DestinyResultsProps {
 }
 
 
-const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, className }: any) => {
-  const [imgSrc, setImgSrc] = useState<string>(initialSrc || fallbackSrc);
+const wikiThumbCache: Record<string, string> = {};
+
+const optimizeImageForDevice = (url?: string): string => {
+  if (!url) return "";
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  if (url.includes("images.unsplash.com")) {
+    const targetW = isMobile ? "800" : "1400";
+    const targetQ = isMobile ? "75" : "80";
+    return url
+      .replace(/w=\d+/g, `w=${targetW}`)
+      .replace(/q=\d+/g, `q=${targetQ}`);
+  }
+  return url;
+};
+
+const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, className, priority = false }: any) => {
+  const resolvedInitial = optimizeImageForDevice(initialSrc || localFallback || fallbackSrc);
+  const [imgSrc, setImgSrc] = useState<string>(resolvedInitial);
+  const [loaded, setLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    let currentSrc = initialSrc || fallbackSrc;
+    let currentSrc = optimizeImageForDevice(initialSrc || fallbackSrc);
     setImgSrc(currentSrc);
     
     if (!cityName || cityName === "Bloqueado" || cityName === "Desconhecido") return;
@@ -414,7 +431,7 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
     );
 
     if (localFallback && !isGenericFallback) {
-      setImgSrc(localFallback);
+      setImgSrc(optimizeImageForDevice(localFallback));
       return;
     }
 
@@ -427,8 +444,12 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
         currentSrc.includes("1511649475") || currentSrc.includes("1490730141")
     )) {
       const cleanCity = cityName.split(',')[0].trim();
+      if (wikiThumbCache[cleanCity]) {
+        setImgSrc(wikiThumbCache[cleanCity]);
+        return;
+      }
       let isSubscribed = true;
-      fetch(`https://pt.wikipedia.org/w/api.php?origin=*&action=query&titles=${encodeURIComponent(cleanCity)}&prop=pageimages&format=json&pithumbsize=1000`)
+      fetch(`https://pt.wikipedia.org/w/api.php?origin=*&action=query&titles=${encodeURIComponent(cleanCity)}&prop=pageimages&format=json&pithumbsize=800`)
         .then(res => res.json())
         .then(data => {
           if (!isSubscribed) return;
@@ -436,7 +457,9 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
           if (pages) {
             const page = Object.values(pages)[0] as any;
             if (page?.thumbnail?.source) {
-              setImgSrc(page.thumbnail.source.split('?')[0]);
+              const thumb = page.thumbnail.source;
+              wikiThumbCache[cleanCity] = thumb;
+              setImgSrc(thumb);
             }
           }
         }).catch(() => {});
@@ -444,8 +467,89 @@ const WikiImage = ({ cityName, initialSrc, fallbackSrc, localFallback, alt, clas
     }
   }, [cityName, initialSrc, fallbackSrc, localFallback]);
 
-  return <img src={imgSrc} alt={alt} className={className} onError={(e) => { e.currentTarget.src = fallbackSrc; }} />;
+  return (
+    <img
+      src={imgSrc}
+      alt={alt}
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+      onLoad={() => setLoaded(true)}
+      className={`${className || ""} transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-85"}`}
+      onError={(e) => { e.currentTarget.src = optimizeImageForDevice(fallbackSrc); }}
+    />
+  );
 };
+
+// Componente Cinema Instantâneo: exibe a foto otimizada em movimento Ken Burns imediato (0.1s)
+// e faz crossfade invisível quando o vídeo termina de carregar os primeiros frames no celular.
+const CinematicCityMedia = ({
+  videoSrc,
+  cityName,
+  posterSrc,
+  fallbackSrc,
+  localFallback,
+  priority = false,
+}: {
+  videoSrc?: string | null;
+  cityName: string;
+  posterSrc?: string;
+  fallbackSrc: string;
+  localFallback?: string;
+  priority?: boolean;
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "300px" });
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  useEffect(() => {
+    setIsVideoPlaying(false);
+  }, [videoSrc, cityName]);
+
+  const shouldMountVideo = Boolean(videoSrc) && (priority || isInView);
+
+  return (
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-[#03100B]">
+      {/* Camada 1: Imagem Otimizada com Movimento Ken Burns Instantâneo */}
+      <motion.div
+        initial={{ scale: 1 }}
+        animate={{ scale: isVideoPlaying ? 1.04 : 1.12 }}
+        transition={{ duration: 18, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+        className="absolute inset-0 w-full h-full"
+      >
+        <WikiImage
+          key={cityName}
+          cityName={cityName}
+          initialSrc={posterSrc}
+          fallbackSrc={fallbackSrc}
+          localFallback={localFallback}
+          alt={cityName}
+          priority={priority}
+          className="w-full h-full object-cover object-center"
+        />
+      </motion.div>
+
+      {/* Camada 2: Vídeo em Crossfade Suave (só aparece quando já está rodando liso) */}
+      {shouldMountVideo && videoSrc && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload={priority ? "auto" : "metadata"}
+          onPlaying={() => setIsVideoPlaying(true)}
+          onCanPlay={() => setIsVideoPlaying(true)}
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
+            isVideoPlaying ? "opacity-100" : "opacity-0"
+          }`}
+          key={videoSrc}
+        >
+          <source src={videoSrc} type={videoSrc.endsWith(".mov") ? "video/quicktime" : "video/mp4"} />
+        </video>
+      )}
+    </div>
+  );
+};
+
 
 
 function getSunSign(birthdate: string | undefined): string {
@@ -976,30 +1080,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       <section ref={heroRef} className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
         {/* Vídeo ou Imagem Full Bleed */}
         <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#03100B] z-10" />
-          {heroVideoSrc ? (
-            <video 
-              autoPlay 
-              muted 
-              loop 
-              playsInline 
-              preload="metadata"
-              poster={bestCity?.img || getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
-              className="w-full h-full object-cover" 
-              key={heroVideoSrc}
-            >
-              <source src={heroVideoSrc} type={heroVideoSrc?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
-            </video>
-          ) : (
-            <WikiImage 
-              key={P_DYNAMIC.city}
-              cityName={P_DYNAMIC.city} 
-              initialSrc={bestCity?.img || getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)} 
-              fallbackSrc={getAtmosphericFallback(P_DYNAMIC.house)} 
-              alt={P_DYNAMIC.city} 
-              className="w-full h-full object-cover" 
-            />
-          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#03100B] z-10 pointer-events-none" />
+          <CinematicCityMedia
+            videoSrc={heroVideoSrc}
+            cityName={P_DYNAMIC.city}
+            posterSrc={bestCity?.img || getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
+            fallbackSrc={getAtmosphericFallback(P_DYNAMIC.house)}
+            localFallback={getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
+            priority={true}
+          />
         </motion.div>
         
         <div className="absolute top-20 md:top-24 right-6 md:right-10 z-20 flex items-center gap-2 text-white/50">
@@ -1762,29 +1851,14 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                     transition={{ duration: 2.5, ease: "easeOut" }}
                                     className="w-full h-full"
                                   >
-                                    {heroVideoSrc ? (
-                                      <video 
-                                        autoPlay 
-                                        muted 
-                                        loop 
-                                        playsInline 
-                                        preload="metadata"
-                                        poster={bestCity?.img || getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
-                                        className="w-full h-full object-cover object-center" 
-                                        key={heroVideoSrc}
-                                      >
-                                        <source src={heroVideoSrc} type="video/mp4" />
-                                      </video>
-                                    ) : (
-                                      <WikiImage 
-                                        cityName={P_DYNAMIC.city}
-                                        initialSrc={bestCity?.img}
-                                        fallbackSrc={getAtmosphericFallback(P_DYNAMIC.house)}
-                                        localFallback={getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
-                                        alt={P_DYNAMIC.city}
-                                        className="w-full h-full object-cover object-center"
-                                      />
-                                    )}
+                                    <CinematicCityMedia
+                                      videoSrc={heroVideoSrc}
+                                      cityName={P_DYNAMIC.city}
+                                      posterSrc={bestCity?.img}
+                                      fallbackSrc={getAtmosphericFallback(P_DYNAMIC.house)}
+                                      localFallback={getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
+                                      priority={false}
+                                    />
                                   </motion.div>
                                   <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/50 to-transparent"></div>
                                   
