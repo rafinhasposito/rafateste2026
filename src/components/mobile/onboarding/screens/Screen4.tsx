@@ -13,7 +13,7 @@ const paths = [
     title: 'Por Casa Astrológica',
     hook: 'Quero virar a chave em uma área.',
     desc: 'Destrave finanças, carreira ou amor. Escolha a mudança que você precisa e encontre os destinos ideais.',
-    video: '/assets/zodiac.mp4',
+    video: '/assets/stars.mp4',
     num: '02',
   },
   {
