@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const destinationExamples = [
   {
@@ -102,7 +103,7 @@ const DesktopScreen2 = () => {
                   className="relative w-full shrink-0 overflow-hidden"
                 >
                   <video 
-                    autoPlay loop muted playsInline 
+                    autoPlay loop muted playsInline preload="metadata"
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ filter: "saturate(1.2) contrast(1.1)" }}
                   >
@@ -212,7 +213,7 @@ const MobileScreen2 = () => {
             >
               {/* Background Video */}
               <video 
-                autoPlay loop muted playsInline 
+                autoPlay loop muted playsInline preload="metadata"
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isActive ? 'opacity-80' : 'opacity-40'}`}
                 style={{ filter: "saturate(1.2) contrast(1.1)" }}
               >
@@ -277,14 +278,10 @@ const MobileScreen2 = () => {
 
 // ─── Main Export ─────────────────────────────────────────────────────────
 export const Screen2 = () => {
+  const isMobile = useIsMobile();
   return (
-    <>
-      <div className="hidden lg:block w-full h-full">
-        <DesktopScreen2 />
-      </div>
-      <div className="lg:hidden w-full h-full">
-        <MobileScreen2 />
-      </div>
-    </>
+    <div className="w-full h-full">
+      {isMobile ? <MobileScreen2 /> : <DesktopScreen2 />}
+    </div>
   );
 };

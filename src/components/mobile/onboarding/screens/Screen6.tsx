@@ -94,7 +94,7 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
             {/* Header with Rome Video strip */}
             <div className="relative h-40 md:h-48 overflow-hidden border-b border-white/[0.05]">
               <video 
-                autoPlay loop muted playsInline 
+                autoPlay loop muted playsInline preload="metadata"
                 poster="/assets/roma-poster.jpg"
                 className="absolute inset-0 w-full h-full object-cover opacity-70"
                 style={{ filter: "saturate(1.2) contrast(1.1)" }}

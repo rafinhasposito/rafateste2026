@@ -74,7 +74,7 @@ export const Screen4 = () => {
             >
               {/* Background Video */}
               <video 
-                autoPlay loop muted playsInline 
+                autoPlay loop muted playsInline preload="metadata"
                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-[10s] ease-linear group-hover:scale-110 ${isOtherHovered ? 'opacity-20' : 'opacity-60 md:opacity-80'}`}
               >
                 <source src={p.video} type="video/mp4" />

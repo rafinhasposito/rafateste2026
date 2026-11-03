@@ -37,7 +37,7 @@ export const Screen3 = () => {
       {/* Cinematic Stars Background */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <video 
-          autoPlay loop muted playsInline 
+          autoPlay loop muted playsInline preload="metadata"
           className="absolute inset-0 w-full h-full object-cover opacity-40 md:opacity-50 mix-blend-screen"
           style={{ filter: "saturate(1.1) contrast(1.3)" }}
         >

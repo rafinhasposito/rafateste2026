@@ -19,19 +19,11 @@ export const Screen1 = () => (
       
       {/* Videos for motion-safe users */}
       <div className="absolute inset-0 w-full h-full hidden motion-safe:block">
-        {/* Mobile Video */}
+        {/* Single Responsive Video */}
         <video
-          autoPlay muted loop playsInline
+          autoPlay muted loop playsInline preload="auto"
           poster="/assets/earth-blue.jpg"
-          className="absolute inset-0 w-full h-full object-cover object-center md:hidden"
-        >
-          <source src="/assets/vecteezy-earth.mp4" type="video/mp4" />
-        </video>
-        {/* Desktop Video */}
-        <video
-          autoPlay muted loop playsInline
-          poster="/assets/earth-blue.jpg"
-          className="absolute inset-0 w-full h-full object-cover object-center hidden md:block"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         >
           <source src="/assets/vecteezy-earth.mp4" type="video/mp4" />
         </video>
