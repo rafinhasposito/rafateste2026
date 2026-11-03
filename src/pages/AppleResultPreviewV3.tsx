@@ -684,7 +684,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     props.cities?.highticket?.[0] ||
     props.cities?.acessivel?.[0] ||
     props.cities?.nacional?.[0];
-  const cityStr = bestCity ? `${bestCity.city}, ${bestCity.country}` : "Nova York, EUA";
+  const cityStr = bestCity
+    ? `${canonicalCityName(bestCity.city)}, ${canonicalCountryName(bestCity.country)}`
+    : "Nova York, EUA";
 
   // P_DYNAMIC uses real user profile data if available
   const _realName = props.userName || "Viajante";
@@ -879,8 +881,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
   // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual (P_DYNAMIC.house)
   const currentHouseResult = props.allResults ? props.allResults[P_DYNAMIC.house.toString()] : null;
-  
-  const canonicalCityName = (rawName?: string): string => {
+
+  function canonicalCityName(rawName?: string): string {
     if (!rawName) return "Destino";
     const trimmed = rawName.trim();
     const map: Record<string, string> = {
@@ -892,8 +894,144 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       "tokyo": "Tóquio",
       "singapore": "Cingapura",
       "sao paulo": "São Paulo",
+      "zurich": "Zurique",
+      "zürich": "Zurique",
+      "geneva": "Genebra",
+      "florence": "Florença",
+      "venice": "Veneza",
+      "rome": "Roma",
+      "milan": "Milão",
+      "naples": "Nápoles",
+      "seville": "Sevilha",
+      "berlin": "Berlim",
+      "munich": "Munique",
+      "vienna": "Viena",
+      "athens": "Atenas",
+      "prague": "Praga",
+      "budapest": "Budapeste",
+      "stockholm": "Estocolmo",
+      "copenhagen": "Copenhague",
+      "reykjavik": "Reiquiavique",
+      "amsterdam": "Amsterdã",
+      "brussels": "Bruxelas",
+      "monaco": "Mônaco",
+      "seoul": "Seul",
+      "kyoto": "Quioto",
+      "beijing": "Pequim",
+      "shanghai": "Xangai",
+      "new delhi": "Nova Delhi",
+      "jerusalem": "Jerusalém",
+      "cape town": "Cidade do Cabo",
+      "marrakech": "Marraquexe",
+      "marrakesh": "Marraquexe",
+      "tunis": "Túnis",
+      "mexico city": "Cidade do México",
+      "panama city": "Cidade do Panamá",
+      "new orleans": "Nova Orleans",
     };
     return map[trimmed.toLowerCase()] || trimmed;
+  }
+
+  function canonicalCountryName(rawCountry?: string): string {
+    if (!rawCountry) return "Internacional";
+    const trimmed = rawCountry.trim();
+    const map: Record<string, string> = {
+      "switzerland": "Suíça",
+      "usa": "EUA",
+      "united states": "EUA",
+      "uk": "Reino Unido",
+      "united kingdom": "Reino Unido",
+      "england": "Reino Unido",
+      "ireland": "Irlanda",
+      "france": "França",
+      "italy": "Itália",
+      "spain": "Espanha",
+      "germany": "Alemanha",
+      "netherlands": "Holanda",
+      "greece": "Grécia",
+      "turkey": "Turquia",
+      "austria": "Áustria",
+      "czech republic": "República Tcheca",
+      "hungary": "Hungria",
+      "sweden": "Suécia",
+      "denmark": "Dinamarca",
+      "norway": "Noruega",
+      "iceland": "Islândia",
+      "morocco": "Marrocos",
+      "south africa": "África do Sul",
+      "egypt": "Egito",
+      "kenya": "Quênia",
+      "tanzania": "Tanzânia",
+      "tunisia": "Tunísia",
+      "japan": "Japão",
+      "south korea": "Coreia do Sul",
+      "china": "China",
+      "thailand": "Tailândia",
+      "indonesia": "Indonésia",
+      "india": "Índia",
+      "united arab emirates": "Emirados Árabes",
+      "uae": "Emirados Árabes",
+      "qatar": "Catar",
+      "singapore": "Cingapura",
+      "australia": "Austrália",
+      "new zealand": "Nova Zelândia",
+      "french polynesia": "Polinésia Francesa",
+      "brazil": "Brasil",
+      "mexico": "México",
+      "canada": "Canadá",
+      "colombia": "Colômbia",
+      "dominican republic": "República Dominicana",
+      "panama": "Panamá",
+    };
+    return map[trimmed.toLowerCase()] || trimmed;
+  }
+
+  const CURATED_CITY_PHOTOS: Record<string, string> = {
+    "zurique": "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?auto=format&fit=crop&w=1000&q=80",
+    "genebra": "https://images.unsplash.com/photo-1573108037329-37aa135a142e?auto=format&fit=crop&w=1000&q=80",
+    "lisboa": "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=1000&q=80",
+    "dublin": "https://images.unsplash.com/photo-1549918864-48ac978761a4?auto=format&fit=crop&w=1000&q=80",
+    "marraquexe": "https://images.unsplash.com/photo-1597212618440-806262de4f6b?auto=format&fit=crop&w=1000&q=80",
+    "nova york": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=1000&q=80",
+    "londres": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1000&q=80",
+    "paris": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1000&q=80",
+    "roma": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1000&q=80",
+    "milao": "https://images.unsplash.com/photo-1520440229-6469a149ac59?auto=format&fit=crop&w=1000&q=80",
+    "florenca": "https://images.unsplash.com/photo-1543429257-3eb0b65d9c58?auto=format&fit=crop&w=1000&q=80",
+    "veneza": "https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=1000&q=80",
+    "madri": "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1000&q=80",
+    "barcelona": "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1000&q=80",
+    "berlim": "https://images.unsplash.com/photo-1560969184-10fe8719e047?auto=format&fit=crop&w=1000&q=80",
+    "amsterda": "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=1000&q=80",
+    "atenas": "https://images.unsplash.com/photo-1555993539-1732b0258235?auto=format&fit=crop&w=1000&q=80",
+    "santorini": "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1000&q=80",
+    "ponta delgada": "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&w=1000&q=80",
+    "toquio": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1000&q=80",
+    "quioto": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1000&auto=format&fit=crop",
+    "cingapura": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1000&q=80",
+    "dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1000&q=80",
+    "abu dhabi": "https://images.unsplash.com/photo-1512632578888-169bbbc64f33?auto=format&fit=crop&w=1000&q=80",
+    "doha": "https://images.unsplash.com/photo-1559564484-e48b3e040ff4?auto=format&fit=crop&w=1000&q=80",
+    "bali": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1000&q=80",
+    "bangkok": "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1000&q=80",
+    "seul": "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=1000&q=80",
+    "sao paulo": "https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=1000&q=80",
+    "rio de janeiro": "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1000&q=80",
+    "fernando de noronha": "https://images.unsplash.com/photo-1518639192441-8fce0a366e2e?auto=format&fit=crop&w=1000&q=80",
+    "salvador": "https://images.unsplash.com/photo-1564659907532-6b5f98c8e70f?auto=format&fit=crop&w=1000&q=80",
+    "florianopolis": "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=1000&q=80",
+    "buenos aires": "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=1000&q=80",
+    "santiago": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1000&q=80",
+    "miami": "https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?auto=format&fit=crop&w=1000&q=80",
+    "los angeles": "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?auto=format&fit=crop&w=1000&q=80",
+    "cidade do mexico": "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=1000&q=80",
+    "cidade do cabo": "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=1000&q=80",
+    "cairo": "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=1000&q=80",
+    "zanzibar": "https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=1000&q=80",
+    "sydney": "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1000&q=80",
+    "melbourne": "https://images.unsplash.com/photo-1514395462725-fb4566210144?auto=format&fit=crop&w=1000&q=80",
+    "auckland": "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=1000&q=80",
+    "bora bora": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
   };
 
   const normalizeMatchScore = (rawScore?: number): number => {
@@ -903,55 +1041,168 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     return Math.min(98, Math.max(80, Math.round(n)));
   };
 
-  // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual
-  const extractRoutes = (tierData: any, seenSet?: Set<string>): any[] => {
-    if (!tierData) return [];
-    const arr = Array.isArray(tierData) ? tierData : [tierData];
-    const localSeen = seenSet || new Set<string>();
-    const out: any[] = [];
-    for (const cityData of arr.filter(Boolean)) {
-      const cleanCity = canonicalCityName(cityData.city || cityData.name);
-      const cleanKey = cleanCity.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      if (localSeen.has(cleanKey)) continue;
-      localSeen.add(cleanKey);
-      out.push({
-        ...cityData,
-        city: cleanCity,
-        score: normalizeMatchScore(cityData.score),
-        img: (cityData.img && cityData.img.startsWith('http')) ? cityData.img : getAtmosphericFallback(P_DYNAMIC.house)
-      });
+  const ALL_CONTINENT_NAMES = ["Américas", "Europa", "Ásia", "África", "Oceania"] as const;
+  type ContinentName = typeof ALL_CONTINENT_NAMES[number];
+
+  const inferContinent = (city: string, country: string, rawCont?: string): ContinentName => {
+    if (rawCont) {
+      const rc = rawCont.trim().toLowerCase();
+      if (rc.includes("amer") || rc.includes("amér") || rc.includes("brasil") || rc.includes("sul") || rc.includes("norte")) return "Américas";
+      if (rc.includes("euro")) return "Europa";
+      if (rc.includes("asi") || rc.includes("ási") || rc.includes("oriente")) return "Ásia";
+      if (rc.includes("afri") || rc.includes("áfri")) return "África";
+      if (rc.includes("ocean")) return "Oceania";
     }
-    return out;
+    const cKey = `${city} ${country}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (/(marrocos|marraquexe|egito|cairo|africa do sul|cidade do cabo|zanzibar|tanzania|quenia|nairobi|tunisia|tunis|mauricia|nigeria|ruanda)/.test(cKey)) {
+      return "África";
+    }
+    if (/(japao|toquio|quioto|osaka|china|pequim|xangai|hong kong|cingapura|singapura|tailandia|bangkok|indonesia|bali|coreia|seul|india|delhi|mumbai|maldivas|emirados|dubai|abu dhabi|catar|doha|israel|jerusalem|tel aviv|vietna|filipinas)/.test(cKey)) {
+      return "Ásia";
+    }
+    if (/(australia|sydney|melbourne|brisbane|perth|nova zelandia|auckland|wellington|polinesia|bora bora|fiji|havai|honolulu)/.test(cKey)) {
+      return "Oceania";
+    }
+    if (/(portugal|lisboa|porto|ponta delgada|espanha|madri|barcelona|sevilha|ibiza|franca|paris|nice|provence|italia|roma|milao|florenca|veneza|napoles|vaticano|suica|zurique|genebra|reino unido|londres|edimburgo|manchester|irlanda|dublin|alemanha|berlim|munique|hamburgo|holanda|amsterda|grecia|atenas|santorini|mykonos|turquia|istambul|austria|viena|innsbruck|praga|budapeste|estocolmo|copenhague|oslo|reiquiavique|islandia|monaco|monte carlo|bruxelas|varsovia|helsinque)/.test(cKey)) {
+      return "Europa";
+    }
+    return "Américas";
   };
 
-  const tierTitleMap: Record<string, { title: string; desc: string }> = {
-    nacional: { title: "Brasil & Américas", desc: "Rota Nacional Alternativa" },
-    acessivel: { title: "Internacional", desc: "Rota Internacional Alternativa" },
-    highticket: { title: "Global Premium", desc: "Destino Alternativo de Luxo" },
+  const CONTINENT_FALLBACK_POOL: Record<ContinentName, Array<{ city: string; country: string; score: number }>> = {
+    "Américas": [
+      { city: "Nova York", country: "EUA", score: 95 },
+      { city: "São Paulo", country: "Brasil", score: 94 },
+      { city: "Miami", country: "EUA", score: 92 },
+      { city: "Rio de Janeiro", country: "Brasil", score: 91 },
+      { city: "Buenos Aires", country: "Argentina", score: 90 },
+      { city: "Cidade do México", country: "México", score: 89 },
+    ],
+    "Europa": [
+      { city: "Lisboa", country: "Portugal", score: 96 },
+      { city: "Zurique", country: "Suíça", score: 95 },
+      { city: "Paris", country: "França", score: 94 },
+      { city: "Londres", country: "Reino Unido", score: 93 },
+      { city: "Roma", country: "Itália", score: 92 },
+      { city: "Madri", country: "Espanha", score: 90 },
+    ],
+    "Ásia": [
+      { city: "Tóquio", country: "Japão", score: 95 },
+      { city: "Dubai", country: "Emirados Árabes", score: 94 },
+      { city: "Cingapura", country: "Cingapura", score: 93 },
+      { city: "Bali", country: "Indonésia", score: 91 },
+      { city: "Bangkok", country: "Tailândia", score: 90 },
+      { city: "Seul", country: "Coreia do Sul", score: 89 },
+    ],
+    "África": [
+      { city: "Marraquexe", country: "Marrocos", score: 93 },
+      { city: "Cidade do Cabo", country: "África do Sul", score: 92 },
+      { city: "Cairo", country: "Egito", score: 90 },
+      { city: "Zanzibar", country: "Tanzânia", score: 89 },
+    ],
+    "Oceania": [
+      { city: "Sydney", country: "Austrália", score: 93 },
+      { city: "Bora Bora", country: "Polinésia Francesa", score: 92 },
+      { city: "Auckland", country: "Nova Zelândia", score: 90 },
+      { city: "Melbourne", country: "Austrália", score: 89 },
+    ],
   };
 
-  const globalSeenCities = new Set<string>();
-  const dynamicContinents = currentHouseResult?.options 
-    ? Object.entries(currentHouseResult.options)
-        .map(([contName, cities]) => {
-          const mapped = tierTitleMap[contName.toLowerCase()];
-          return {
-            title: mapped ? mapped.title : contName,
-            desc: mapped ? mapped.desc : `Rota ${contName} Alternativa`,
-            data: extractRoutes(cities, globalSeenCities)
-          };
-        })
-        .filter(tier => tier.data.length > 0)
-    : [];
+  const formatRouteItem = (cityData: any) => {
+    const cleanCity = canonicalCityName(cityData.city || cityData.name);
+    const cleanCountry = canonicalCountryName(cityData.country);
+    const cleanKey = cleanCity.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const curatedImg = CURATED_CITY_PHOTOS[cleanKey];
+    const resolvedImg =
+      (cityData.img && cityData.img.startsWith("http"))
+        ? cityData.img
+        : curatedImg || getAtmosphericFallback(P_DYNAMIC.house);
+    return {
+      ...cityData,
+      city: cleanCity,
+      country: cleanCountry,
+      continent: inferContinent(cleanCity, cleanCountry, cityData.continent),
+      score: normalizeMatchScore(cityData.score),
+      img: resolvedImg,
+    };
+  };
 
-  // Fallback caso o backend não mande nada (ex: consultas antigas)
-  const displayContinents = dynamicContinents.length > 0 
-    ? dynamicContinents 
-    : [
-        { title: "Brasil & Américas", desc: "Rota Nacional Alternativa", data: extractRoutes(props.cities?.nacional, globalSeenCities) },
-        { title: "Internacional", desc: "Rota Internacional Alternativa", data: extractRoutes(props.cities?.acessivel, globalSeenCities) },
-        { title: "Global Premium", desc: "Destino Alternativo de Luxo", data: extractRoutes(props.cities?.highticket, globalSeenCities) }
-      ].filter(tier => tier.data.length > 0);
+  // Monta SEMPRE 3 Continentes Reais x 3 Cidades cada (nunca mostra "Internacional" ou "Global Premium")
+  const displayContinents = (() => {
+    const seenCities = new Set<string>();
+    const byContinent: Record<ContinentName, any[]> = {
+      "Américas": [],
+      "Europa": [],
+      "Ásia": [],
+      "África": [],
+      "Oceania": [],
+    };
+
+    const addCityToContinent = (rawItem: any, forcedCont?: ContinentName) => {
+      if (!rawItem) return;
+      const item = formatRouteItem(rawItem);
+      const key = item.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (!key || key === "destino" || seenCities.has(key)) return;
+      seenCities.add(key);
+      const cont: ContinentName = forcedCont || item.continent;
+      if (byContinent[cont].length < 3) {
+        byContinent[cont].push(item);
+      }
+    };
+
+    const rawOptions = currentHouseResult?.options || {};
+    const optionEntries = Object.entries(rawOptions);
+    const hasNativeContinentKeys = optionEntries.some(([k]) =>
+      ALL_CONTINENT_NAMES.includes(k as ContinentName)
+    );
+
+    if (hasNativeContinentKeys) {
+      for (const [k, list] of optionEntries) {
+        if (ALL_CONTINENT_NAMES.includes(k as ContinentName)) {
+          const arr = Array.isArray(list) ? list : [list];
+          arr.forEach((c) => addCityToContinent(c, k as ContinentName));
+        }
+      }
+    } else {
+      // Converte consultas salvas antigas (nacional / acessivel / highticket) para Continentes Reais
+      for (const [, list] of optionEntries) {
+        const arr = Array.isArray(list) ? list : [list];
+        arr.forEach((c) => addCityToContinent(c));
+      }
+      // Também aproveita props.cities caso options estivesse vazio
+      [
+        ...(props.cities?.nacional || []),
+        ...(props.cities?.acessivel || []),
+        ...(props.cities?.highticket || []),
+      ].forEach((c) => addCityToContinent(c));
+    }
+
+    // Escolhe os 3 Continentes mais fortes daquela Casa (priorizando quem já tem cidades reais da Casa)
+    const rankedContinents = [...ALL_CONTINENT_NAMES].sort((a, b) => {
+      const lenDiff = byContinent[b].length - byContinent[a].length;
+      if (lenDiff !== 0) return lenDiff;
+      const maxA = Math.max(0, ...byContinent[a].map((c) => c.score || 0));
+      const maxB = Math.max(0, ...byContinent[b].map((c) => c.score || 0));
+      return maxB - maxA;
+    });
+
+    const selectedContinents = rankedContinents.slice(0, 3);
+
+    // Garante que cada um dos 3 Continentes tenha exatamente 3 cidades (3x3 = 9 destinos completos)
+    return selectedContinents.map((contName) => {
+      if (byContinent[contName].length < 3) {
+        for (const fb of CONTINENT_FALLBACK_POOL[contName]) {
+          if (byContinent[contName].length >= 3) break;
+          addCityToContinent(fb, contName);
+        }
+      }
+      return {
+        title: contName,
+        desc: `Rota ${contName} Alternativa`,
+        data: byContinent[contName].slice(0, 3),
+      };
+    });
+  })();
 
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   // Find the intended area based on props.intent
@@ -1001,7 +1252,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   
   const getHouseImageUrl = (cityName: string, houseId: number, apiImg?: string) => {
     if (apiImg) return apiImg;
-    const norm = (cityName||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    const baseCity = canonicalCityName((cityName || "").split(",")[0]);
+    const norm = baseCity.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    if (CURATED_CITY_PHOTOS[norm]) return CURATED_CITY_PHOTOS[norm];
     if (norm.includes("nova york")) return "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=2000&q=80";
     if (norm.includes("toquio")) return "https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?auto=format&fit=crop&w=2000&q=80";
     if (norm.includes("dubai")) return "https://images.unsplash.com/photo-1459787915554-b34915863013?auto=format&fit=crop&w=2000&q=80";
