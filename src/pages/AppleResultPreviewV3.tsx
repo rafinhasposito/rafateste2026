@@ -2240,6 +2240,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {displayContinents.map((tier, idx) => (
                 {[
                   { title: "Nacional", desc: "Rota Nacional Alternativa", data: citiesObj.nacional },
                   { title: "Acessível", desc: "Rota Internacional Alternativa", data: citiesObj.acessivel },
