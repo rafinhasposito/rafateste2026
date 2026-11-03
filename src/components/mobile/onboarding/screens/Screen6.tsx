@@ -62,10 +62,10 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
               onClick={onComplete}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="group relative inline-flex items-center justify-center bg-white text-black font-ps-ui text-sm font-bold uppercase tracking-widest px-8 py-5 rounded-full shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] transition-all duration-300 w-auto mb-4"
+              className="group relative inline-flex items-center justify-center bg-[#C9A227] text-[#02050A] hover:bg-[#E5C158] font-ps-display text-sm font-bold uppercase tracking-widest px-8 py-5 rounded-full shadow-[0_10px_36px_rgba(201,162,39,0.35)] transition-all duration-300 w-auto mb-4"
             >
               <span className="relative z-10">Revelar o Destino do Meu Aniversário</span>
-              <div className="absolute inset-0 rounded-full border border-white/40 scale-105 group-hover:scale-110 transition-transform duration-500 opacity-0 group-hover:opacity-100" />
+              <div className="absolute inset-0 rounded-full border border-[#F5DE98]/40 scale-105 group-hover:scale-110 transition-transform duration-500 opacity-0 group-hover:opacity-100" />
             </motion.button>
 
             {/* Trust Badge */}

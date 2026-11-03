@@ -69,11 +69,7 @@ export function OnboardingNav({
           <div className="w-full md:w-auto md:min-w-[240px]">
             <button
               onClick={onNext}
-              className={`h-14 md:h-16 w-full px-10 rounded-xl font-ps-display tracking-[0.08em] text-[15px] md:text-[17px] transition-all flex items-center justify-center active:scale-95 hover:scale-[1.02] ${
-                isFinal
-                  ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]'
-                  : 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.15)]'
-              }`}
+              className="h-14 md:h-16 w-full px-10 rounded-xl font-ps-display font-bold tracking-[0.08em] text-[15px] md:text-[17px] transition-all flex items-center justify-center active:scale-95 hover:scale-[1.02] bg-[#C9A227] text-[#02050A] hover:bg-[#E5C158] shadow-[0_10px_30px_rgba(201,162,39,0.35)]"
             >
               {isFinal ? 'REVELAR MEU DESTINO' : 'CONTINUAR'}
             </button>
