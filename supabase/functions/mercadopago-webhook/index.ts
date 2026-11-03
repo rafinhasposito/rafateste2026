@@ -42,7 +42,8 @@ serve(async (req) => {
       return new Response("Not a payment event", { status: 200 });
     }
 
-    const mpAccessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN');
+    const rawToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || '';
+    const mpAccessToken = rawToken.trim().replace(/^["']|["']$/g, '');
     if (!mpAccessToken) {
       console.error("[mp-webhook] Missing MERCADOPAGO_ACCESS_TOKEN environment variable");
       throw new Error("Missing MERCADOPAGO_ACCESS_TOKEN");

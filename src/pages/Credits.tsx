@@ -115,16 +115,49 @@ const Credits = () => {
       if (error) {
         let detail = error.message;
         try {
-          const context = (error as any).context;
-          if (context) {
-            const text = await context.text?.();
-            const parsed = JSON.parse(text || "{}");
-            if (parsed?.error) detail = parsed.error;
+          const ctx = (error as any).context;
+          if (ctx) {
+            if (typeof ctx.json === 'function') {
+              const parsed = await ctx.json().catch(() => null);
+              if (parsed?.error) detail = parsed.error;
+            } else if (typeof ctx.text === 'function') {
+              const text = await ctx.text().catch(() => "");
+              const parsed = JSON.parse(text || "{}");
+              if (parsed?.error) detail = parsed.error;
+            }
           }
         } catch {}
         throw new Error(detail);
       }
       if (data?.error) throw new Error(data.error);
+
+      // Tenta abrir o Checkout no Modal embutido dentro do site (sem redirecionar para fora)
+      if (data?.preferenceId) {
+        try {
+          const MP = (window as any).MercadoPago || await new Promise<any>((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://sdk.mercadopago.com/js/v2";
+            script.onload = () => resolve((window as any).MercadoPago);
+            script.onerror = () => resolve(null);
+            document.body.appendChild(script);
+          });
+
+          if (MP) {
+            const publicKey = data.publicKey || "APP_USR-696a532b-8901-4941-9361-8ce2722c133b";
+            const mp = new MP(publicKey, { locale: "pt-BR" });
+            mp.checkout({
+              preference: {
+                id: data.preferenceId,
+              },
+              autoOpen: true,
+            });
+            console.log("[Checkout] Modal Mercado Pago aberto com sucesso na página.");
+            return;
+          }
+        } catch (modalErr) {
+          console.warn("[Checkout] Falha ao abrir modal embutido, usando fallback:", modalErr);
+        }
+      }
 
       if (data?.checkoutUrl) {
         window.location.href = data.checkoutUrl;

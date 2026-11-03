@@ -73,55 +73,78 @@ serve(async (req) => {
     }
 
     // 4. Create Mercado Pago Preference
-    const mpAccessToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN');
+    const rawToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || '';
+    const mpAccessToken = rawToken.trim().replace(/^["']|["']$/g, '');
     if (!mpAccessToken) {
-      throw new Error("Missing MERCADOPAGO_ACCESS_TOKEN");
+      throw new Error("MERCADOPAGO_ACCESS_TOKEN não configurado nas Secrets do Supabase");
     }
 
+    const isProduction = mpAccessToken.startsWith('APP_USR-') || 
+                         Deno.env.get('MP_ENVIRONMENT')?.trim().toLowerCase() === 'production';
+
     // Resolve appUrl dynamically: check APP_URL, then origin header, fallback to production domain
-    let appUrl = (Deno.env.get('APP_URL') || '').trim().replace(/\/$/, '');
+    let appUrl = (Deno.env.get('APP_URL') || '').trim().replace(/\/$/, '').replace(/^["']|["']$/g, '');
     if (!appUrl) {
       const origin = req.headers.get('origin') || req.headers.get('referer');
       if (origin) {
         try {
           const parsed = new URL(origin);
-          appUrl = `${parsed.protocol}//${parsed.host}`;
+          // Em produção, o Mercado Pago proíbe estritamente localhost nas back_urls
+          if (isProduction && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1')) {
+            appUrl = 'https://protocolosolar.com.br';
+          } else {
+            appUrl = `${parsed.protocol}//${parsed.host}`;
+          }
         } catch {
           appUrl = 'https://protocolosolar.com.br';
         }
       } else {
         appUrl = 'https://protocolosolar.com.br';
       }
+    } else if (isProduction && (appUrl.includes('localhost') || appUrl.includes('127.0.0.1'))) {
+      appUrl = 'https://protocolosolar.com.br';
     }
 
     // Resolve notificationUrl: check MERCADOPAGO_NOTIFICATION_URL, fallback to Supabase Edge Function URL
+    const rawNotif = (Deno.env.get('MERCADOPAGO_NOTIFICATION_URL') || '').trim().replace(/^["']|["']$/g, '');
     const supabaseUrl = (Deno.env.get('SUPABASE_URL') || '').trim().replace(/\/$/, '');
     const defaultNotificationUrl = supabaseUrl ? `${supabaseUrl}/functions/v1/mercadopago-webhook` : undefined;
-    const notificationUrl = (Deno.env.get('MERCADOPAGO_NOTIFICATION_URL') || '').trim() || defaultNotificationUrl;
+    const notificationUrl = rawNotif || defaultNotificationUrl;
 
-    const preferencePayload = {
+    const userEmail = (user.email && user.email.includes('@')) 
+      ? user.email 
+      : 'contato@protocolosolar.com.br';
+
+    const unitPrice = Number(pricingConfig.price_brl);
+    if (isNaN(unitPrice) || unitPrice <= 0) {
+      throw new Error(`Preço inválido para o pacote ${pricingConfig.key}: ${pricingConfig.price_brl}`);
+    }
+
+    const preferencePayload: Record<string, any> = {
       items: [
         {
-          id: pricingConfig.key,
-          title: pricingConfig.label,
-          description: pricingConfig.description || `Pacote de ${pricingConfig.credits} créditos`,
+          id: String(pricingConfig.key),
+          title: String(pricingConfig.label),
+          description: String(pricingConfig.description || `Pacote de ${pricingConfig.credits} créditos`),
           quantity: 1,
           currency_id: "BRL",
-          unit_price: pricingConfig.price_brl,
+          unit_price: unitPrice,
         }
       ],
-      payer: {
-        email: user.email,
-      },
       back_urls: {
         success: `${appUrl}/credits?status=success`,
         pending: `${appUrl}/credits?status=pending`,
         failure: `${appUrl}/credits?status=failure`,
       },
       auto_return: "approved",
-      external_reference: order.id,
-      notification_url: notificationUrl || undefined
+      external_reference: String(order.id),
     };
+
+    if (notificationUrl) {
+      preferencePayload.notification_url = notificationUrl;
+    }
+
+    console.log(`[create-checkout] Creating preference for user ${user.id}, order ${order.id}, appUrl: ${appUrl}, isProduction: ${isProduction}`);
 
     const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
@@ -134,8 +157,22 @@ serve(async (req) => {
 
     if (!mpResponse.ok) {
       const errorData = await mpResponse.text();
-      console.error("MP Error:", errorData);
-      throw new Error("Failed to create Mercado Pago preference");
+      console.error("[create-checkout] MP API Error:", mpResponse.status, errorData);
+      let detailMsg = errorData;
+      try {
+        const parsed = JSON.parse(errorData);
+        detailMsg = parsed.message || parsed.error || errorData;
+        if (parsed.cause && Array.isArray(parsed.cause)) {
+          const causes = parsed.cause.map((c: any) => c.description || c.code).join(", ");
+          detailMsg += ` - ${causes}`;
+        }
+      } catch {}
+
+      if (mpResponse.status === 403 && detailMsg.toLowerCase().includes("policy")) {
+        detailMsg = "Credenciais de Produção não ativadas no Mercado Pago. Acesse o Painel de Desenvolvedores do Mercado Pago e conclua o formulário 'Ativar credenciais de produção'.";
+      }
+
+      throw new Error(`Mercado Pago (${mpResponse.status}): ${detailMsg}`);
     }
 
     const preferenceData = await mpResponse.json();
@@ -148,15 +185,20 @@ serve(async (req) => {
 
     // 6. Return Checkout URL
     // Se o token for de produção (inicia com APP_USR) ou MP_ENVIRONMENT for production, usa init_point real.
-    const isProduction = mpAccessToken.startsWith('APP_USR-') || 
-                         Deno.env.get('MP_ENVIRONMENT')?.trim().toLowerCase() === 'production';
     const checkoutUrl = isProduction 
       ? (preferenceData.init_point || preferenceData.sandbox_init_point)
       : (preferenceData.sandbox_init_point || preferenceData.init_point);
 
     console.log(`[create-checkout] Created preference ${preferenceData.id}, isProduction: ${isProduction}`);
 
-    return new Response(JSON.stringify({ checkoutUrl, orderId: order.id }), {
+    const publicKey = (Deno.env.get('MERCADOPAGO_PUBLIC_KEY') || '').trim().replace(/^["']|["']$/g, '') || 'APP_USR-696a532b-8901-4941-9361-8ce2722c133b';
+
+    return new Response(JSON.stringify({ 
+      checkoutUrl, 
+      preferenceId: preferenceData.id, 
+      orderId: order.id,
+      publicKey
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

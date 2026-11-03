@@ -1,21 +1,22 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-03T07:05:00-03:00 — V1.1 Item 1: Ativação Mercado Pago em Produção. Edge Functions 'create-mercadopago-checkout' e 'mercadopago-webhook' blindadas com resolução automática de domínio de produção (protocolosolar.com.br), auto-resolução de URL de notificação Supabase, suporte unificado a todos os formatos de eventos de pagamento do Mercado Pago (IPN, Webhooks v1/v2, querystring e body), e auto-refresh de saldo de créditos no retorno do checkout em Credits.tsx.",
+  "last_verification": "2026-11-03T07:34:00-03:00 — V1.1 Item 1 & 2: Ativação Mercado Pago em Produção com Checkout Modal embutido no site (sem redirecionar o usuário para fora). Integração nativa do SDK v2 do Mercado Pago no Credits.tsx e index.html, gerando Pix (com QR Code e Copia e Cola) e Cartão de Crédito diretamente em tela flutuante responsiva dentro de protocolosolar.com.br.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br)",
   "deploy_instructions": {
-    "step1": "Configurar MERCADOPAGO_ACCESS_TOKEN (APP_USR-...) e MERCADOPAGO_NOTIFICATION_URL no Supabase Secrets",
-    "step2": "Fazer git commit e git push github release/recovery-83ce832:main",
-    "step3": "Fazer deploy das edge functions: npx supabase functions deploy create-mercadopago-checkout e npx supabase functions deploy mercadopago-webhook"
+    "step1": "Fazer deploy da Edge Function: npx supabase functions deploy create-mercadopago-checkout --project-ref gvqdlsflrbctfiorimcl",
+    "step2": "Fazer git push github release/recovery-83ce832:main",
+    "step3": "GitHub Actions publica no GitHub Pages automaticamente"
   },
   "notes": {
     "videos": "Vídeos das cidades verificados (/assets/newyork.mp4, /assets/paris.mp4, /assets/roma.mp4, /assets/tokyo.mp4, /assets/zurich.mp4) integrados no Bloco 4 e hero.",
-    "mercadopago": "Pronto para produção. Edge functions preparadas para chave APP_USR-... e auto-return dinâmico.",
+    "mercadopago": "Checkout Modal oficial do Mercado Pago ativado dentro do site com suporte a Pix e Cartão.",
     "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
   },
   "blockers_open": [],
   "blockers_fixed": [
+    "Mercado Pago: Checkout Modal oficial embutido no site (Pix e Cartão na mesma página sem sair de protocolosolar.com.br)",
     "Mercado Pago: Edge functions blindadas com fallbacks para produção (protocolosolar.com.br e webhook Supabase)",
     "Mercado Pago: Parser do webhook atualizado para aceitar IPN (topic/id), Webhooks v2 (action/data.id) e querystrings",
     "Mercado Pago: Credits.tsx atualizado para sincronização e atualização de saldo em tempo real pós-retorno do MP",
