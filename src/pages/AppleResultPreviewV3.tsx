@@ -1320,6 +1320,85 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
   const [showSummary, setShowSummary] = useState<boolean>(false);
 
+  const activeMode = (props.mode || "futuro").toLowerCase();
+  const isPastMode = activeMode === "passado";
+  const isPresentMode = activeMode === "presente";
+  const isFutureMode = !isPastMode && !isPresentMode;
+  const currentHouseTheme = houseThemes[P_DYNAMIC.house] || houseThemes[2];
+  const shortCityName = P_DYNAMIC.city.split(",")[0].trim();
+
+  // Adapta o tempo verbal do conteúdo da Casa (Passado / Presente / Futuro)
+  const conjugateHouseText = (text: string): string => {
+    if (!text) return "";
+    if (isPastMode) {
+      return text
+        .replace(/^A energia deste ano convida você a/i, `No ciclo de ${P_DYNAMIC.year}, a energia de ${shortCityName} convidou você a`)
+        .replace(/este é o momento de/gi, "aquele foi o momento de")
+        .replace(/O momento perfeito para/g, "Foi o momento perfeito para")
+        .replace(/O momento de/g, "Foi o momento de")
+        .replace(/Momento em que/g, "Foi um momento em que")
+        .replace(/Um ciclo de/g, "Foi um ciclo de")
+        .replace(/Um ciclo onde/g, "Foi um ciclo onde")
+        .replace(/Um período de/g, "Foi um período de")
+        .replace(/Um período para/g, "Foi um período para")
+        .replace(/Uma fase fértil para/g, "Foi uma fase fértil para")
+        .replace(/Uma fase de/g, "Foi uma fase de")
+        .replace(/A oportunidade de/g, "Trouxe a oportunidade de")
+        .replace(/este ciclo abre espaço para/gi, "aquele ciclo abriu espaço para")
+        .replace(/este ciclo favorece/gi, "aquele ciclo favoreceu")
+        .replace(/este ciclo convida a/gi, "aquele ciclo convidou a")
+        .replace(/este é o ciclo para/gi, "aquele foi o ciclo para")
+        .replace(/a força deste ciclo está em/gi, "a força daquele ciclo esteve em")
+        .replace(/O foco se volta para/g, "O foco se voltou para")
+        .replace(/o foco se volta para/g, "o foco se voltou para")
+        .replace(/ganham destaque, fortalecendo/g, "ganharam destaque, fortalecendo")
+        .replace(/ganham um ritmo acelerado/g, "ganharam um ritmo acelerado")
+        .replace(/ganha destaque público e atrai/g, "ganhou destaque público e atraiu")
+        .replace(/se tornam o grande motor/g, "se tornaram o grande motor")
+        .replace(/desempenham um papel vital/g, "desempenharam um papel vital")
+        .replace(/abrem caminhos/g, "abriram caminhos")
+        .replace(/abre caminhos/g, "abriu caminhos")
+        .replace(/permite proteger/g, "permitiu proteger")
+        .replace(/ativam um magnetismo/g, "ativaram um magnetismo")
+        .replace(/sustenta seu ritmo/g, "sustentou seu ritmo")
+        .replace(/libertam sua mente/g, "libertaram sua mente")
+        .replace(/não faz mais sentido/g, "deixou de fazer sentido")
+        .replace(/não é mais uma opção/g, "deixou de ser uma opção")
+        .replace(/não combina mais com você/g, "deixou de combinar com você")
+        .replace(/drena seus resultados/g, "drenava seus resultados")
+        .replace(/drena sua força/g, "drenava sua força")
+        .replace(/desgasta;/g, "desgastava;")
+        .replace(/bloqueia seu crescimento/g, "bloqueava seu crescimento")
+        .replace(/tem limite;/g, "tinha limite;");
+    }
+    if (isPresentMode) {
+      return text
+        .replace(/^A energia deste ano convida você a/i, `Neste ciclo atual (${P_DYNAMIC.year}), a energia de ${shortCityName} está convidando você a`);
+    }
+    return text;
+  };
+
+  const conjugatePersonaText = (text: string): string => {
+    if (!text) return "";
+    if (isPastMode) {
+      return text
+        .replace(/^Cansou de /i, "Sentiu cansaço de ")
+        .replace(/ e precisa /g, " e precisou ")
+        .replace(/ e quer /g, " e quis ")
+        .replace(/ e busca /g, " e buscou ")
+        .replace(/ e entendeu /g, " e percebeu ")
+        .replace(/, precisando de /g, ", sentindo necessidade de ")
+        .replace(/^Busca /i, "Buscou ")
+        .replace(/^Quer vivenciar um ano /i, "Vivenciou um ciclo ");
+    }
+    if (isPresentMode) {
+      return text
+        .replace(/^Cansou de /i, "Sente cansaço de ")
+        .replace(/^Quer vivenciar um ano /i, "Está vivenciando um ciclo ");
+    }
+    return text;
+  };
+
   const casaRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: casaProgress } = useScroll({
     target: casaRef,
@@ -1372,7 +1451,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         <motion.div style={{ opacity: textOpacity }} className="mb-6">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/10 bg-white/5 backdrop-blur-xl rounded-full text-[10px] md:text-xs uppercase font-bold tracking-[0.3em] text-white/70">
             <span>✦</span>
-            <span>{P_DYNAMIC.firstName}, o seu próximo aniversário pode ser em...</span>
+            <span>
+              {isPastMode
+                ? `${P_DYNAMIC.firstName}, no aniversário de ${P_DYNAMIC.year} você ativou a Casa ${P_DYNAMIC.house} em...`
+                : isPresentMode
+                  ? `${P_DYNAMIC.firstName}, no seu ciclo atual você ativou a Casa ${P_DYNAMIC.house} em...`
+                  : `${P_DYNAMIC.firstName}, o seu próximo aniversário pode ser em...`}
+            </span>
           </div>
         </motion.div>
         
@@ -1385,7 +1470,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
         <motion.div style={{ opacity: textOpacity }} className="flex flex-col items-center max-w-4xl text-center px-4 mt-2">
            <p className="text-2xl md:text-3xl lg:text-4xl font-light text-white/90 leading-[1.4] md:leading-[1.3] tracking-tight">
-             {currentActiveData.teaser}
+             {isFutureMode ? currentActiveData.teaser : conjugateHouseText(currentHouseTheme.energyIntro)}
            </p>
         </motion.div>
 
@@ -1393,7 +1478,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       </section>
 
       {/* ══════════════════════════════════════════════════
-         3. PERSONALIZAÇÃO (ACORDEÃO)
+         3. PERSONALIZAÇÃO & A REAL DA CASA
          ══════════════════════════════════════════════════ */}
       <section className="relative pt-8 pb-20 md:pb-32">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
@@ -1406,15 +1491,23 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                <div className="relative z-10 flex flex-col items-center">
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[var(--hc)] mb-6 md:mb-8">
                     <Sparkles className="w-3 h-3" />
-                    <span>Seu Resultado Personalizado</span>
+                    <span>
+                      {isPastMode
+                        ? `Diagnóstico do Ciclo Passado • ${P_DYNAMIC.year}`
+                        : isPresentMode
+                          ? `Diagnóstico do Ciclo Vigente • ${P_DYNAMIC.year}`
+                          : "Seu Resultado Personalizado"}
+                    </span>
                   </div>
                   
-                  <h3 className="text-center mb-10 md:mb-20 flex flex-col items-center gap-2 md:gap-3">
+                  <h3 className="text-center mb-10 md:mb-16 flex flex-col items-center gap-2 md:gap-3">
                     <span className="font-ps-display text-2xl md:text-3xl lg:text-4xl text-white/60 font-light tracking-wide whitespace-nowrap">
                       Casa {P_DYNAMIC.house}
                     </span>
-                    <span className="font-ps-display text-4xl sm:text-6xl md:text-7xl lg:text-[80px] text-transparent bg-clip-text bg-gradient-to-r from-[var(--hc)] to-white/50 leading-tight pb-2 tracking-tight">
-                      {hasFreeFirstFocus ? "Escolha Seu Foco" : `Foco em ${currentActiveData?.label?.split(" ")[0]}`}
+                    <span className="font-ps-display text-3xl sm:text-5xl md:text-6xl lg:text-[68px] text-transparent bg-clip-text bg-gradient-to-r from-[var(--hc)] to-white/70 leading-tight pb-2 tracking-tight max-w-4xl">
+                      {isFutureMode
+                        ? (hasFreeFirstFocus ? "Escolha Seu Foco" : `Foco em ${currentActiveData?.label?.split(" ")[0]}`)
+                        : currentHouseTheme.subtitle}
                     </span>
                   </h3>
 
@@ -1433,7 +1526,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                          <div className="flex items-center gap-4 md:gap-6">
                            <div className="flex items-center gap-3 hidden md:flex">
                              <div className="w-2 h-2 rounded-full bg-[var(--hc)] animate-pulse shadow-[0_0_10px_var(--hc)]"></div>
-                             <span className="text-[var(--hc90)] font-sans text-xs tracking-widest">{P_DYNAMIC.hash} • ATIVO</span>
+                             <span className="text-[var(--hc90)] font-sans text-xs tracking-widest">
+                               {P_DYNAMIC.hash} • {isPastMode ? `CICLO ${P_DYNAMIC.year}` : isPresentMode ? "CICLO VIGENTE" : "ATIVO"}
+                             </span>
                            </div>
                            
                            {!isBoardingPassOpen && (
@@ -1469,7 +1564,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                   <div className="ml-auto flex items-center gap-1 sm:gap-2 shrink-0 pl-1">
                                     <span className="text-[var(--hc)] font-bold flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm">
                                       <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                                      {Math.min(P.match, 98)}% MATCH
+                                      Casa {P_DYNAMIC.house}
                                     </span>
                                   </div>
                                </div>
@@ -1497,7 +1592,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                          {/* Rota de Ancoragem */}
                          <div className="bg-white/[0.02] rounded-2xl p-5 sm:p-6 md:p-8 border border-white/5 relative overflow-hidden">
                            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--hc5)] rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
-                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-6">Rota de Ancoragem</p>
+                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-6">
+                             {isPastMode ? `Rota Vivida em ${P_DYNAMIC.year}` : isPresentMode ? "Rota do Ciclo Vigente" : "Rota de Ancoragem"}
+                           </p>
                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
                              <div className="flex-1 min-w-0">
                                <p className="text-white font-medium text-xl md:text-2xl flex items-center gap-2">
@@ -1519,13 +1616,17 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                  <span className="truncate">{P_DYNAMIC.city}</span>
                                  <MapPin className="w-6 h-6 shrink-0"/>
                                </p>
-                               <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Destino do Aniversário</p>
+                               <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">
+                                 {isPastMode ? `Local do Aniversário (${P_DYNAMIC.year})` : isPresentMode ? "Local do Último Aniversário" : "Destino do Aniversário"}
+                               </p>
                              </div>
                            </div>
                          </div>
                          {/* Momento Exato */}
                          <div>
-                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4">Momento Exato da Ativação (Retorno Solar)</p>
+                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4">
+                             {isPastMode ? `Momento Exato do Retorno Solar (${P_DYNAMIC.year})` : "Momento Exato da Ativação (Retorno Solar)"}
+                           </p>
                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 text-white text-base sm:text-lg md:text-xl font-medium">
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                                <Calendar className="w-5 h-5 text-[var(--hc)]"/> 
@@ -1553,30 +1654,41 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                            </div>
                            <div className="bg-[var(--hc10)] border border-[var(--hc20)] rounded-2xl p-5 sm:p-6 relative overflow-hidden">
                              <div className="absolute inset-0 bg-gradient-to-br from-[#10b981]/10 to-transparent pointer-events-none"></div>
-                             <p className="text-[var(--hc70)] text-[10px] uppercase font-bold tracking-widest mb-4 sm:mb-5 relative z-10">Ativação Anual</p>
+                             <p className="text-[var(--hc70)] text-[10px] uppercase font-bold tracking-widest mb-4 sm:mb-5 relative z-10">
+                               {isPastMode ? `Casa Ativada em ${P_DYNAMIC.year}` : isPresentMode ? "Casa Regente Atual" : "Ativação Anual"}
+                             </p>
                              <div className="space-y-3 sm:space-y-4 relative z-10">
                                <p className="text-white font-medium text-base sm:text-lg flex items-center gap-3">
                                  <Landmark className="w-5 h-5 text-[var(--hc)] shrink-0"/> Casa {P_DYNAMIC.house}
                                </p>
-                               <p className="text-[var(--hc)] font-bold text-lg sm:text-xl flex items-center gap-3">
-                                 <CircleDollarSign className="w-5 h-5 shrink-0"/> {currentActiveData?.label || "Dinheiro & Prosperidade"}
+                               <p className="text-[var(--hc)] font-bold text-base sm:text-lg flex items-center gap-3">
+                                 <Sparkles className="w-5 h-5 shrink-0"/>
+                                 {isFutureMode ? (currentActiveData?.label || currentHouseTheme.subtitle) : currentHouseTheme.subtitle.replace(/^A energia (do|da|dos|das) /i, "")}
                                </p>
                              </div>
                            </div>
                          </div>
                          {/* Compatibilidade */}
                          <div className="flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 pt-6 sm:pt-8 mt-2 gap-4">
-                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Compatibilidade da Escolha</p>
+                           <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">
+                             {isPastMode ? "Precisão Astronômica da Coordenada" : "Compatibilidade da Escolha"}
+                           </p>
                            <div className="flex items-center justify-center gap-3 bg-[var(--hc20)] px-6 py-3 rounded-full border border-[var(--hc30)] shadow-[0_0_30px_var(--hc20)]">
                              <div className="w-2.5 h-2.5 rounded-full bg-[var(--hc)] animate-pulse"></div>
-                             <span className="text-[var(--hc)] font-bold tracking-widest text-base sm:text-lg">{Math.min(P.match, 98)}% MATCH</span>
+                             <span className="text-[var(--hc)] font-bold tracking-widest text-base sm:text-lg">CASA {P_DYNAMIC.house} CONFIRMADA</span>
                            </div>
                          </div>
                        </div>
                        {/* Footer Barcode */}
                        <div className="bg-black/60 px-5 sm:px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t border-[var(--hc20)]">
                          <div className="font-barcode text-4xl sm:text-5xl md:text-6xl tracking-[0.2em] text-[var(--hc70)] scale-y-150 py-2">||| || ||| | || || |||</div>
-                         <span className="font-sans text-[10px] md:text-xs text-white/50 tracking-[0.2em] uppercase text-center bg-black/40 px-4 py-2 rounded-lg border border-white/5">Protocolo Solar • 24h de Imantação na Cidade de Destino</span>
+                         <span className="font-sans text-[10px] md:text-xs text-white/50 tracking-[0.2em] uppercase text-center bg-black/40 px-4 py-2 rounded-lg border border-white/5">
+                           {isPastMode
+                             ? `Protocolo Solar • Registro Astronômico do Ciclo de ${P_DYNAMIC.year}`
+                             : isPresentMode
+                               ? "Protocolo Solar • Mapeamento Astronômico do Ciclo Vigente"
+                               : "Protocolo Solar • 24h de Imantação na Cidade de Destino"}
+                         </span>
                        </div>
                      </motion.div>
                    )}
@@ -1584,6 +1696,116 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                </div>
             </div>
 
+                  {/* ======================= A REAL DA CASA (TRAILER COMPLETO — PASSADO, PRESENTE E FUTURO POR CIDADE) ======================= */}
+                  <div className="w-full max-w-4xl mx-auto mt-4 mb-16 md:mb-24 text-left">
+                    <div className="text-center mb-12 md:mb-16">
+                      <span
+                        style={{ color: houseColor }}
+                        className="text-[10px] font-bold uppercase tracking-[0.3em] block mb-4"
+                      >
+                        {isPastMode
+                          ? `A Real da Casa ${P_DYNAMIC.house} • O Que Regeu Seu Ano de ${P_DYNAMIC.year}`
+                          : isPresentMode
+                            ? `A Real da Casa ${P_DYNAMIC.house} • A Energia Que Está Regendo Seu Ano`
+                            : `A Real da Casa ${P_DYNAMIC.house} • A Energia Base Desta Coordenada`}
+                      </span>
+
+                      <p className="text-2xl sm:text-3xl md:text-4xl font-light text-white/90 leading-tight max-w-3xl mx-auto">
+                        {(() => {
+                          const introText = conjugateHouseText(currentHouseTheme.energyIntro);
+                          const words = introText.split(" ");
+                          const splitIdx = Math.floor(words.length * 0.55);
+                          return words.map((word, idx) => {
+                            const isColored = idx >= splitIdx;
+                            return (
+                              <span
+                                key={idx}
+                                style={isColored ? { color: houseColor } : undefined}
+                                className={`inline-block mr-[0.25em] ${isColored ? "font-medium" : ""}`}
+                              >
+                                {word}
+                              </span>
+                            );
+                          });
+                        })()}
+                      </p>
+                    </div>
+
+                    {/* Os 3 Pilares Reais da Casa (01, 02, 03 do Trailer) */}
+                    <div className="flex flex-col divide-y divide-white/[0.08] border-y border-white/[0.08]">
+                      {currentHouseTheme.energyPoints.map((point, idx) => (
+                        <div key={idx} className="flex items-start gap-6 sm:gap-8 py-7 sm:py-8 group">
+                          <span
+                            className="font-ps-display text-4xl sm:text-5xl md:text-6xl font-bold leading-none shrink-0 w-12 sm:w-16 text-right opacity-80"
+                            style={{ color: houseColor }}
+                          >
+                            0{idx + 1}
+                          </span>
+                          <div className="flex-1 mt-0.5">
+                            <h4 className="text-xl md:text-2xl font-ps-display font-bold text-white mb-2">
+                              {point.title}
+                            </h4>
+                            <p className="text-white/65 text-sm sm:text-base md:text-lg font-light leading-relaxed">
+                              {conjugateHouseText(point.text)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Os 3 Cenários / Personas da Casa (No Passado e Presente mostra completo com Memojis) */}
+                    {!isFutureMode && (
+                      <div
+                        className="w-full rounded-[28px] border border-white/10 p-6 sm:p-8 md:p-10 mt-12 relative overflow-hidden"
+                        style={{ backgroundColor: `color-mix(in srgb, ${houseColor} 14%, rgba(5,7,12,0.9))` }}
+                      >
+                        <div className="flex flex-col items-center text-center mb-8">
+                          <span
+                            style={{ color: houseColor }}
+                            className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2"
+                          >
+                            {isPastMode
+                              ? `Como a Casa ${P_DYNAMIC.house} Se Manifestou em ${P_DYNAMIC.year}`
+                              : `Como a Casa ${P_DYNAMIC.house} Atua no Seu Ciclo Vigente`}
+                          </span>
+                          <h4 className="font-ps-display text-2xl sm:text-3xl font-bold text-white mb-2">
+                            {isPastMode
+                              ? "O que este ciclo despertou na sua vida..."
+                              : "O que este ciclo está pedindo de você agora..."}
+                          </h4>
+                          <p className="text-white/50 text-xs sm:text-sm font-light">
+                            {isPastMode
+                              ? `Reconheça os 3 movimentos centrais que marcaram seu aniversário em ${shortCityName}.`
+                              : `Reconheça os 3 movimentos centrais ativos desde o seu último aniversário em ${shortCityName}.`}
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                          {currentHouseTheme.personas.map(({ text, avatarM }, i) => (
+                            <div
+                              key={i}
+                              className="flex flex-col items-center text-center p-6 rounded-2xl bg-black/40 border border-white/10"
+                            >
+                              <div className="w-24 h-24 mb-4 relative">
+                                <img
+                                  src={`/memojis/${avatarM}`}
+                                  alt={`Movimento ${i + 1}`}
+                                  className="w-full h-full object-contain drop-shadow-xl"
+                                />
+                              </div>
+                              <p className="text-white/80 text-sm sm:text-base font-light leading-relaxed">
+                                {conjugatePersonaText(text)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* SEÇÃO DE FOCOS: EXCLUSIVA PARA O MODO FUTURO */}
+                  {isFutureMode ? (
+                  <>
                   {/* Banner de Escolha do 1º Foco (Consultas Por Cidade / Por Casa) */}
                   {hasFreeFirstFocus && (
                     <div className="w-full max-w-4xl mx-auto mb-6 p-5 sm:p-6 rounded-2xl border border-[#C9A227]/40 bg-[#C9A227]/10 backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-left shadow-[0_0_30px_rgba(201,162,39,0.12)]">
@@ -2484,9 +2706,54 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
                     </div>
                   )}
+                  </>
+                  ) : (
+                    /* FECHAMENTO DO DIAGNÓSTICO (PASSADO E PRESENTE — SEM COMPRA DE FOCOS OU ROTAS EXTRAS) */
+                    <div className="w-full max-w-4xl mx-auto mt-4 mb-8 flex flex-col items-center text-center">
+                      <div className="w-full rounded-[28px] border border-white/10 bg-black/40 p-6 sm:p-10 text-left mb-10">
+                        <span
+                          style={{ color: houseColor }}
+                          className="text-[10px] font-bold uppercase tracking-[0.3em] block mb-3"
+                        >
+                          {isPastMode
+                            ? `Síntese do Ciclo de ${P_DYNAMIC.year} em ${shortCityName}`
+                            : `Síntese do Seu Ciclo Vigente em ${shortCityName}`}
+                        </span>
+                        <h4 className="font-ps-display text-2xl sm:text-3xl font-bold text-white mb-4">
+                          {isPastMode
+                            ? `O legado que a Casa ${P_DYNAMIC.house} deixou na sua jornada`
+                            : `Como aproveitar o melhor da Casa ${P_DYNAMIC.house} neste ano`}
+                        </h4>
+                        <p className="text-white/75 text-base sm:text-lg font-light leading-relaxed mb-6">
+                          {conjugateHouseText(houseBaseData?.understand || currentHouseTheme.energyIntro)}
+                        </p>
+                        {houseBaseData?.realDynamics && (
+                          <div className="pt-5 border-t border-white/10">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40 block mb-2">
+                              {isPastMode ? "Na Prática Daquele Ano" : "Na Prática do Dia a Dia"}
+                            </span>
+                            <p className="text-white/70 text-sm sm:text-base font-light leading-relaxed">
+                              {conjugateHouseText(houseBaseData.realDynamics)}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      <Link
+                        to="/"
+                        className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-[0.2em] text-black transition-transform hover:scale-105 active:scale-95 shadow-xl"
+                        style={{ backgroundColor: houseColor }}
+                      >
+                        <Compass className="w-4 h-4" />
+                        <span>Planejar Meu Próximo Aniversário (Modo Futuro)</span>
+                      </Link>
+                    </div>
+                  )}
                </div>
             </div>
           
+            {isFutureMode && (
+            <>
             {/* BLOCO 7: ROTAS ALTERNATIVAS (Cidades Extras) */}
             <div className="w-full max-w-5xl mx-auto mt-16 md:mt-20 mb-24 md:mb-32 px-0 sm:px-6">
               <div className="flex items-center gap-4 mb-10 md:mb-12 border-b border-white/5 pb-6 md:pb-8">
@@ -2681,6 +2948,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 })}
               </div>
             </div>
+            </>
+            )}
 
 </Reveal>
         </div>
