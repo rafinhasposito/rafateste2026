@@ -196,7 +196,10 @@ const Dashboard = () => {
   const handleUnlockFocus = async (focusId: string, houseNum: number) => {
     if (!user || !profile || !consultation || unlocking) return;
 
-    if (!isAdmin && credits < costFocus) {
+    const existingHouseFocuses = consultation.result?.unlocked_focuses?.[String(houseNum)] || [];
+    const isFirstFreeFocus = !consultation.intent && existingHouseFocuses.length === 0;
+
+    if (!isAdmin && !isFirstFreeFocus && credits < costFocus) {
       showAlert(`Você não tem créditos suficientes. Adquira mais no menu.`);
       navigate("/credits");
       throw new Error("Sem créditos");
@@ -204,7 +207,7 @@ const Dashboard = () => {
 
     setUnlocking(true);
     try {
-      if (!isAdmin) {
+      if (!isAdmin && !isFirstFreeFocus) {
         const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
           p_amount: costFocus,
           p_description: `Desbloqueio de Foco: ${focusId} (Casa ${houseNum})`,
@@ -216,7 +219,7 @@ const Dashboard = () => {
       // Save to database
       const currentResult = consultation.result || {};
       const currentUnlockedFocuses = currentResult.unlocked_focuses || {};
-      const houseFocuses = currentUnlockedFocuses[String(houseNum)] || [];
+      const houseFocuses = [...(currentUnlockedFocuses[String(houseNum)] || [])];
       
       if (!houseFocuses.includes(focusId)) {
         houseFocuses.push(focusId);
@@ -230,16 +233,16 @@ const Dashboard = () => {
         .update({ result: newResult })
         .eq("id", consultation.id);
         
-      if (updateErr) throw new Error("Erro ao salvar desbloqueio.");
+      if (updateErr) throw new Error("Erro ao salvar foco escolhido.");
       
       // Update local state
       setConsultation(prev => prev ? { ...prev, result: newResult } : null);
-      if (!isAdmin) {
+      if (!isAdmin && !isFirstFreeFocus) {
          await refreshProfile();
       }
-      showAlert("Foco ativado com sucesso!", "success");
+      showAlert(isFirstFreeFocus ? "Foco principal escolhido e ativado!" : "Foco ativado com sucesso!", "success");
     } catch (err: any) {
-      showAlert(err.message || "Erro ao desbloquear.");
+      showAlert(err.message || "Erro ao ativar foco.");
       throw err;
     } finally {
       setUnlocking(false);

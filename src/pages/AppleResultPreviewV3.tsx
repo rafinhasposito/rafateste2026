@@ -796,11 +796,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     return matched ? matched.id : null;
   }, [props.intent]);
 
-  const [hoveredArea, setHoveredArea] = useState<string | null>(intendedAreaId);
+  const savedHouseFocuses = P.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
+  const [hoveredArea, setHoveredArea] = useState<string | null>(intendedAreaId || savedHouseFocuses[0] || LIFE_AREAS[0].id);
 
   // Force reset hovered focus when the house changes
   React.useEffect(() => {
-    setHoveredArea(intendedAreaId);
+    const saved = P.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
+    setHoveredArea(intendedAreaId || saved[0] || LIFE_AREAS[0].id);
   }, [P_DYNAMIC.house, intendedAreaId]);
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [areas, setAreas] = useState(LIFE_AREAS);
@@ -808,9 +810,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
   const [unlockingFocus, setUnlockingFocus] = useState<string | null>(null);
   const [unlockedItems, setUnlockedItems] = useState<string[]>(() => {
-    const defaultFocus = intendedAreaId ? intendedAreaId : Object.keys(LIFE_AREAS)[0];
     const saved = P.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
-    return [defaultFocus, ...saved];
+    return intendedAreaId ? [...new Set([intendedAreaId, ...saved])] : [...saved];
   });
   useEffect(() => {
     if (props.unlockedFocuses?.[String(props.house)]) {
@@ -822,12 +823,12 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     }
   }, [props.unlockedFocuses, props.house]);
 
-  
   useEffect(() => {
-    const defaultFocus = intendedAreaId ? intendedAreaId : Object.keys(LIFE_AREAS)[0];
     const saved = P.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
-    setUnlockedItems([defaultFocus, ...saved]);
+    setUnlockedItems(intendedAreaId ? [...new Set([intendedAreaId, ...saved])] : [...saved]);
   }, [P.unlockedFocuses, P_DYNAMIC.house, intendedAreaId]);
+
+  const hasFreeFirstFocus = !intendedAreaId && !LIFE_AREAS.some(a => unlockedItems.includes(a.id) || (P.unlockedFocuses?.[String(P_DYNAMIC.house)] || []).includes(a.id));
   const [activeDossierCard, setActiveDossierCard] = useState<number | null>(0);
   const baseHouseId = P_DYNAMIC.house as keyof typeof BASE_HOUSE_PROFILES;
   const houseBaseData = (BASE_HOUSE_PROFILES as any)[baseHouseId];
@@ -1041,39 +1042,39 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
          3. PERSONALIZAÇÃO (ACORDEÃO)
          ══════════════════════════════════════════════════ */}
       <section className="relative pt-8 pb-20 md:pb-32">
-        <div className="max-w-[1200px] mx-auto px-6 relative z-10">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
           <Reveal className="mb-24 max-w-[1000px] mx-auto">
-            <div className="bg-white/[0.02] border border-white/[0.04] rounded-[32px] p-8 md:p-12 relative overflow-hidden">
+            <div className="bg-transparent border-0 p-0 md:bg-white/[0.02] md:border md:border-white/[0.04] md:rounded-[32px] md:p-12 relative overflow-hidden">
                {/* Fundo glow sutil */}
                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[40%] bg-[var(--hc5)] blur-[120px] rounded-full pointer-events-none"></div>
                
                {/* A GRANDE DIVISÃO DA PERSONALIZAÇÃO */}
                <div className="relative z-10 flex flex-col items-center">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[var(--hc)] mb-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest text-[var(--hc)] mb-6 md:mb-8">
                     <Sparkles className="w-3 h-3" />
                     <span>Seu Resultado Personalizado</span>
                   </div>
                   
-                  <h3 className="text-center mb-12 md:mb-20 flex flex-col items-center gap-2 md:gap-3">
+                  <h3 className="text-center mb-10 md:mb-20 flex flex-col items-center gap-2 md:gap-3">
                     <span className="font-ps-display text-2xl md:text-3xl lg:text-4xl text-white/60 font-light tracking-wide whitespace-nowrap">
                       Casa {P_DYNAMIC.house}
                     </span>
                     <span className="font-ps-display text-4xl sm:text-6xl md:text-7xl lg:text-[80px] text-transparent bg-clip-text bg-gradient-to-r from-[var(--hc)] to-white/50 leading-tight pb-2 tracking-tight">
-                      Foco em {currentActiveData?.label?.split(" ")[0] }
+                      {hasFreeFirstFocus ? "Escolha Seu Foco" : `Foco em ${currentActiveData?.label?.split(" ")[0]}`}
                     </span>
                   </h3>
 
                   {/* ======================= PROTOCOLO SOLAR • CASA {P_DYNAMIC.house} (HIGH-END) ======================= */}
-                  <div className="w-full max-w-4xl mx-auto mb-20">
-                     <div className="bg-black/40 border border-[var(--hc30)] rounded-[32px] overflow-hidden shadow-[0_30px_80px_var(--hc15)] backdrop-blur-xl flex flex-col">
+                  <div className="w-full max-w-4xl mx-auto mb-12 md:mb-20">
+                     <div className="bg-black/40 border border-[var(--hc30)] rounded-[24px] md:rounded-[32px] overflow-hidden shadow-[0_30px_80px_var(--hc15)] backdrop-blur-xl flex flex-col">
                        {/* Header */}
                        <div 
                          onClick={() => setIsBoardingPassOpen(!isBoardingPassOpen)}
-                         className="bg-[var(--hc10)] border-b border-[var(--hc20)] px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 cursor-pointer hover:bg-[var(--hc20)] transition-colors select-none"
+                         className="bg-[var(--hc10)] border-b border-[var(--hc20)] px-5 sm:px-8 py-4 sm:py-5 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 cursor-pointer hover:bg-[var(--hc20)] transition-colors select-none"
                        >
                          <div className="flex items-center gap-3">
-                           <Plane className="w-5 h-5 text-[var(--hc)]" />
-                           <span className="font-ps-display font-bold uppercase tracking-[0.25em] text-[var(--hc)] text-sm">Protocolo Solar • Casa {P_DYNAMIC.house}</span>
+                           <Plane className="w-5 h-5 text-[var(--hc)] shrink-0" />
+                           <span className="font-ps-display font-bold uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[var(--hc)] text-xs sm:text-sm">Protocolo Solar • Casa {P_DYNAMIC.house}</span>
                          </div>
                          <div className="flex items-center gap-4 md:gap-6">
                            <div className="flex items-center gap-3 hidden md:flex">
@@ -1114,7 +1115,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                   <div className="ml-auto flex items-center gap-1 sm:gap-2 shrink-0 pl-1">
                                     <span className="text-[var(--hc)] font-bold flex items-center gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm">
                                       <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-                                      {Math.min(P.match, 100)}% MATCH
+                                      {Math.min(P.match, 98)}% MATCH
                                     </span>
                                   </div>
                                </div>
@@ -1133,18 +1134,18 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                              transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
                              className="overflow-hidden origin-top"
                            >
-                             <div className="p-8 md:p-10 flex flex-col gap-10">
+                             <div className="p-5 sm:p-8 md:p-10 flex flex-col gap-8 md:gap-10">
                          {/* Viajante */}
                          <div>
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-2">Viajante</p>
-                           <p className="text-white font-serif text-3xl">{P_DYNAMIC.name}</p>
+                           <p className="text-white font-serif text-2xl sm:text-3xl">{P_DYNAMIC.name}</p>
                          </div>
                          {/* Rota de Ancoragem */}
-                         <div className="bg-white/[0.02] rounded-2xl p-6 md:p-8 border border-white/5 relative overflow-hidden">
+                         <div className="bg-white/[0.02] rounded-2xl p-5 sm:p-6 md:p-8 border border-white/5 relative overflow-hidden">
                            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--hc5)] rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-6">Rota de Ancoragem</p>
                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
-                             <div className="flex-1">
+                             <div className="flex-1 min-w-0">
                                <p className="text-white font-medium text-xl md:text-2xl flex items-center gap-2">
                                  <MapPin className="w-5 h-5 text-white/50 shrink-0"/> 
                                  <span className="truncate">{P_DYNAMIC.origin} <span className="text-white/30 text-sm ml-1">(BR)</span></span>
@@ -1159,7 +1160,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                <div className="w-px h-8 bg-gradient-to-b from-transparent via-[#10b981]/50 to-transparent ml-2.5"></div>
                                <Plane className="w-5 h-5 rotate-90" />
                              </div>
-                             <div className="flex-1 md:text-right">
+                             <div className="flex-1 min-w-0 md:text-right">
                                <p className="text-[var(--hc)] font-bold text-2xl md:text-3xl uppercase tracking-tight flex items-center md:justify-end gap-2">
                                  <span className="truncate">{P_DYNAMIC.city}</span>
                                  <MapPin className="w-6 h-6 shrink-0"/>
@@ -1171,7 +1172,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                          {/* Momento Exato */}
                          <div>
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4">Momento Exato da Ativação (Retorno Solar)</p>
-                           <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white text-lg md:text-xl font-medium">
+                           <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 text-white text-base sm:text-lg md:text-xl font-medium">
                              <span className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                                <Calendar className="w-5 h-5 text-[var(--hc)]"/> 
                                {P_DYNAMIC.date}
@@ -1184,43 +1185,43 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                            </div>
                          </div>
                          {/* DNA vs Ativação */}
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                           <div className="bg-[var(--hc5)] border border-[var(--hc10)] rounded-2xl p-6">
-                             <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-5">DNA Astrológico</p>
-                             <div className="space-y-4">
-                               <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Sun className="w-5 h-5 text-yellow-400"/> Sol em {P_DYNAMIC.sign}
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pt-2 sm:pt-4">
+                           <div className="bg-[var(--hc5)] border border-[var(--hc10)] rounded-2xl p-5 sm:p-6">
+                             <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-4 sm:mb-5">DNA Astrológico</p>
+                             <div className="space-y-3 sm:space-y-4">
+                               <p className="text-white font-medium text-base sm:text-lg flex items-center gap-3">
+                                 <Sun className="w-5 h-5 text-yellow-400 shrink-0"/> Sol em {P_DYNAMIC.sign}
                                </p>
-                               <p className="text-white/80 font-medium text-lg flex items-center gap-3">
-                                 <ArrowUpCircle className="w-5 h-5 text-purple-400"/> Ascendente em {P_DYNAMIC.ascendant}
+                               <p className="text-white/80 font-medium text-base sm:text-lg flex items-center gap-3">
+                                 <ArrowUpCircle className="w-5 h-5 text-purple-400 shrink-0"/> Ascendente em {P_DYNAMIC.ascendant}
                                </p>
                              </div>
                            </div>
-                           <div className="bg-[var(--hc10)] border border-[var(--hc20)] rounded-2xl p-6 relative overflow-hidden">
+                           <div className="bg-[var(--hc10)] border border-[var(--hc20)] rounded-2xl p-5 sm:p-6 relative overflow-hidden">
                              <div className="absolute inset-0 bg-gradient-to-br from-[#10b981]/10 to-transparent pointer-events-none"></div>
-                             <p className="text-[var(--hc70)] text-[10px] uppercase font-bold tracking-widest mb-5 relative z-10">Ativação Anual</p>
-                             <div className="space-y-4 relative z-10">
-                               <p className="text-white font-medium text-lg flex items-center gap-3">
-                                 <Landmark className="w-5 h-5 text-[var(--hc)]"/> Casa {P_DYNAMIC.house}
+                             <p className="text-[var(--hc70)] text-[10px] uppercase font-bold tracking-widest mb-4 sm:mb-5 relative z-10">Ativação Anual</p>
+                             <div className="space-y-3 sm:space-y-4 relative z-10">
+                               <p className="text-white font-medium text-base sm:text-lg flex items-center gap-3">
+                                 <Landmark className="w-5 h-5 text-[var(--hc)] shrink-0"/> Casa {P_DYNAMIC.house}
                                </p>
-                               <p className="text-[var(--hc)] font-bold text-xl flex items-center gap-3">
-                                 <CircleDollarSign className="w-5 h-5"/> {currentActiveData?.label || "Dinheiro & Prosperidade"}
+                               <p className="text-[var(--hc)] font-bold text-lg sm:text-xl flex items-center gap-3">
+                                 <CircleDollarSign className="w-5 h-5 shrink-0"/> {currentActiveData?.label || "Dinheiro & Prosperidade"}
                                </p>
                              </div>
                            </div>
                          </div>
                          {/* Compatibilidade */}
-                         <div className="flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 pt-8 mt-2 gap-4">
+                         <div className="flex flex-col md:flex-row md:items-center justify-between border-t border-white/10 pt-6 sm:pt-8 mt-2 gap-4">
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Compatibilidade da Escolha</p>
                            <div className="flex items-center justify-center gap-3 bg-[var(--hc20)] px-6 py-3 rounded-full border border-[var(--hc30)] shadow-[0_0_30px_var(--hc20)]">
                              <div className="w-2.5 h-2.5 rounded-full bg-[var(--hc)] animate-pulse"></div>
-                             <span className="text-[var(--hc)] font-bold tracking-widest text-lg">{Math.min(P.match, 98)}% MATCH</span>
+                             <span className="text-[var(--hc)] font-bold tracking-widest text-base sm:text-lg">{Math.min(P.match, 98)}% MATCH</span>
                            </div>
                          </div>
                        </div>
                        {/* Footer Barcode */}
-                       <div className="bg-black/60 px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t border-[var(--hc20)]">
-                         <div className="font-barcode text-5xl md:text-6xl tracking-[0.2em] text-[var(--hc70)] scale-y-150 py-2">||| || ||| | || || |||</div>
+                       <div className="bg-black/60 px-5 sm:px-8 py-5 flex flex-col md:flex-row justify-between items-center opacity-80 gap-4 border-t border-[var(--hc20)]">
+                         <div className="font-barcode text-4xl sm:text-5xl md:text-6xl tracking-[0.2em] text-[var(--hc70)] scale-y-150 py-2">||| || ||| | || || |||</div>
                          <span className="font-sans text-[10px] md:text-xs text-white/50 tracking-[0.2em] uppercase text-center bg-black/40 px-4 py-2 rounded-lg border border-white/5">Protocolo Solar • 24h de Imantação na Cidade de Destino</span>
                        </div>
                      </motion.div>
@@ -1228,9 +1229,28 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                  </AnimatePresence>
                </div>
             </div>
+
+                  {/* Banner de Escolha do 1º Foco (Consultas Por Cidade / Por Casa) */}
+                  {hasFreeFirstFocus && (
+                    <div className="w-full max-w-4xl mx-auto mb-6 p-5 sm:p-6 rounded-2xl border border-[#C9A227]/40 bg-[#C9A227]/10 backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-left shadow-[0_0_30px_rgba(201,162,39,0.12)]">
+                      <div className="flex items-start gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-[#C9A227]/20 border border-[#C9A227]/40 flex items-center justify-center shrink-0 mt-0.5">
+                          <Sparkles className="w-5 h-5 text-[#F5DE98]" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-[#F5DE98] block mb-1">
+                            1º Foco Incluso na Sua Consulta
+                          </span>
+                          <p className="text-white/90 text-sm sm:text-base font-light leading-relaxed">
+                            Escolha uma das 8 áreas abaixo e toque em <strong className="text-white font-semibold">"Escolher e Ativar Este Foco"</strong> para abrir o seu dossiê completo desta cidade.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
 {/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
-                  <div className="w-full mt-10 flex flex-col lg:flex-row gap-6 min-h-[700px] text-left">
+                  <div className="w-full mt-4 flex flex-col lg:flex-row gap-6 lg:min-h-[700px] text-left">
                                   {/* COLUNA ESQUERDA: SIDEBAR — expandida por padrão, encolhe pra ícones quando mouse vai pro painel */}
               <div
                 className="hidden lg:flex w-[72px] shrink-0 flex-col gap-2 items-stretch min-h-[700px]"
@@ -1244,7 +1264,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                     <div
                       key={area.id}
                       onClick={() => {
-                        if (!isUnlockedLocally) {
+                        if (!isUnlockedLocally && !hasFreeFirstFocus) {
                           setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house }); setIsPaywallOpen(true);
                         } else {
                           setHoveredArea(area.id);
@@ -1290,7 +1310,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       {/* Cabeçalho do item (sempre visível) */}
                       <button
                         onClick={() => {
-                          if (!isUnlockedLocally) {
+                          if (!isUnlockedLocally && !hasFreeFirstFocus) {
                             setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house }); setIsPaywallOpen(true);
                           } else {
                             setHoveredArea(isActive ? null : area.id);
@@ -1322,7 +1342,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
                               <motion.div
                                 className="h-full rounded-full"
-                                animate={{ width: isActive ? `${Math.min(area.score, 100)}%` : '0%' }}
+                                animate={{ width: isActive ? `${Math.min(area.score, 98)}%` : '0%' }}
                                 transition={{ duration: 0.8, type: 'spring', bounce: 0.25, delay: isActive ? 0.05 : 0 }}
                                 style={{ backgroundColor: area.color }}
                               />
@@ -1332,7 +1352,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               transition={{ duration: 0.3, delay: isActive ? 0.7 : 0 }}
                               className="text-[10px] font-bold tracking-widest shrink-0 text-white"
                             >
-                              {Math.min(area.score, 100)}%
+                              {Math.min(area.score, 98)}%
                             </motion.span>
                           </div>
                         </div>
@@ -1350,7 +1370,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                           >
                             <div
                               className="relative mt-2 rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)]"
-                              style={{ minHeight: 320 }}
+                              style={{ minHeight: 280 }}
                             >
                               {/* Background colorido */}
                               <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${area.color} 0%, transparent 80%)` }} />
@@ -1378,6 +1398,34 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                       <Sparkles className="w-4 h-4" />
                                       Foco Ativado ✓
                                     </div>
+                                  </>
+                                ) : hasFreeFirstFocus ? (
+                                  <>
+                                    <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
+                                    <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
+                                    <p className="text-white/80 text-sm font-light leading-relaxed mb-6">
+                                      Ative este foco para revelar os 3 pilares, a linha do tempo de 12 meses e o ritual de ativação de {P_DYNAMIC.city.split(", ")[0]} para {area.label.toLowerCase()}.
+                                    </p>
+                                    <button
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        setUnlockedItems(prev => [...new Set([...prev, area.id])]);
+                                        setHoveredArea(area.id);
+                                        if (P.onUnlockFocus) {
+                                          setUnlockingFocus(area.id);
+                                          try {
+                                            await P.onUnlockFocus(area.id, P_DYNAMIC.house);
+                                          } catch(err) {}
+                                          finally { setUnlockingFocus(null); }
+                                        }
+                                      }}
+                                      disabled={unlockingFocus === area.id}
+                                      className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 text-white hover:scale-105 active:scale-95 transition-transform"
+                                      style={{ backgroundColor: area.color, boxShadow: `0 0 30px ${area.color}60` }}
+                                    >
+                                      <Sparkles className="w-4 h-4" />
+                                      {unlockingFocus === area.id ? "Ativando Foco..." : "Escolher e Ativar Este Foco"}
+                                    </button>
                                   </>
                                 ) : (
                                   <>
@@ -1412,32 +1460,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 })}
               </div>
 
-              {/* Botão "Desbloquear Todos os Focos" */}
-              {P.onUnlockAllFocuses && (() => {
-                const lockedFocuses = sortedAreas.filter(a => !isFocusUnlocked(a.id));
-                if (lockedFocuses.length <= 1) return null;
-                return (
-                  <button
-                    onClick={async () => {
-                      const allIds = sortedAreas.map(a => a.id);
-                      setUnlockingFocus("__all__");
-                      try {
-                        await P.onUnlockAllFocuses!(allIds, P_DYNAMIC.house);
-                      } catch(err) {}
-                      finally { setUnlockingFocus(null); }
-                    }}
-                    disabled={unlockingFocus === "__all__"}
-                    className="w-full mt-4 px-6 py-4 font-bold text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 border border-white/10 bg-white/5 text-white hover:bg-white/10 active:scale-95 transition-all backdrop-blur-md"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    {unlockingFocus === "__all__" ? "Desbloqueando..." : `Desbloquear Todos os Focos · ${P.allFocusesCostLabel || "3 Créditos"}`}
-                  </button>
-                );
-              })()}
-
-              {/* COLUNA DIREITA: O PAINEL GIGANTE (Travado) */}
+              {/* COLUNA DIREITA: O PAINEL GIGANTE (Apenas Desktop) */}
               <div
-                className="flex-1 h-[600px] lg:min-h-[700px] relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${currentActiveData?.color || '#10b981'} 12%, #000000)` }}
+                className="hidden lg:block flex-1 h-[600px] lg:min-h-[700px] relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${currentActiveData?.color || '#10b981'} 12%, #000000)` }}
               >
                 <AnimatePresence mode="wait">
                   {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
@@ -1486,6 +1511,39 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               Foco Ativado ✓
                             </div>
                           </>
+                        ) : hasFreeFirstFocus ? (
+                          <>
+                            {/* 1º FOCO INCLUSO — escolha sem cobrar crédito */}
+                            <h3 className="font-ps-display text-5xl md:text-7xl font-bold tracking-tight text-white leading-none drop-shadow-xl mb-6">
+                              {activeArea.label}
+                            </h3>
+                            <div className="w-16 h-px mb-6" style={{ backgroundColor: `${activeArea.color}80` }} />
+                            <p className="text-white/80 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl drop-shadow-md">
+                              Ative este foco principal (incluso na sua consulta) para abrir os 3 pilares, a linha do tempo de 12 meses e o ritual de ativação em {P_DYNAMIC.city.split(", ")[0]}.
+                            </p>
+                            <div className="flex flex-col items-center md:items-start gap-4">
+                              <button
+                                onClick={async (e) => { 
+                                  e.stopPropagation(); 
+                                  setUnlockedItems(prev => [...new Set([...prev, activeArea.id])]);
+                                  setHoveredArea(activeArea.id);
+                                  if (P.onUnlockFocus) {
+                                    setUnlockingFocus(activeArea.id);
+                                    try {
+                                      await P.onUnlockFocus(activeArea.id, P_DYNAMIC.house);
+                                    } catch(err) {}
+                                    finally { setUnlockingFocus(null); }
+                                  }
+                                }}
+                                disabled={unlockingFocus === activeArea.id}
+                                className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-white hover:scale-105 active:scale-95"
+                                style={{ backgroundColor: activeArea.color, boxShadow: `0 0 50px ${activeArea.color}80` }}
+                              >
+                                <Sparkles className="w-4 h-4 shrink-0" />
+                                {unlockingFocus === activeArea.id ? "Ativando Foco..." : "Escolher e Ativar Este Foco"}
+                              </button>
+                            </div>
+                          </>
                         ) : (
                           <>
                             {/* TRANCADO — preview embaçado + botão de crédito */}
@@ -1531,6 +1589,29 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
               </div>
 
                   </div>
+
+                  {/* Botão "Desbloquear Todos os Focos" (aparece após ativar o 1º foco) */}
+                  {!hasFreeFirstFocus && P.onUnlockAllFocuses && (() => {
+                    const lockedFocuses = sortedAreas.filter(a => !(a.unlocked || unlockedItems.includes(a.id)));
+                    if (lockedFocuses.length <= 1) return null;
+                    return (
+                      <button
+                        onClick={async () => {
+                          const allIds = sortedAreas.map(a => a.id);
+                          setUnlockingFocus("__all__");
+                          try {
+                            await P.onUnlockAllFocuses!(allIds, P_DYNAMIC.house);
+                          } catch(err) {}
+                          finally { setUnlockingFocus(null); }
+                        }}
+                        disabled={unlockingFocus === "__all__"}
+                        className="w-full mt-4 px-6 py-4 font-bold text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 border border-white/10 bg-white/5 text-white hover:bg-white/10 active:scale-95 transition-all backdrop-blur-md"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        {unlockingFocus === "__all__" ? "Desbloqueando..." : `Desbloquear Todos os Focos · ${P.allFocusesCostLabel || "3 Créditos"}`}
+                      </button>
+                    );
+                  })()}
                   
                   {/* ÁREA DE CONTEÚDO DESBLOQUEADO (DOSSIÊ) */}
                   {(currentActiveData?.unlocked || (currentActiveData && unlockedItems.includes(currentActiveData.id))) && (
@@ -1576,9 +1657,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       </motion.div>
 
                       {/* BLOCO 3: O SEU DNA DE ATIVAÇÃO (Borderless Apple Narrative) */}
-                      <div className="w-full mt-40">
+                      <div className="w-full mt-20 md:mt-40">
                         
-                        <div className="flex flex-col gap-32 md:gap-40 w-full relative">
+                        <div className="flex flex-col gap-16 md:gap-40 w-full relative">
                           
                           {/* Elemento 1: Essência (Left Aligned) */}
                           <motion.div 
@@ -1588,13 +1669,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="flex flex-col items-start text-left max-w-3xl relative z-10"
                           >
-                            <span className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                            <span className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-3 md:mb-6" style={{ color: currentActiveData.color }}>
                               01. Sua Essência
                             </span>
-                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                            <h3 className="font-ps-display text-4xl sm:text-5xl md:text-8xl font-bold text-white mb-4 md:mb-8 tracking-tighter leading-none">
                               Sol em {P_DYNAMIC.sign}.
                             </h3>
-                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                            <p className="text-white/70 text-base sm:text-xl md:text-3xl font-light leading-relaxed">
                               {currentActiveData.dnaData?.essencia || currentActiveData.dna?.essencia}
                             </p>
                           </motion.div>
@@ -1607,13 +1688,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="flex flex-col items-start md:items-end text-left md:text-right max-w-3xl self-end relative z-10"
                           >
-                            <span className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                            <span className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-3 md:mb-6" style={{ color: currentActiveData.color }}>
                               02. Seu Método
                             </span>
-                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                            <h3 className="font-ps-display text-4xl sm:text-5xl md:text-8xl font-bold text-white mb-4 md:mb-8 tracking-tighter leading-none">
                               Ascendente <br className="hidden md:block" />em {P_DYNAMIC.ascendant}.
                             </h3>
-                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                            <p className="text-white/70 text-base sm:text-xl md:text-3xl font-light leading-relaxed">
                               {currentActiveData.dnaData?.metodo || currentActiveData.dna?.metodo}
                             </p>
                           </motion.div>
@@ -1624,15 +1705,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                            className="flex flex-col items-start md:items-center text-left md:text-center max-w-4xl self-center relative z-10 mt-10"
+                            className="flex flex-col items-start md:items-center text-left md:text-center max-w-4xl self-center relative z-10 mt-2 md:mt-10"
                           >
-                            <span className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-6" style={{ color: currentActiveData.color }}>
+                            <span className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-3 md:mb-6" style={{ color: currentActiveData.color }}>
                               03. Fase Atual
                             </span>
-                            <h3 className="font-ps-display text-6xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                            <h3 className="font-ps-display text-4xl sm:text-5xl md:text-8xl font-bold text-white mb-4 md:mb-8 tracking-tighter leading-none">
                               Maturidade.
                             </h3>
-                            <p className="text-white/60 text-xl md:text-3xl font-light leading-relaxed">
+                            <p className="text-white/70 text-base sm:text-xl md:text-3xl font-light leading-relaxed">
                               {currentActiveData.dnaData?.fase || currentActiveData.dna?.fase}
                             </p>
                           </motion.div>
@@ -1644,7 +1725,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       </div>
 
 {/* BLOCO 4: O PLANO DE ATIVAÇÃO MESTRE (SIMÉTRICO & DIGESTÍVEL) */}
-                      <div ref={block4Ref} className="w-full mt-40 max-w-[1400px] mx-auto mb-32 relative px-4 md:px-8">
+                      <div ref={block4Ref} className="w-full mt-20 md:mt-40 max-w-[1400px] mx-auto mb-20 md:mb-32 relative px-0 md:px-8">
                         {(() => {
                           const sentences = (houseBaseData?.understand || "").split(". ").filter(Boolean);
                           const quote = currentActiveData.full || currentActiveData.teaser || currentActiveData.headline || sentences[0] || "";
@@ -1667,14 +1748,14 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }}>
                               
                               {/* O CABEÇALHO DO BLOCO */}
-                              <motion.div variants={itemVariants} className="w-full flex justify-center mb-8">
+                              <motion.div variants={itemVariants} className="w-full flex justify-center mb-6 md:mb-8">
                                 <h3 className="font-sans text-[11px] md:text-sm tracking-[0.4em] uppercase font-bold" style={{ color: activeColor }}>
                                   Ativação da Casa {P_DYNAMIC.house}
                                 </h3>
                               </motion.div>
 
                               {/* 1. O HERO: Foto Panorâmica com Hierarquia Focada */}
-                              <motion.div variants={itemVariants} className="w-full h-[50vh] min-h-[450px] md:h-[65vh] rounded-[40px] overflow-hidden relative shadow-2xl mb-12 border border-white/10 group">
+                              <motion.div variants={itemVariants} className="w-full h-[46vh] min-h-[380px] md:h-[65vh] rounded-[28px] md:rounded-[40px] overflow-hidden relative shadow-2xl mb-8 md:mb-12 border border-white/10 group">
                                   <motion.div 
                                     initial={{ scale: 1.1 }}
                                     whileInView={{ scale: 1 }}
@@ -1707,12 +1788,12 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                   </motion.div>
                                   <div className="absolute inset-0 bg-gradient-to-t from-[#030306] via-[#030306]/50 to-transparent"></div>
                                   
-                                  <div className="absolute bottom-10 md:bottom-16 left-0 right-0 z-10 flex flex-col items-center text-center px-6">
+                                  <div className="absolute bottom-8 md:bottom-16 left-0 right-0 z-10 flex flex-col items-center text-center px-5 sm:px-6">
                                     <motion.h1 
                                       initial={{ opacity: 0, y: 30 }} 
                                       whileInView={{ opacity: 1, y: 0 }} 
                                       transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                                      className="font-ps-display text-5xl md:text-8xl text-white mb-3 tracking-tight drop-shadow-2xl uppercase"
+                                      className="font-ps-display text-4xl sm:text-5xl md:text-8xl text-white mb-3 tracking-tight drop-shadow-2xl uppercase"
                                     >
                                       {P_DYNAMIC.city}
                                     </motion.h1>
@@ -1720,14 +1801,14 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                       initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }} 
                                       whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }} 
                                       transition={{ delay: 0.3, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                                      className="font-ps-ui text-lg md:text-[24px] font-light tracking-wide drop-shadow-md text-white/90 max-w-3xl leading-[1.4]"
+                                      className="font-ps-ui text-base sm:text-lg md:text-[24px] font-light tracking-wide drop-shadow-md text-white/90 max-w-3xl leading-[1.4]"
                                     >
                                       {quote}
                                     </motion.p>
                                   </div>
                               </motion.div>
 
-                              {/* 2. OS BLOCOS DE CONTEÚDO (Expanding Bento Grid Perfeito) */}
+                              {/* 2. OS BLOCOS DE CONTEÚDO (Mobile: Cards Diretos Sem Esconder Texto | Desktop: Expanding Bento Grid) */}
                               <div className="flex flex-col gap-6 lg:gap-8 relative z-10 max-w-6xl mx-auto w-full">
                                  {/* Glow de fundo */}
                                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] blur-[150px] opacity-10 pointer-events-none" style={{ backgroundColor: activeColor }}></div>
@@ -1738,26 +1819,26 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                        id: 0,
                                        title: "O Efeito",
                                        subtitle: "A vibração desse destino",
-                                       icon: <MapPin className="w-8 h-8" />,
+                                       icon: <MapPin className="w-6 h-6 lg:w-8 lg:h-8" />,
                                        content: (
                                           <div className="flex flex-col h-full w-full min-w-0 max-w-[500px] justify-center relative">
                                             {/* Marca d'água sutil para preencher o vazio sem poluir */}
                                             <Sparkles className="absolute -bottom-4 -right-4 w-48 h-48 opacity-[0.03] pointer-events-none" style={{ color: activeColor }} />
                                             
-                                            <div className="relative z-10 flex flex-col gap-6 md:gap-8">
+                                            <div className="relative z-10 flex flex-col gap-5 md:gap-8">
                                               <div>
-                                                <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-3 md:mb-4" style={{ color: activeColor }}>
+                                                <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-2.5 md:mb-4" style={{ color: activeColor }}>
                                                   Benefício Central
                                                 </span>
-                                                <p className="font-ps-display text-white/95 text-[22px] sm:text-[26px] md:text-[28px] leading-[1.1] tracking-tight pr-4">
+                                                <p className="font-ps-display text-white/95 text-[20px] sm:text-[24px] md:text-[28px] leading-[1.2] tracking-tight">
                                                   <AppleHighlightText text={beneficios} activeColor={activeColor} />
                                                 </p>
                                               </div>
                                               
                                               {/* Transferido do Card 2 - O Momento Ideal */}
-                                              <div className="pt-5 md:pt-6 border-t border-white/[0.04]">
-                                                <span className="font-sans text-[8px] uppercase tracking-[0.3em] font-bold text-white/30 block mb-2">O Momento Ideal</span>
-                                                <p className="font-ps-ui text-white/50 text-[13px] md:text-[14px] leading-relaxed font-light pr-4">
+                                              <div className="pt-4 md:pt-6 border-t border-white/[0.06]">
+                                                <span className="font-sans text-[9px] uppercase tracking-[0.3em] font-bold text-white/40 block mb-2">O Momento Ideal</span>
+                                                <p className="font-ps-ui text-white/65 text-[14px] leading-relaxed font-light">
                                                   <AppleHighlightText text={paraQuem} activeColor={activeColor} />
                                                 </p>
                                               </div>
@@ -1769,10 +1850,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                        id: 1,
                                        title: "O Objetivo",
                                        subtitle: "A dinâmica no dia a dia",
-                                       icon: <Target className="w-8 h-8" />,
+                                       icon: <Target className="w-6 h-6 lg:w-8 lg:h-8" />,
                                        content: (
                                           <div className="flex flex-col justify-center h-full w-full min-w-0 max-w-[500px]">
-                                            <div className="flex flex-col gap-5 md:gap-6 pr-2 md:pr-6">
+                                            <div className="flex flex-col gap-4 md:gap-6">
                                               {/* Badge estilo iOS */}
                                               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] shadow-lg w-fit backdrop-blur-sm">
                                                 <Target className="w-3 h-3" style={{ color: activeColor }} />
@@ -1780,7 +1861,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                               </div>
                                               
                                               {/* Texto Principal (Manchete Apple) */}
-                                              <p className="font-ps-display text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/40 text-[20px] md:text-[24px] leading-[1.2] tracking-tight pr-2">
+                                              <p className="font-ps-display text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/40 text-[20px] md:text-[24px] leading-[1.25] tracking-tight">
                                                 <AppleHighlightText text={naPratica} activeColor={activeColor} gradientParent={true} />
                                               </p>
                                             </div>
@@ -1791,19 +1872,19 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                        id: 2,
                                        title: "A Chave",
                                        subtitle: "O Segredo do Ciclo",
-                                       icon: <Sparkles className="w-8 h-8" />,
+                                       icon: <Sparkles className="w-6 h-6 lg:w-8 lg:h-8" />,
                                        content: (
-                                          <div className="flex flex-col gap-10 w-full min-w-0 max-w-[450px]">
+                                          <div className="flex flex-col gap-6 md:gap-10 w-full min-w-0 max-w-[450px]">
                                             <div>
-                                              <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-4 text-white/40">Foco do Novo Ciclo</span>
-                                              <p className="font-ps-display text-white text-3xl sm:text-4xl leading-tight">
+                                              <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-2.5 md:mb-4 text-white/40">Foco do Novo Ciclo</span>
+                                              <p className="font-ps-display text-white text-2xl sm:text-3xl md:text-4xl leading-tight">
                                                 <AppleHighlightText text={currentActiveData.themeData || "Consolidação e Crescimento"} activeColor={activeColor} />
                                               </p>
                                             </div>
                                             
                                             <div>
-                                              <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-3" style={{ color: activeColor }}>A Chave Oculta</span>
-                                              <p className="font-ps-ui text-white/80 text-[16px] leading-[1.6] font-light">
+                                              <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-2.5" style={{ color: activeColor }}>A Chave Oculta</span>
+                                              <p className="font-ps-ui text-white/80 text-[15px] md:text-[16px] leading-[1.6] font-light">
                                                 <AppleHighlightText text={currentActiveData.secretData || "A verdadeira prosperidade neste ciclo não virá do esforço exaustivo, mas do posicionamento estratégico."} activeColor={activeColor} />
                                               </p>
                                             </div>
@@ -1814,21 +1895,21 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                        id: 3,
                                        title: "O Ritual",
                                        subtitle: "Ativação em 24h",
-                                       icon: <Compass className="w-8 h-8" />,
+                                       icon: <Compass className="w-6 h-6 lg:w-8 lg:h-8" />,
                                        content: (
                                           <div className="flex flex-col w-full min-w-0 max-w-[500px] justify-center h-full">
-                                            <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-6 md:mb-10" style={{ color: activeColor }}>Guia de Ativação</span>
+                                            <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-5 md:mb-10" style={{ color: activeColor }}>Guia de Ativação</span>
                                             
                                             {/* Apple Giant Numbers Layout */}
-                                            <div className="flex flex-col gap-6 md:gap-8">
+                                            <div className="flex flex-col gap-5 md:gap-8">
                                                {[
                                                  currentActiveData.ritualData?.step1 || 'Sintonize a intenção.',
                                                  currentActiveData.ritualData?.step2 || 'Faça uma ação física.',
                                                  currentActiveData.ritualData?.step3 || 'Ancore na cidade.'
                                                ].map((step, idx) => (
-                                                 <div key={idx} className="flex items-start gap-5 md:gap-6">
+                                                 <div key={idx} className="flex items-start gap-4 md:gap-6">
                                                    <span 
-                                                     className="font-ps-display text-[40px] md:text-[56px] leading-[0.75] tracking-tighter opacity-90 flex-shrink-0 mt-1" 
+                                                     className="font-ps-display text-[32px] md:text-[56px] leading-[0.8] tracking-tighter opacity-90 flex-shrink-0 mt-1" 
                                                      style={{ 
                                                        color: activeColor, 
                                                        textShadow: `0 4px 24px ${activeColor}50` 
@@ -1836,8 +1917,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                                    >
                                                      0{idx + 1}
                                                    </span>
-                                                   <div className="pt-1">
-                                                     <p className="font-ps-ui text-white/90 text-[15px] md:text-[16px] leading-relaxed font-light pr-2">
+                                                   <div className="pt-0.5">
+                                                     <p className="font-ps-ui text-white/90 text-[15px] md:text-[16px] leading-relaxed font-light">
                                                        <AppleHighlightText text={step} activeColor={activeColor} />
                                                      </p>
                                                    </div>
@@ -1853,7 +1934,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                       const [activeCardId, setActiveCardId] = useState<number | null>(null);
 
                                       return (
-                                        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 w-full lg:h-[450px]">
+                                        <div className="hidden lg:flex flex-row gap-8 w-full h-[450px]">
                                            {cardsRow.map((card) => {
                                               const isHovered = activeCardId === card.id;
                                               const isNeighborHovered = activeCardId !== null && activeCardId !== card.id;
@@ -1861,42 +1942,35 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                               return (
                                                 <motion.div
                                                    key={card.id}
-                                                   onMouseEnter={() => window.innerWidth >= 1024 && setActiveCardId(card.id)}
-                                                   onMouseLeave={() => window.innerWidth >= 1024 && setActiveCardId(null)}
-                                                   onClick={() => window.innerWidth < 1024 && setActiveCardId(isHovered ? null : card.id)}
+                                                   onMouseEnter={() => setActiveCardId(card.id)}
+                                                   onMouseLeave={() => setActiveCardId(null)}
                                                    initial={false}
                                                    animate={{ 
-                                                     flex: (typeof window !== 'undefined' && window.innerWidth >= 1024) 
-                                                              ? (isHovered ? 2.5 : isNeighborHovered ? 0.8 : 1) 
-                                                              : 1,
-                                                     height: (typeof window !== 'undefined' && window.innerWidth < 1024)
-                                                              ? (isHovered ? "auto" : "250px")
-                                                              : "100%"
+                                                     flex: isHovered ? 2.5 : isNeighborHovered ? 0.8 : 1
                                                    }}
                                                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                                                   className="group relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden cursor-pointer shadow-2xl flex-shrink-0 min-h-[250px] lg:min-h-0"
+                                                   className="group relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden cursor-pointer shadow-2xl flex-shrink-0 h-full"
                                                 >
                                                    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none z-0"></div>
                                                    
-                                                   {/* Estado: CAPA (Desaparece no hover/tap) */}
+                                                   {/* Estado: CAPA (Desaparece no hover) */}
                                                    <motion.div 
                                                      animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
                                                      transition={{ duration: 0.5 }}
-                                                     className="absolute inset-0 p-8 md:p-12 flex flex-col items-center justify-center text-center z-20 pointer-events-none bg-[#030306]/40 backdrop-blur-sm"
+                                                     className="absolute inset-0 p-12 flex flex-col items-center justify-center text-center z-20 pointer-events-none bg-[#030306]/40 backdrop-blur-sm"
                                                    >
                                                       <div className="p-4 rounded-full bg-white/5 mb-6 shadow-[0_0_30px_rgba(255,255,255,0.05)]" style={{ color: activeColor }}>
                                                         {card.icon}
                                                       </div>
-                                                      <h3 className="font-ps-display text-3xl md:text-4xl text-white mb-3" style={{ opacity: isNeighborHovered ? 0.3 : 1, transition: 'opacity 0.5s' }}>{card.title}</h3>
+                                                      <h3 className="font-ps-display text-4xl text-white mb-3" style={{ opacity: isNeighborHovered ? 0.3 : 1, transition: 'opacity 0.5s' }}>{card.title}</h3>
                                                       <span className="font-ps-ui text-[10px] uppercase font-bold tracking-[0.2em] text-white/40">{card.subtitle}</span>
-                                                      <span className="font-sans text-[9px] uppercase tracking-widest text-[var(--hc)]/80 mt-2 block lg:hidden font-semibold">Toque para ver</span>
                                                    </motion.div>
 
-                                                   {/* Estado: CONTEÚDO (Aparece no hover/tap) */}
+                                                   {/* Estado: CONTEÚDO (Aparece no hover) */}
                                                    <motion.div 
                                                      animate={{ opacity: isHovered ? 1 : 0 }}
                                                      transition={{ duration: 0.6, delay: isHovered ? 0.1 : 0 }}
-                                                     className={`absolute inset-0 p-8 md:p-12 flex flex-col justify-center z-10 ${isHovered ? 'pointer-events-auto' : 'pointer-events-none'}`}
+                                                     className={`absolute inset-0 p-12 flex flex-col justify-center z-10 ${isHovered ? 'pointer-events-auto' : 'pointer-events-none'}`}
                                                    >
                                                       {card.content}
                                                    </motion.div>
@@ -1909,6 +1983,31 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
                                    return (
                                      <>
+                                       {/* MOBILE: Cards abertos diretamente, sem efeito que esconde ou corta o texto */}
+                                       <div className="flex flex-col gap-5 lg:hidden">
+                                         {cardData.map((card) => (
+                                           <div
+                                             key={card.id}
+                                             className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[28px] p-6 sm:p-8 shadow-xl overflow-hidden"
+                                           >
+                                             <div className="flex items-center gap-4 pb-5 mb-5 border-b border-white/10">
+                                               <div
+                                                 className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0"
+                                                 style={{ color: activeColor }}
+                                               >
+                                                 {card.icon}
+                                               </div>
+                                               <div>
+                                                 <h3 className="font-ps-display text-2xl text-white font-bold leading-tight">{card.title}</h3>
+                                                 <span className="font-ps-ui text-[10px] uppercase font-bold tracking-[0.2em] text-white/40 block mt-0.5">{card.subtitle}</span>
+                                               </div>
+                                             </div>
+                                             {card.content}
+                                           </div>
+                                         ))}
+                                       </div>
+
+                                       {/* DESKTOP: Expanding Bento Rows */}
                                        <ExpandingRow cardsRow={[cardData[0], cardData[1]]} />
                                        <ExpandingRow cardsRow={[cardData[2], cardData[3]]} />
                                      </>
@@ -1921,17 +2020,17 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       </div>
 
                       {/* BLOCO 4.5: O MANTRA DE ATIVAÇÃO (GRADIENTE CINEMÁTICO) */}
-                      <div className="w-full max-w-6xl mx-auto mt-32 mb-48 px-6 text-center flex flex-col items-center relative">
+                      <div className="w-full max-w-6xl mx-auto mt-20 md:mt-32 mb-20 md:mb-48 px-2 sm:px-6 text-center flex flex-col items-center relative">
                         {/* Glow suave de fundo para ancorar o texto */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] blur-[120px] opacity-20 pointer-events-none" style={{ backgroundColor: currentActiveData?.color || '#10b981' }}></div>
                         
                         <div className="relative z-10 flex flex-col items-center">
-                          <div className="flex items-center gap-3 mb-10 px-5 py-2.5 bg-white/5 rounded-full border border-white/10 backdrop-blur-md shadow-lg">
+                          <div className="flex items-center gap-3 mb-6 md:mb-10 px-5 py-2.5 bg-white/5 rounded-full border border-white/10 backdrop-blur-md shadow-lg">
                              <Sparkles className="w-4 h-4" style={{ color: currentActiveData?.color || '#10b981' }} />
                              <span className="font-sans text-xs tracking-[0.2em] uppercase font-bold" style={{ color: currentActiveData?.color || '#10b981' }}>O Mantra de Ativação</span>
                           </div>
                           
-                          <p className="text-4xl md:text-6xl lg:text-7xl font-ps-display font-bold tracking-tighter leading-[1.1] md:leading-[1.15] bg-clip-text text-transparent pb-2 max-w-5xl"
+                          <p className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-ps-display font-bold tracking-tighter leading-[1.2] md:leading-[1.15] bg-clip-text text-transparent pb-2 max-w-5xl"
                              style={{ backgroundImage: `linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.9) 40%, ${currentActiveData?.color || '#10b981'} 100%)` }}>
                             "{currentActiveData?.mantra}"
                           </p>
@@ -1939,10 +2038,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       </div>
 
                       {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
-                      <div className="w-full mt-40 max-w-4xl mx-auto mb-32">
-                        <div className="text-center mb-24">
-                          <h2 className="font-ps-display text-4xl md:text-6xl font-bold tracking-tighter mb-6">A Evolução da Casa {P_DYNAMIC.house}</h2>
-                          <p className="text-white/60 text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                      <div className="w-full mt-20 md:mt-40 max-w-4xl mx-auto mb-20 md:mb-32">
+                        <div className="text-center mb-12 md:mb-24">
+                          <h2 className="font-ps-display text-3xl sm:text-4xl md:text-6xl font-bold tracking-tighter mb-4 md:mb-6">A Evolução da Casa {P_DYNAMIC.house}</h2>
+                          <p className="text-white/60 text-base sm:text-xl max-w-2xl mx-auto font-light leading-relaxed">
                             Como a energia da cidade trabalha o seu foco em <strong className="text-white font-medium">{currentActiveData.label}</strong> ao longo do novo ciclo.
                           </p>
                         </div>
@@ -1954,26 +2053,33 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               <div key={index} className="border-b border-white/10 flex flex-col group">
                                 <button 
                                   onClick={() => setOpenTimelinePhase(isOpen ? null : index)}
-                                  className="w-full py-6 md:py-14 flex items-center justify-between text-left transition-colors duration-500 hover:bg-white/[0.02] px-4 md:px-8"
+                                  className="w-full py-6 md:py-14 flex items-center justify-between text-left transition-colors duration-500 hover:bg-white/[0.02] px-2 sm:px-4 md:px-8"
                                 >
-                                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-16 w-full">
-                                    <div className="flex items-center gap-2">
+                                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-16 w-full min-w-0 pr-3">
+                                    <div className="flex items-center gap-2.5 flex-wrap">
                                       <span 
-                                        className="font-sans text-xs sm:text-sm tracking-[0.2em] uppercase transition-colors duration-500 w-auto md:w-40 shrink-0 font-semibold" 
-                                        style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.4)' }}
+                                        className="font-sans text-xs sm:text-sm tracking-[0.2em] uppercase transition-colors duration-500 w-auto md:w-40 shrink-0 font-bold" 
+                                        style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.6)' }}
                                       >
                                         {phase.period}
                                       </span>
-                                      {!isOpen && (
-                                        <span className="md:hidden text-[9px] uppercase tracking-wider text-white/30 font-sans">(Toque para abrir)</span>
-                                      )}
+                                      <span
+                                        className="md:hidden text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border font-sans font-semibold"
+                                        style={{
+                                          color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.7)',
+                                          borderColor: isOpen ? `${currentActiveData.color}50` : 'rgba(255,255,255,0.15)',
+                                          backgroundColor: isOpen ? `${currentActiveData.color}15` : 'rgba(255,255,255,0.05)'
+                                        }}
+                                      >
+                                        {isOpen ? "Aberta" : "Toque para ler +"}
+                                      </span>
                                     </div>
-                                    <h3 className={`font-ps-display text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight transition-colors duration-500 ${isOpen ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`}>
+                                    <h3 className={`font-ps-display text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight transition-colors duration-500 ${isOpen ? 'text-white' : 'text-white/75 group-hover:text-white'}`}>
                                       {phase.phase}
                                     </h3>
                                   </div>
-                                  <div className="flex shrink-0 ml-4 mr-2 md:mr-8 w-8 h-8 md:w-12 md:h-12 items-center justify-center rounded-full border transition-all duration-500" style={{ borderColor: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.1)', backgroundColor: isOpen ? `${currentActiveData.color}10` : 'transparent' }}>
-                                     <Plus className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-500 ${isOpen ? 'rotate-45' : ''}`} style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.4)' }} />
+                                  <div className="flex shrink-0 w-9 h-9 md:w-12 md:h-12 items-center justify-center rounded-full border transition-all duration-500" style={{ borderColor: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.2)', backgroundColor: isOpen ? `${currentActiveData.color}15` : 'rgba(255,255,255,0.04)' }}>
+                                     <Plus className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-500 ${isOpen ? 'rotate-45' : ''}`} style={{ color: isOpen ? currentActiveData.color : 'rgba(255,255,255,0.7)' }} />
                                   </div>
                                 </button>
 
@@ -1986,8 +2092,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                       transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
                                       className="overflow-hidden"
                                     >
-                                      <div className="pb-14 px-4 md:pl-[14rem] md:pr-12">
-                                         <p className="text-white/70 text-lg md:text-2xl leading-relaxed font-light">{phase.text}</p>
+                                      <div className="pb-10 md:pb-14 px-2 sm:px-4 md:pl-[14rem] md:pr-12">
+                                         <p className="text-white/80 text-base sm:text-lg md:text-2xl leading-relaxed font-light">{phase.text}</p>
                                       </div>
                                     </motion.div>
                                   )}
@@ -1998,32 +2104,32 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         </div>
                       </div>
                       {/* BLOCO 6: O PONTO CEGO (AMEAÇA CRÍTICA - V2) */}
-                      <div className="w-full max-w-4xl mx-auto mt-16 md:mt-32 mb-16 md:mb-28 px-4 md:px-6">
+                      <div className="w-full max-w-4xl mx-auto mt-16 md:mt-32 mb-16 md:mb-28 px-0 md:px-6">
                         <div className="bg-[#020202] rounded-3xl border border-red-900/30 p-0.5 md:p-1.5 relative overflow-hidden shadow-[0_0_60px_rgba(239,68,68,0.15)]">
                           
                           {/* Pulsing subtle glow */}
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] blur-[8px] bg-red-600"></div>
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-[1px] bg-red-500"></div>
 
-                          <div className="bg-[#050505] rounded-[26px] p-6 sm:p-8 md:p-14 relative z-10 flex flex-col items-center text-center border border-white/[0.02]">
+                          <div className="bg-[#050505] rounded-[26px] p-5 sm:p-8 md:p-14 relative z-10 flex flex-col items-center text-center border border-white/[0.02]">
                             
-                            <div className="flex items-center gap-2 sm:gap-3 mb-6 md:mb-8 px-4 py-1.5 bg-red-500/10 rounded-full border border-red-500/20">
+                            <div className="flex items-center gap-2 sm:gap-3 mb-5 md:mb-8 px-4 py-1.5 bg-red-500/10 rounded-full border border-red-500/20">
                                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                                <span className="font-sans text-[10px] tracking-widest uppercase text-red-400 font-bold">O Ponto Cego</span>
                             </div>
                             
-                            <h3 className="font-ps-display text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6 md:mb-8 tracking-tighter">
+                            <h3 className="font-ps-display text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-5 md:mb-8 tracking-tighter">
                               O Ponto Cego.
                             </h3>
                             
-                            <p className="text-red-50/80 text-base sm:text-lg md:text-2xl font-light leading-relaxed max-w-2xl mb-8 md:mb-12">
+                            <p className="text-red-50/85 text-base sm:text-lg md:text-2xl font-light leading-relaxed max-w-2xl mb-6 md:mb-12">
                               {currentActiveData.blindSpotData || "A euforia desta configuração atrai oportunidades, mas também um impulso irresistível para o desperdício."}
                             </p>
 
-                            <div className="w-full h-px bg-gradient-to-r from-transparent via-red-900/50 to-transparent mb-8 md:mb-10"></div>
+                            <div className="w-full h-px bg-gradient-to-r from-transparent via-red-900/50 to-transparent mb-6 md:mb-10"></div>
                             
                             <div className="text-left w-full max-w-2xl bg-black/60 p-5 sm:p-7 rounded-2xl border border-red-900/30 shadow-lg">
-                               <div className="flex items-center gap-2.5 mb-4 border-b border-red-900/30 pb-3">
+                               <div className="flex items-center gap-2.5 mb-3 sm:mb-4 border-b border-red-900/30 pb-3">
                                  <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 shrink-0" />
                                  <span className="font-sans text-[11px] sm:text-xs tracking-[0.2em] uppercase text-red-500 font-bold">Protocolo de Defesa</span>
                                </div>
@@ -2043,10 +2149,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
             </div>
           
             {/* BLOCO 7: ROTAS ALTERNATIVAS (Cidades Extras) */}
-            <div className="w-full max-w-5xl mx-auto mt-20 mb-32 px-6">
-              <div className="flex items-center gap-4 mb-12 border-b border-white/5 pb-8">
-                <Compass className="w-8 h-8 text-white/50" />
-                <h2 className="font-ps-display text-4xl md:text-5xl font-bold tracking-tighter text-white">
+            <div className="w-full max-w-5xl mx-auto mt-16 md:mt-20 mb-24 md:mb-32 px-0 sm:px-6">
+              <div className="flex items-center gap-4 mb-10 md:mb-12 border-b border-white/5 pb-6 md:pb-8">
+                <Compass className="w-7 h-7 md:w-8 md:h-8 text-white/50 shrink-0" />
+                <h2 className="font-ps-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-white">
                   Rotas Alternativas
                 </h2>
               </div>
@@ -2109,7 +2215,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
             </div>
 
             {/* BLOCO 8: VISÃO COMPLETA (A Grade 360º) */}
-            <div id="visao-360" className="w-full max-w-6xl mx-auto mt-20 md:mt-32 mb-24 md:mb-40 px-4 md:px-6">
+            <div id="visao-360" className="w-full max-w-6xl mx-auto mt-20 md:mt-32 mb-24 md:mb-40 px-0 sm:px-6">
               <div className="flex flex-col items-center text-center mb-12 md:mb-16 relative">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 blur-[100px] opacity-10 bg-white pointer-events-none"></div>
                 

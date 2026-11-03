@@ -1,55 +1,43 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-03T07:34:00-03:00 — V1.1 Item 1 & 2: Ativação Mercado Pago em Produção com Checkout Modal embutido no site (sem redirecionar o usuário para fora). Integração nativa do SDK v2 do Mercado Pago no Credits.tsx e index.html, gerando Pix (com QR Code e Copia e Cola) e Cartão de Crédito diretamente em tela flutuante responsiva dentro de protocolosolar.com.br.",
+  "last_verification": "2026-11-03T08:58:00-03:00 — Regra do 1º Foco Incluso em Consultas Por Cidade/Por Casa (botão 'Escolher e Ativar Este Foco' sem cobrar crédito e sem mencionar crédito até o 1º foco ser ativado) + Reforma Mobile Definitiva (fim do 'caixa dentro de caixa', remoção de painel duplicado e cards O Efeito/O Objetivo/A Chave/O Ritual abertos diretamente no mobile sem cortar texto) + Poster instantâneo nos vídeos.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br)",
   "deploy_instructions": {
-    "step1": "Fazer deploy da Edge Function: npx supabase functions deploy create-mercadopago-checkout --project-ref gvqdlsflrbctfiorimcl",
-    "step2": "Fazer git push github release/recovery-83ce832:main",
-    "step3": "GitHub Actions publica no GitHub Pages automaticamente"
+    "step1": "Fazer commit e git push github release/recovery-83ce832:main",
+    "step2": "GitHub Actions publica no GitHub Pages automaticamente"
   },
   "notes": {
-    "videos": "Vídeos das cidades verificados (/assets/newyork.mp4, /assets/paris.mp4, /assets/roma.mp4, /assets/tokyo.mp4, /assets/zurich.mp4) integrados no Bloco 4 e hero.",
+    "videos": "Vídeos das cidades com poster instantâneo (preload=metadata + poster de alta resolução) para carregamento imediato no mobile.",
     "mercadopago": "Checkout Modal oficial do Mercado Pago ativado dentro do site com suporte a Pix e Cartão.",
     "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
   },
   "blockers_open": [],
   "blockers_fixed": [
+    "Consulta Por Cidade / Por Casa: 1º Foco incluso gratuitamente com banner explicativo e botão 'Escolher e Ativar Este Foco' (sem usar a palavra crédito); cobrança de 1 crédito ativada apenas do 2º foco em diante",
+    "Mobile Layout: Removido container externo com borda e padding duplo ('caixa dentro de caixa') que espremia o Ponto Cego e os blocos internos",
+    "Mobile Layout: Removido painel gigante duplicado que aparecia abaixo do acordeão de focos no celular",
+    "Mobile Layout: Cards O Efeito, O Objetivo, A Chave e O Ritual agora abrem diretamente com todo o texto visível no celular (sem capa 'Toque para ver' que cortava textos longos)",
+    "Vídeos Mobile: Adicionado poster de alta resolução instantâneo e preload='metadata' para eliminar tela preta enquanto o vídeo carrega",
+    "Dashboard: Removido window.scrollTo(0,0) ao desbloquear casas, mantendo o usuário na grade Visão 360º ('Mapa Completo Desbloqueado')",
     "Mercado Pago: Checkout Modal oficial embutido no site (Pix e Cartão na mesma página sem sair de protocolosolar.com.br)",
     "Mercado Pago: Edge functions blindadas com fallbacks para produção (protocolosolar.com.br e webhook Supabase)",
     "Mercado Pago: Parser do webhook atualizado para aceitar IPN (topic/id), Webhooks v2 (action/data.id) e querystrings",
     "Mercado Pago: Credits.tsx atualizado para sincronização e atualização de saldo em tempo real pós-retorno do MP",
     "vídeo da cidade ativado no Bloco 4 (Nova York, Paris, Roma, Tóquio, Zurique)",
-    "bug de 999% corrigido para 98% e travado em Math.min(score, 100)%",
+    "bug de 999% corrigido para 98% e travado em Math.min(score, 98)%",
     "data do cartão de embarque formatada em DD/MM/YYYY sem quebra em 3 linhas",
     "MATCH % ajustado sem corte à direita na barra do viajante",
     "alinhamento do título e ícone em 'Os 3 Pilares da Ativação da Casa'",
-    "linhas Bento que colapsavam em 4 traços no mobile transformadas em cards com toque e min-height",
-    "indicador '+' e hint 'Toque para abrir' visíveis no mobile nas fases dos meses",
+    "indicador '+' e badge 'Toque para ler +' visíveis no mobile nas fases dos meses",
     "Ponto Cego com espaçamentos proporcionais sem esticamento vertical",
     "Expanda o Seu Mapa atualizado para 'Mapa Completo Desbloqueado' e '12 Casas Ativas' sem scroll jump para o topo",
     "espaço uniforme de 3 linhas nos cards das 12 casas prevenindo desconfiguração",
     "menu de navegação inferior mobile (Descobrir, Consultas, Como Funciona, Conta) e rodapé adicionados no resultado",
-    "eliminação de download duplicado de vídeos (Home e Onboarding com player único e preload=metadata)",
-    "copy 100% humana — zero jargao de IA/dev/efemérides",
-    "design Cosmic Obsidian unificado (#02050A)",
-    "Tri-Mode paletas: Passado=Silver, Presente=Emerald, Futuro=Imperial Gold",
-    "Earth: Desktop=direita (translate-x 20%), Mobile=horizonte (translate-y -14%)",
-    "SEO: robots.txt, sitemap.xml, JSON-LD WebApplication, meta pt-BR, Open Graph",
-    "Auth card compacto (logo h-24 sm:h-28)",
-    "Credits luxury redesign (pacotes Obsidian & Gold, CTA gold)",
-    "Profile luxury cards com gold CTA Salvar Dados de Nascimento",
-    "History badge Tri-Mode (removido blue-400)",
-    "FocusedShell: bg-[#02050A], Voltar pill luxury glass",
-    "Onboarding key ps_onboarding_completed consistente em todos os componentes",
-    "StarryBackground: full-bleed fixed inset-0"
+    "eliminação de download duplicado de vídeos (Home e Onboarding com player único e preload=metadata)"
   ],
   "v1_1_backlog": [
-    "Mercado Pago producao: inserir credencial APP_USR-... nas Supabase Secrets e validar webhook",
-    "Mercado Pago embutido: Checkout Bricks (sem redirect para MP)",
-    "Videos CDN: fazer upload de bg-earth-web.mp4 e /videos/*.mp4 para Supabase Storage",
-    "Code splitting: reduzir bundle de 3MB (chunk size warning)",
-    "Dominio custom: protocolosolar.com.br no Vercel"
+    "Code splitting: reduzir bundle de 3MB (chunk size warning)"
   ]
 }
