@@ -34,6 +34,7 @@ VIDEOS PARA BACKGROUND/
 # Vídeos de cidades agora estão comprimidos (< 4.5MB) e liberados para produção
 
 .env.local
-docs/archive/media/raw_folders/
+docs/archive/media/
 CIDADES VIDEOS/
 *.tmp.mp4
+ffmpeg2pass*

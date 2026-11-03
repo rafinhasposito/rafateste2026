@@ -1,20 +1,24 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-03T08:58:00-03:00 — Regra do 1º Foco Incluso em Consultas Por Cidade/Por Casa (botão 'Escolher e Ativar Este Foco' sem cobrar crédito e sem mencionar crédito até o 1º foco ser ativado) + Reforma Mobile Definitiva (fim do 'caixa dentro de caixa', remoção de painel duplicado e cards O Efeito/O Objetivo/A Chave/O Ritual abertos diretamente no mobile sem cortar texto) + Poster instantâneo nos vídeos.",
+  "last_verification": "2026-11-03T11:06:40-03:00 — Deploy completo em produção (commit 7a91ce9 em github/main + Edge Function create-mercadopago-checkout no Supabase gvqdlsflrbctfiorimcl): Portal de Entrada do Onboarding com preload invisível, scroll touch destravado no iPhone em todas as telas do Onboarding, 46 vídeos de cidades comprimidos (< 4.5MB com +faststart), Cinema Instantâneo Mobile (Ken Burns + crossfade), Checkout Transparente In-Site (Pix QR Code + Copia e Cola + Cartão Brick) e 1º Foco Incluso.",
   "build_status": "PASS",
-  "deploy_target": "GitHub Pages (protocolosolar.com.br)",
+  "deploy_target": "GitHub Pages (protocolosolar.com.br) + Supabase Edge Functions (gvqdlsflrbctfiorimcl)",
   "deploy_instructions": {
-    "step1": "Fazer commit e git push github release/recovery-83ce832:main",
-    "step2": "GitHub Actions publica no GitHub Pages automaticamente"
+    "step1": "Publicado no commit 7a91ce9 (release/recovery-83ce832 -> main)",
+    "step2": "GitHub Actions publica em protocolosolar.com.br automaticamente"
   },
   "notes": {
-    "videos": "Vídeos das cidades com poster instantâneo (preload=metadata + poster de alta resolução) para carregamento imediato no mobile.",
-    "mercadopago": "Checkout Modal oficial do Mercado Pago ativado dentro do site com suporte a Pix e Cartão.",
+    "videos": "Todos os 46 vídeos de cidades e vídeos do Onboarding comprimidos abaixo de 4.5MB com +faststart e conectados ao player com Ken Burns + crossfade.",
+    "mercadopago": "Checkout Transparente 100% in-site (Pix QR Code + Copia e Cola + Cartão via Brick) ativo na Edge Function create-mercadopago-checkout.",
     "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
   },
   "blockers_open": [],
   "blockers_fixed": [
+    "Onboarding iPhone: Destravado o scroll touch (overflow-y-auto + -webkit-overflow-scrolling:touch) em todas as telas (Portal, Screen1 a Screen6) e eliminado o corte de título/cards pelo botão CONTINUAR",
+    "Onboarding Portal de Entrada (step 0): Pergunta magnética de abertura instantânea (0.05s em CSS puro) com pré-carregamento invisível do vídeo da Terra em segundo plano",
+    "Vídeos Comprimidos (< 4.5MB): Todos os vídeos principais e 46 vídeos de cidades em public/assets/cities/ comprimidos com ffmpeg +faststart e conectados ao Resultado",
+    "Checkout Transparente In-Site: Modal nativo com abas Pix (QR Code + Copia e Cola + polling automático) e Cartão (Mercado Pago Card Payment Brick) sem redirecionar para fora do site",
     "Consulta Por Cidade / Por Casa: 1º Foco incluso gratuitamente com banner explicativo e botão 'Escolher e Ativar Este Foco' (sem usar a palavra crédito); cobrança de 1 crédito ativada apenas do 2º foco em diante",
     "Mobile Layout: Removido container externo com borda e padding duplo ('caixa dentro de caixa') que espremia o Ponto Cego e os blocos internos",
     "Mobile Layout: Removido painel gigante duplicado que aparecia abaixo do acordeão de focos no celular",
