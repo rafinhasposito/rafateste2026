@@ -8,10 +8,13 @@ export function MobileAppChrome() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // The bottom bar appears on main app views
-  const showBottomBar = ["/", "/history", "/perfil", "/tecnologia"].includes(location.pathname);
+  // The bottom bar appears on main app views including dashboard and result preview
+  const showBottomBar = ["/", "/history", "/perfil", "/tecnologia", "/dashboard", "/v3-preview"].some(
+    (p) => location.pathname === p || location.pathname.startsWith("/v3-preview")
+  );
 
   const isHome = location.pathname === "/";
+  const isDashboard = location.pathname === "/dashboard" || location.pathname.startsWith("/v3-preview");
   const isTecnologia = location.pathname === "/tecnologia";
   const isOnboarding = location.pathname === "/app/onboarding";
 

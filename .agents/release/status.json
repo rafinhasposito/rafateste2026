@@ -1,7 +1,51 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "Human UX + Google SEO V1 aprovada: copy 100% humana (zero jargão de IA/dev/efemérides), Step 3 corrigido (ano 2026 com botões -/+ sem caixa escura, fundo cósmico limpo, busca sem borda dupla, card acolhedor de dados de nascimento), página Como Funciona traduzida + Schema FAQPage, SEO completo (index.html pt-BR, Open Graph, JSON-LD WebApplication, robots.txt, sitemap.xml, proteção Googlebot sem redirect para onboarding e H1 único), build PASS",
+  "last_verification": "2026-11-03T02:15:00-03:00 — Correções cirúrgicas de UX Mobile no resultado (AppleResultPreviewV3 e MobileAppChrome): vídeo da cidade integrado e ativo no Bloco 4, correção do bug de 999% para 98%, formatação de data DD/MM/YYYY sem quebra em 3 linhas, eliminação de colapso das caixas Bento no mobile, indicador de toque e chevron/plus nos meses da linha do tempo, ajuste do Ponto Cego sem esticamento vertical, título dinâmico 'Mapa Completo Desbloqueado' com ancoragem sem scroll jump, altura fixa para 3 linhas nos 12 cards, e barra de navegação/rodapé no mobile.",
   "build_status": "PASS",
-  "deploy_target": "Vercel"
+  "deploy_target": "GitHub Pages (protocolosolar.com.br)",
+  "deploy_instructions": {
+    "step1": "Fazer git add src/ e git commit -m 'fix(mobile): resolve mobile ux, score, date, bento cards and navigation'",
+    "step2": "Fazer git push origin main",
+    "step3": "GitHub Actions publica no GitHub Pages automaticamente"
+  },
+  "notes": {
+    "videos": "Vídeos das cidades verificados (/assets/newyork.mp4, /assets/paris.mp4, /assets/roma.mp4, /assets/tokyo.mp4, /assets/zurich.mp4) integrados no Bloco 4 e hero.",
+    "mercadopago": "Em modo sandbox. Para producao: trocar MERCADOPAGO_ACCESS_TOKEN por APP_USR-... nas Supabase Secrets.",
+    "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
+  },
+  "blockers_open": [],
+  "blockers_fixed": [
+    "vídeo da cidade ativado no Bloco 4 (Nova York, Paris, Roma, Tóquio, Zurique)",
+    "bug de 999% corrigido para 98% e travado em Math.min(score, 100)%",
+    "data do cartão de embarque formatada em DD/MM/YYYY sem quebra em 3 linhas",
+    "MATCH % ajustado sem corte à direita na barra do viajante",
+    "alinhamento do título e ícone em 'Os 3 Pilares da Ativação da Casa'",
+    "linhas Bento que colapsavam em 4 traços no mobile transformadas em cards com toque e min-height",
+    "indicador '+' e hint 'Toque para abrir' visíveis no mobile nas fases dos meses",
+    "Ponto Cego com espaçamentos proporcionais sem esticamento vertical",
+    "Expanda o Seu Mapa atualizado para 'Mapa Completo Desbloqueado' e '12 Casas Ativas' sem scroll jump para o topo",
+    "espaço uniforme de 3 linhas nos cards das 12 casas prevenindo desconfiguração",
+    "menu de navegação inferior mobile (Descobrir, Consultas, Como Funciona, Conta) e rodapé adicionados no resultado",
+    "eliminação de download duplicado de vídeos (Home e Onboarding com player único e preload=metadata)",
+    "copy 100% humana — zero jargao de IA/dev/efemérides",
+    "design Cosmic Obsidian unificado (#02050A)",
+    "Tri-Mode paletas: Passado=Silver, Presente=Emerald, Futuro=Imperial Gold",
+    "Earth: Desktop=direita (translate-x 20%), Mobile=horizonte (translate-y -14%)",
+    "SEO: robots.txt, sitemap.xml, JSON-LD WebApplication, meta pt-BR, Open Graph",
+    "Auth card compacto (logo h-24 sm:h-28)",
+    "Credits luxury redesign (pacotes Obsidian & Gold, CTA gold)",
+    "Profile luxury cards com gold CTA Salvar Dados de Nascimento",
+    "History badge Tri-Mode (removido blue-400)",
+    "FocusedShell: bg-[#02050A], Voltar pill luxury glass",
+    "Onboarding key ps_onboarding_completed consistente em todos os componentes",
+    "StarryBackground: full-bleed fixed inset-0"
+  ],
+  "v1_1_backlog": [
+    "Mercado Pago producao: trocar token sandbox por APP_USR-...",
+    "Mercado Pago embutido: Checkout Bricks (sem redirect para MP)",
+    "Videos CDN: fazer upload de bg-earth-web.mp4 e /videos/*.mp4 para Supabase Storage",
+    "Code splitting: reduzir bundle de 3MB (chunk size warning)",
+    "Dominio custom: protocolosolar.com.br no Vercel"
+  ]
 }
