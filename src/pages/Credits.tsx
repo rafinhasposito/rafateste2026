@@ -18,7 +18,7 @@ const ICONS: Record<string, any> = {
 };
 
 const Credits = () => {
-  const { profile, session } = useAuth();
+  const { profile, session, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { packages, costs, loading } = usePricing();
@@ -26,17 +26,33 @@ const Credits = () => {
 
   useEffect(() => {
     const status = searchParams.get("status");
-    if (status === "success") {
+    const collectionStatus = searchParams.get("collection_status");
+    const isApproved = status === "success" || status === "approved" || collectionStatus === "approved";
+    const isPending = status === "pending" || collectionStatus === "pending" || collectionStatus === "in_process";
+    const isFailure = status === "failure" || collectionStatus === "rejected";
+
+    if (isApproved) {
       toast.success("Pagamento aprovado! Seus créditos já estão disponíveis.");
+      refreshProfile();
+      // Polling para sincronização em tempo real caso o webhook ainda esteja processando
+      const t1 = setTimeout(refreshProfile, 2000);
+      const t2 = setTimeout(refreshProfile, 5000);
       window.history.replaceState({}, document.title, "/credits");
-    } else if (status === "failure") {
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    } else if (isFailure) {
       toast.error("O pagamento foi recusado ou cancelado.");
       window.history.replaceState({}, document.title, "/credits");
-    } else if (status === "pending") {
-      toast.info("Pagamento pendente. Os créditos cairão assim que confirmado.");
+    } else if (isPending) {
+      toast.info("Pagamento pendente. Os créditos serão liberados assim que compensado.");
+      refreshProfile();
+      const t = setTimeout(refreshProfile, 4000);
       window.history.replaceState({}, document.title, "/credits");
+      return () => clearTimeout(t);
     }
-  }, [searchParams]);
+  }, [searchParams, refreshProfile]);
 
   const handlePurchase = async (pkg: PricingItem) => {
     if (!profile) {

@@ -1,21 +1,24 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-03T02:15:00-03:00 — Correções cirúrgicas de UX Mobile no resultado (AppleResultPreviewV3 e MobileAppChrome): vídeo da cidade integrado e ativo no Bloco 4, correção do bug de 999% para 98%, formatação de data DD/MM/YYYY sem quebra em 3 linhas, eliminação de colapso das caixas Bento no mobile, indicador de toque e chevron/plus nos meses da linha do tempo, ajuste do Ponto Cego sem esticamento vertical, título dinâmico 'Mapa Completo Desbloqueado' com ancoragem sem scroll jump, altura fixa para 3 linhas nos 12 cards, e barra de navegação/rodapé no mobile.",
+  "last_verification": "2026-11-03T07:05:00-03:00 — V1.1 Item 1: Ativação Mercado Pago em Produção. Edge Functions 'create-mercadopago-checkout' e 'mercadopago-webhook' blindadas com resolução automática de domínio de produção (protocolosolar.com.br), auto-resolução de URL de notificação Supabase, suporte unificado a todos os formatos de eventos de pagamento do Mercado Pago (IPN, Webhooks v1/v2, querystring e body), e auto-refresh de saldo de créditos no retorno do checkout em Credits.tsx.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br)",
   "deploy_instructions": {
-    "step1": "Fazer git add src/ e git commit -m 'fix(mobile): resolve mobile ux, score, date, bento cards and navigation'",
-    "step2": "Fazer git push origin main",
-    "step3": "GitHub Actions publica no GitHub Pages automaticamente"
+    "step1": "Configurar MERCADOPAGO_ACCESS_TOKEN (APP_USR-...) e MERCADOPAGO_NOTIFICATION_URL no Supabase Secrets",
+    "step2": "Fazer git commit e git push github release/recovery-83ce832:main",
+    "step3": "Fazer deploy das edge functions: npx supabase functions deploy create-mercadopago-checkout e npx supabase functions deploy mercadopago-webhook"
   },
   "notes": {
     "videos": "Vídeos das cidades verificados (/assets/newyork.mp4, /assets/paris.mp4, /assets/roma.mp4, /assets/tokyo.mp4, /assets/zurich.mp4) integrados no Bloco 4 e hero.",
-    "mercadopago": "Em modo sandbox. Para producao: trocar MERCADOPAGO_ACCESS_TOKEN por APP_USR-... nas Supabase Secrets.",
+    "mercadopago": "Pronto para produção. Edge functions preparadas para chave APP_USR-... e auto-return dinâmico.",
     "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
   },
   "blockers_open": [],
   "blockers_fixed": [
+    "Mercado Pago: Edge functions blindadas com fallbacks para produção (protocolosolar.com.br e webhook Supabase)",
+    "Mercado Pago: Parser do webhook atualizado para aceitar IPN (topic/id), Webhooks v2 (action/data.id) e querystrings",
+    "Mercado Pago: Credits.tsx atualizado para sincronização e atualização de saldo em tempo real pós-retorno do MP",
     "vídeo da cidade ativado no Bloco 4 (Nova York, Paris, Roma, Tóquio, Zurique)",
     "bug de 999% corrigido para 98% e travado em Math.min(score, 100)%",
     "data do cartão de embarque formatada em DD/MM/YYYY sem quebra em 3 linhas",
@@ -42,7 +45,7 @@
     "StarryBackground: full-bleed fixed inset-0"
   ],
   "v1_1_backlog": [
-    "Mercado Pago producao: trocar token sandbox por APP_USR-...",
+    "Mercado Pago producao: inserir credencial APP_USR-... nas Supabase Secrets e validar webhook",
     "Mercado Pago embutido: Checkout Bricks (sem redirect para MP)",
     "Videos CDN: fazer upload de bg-earth-web.mp4 e /videos/*.mp4 para Supabase Storage",
     "Code splitting: reduzir bundle de 3MB (chunk size warning)",

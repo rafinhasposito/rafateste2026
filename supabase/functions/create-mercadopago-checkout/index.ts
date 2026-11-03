@@ -78,10 +78,26 @@ serve(async (req) => {
       throw new Error("Missing MERCADOPAGO_ACCESS_TOKEN");
     }
 
-    const appUrl = Deno.env.get('APP_URL') ?? 'http://localhost:3000';
-    // Em produção, você deverá configurar o Notification URL real da edge function mercadopago-webhook
-    // Ex: https://xxx.supabase.co/functions/v1/mercadopago-webhook
-    const notificationUrl = Deno.env.get('MERCADOPAGO_NOTIFICATION_URL');
+    // Resolve appUrl dynamically: check APP_URL, then origin header, fallback to production domain
+    let appUrl = (Deno.env.get('APP_URL') || '').trim().replace(/\/$/, '');
+    if (!appUrl) {
+      const origin = req.headers.get('origin') || req.headers.get('referer');
+      if (origin) {
+        try {
+          const parsed = new URL(origin);
+          appUrl = `${parsed.protocol}//${parsed.host}`;
+        } catch {
+          appUrl = 'https://protocolosolar.com.br';
+        }
+      } else {
+        appUrl = 'https://protocolosolar.com.br';
+      }
+    }
+
+    // Resolve notificationUrl: check MERCADOPAGO_NOTIFICATION_URL, fallback to Supabase Edge Function URL
+    const supabaseUrl = (Deno.env.get('SUPABASE_URL') || '').trim().replace(/\/$/, '');
+    const defaultNotificationUrl = supabaseUrl ? `${supabaseUrl}/functions/v1/mercadopago-webhook` : undefined;
+    const notificationUrl = (Deno.env.get('MERCADOPAGO_NOTIFICATION_URL') || '').trim() || defaultNotificationUrl;
 
     const preferencePayload = {
       items: [
@@ -135,8 +151,8 @@ serve(async (req) => {
     const isProduction = mpAccessToken.startsWith('APP_USR-') || 
                          Deno.env.get('MP_ENVIRONMENT')?.trim().toLowerCase() === 'production';
     const checkoutUrl = isProduction 
-      ? preferenceData.init_point 
-      : preferenceData.sandbox_init_point;
+      ? (preferenceData.init_point || preferenceData.sandbox_init_point)
+      : (preferenceData.sandbox_init_point || preferenceData.init_point);
 
     console.log(`[create-checkout] Created preference ${preferenceData.id}, isProduction: ${isProduction}`);
 
