@@ -40,9 +40,9 @@ while IFS= read -r -d '' IN; do
   TMP="${IN%.*}.tmp.mp4"
   echo "▶ ${REL}  (${SIZE_MB}MB → alvo ${TARGET_MB}MB, dur=${DUR}s, vb=${VBPS}k)"
 
-  ffmpeg -y -loglevel error -i "$IN" -vf "scale='min(${MAX_W},iw)':-2" \
+  ffmpeg -nostdin -y -loglevel error -i "$IN" -vf "scale='min(${MAX_W},iw)':-2" \
     -c:v libx264 -b:v ${VBPS}k -preset slow -pass 1 -an -f mp4 /dev/null
-  ffmpeg -y -loglevel error -i "$IN" -vf "scale='min(${MAX_W},iw)':-2" \
+  ffmpeg -nostdin -y -loglevel error -i "$IN" -vf "scale='min(${MAX_W},iw)':-2" \
     -c:v libx264 -b:v ${VBPS}k -preset slow -pass 2 \
     -c:a aac -b:a ${AUDIO_KBPS}k -movflags +faststart "$TMP"
 

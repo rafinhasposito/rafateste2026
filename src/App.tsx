@@ -11,7 +11,6 @@ import { FocusedShell } from "./layouts/FocusedShell";
 
 // Pages
 import Index from "./pages/Index";
-import AppleResultPrototype from "./pages/AppleResultPrototype";
 import AppleResultPreview from "./pages/AppleResultPreview";
 import AppleResultPreviewV3 from "./pages/AppleResultPreviewV3";
 import HouseResult from "./pages/HouseResult";
@@ -104,7 +103,6 @@ const App = () => (
             <Route path="/apple-3d" element={<AppleScrollExplosion />} />
             <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
-            <Route path="/v2-apple" element={<AppleResultPrototype />} />
             <Route path="/v2-preview" element={<AppleResultPreview />} />
             <Route path="/v3-preview" element={<AppleResultPreviewV3 />} />
             <Route path="/v3-preview/:houseId" element={<AppleResultPreviewV3 />} />

@@ -31,8 +31,9 @@ test-results/
 protocolo-solar-antigravity-release*/
 VIDEOS PARA BACKGROUND/
 *.mov
-# Ignora pasta pesada de cidades (cairo 396MB, panama 467MB, etc.)
-public/assets/cities/
-# (mp4 principais como Terra, Onboarding e Modos são permitidos)
+# Vídeos de cidades agora estão comprimidos (< 4.5MB) e liberados para produção
 
 .env.local
+docs/archive/media/raw_folders/
+CIDADES VIDEOS/
+*.tmp.mp4

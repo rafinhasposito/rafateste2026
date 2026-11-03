@@ -799,8 +799,11 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       "munique": "berlin.mp4",
       "viena": "geneva.mp4",
       "los angeles": "las_vegas.mp4",
-      "cidade do panama": "panama_city.mp4"
-};
+      "cidade do panama": "panama_city.mp4",
+      "madrid": "madrid.mp4",
+      "madri": "madrid.mp4",
+      "bariloche": "bariloche.mp4"
+    };
     
     // Map verified video assets in /assets/
     if (baseCity.includes("york") || baseCity.includes("nova york") || baseCity.includes("new york")) {
@@ -817,6 +820,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     }
     if (baseCity.includes("zurich") || baseCity.includes("zurique")) {
       return "/assets/zurich.mp4";
+    }
+    if (map[baseCity]) {
+      return `/assets/cities/${map[baseCity]}`;
     }
     
     return null; 
