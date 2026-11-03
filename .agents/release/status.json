@@ -1,45 +1,29 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-03T11:06:40-03:00 — Deploy completo em produção (commit 7a91ce9 em github/main + Edge Function create-mercadopago-checkout no Supabase gvqdlsflrbctfiorimcl): Portal de Entrada do Onboarding com preload invisível, scroll touch destravado no iPhone em todas as telas do Onboarding, 46 vídeos de cidades comprimidos (< 4.5MB com +faststart), Cinema Instantâneo Mobile (Ken Burns + crossfade), Checkout Transparente In-Site (Pix QR Code + Copia e Cola + Cartão Brick) e 1º Foco Incluso.",
+  "last_verification": "2026-11-03T16:04:00-03:00 — Corrigidos: (1) Bug crítico da Casa 2 (São Paulo abrindo Ponta Delgada) em AppleResultPreviewV3.tsx unificando bestCity do Hero com resultForHouse.city do card; (2) Motor de Continentes dinâmicos no Backend Python (protocolo-solar-api/house_scanner.py e app.py) com scores calibrados entre 80% e 98% e nomes canônicos PT-BR; (3) Onboarding Mobile iniciando direto em 1 de 6 (sem tela de preview poluída), fotos pré-carregadas em RAM na abertura e camada <img> instantânea sob <video> (opacity-0 até onPlaying) nas telas 1, 2, 4 e 6; (4) Destravamento total do scroll nativo do iPhone removendo nested overflow-y-auto, filtro SVG feTurbulence e blur vinculado a scroll.",
   "build_status": "PASS",
-  "deploy_target": "GitHub Pages (protocolosolar.com.br) + Supabase Edge Functions (gvqdlsflrbctfiorimcl)",
+  "deploy_target": "GitHub Pages (protocolosolar.com.br) + Render Python API (protocolo-solar-api.onrender.com) + Supabase Edge Functions (gvqdlsflrbctfiorimcl)",
   "deploy_instructions": {
-    "step1": "Publicado no commit 7a91ce9 (release/recovery-83ce832 -> main)",
-    "step2": "GitHub Actions publica em protocolosolar.com.br automaticamente"
+    "step1": "Publicar Backend Python (protocolo-solar-api) em origin/main para atualizar o Render",
+    "step2": "Publicar Frontend React (solar-release-candidate) em github/main para atualizar protocolosolar.com.br via GitHub Actions"
   },
   "notes": {
-    "videos": "Todos os 46 vídeos de cidades e vídeos do Onboarding comprimidos abaixo de 4.5MB com +faststart e conectados ao player com Ken Burns + crossfade.",
+    "videos": "Todos os 46 vídeos de cidades e vídeos do Onboarding comprimidos abaixo de 4.5MB com +faststart, acompanhados de camada <img> pré-carregada em RAM que mantém a foto visível até o frame 1 do vídeo tocar.",
+    "continents_engine": "Rotas Alternativas agrupadas dinamicamente por Continente (Américas, Europa, Ásia, África, Oceania) sem repetição de cidades e com scores calibrados (80% a 98%).",
     "mercadopago": "Checkout Transparente 100% in-site (Pix QR Code + Copia e Cola + Cartão via Brick) ativo na Edge Function create-mercadopago-checkout.",
     "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
   },
   "blockers_open": [],
   "blockers_fixed": [
-    "Onboarding iPhone: Destravado o scroll touch (overflow-y-auto + -webkit-overflow-scrolling:touch) em todas as telas (Portal, Screen1 a Screen6) e eliminado o corte de título/cards pelo botão CONTINUAR",
-    "Onboarding Portal de Entrada (step 0): Pergunta magnética de abertura instantânea (0.05s em CSS puro) com pré-carregamento invisível do vídeo da Terra em segundo plano",
+    "Bug Crítico Casa 2 (São Paulo -> Ponta Delgada): Hero de AppleResultPreviewV3.tsx agora prioriza exatamente activeHouseResult.city (mesma fonte do card no Mapa Completo Desbloqueado), garantindo 100% de consistência ao clicar em qualquer Casa",
+    "Backend Python (protocolo-solar-api/house_scanner.py): Calibrados scores astrológicos para 88%-98% (cidades reais da casa) e 80%-94% (fallbacks), corrigindo o bug do código do DeepSeek onde cidades reais exibiam 10%-12% MATCH e perdiam para fallbacks de 50%",
+    "Onboarding Sem Tela de Preview Poluída: Removido step 0; Onboarding abre direto na página 1 de 6 com cabeçalho e rodapé fixos ao viewport e scroll nativo do window no iPhone",
+    "Carregamento Instantâneo nas Telas 1, 2, 4 e 6 do Onboarding: Pré-carregamento em RAM (new Image().decode()) de todas as fotos leves (~45 KB) logo no passo 1 + camada <img> permanente sob o <video> (que só faz fade-in no evento onPlaying), eliminando cards pretos no iPhone",
+    "Fim da Travada no Scroll Mobile (iOS Safari): Removidos containers aninhados overflow-y-auto, filtro SVG feTurbulence de tela cheia em StarryBackground.tsx, StarryBackground duplicado em Index.tsx, blur(16px) atrelado ao scroll em AppleResultPreviewV3.tsx e scroll-behavior: smooth no mobile",
     "Vídeos Comprimidos (< 4.5MB): Todos os vídeos principais e 46 vídeos de cidades em public/assets/cities/ comprimidos com ffmpeg +faststart e conectados ao Resultado",
     "Checkout Transparente In-Site: Modal nativo com abas Pix (QR Code + Copia e Cola + polling automático) e Cartão (Mercado Pago Card Payment Brick) sem redirecionar para fora do site",
-    "Consulta Por Cidade / Por Casa: 1º Foco incluso gratuitamente com banner explicativo e botão 'Escolher e Ativar Este Foco' (sem usar a palavra crédito); cobrança de 1 crédito ativada apenas do 2º foco em diante",
-    "Mobile Layout: Removido container externo com borda e padding duplo ('caixa dentro de caixa') que espremia o Ponto Cego e os blocos internos",
-    "Mobile Layout: Removido painel gigante duplicado que aparecia abaixo do acordeão de focos no celular",
-    "Mobile Layout: Cards O Efeito, O Objetivo, A Chave e O Ritual agora abrem diretamente com todo o texto visível no celular (sem capa 'Toque para ver' que cortava textos longos)",
-    "Vídeos Mobile: Adicionado poster de alta resolução instantâneo e preload='metadata' para eliminar tela preta enquanto o vídeo carrega",
-    "Dashboard: Removido window.scrollTo(0,0) ao desbloquear casas, mantendo o usuário na grade Visão 360º ('Mapa Completo Desbloqueado')",
-    "Mercado Pago: Checkout Modal oficial embutido no site (Pix e Cartão na mesma página sem sair de protocolosolar.com.br)",
-    "Mercado Pago: Edge functions blindadas com fallbacks para produção (protocolosolar.com.br e webhook Supabase)",
-    "Mercado Pago: Parser do webhook atualizado para aceitar IPN (topic/id), Webhooks v2 (action/data.id) e querystrings",
-    "Mercado Pago: Credits.tsx atualizado para sincronização e atualização de saldo em tempo real pós-retorno do MP",
-    "vídeo da cidade ativado no Bloco 4 (Nova York, Paris, Roma, Tóquio, Zurique)",
-    "bug de 999% corrigido para 98% e travado em Math.min(score, 98)%",
-    "data do cartão de embarque formatada em DD/MM/YYYY sem quebra em 3 linhas",
-    "MATCH % ajustado sem corte à direita na barra do viajante",
-    "alinhamento do título e ícone em 'Os 3 Pilares da Ativação da Casa'",
-    "indicador '+' e badge 'Toque para ler +' visíveis no mobile nas fases dos meses",
-    "Ponto Cego com espaçamentos proporcionais sem esticamento vertical",
-    "Expanda o Seu Mapa atualizado para 'Mapa Completo Desbloqueado' e '12 Casas Ativas' sem scroll jump para o topo",
-    "espaço uniforme de 3 linhas nos cards das 12 casas prevenindo desconfiguração",
-    "menu de navegação inferior mobile (Descobrir, Consultas, Como Funciona, Conta) e rodapé adicionados no resultado",
-    "eliminação de download duplicado de vídeos (Home e Onboarding com player único e preload=metadata)"
+    "Consulta Por Cidade / Por Casa: 1º Foco incluso gratuitamente com banner explicativo e botão 'Escolher e Ativar Este Foco' (sem usar a palavra crédito); cobrança de 1 crédito ativada apenas do 2º foco em diante"
   ],
   "v1_1_backlog": [
     "Code splitting: reduzir bundle de 3MB (chunk size warning)"

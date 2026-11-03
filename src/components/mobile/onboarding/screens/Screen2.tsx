@@ -180,14 +180,11 @@ const DesktopScreen2 = () => {
 
 // ─── Mobile View ─────────────────────────────────────────────────────────
 const MobileScreen2 = () => {
-  // Começa como null para que o usuário veja todas as cidades empilhadas igualmente primeiro
   const [activeCard, setActiveCard] = useState<string | null>(null);
+  const [playingVideos, setPlayingVideos] = useState<Record<string, boolean>>({});
 
   return (
-    <div
-      data-onboarding-scroll
-      className="relative w-full h-full overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain touch-pan-y bg-[#030306]"
-    >
+    <div className="relative w-full min-h-[100svh] bg-[#030306]">
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#C9A227]/5 via-[#030306] to-[#030306]" />
 
       {/* Header */}
@@ -207,46 +204,60 @@ const MobileScreen2 = () => {
       <div className="relative z-10 flex flex-col gap-3.5 px-5 pb-32 w-full max-w-md mx-auto">
         {destinationExamples.map((dest) => {
           const isActive = activeCard === dest.id;
+          const isVideoReady = Boolean(playingVideos[dest.id]);
           
           return (
-            <motion.div
+            <div
               key={dest.id}
-              layout
               onClick={() => setActiveCard(isActive ? null : dest.id)}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
-              className={`relative rounded-2xl overflow-hidden border transition-colors duration-500 cursor-pointer shrink-0 ${
+              className={`relative rounded-2xl overflow-hidden border transition-all duration-300 cursor-pointer shrink-0 bg-[#0A0A12] ${
                 isActive ? 'border-[#C9A227]/40 shadow-2xl min-h-[260px]' : 'border-white/10 shadow-md min-h-[118px]'
               }`}
             >
-              {/* Background Video */}
-              <video 
-                autoPlay loop muted playsInline preload="metadata"
-                poster={dest.poster}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none ${isActive ? 'opacity-80' : 'opacity-45'}`}
-                style={{ filter: "saturate(1.2) contrast(1.1)" }}
-              >
-                <source src={dest.video} type={dest.video.endsWith('mov') ? 'video/quicktime' : 'video/mp4'} />
-                {dest.video.endsWith('mov') && <source src={dest.video} type="video/mp4" />}
-              </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#030306]/90 via-[#030306]/45 to-[#030306]/80 pointer-events-none" />
+              {/* Camada 1: Foto Pré-carregada Instantânea (0.00s, nunca fica preta) */}
+              <img
+                src={dest.poster}
+                alt={dest.city}
+                loading="eager"
+                decoding="sync"
+                className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500 ${
+                  isActive ? 'opacity-85' : 'opacity-55'
+                }`}
+                style={{ filter: "saturate(1.15) contrast(1.08)" }}
+              />
+
+              {/* Camada 2: Vídeo em Crossfade Suave (só aparece se estiver rodando) */}
+              {isActive && (
+                <video 
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  onPlaying={() => setPlayingVideos(prev => ({ ...prev, [dest.id]: true }))}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none ${
+                    isVideoReady ? 'opacity-85' : 'opacity-0'
+                  }`}
+                  style={{ filter: "saturate(1.2) contrast(1.1)" }}
+                >
+                  <source src={dest.video} type="video/mp4" />
+                </video>
+              )}
+
+              <div className="absolute inset-0 bg-gradient-to-t from-[#030306]/90 via-[#030306]/40 to-[#030306]/75 pointer-events-none" />
               
               {/* Collapsed State: City and House centered */}
               {!isActive ? (
                 <div className="relative z-10 min-h-[118px] py-5 px-4 flex flex-col items-center justify-center text-center">
                   <span className="font-ps-display text-2xl md:text-3xl text-white tracking-widest uppercase drop-shadow-lg">{dest.city}</span>
                   <span className="font-ps-ui text-[#C9A227] text-[10px] font-bold uppercase tracking-[0.2em] mt-1.5 drop-shadow-md">{dest.house}</span>
-                  <span className="font-ps-ui text-white/45 text-[8px] uppercase tracking-widest mt-3 border border-white/15 bg-black/30 rounded-full px-3 py-1">
+                  <span className="font-ps-ui text-white/55 text-[8px] uppercase tracking-widest mt-3 border border-white/15 bg-black/40 rounded-full px-3 py-1">
                     Toque para abrir
                   </span>
                 </div>
               ) : (
-                /* Expanded State: Content Panel in natural flow so it never clips and allows scrolling */
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="relative z-10 p-3.5 pt-12 flex flex-col justify-end"
-                >
+                /* Expanded State: Content Panel in natural flow */
+                <div className="relative z-10 p-3.5 pt-10 flex flex-col justify-end">
                   <div className="bg-black/75 backdrop-blur-md rounded-xl p-4 border border-white/10 flex flex-col gap-3">
                     {/* Title & Tag */}
                     <div>
@@ -275,10 +286,10 @@ const MobileScreen2 = () => {
                       <span className="font-ps-ui text-white/85 text-[11px] leading-snug">{dest.details.vidaReal}</span>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
 
-            </motion.div>
+            </div>
           );
         })}
       </div>

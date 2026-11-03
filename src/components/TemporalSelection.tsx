@@ -101,7 +101,7 @@ function DesktopScene({ onSelectMode }: Props) {
 // ─── Mobile: Touch-first vertical layout (Earth Horizon Top, Crisp Obsidian Bottom) ─
 function MobileTimeline({ onSelectMode }: Props) {
   return (
-    <div className="relative w-full min-h-[100svh] overflow-y-auto overflow-x-hidden flex flex-col">
+    <div className="relative w-full min-h-[100svh] overflow-x-hidden flex flex-col">
 
       <div className="relative z-10 flex flex-col w-full min-h-[100svh]">
         {/* Spacer to showcase Earth horizon at top below MobileAppChrome header */}
@@ -206,7 +206,7 @@ function MobileTimeline({ onSelectMode }: Props) {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export function TemporalSelection({ onSelectMode }: Props) {
   return (
-    <div className="relative w-full min-h-[100svh] lg:h-[calc(100dvh-80px)] overflow-hidden bg-[#02050A]">
+    <div className="relative w-full min-h-[100svh] lg:h-[calc(100dvh-80px)] overflow-x-hidden lg:overflow-hidden bg-[#02050A]">
       {/* ─── Single Unified Earth Video (Zero duplicate downloads) ─── */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <video

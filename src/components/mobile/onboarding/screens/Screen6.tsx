@@ -8,30 +8,15 @@ import { ChevronDown } from 'lucide-react';
  */
 export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [romeVideoPlaying, setRomeVideoPlaying] = useState(false);
 
   return (
-    <div
-      data-onboarding-scroll
-      className="relative w-full h-full flex flex-col items-center justify-start lg:justify-center overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain touch-pan-y lg:overflow-hidden custom-scrollbar bg-[#030306]"
-    >
+    <div className="relative w-full min-h-[100svh] flex flex-col items-center justify-start lg:justify-center bg-[#030306]">
       
       {/* Abstract starry background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-[#030306] via-[#080A14] to-[#030306]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#C9A227]/[0.03] via-transparent to-transparent" />
-        <div className="absolute inset-0 pointer-events-none opacity-40">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-0.5 h-0.5 bg-white rounded-full"
-              style={{ 
-                top: `${Math.random() * 100}%`, 
-                left: `${Math.random() * 100}%`, 
-                opacity: Math.random() * 0.8 + 0.2 
-              }}
-            />
-          ))}
-        </div>
       </div>
 
       {/* Main Content Layout */}
@@ -39,9 +24,9 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
         
         {/* Left Column: Copy */}
         <motion.div
-          initial={{ opacity: 0, x: -30 }}
+          initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
           className="w-full lg:w-[45%] text-center lg:text-left flex flex-col items-center lg:items-start"
         >
           <span className="inline-block font-ps-ui text-[10px] md:text-[11px] tracking-[0.3em] text-[#C9A227] uppercase mb-5 drop-shadow-md">
@@ -83,23 +68,36 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
 
         {/* Right Column: Premium Rome Mockup Card */}
         <motion.div
-          initial={{ opacity: 0, y: 30, rotateX: 10 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ delay: 0.3, duration: 1, ease: 'easeOut' }}
-          style={{ perspective: 1000 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.6, ease: 'easeOut' }}
           className="w-full lg:w-[45%] max-w-md flex flex-col items-center justify-center mx-auto"
         >
-          <div className="relative w-full bg-[#08090F]/90 backdrop-blur-3xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] lg:hover:rotate-y-[-5deg] lg:hover:rotate-x-[2deg] lg:transition-transform lg:duration-700">
+          <div className="relative w-full bg-[#08090F]/95 border border-white/10 rounded-2xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
             
             {/* Subtle Glow Behind Card */}
             <div className="absolute -inset-0.5 bg-gradient-to-b from-[#C9A227]/20 to-transparent opacity-30 rounded-2xl blur-md pointer-events-none" />
 
-            {/* Header with Rome Video strip */}
-            <div className="relative h-40 md:h-48 overflow-hidden border-b border-white/[0.05]">
+            {/* Header with Instant Preloaded Rome Photo + Progressive Video Crossfade */}
+            <div className="relative h-40 md:h-48 overflow-hidden border-b border-white/[0.05] bg-[#0B0E17]">
+              <img
+                src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=75"
+                alt="Roma, Itália"
+                loading="eager"
+                decoding="sync"
+                className="absolute inset-0 w-full h-full object-cover opacity-75"
+                style={{ filter: "saturate(1.2) contrast(1.1)" }}
+              />
               <video 
-                autoPlay loop muted playsInline preload="metadata"
-                poster="/assets/roma-poster.jpg"
-                className="absolute inset-0 w-full h-full object-cover opacity-70"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                onPlaying={() => setRomeVideoPlaying(true)}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                  romeVideoPlaying ? 'opacity-75' : 'opacity-0'
+                }`}
                 style={{ filter: "saturate(1.2) contrast(1.1)" }}
               >
                 <source src="/assets/roma.mp4" type="video/mp4" />

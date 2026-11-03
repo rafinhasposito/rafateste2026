@@ -6,10 +6,7 @@ import { motion } from 'framer-motion';
  * Serve como um respiro luxuoso antes do resultado final.
  */
 export const Screen5 = () => (
-  <div
-    data-onboarding-scroll
-    className="relative w-full h-full flex flex-col items-center justify-start bg-[#020204] overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain touch-pan-y px-6 pt-20 pb-32"
-  >
+  <div className="relative w-full min-h-[100svh] flex flex-col items-center justify-center bg-[#020204] px-6 pt-20 pb-32">
     
     {/* Ultra-subtle stage light (Quase invisível, apenas para dar profundidade ao preto) */}
     <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#C9A227]/[0.02] rounded-full blur-[120px] pointer-events-none" />

@@ -32,10 +32,7 @@ export const Screen3 = () => {
   }
 
   return (
-    <div
-      data-onboarding-scroll
-      className="relative w-full h-full flex flex-col items-center justify-start overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain touch-pan-y bg-[#030306] px-6 pt-20 pb-32"
-    >
+    <div className="relative w-full min-h-[100svh] flex flex-col items-center justify-start bg-[#030306] px-6 pt-20 pb-32">
       
       {/* Cinematic Stars Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">

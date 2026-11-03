@@ -674,7 +674,16 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const parsedId = houseId ? parseInt(houseId) : 2;
   const urlHouseIndex = props.house || ((parsedId >= 1 && parsedId <= 12) ? parsedId : 2);
 
-  const bestCity = props.cities?.highticket?.[0] || props.cities?.acessivel?.[0] || props.cities?.nacional?.[0];
+  const activeHouseResult = props.allResults ? props.allResults[urlHouseIndex.toString()] : null;
+  const firstOptionFromHouse = activeHouseResult?.options
+    ? (Object.values(activeHouseResult.options).flat().filter(Boolean)[0] as CityOption | undefined)
+    : undefined;
+  const bestCity =
+    activeHouseResult?.city ||
+    firstOptionFromHouse ||
+    props.cities?.highticket?.[0] ||
+    props.cities?.acessivel?.[0] ||
+    props.cities?.nacional?.[0];
   const cityStr = bestCity ? `${bestCity.city}, ${bestCity.country}` : "Nova York, EUA";
 
   // P_DYNAMIC uses real user profile data if available
@@ -871,35 +880,78 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual (P_DYNAMIC.house)
   const currentHouseResult = props.allResults ? props.allResults[P_DYNAMIC.house.toString()] : null;
   
-  // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual
-  const extractRoutes = (tierData: any): any[] => {
-    if (!tierData) return [];
-    const arr = Array.isArray(tierData) ? tierData : [tierData];
-    return arr.filter(Boolean).map(cityData => ({
-      ...cityData,
-      city: cityData.city || cityData.name || "Destino",
-      score: cityData.score || 98,
-      img: (cityData.img && cityData.img.startsWith('http')) ? cityData.img : getAtmosphericFallback(P_DYNAMIC.house)
-    }));
+  const canonicalCityName = (rawName?: string): string => {
+    if (!rawName) return "Destino";
+    const trimmed = rawName.trim();
+    const map: Record<string, string> = {
+      "new york": "Nova York",
+      "new york city": "Nova York",
+      "nyc": "Nova York",
+      "london": "Londres",
+      "lisbon": "Lisboa",
+      "tokyo": "Tóquio",
+      "singapore": "Cingapura",
+      "sao paulo": "São Paulo",
+    };
+    return map[trimmed.toLowerCase()] || trimmed;
   };
 
-  // NOVO: Cria os cards dinamicamente baseado nos continentes que o backend mandou
+  const normalizeMatchScore = (rawScore?: number): number => {
+    if (!rawScore || Number.isNaN(Number(rawScore))) return 96;
+    const n = Number(rawScore);
+    if (n < 50) return Math.min(98, Math.max(88, 84 + Math.round(n)));
+    return Math.min(98, Math.max(80, Math.round(n)));
+  };
+
+  // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual
+  const extractRoutes = (tierData: any, seenSet?: Set<string>): any[] => {
+    if (!tierData) return [];
+    const arr = Array.isArray(tierData) ? tierData : [tierData];
+    const localSeen = seenSet || new Set<string>();
+    const out: any[] = [];
+    for (const cityData of arr.filter(Boolean)) {
+      const cleanCity = canonicalCityName(cityData.city || cityData.name);
+      const cleanKey = cleanCity.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (localSeen.has(cleanKey)) continue;
+      localSeen.add(cleanKey);
+      out.push({
+        ...cityData,
+        city: cleanCity,
+        score: normalizeMatchScore(cityData.score),
+        img: (cityData.img && cityData.img.startsWith('http')) ? cityData.img : getAtmosphericFallback(P_DYNAMIC.house)
+      });
+    }
+    return out;
+  };
+
+  const tierTitleMap: Record<string, { title: string; desc: string }> = {
+    nacional: { title: "Brasil & Américas", desc: "Rota Nacional Alternativa" },
+    acessivel: { title: "Internacional", desc: "Rota Internacional Alternativa" },
+    highticket: { title: "Global Premium", desc: "Destino Alternativo de Luxo" },
+  };
+
+  const globalSeenCities = new Set<string>();
   const dynamicContinents = currentHouseResult?.options 
-    ? Object.entries(currentHouseResult.options).map(([contName, cities]) => ({
-        title: contName,
-        desc: `Rota ${contName} Alternativa`,
-        data: extractRoutes(cities)
-      }))
+    ? Object.entries(currentHouseResult.options)
+        .map(([contName, cities]) => {
+          const mapped = tierTitleMap[contName.toLowerCase()];
+          return {
+            title: mapped ? mapped.title : contName,
+            desc: mapped ? mapped.desc : `Rota ${contName} Alternativa`,
+            data: extractRoutes(cities, globalSeenCities)
+          };
+        })
+        .filter(tier => tier.data.length > 0)
     : [];
 
   // Fallback caso o backend não mande nada (ex: consultas antigas)
   const displayContinents = dynamicContinents.length > 0 
     ? dynamicContinents 
     : [
-        { title: "Nacional", desc: "Rota Nacional Alternativa", data: extractRoutes(props.cities?.nacional) },
-        { title: "Acessível", desc: "Rota Internacional Alternativa", data: extractRoutes(props.cities?.acessivel) },
-        { title: "High Ticket", desc: "Destino Alternativo de Luxo", data: extractRoutes(props.cities?.highticket) }
-      ];
+        { title: "Brasil & Américas", desc: "Rota Nacional Alternativa", data: extractRoutes(props.cities?.nacional, globalSeenCities) },
+        { title: "Internacional", desc: "Rota Internacional Alternativa", data: extractRoutes(props.cities?.acessivel, globalSeenCities) },
+        { title: "Global Premium", desc: "Destino Alternativo de Luxo", data: extractRoutes(props.cities?.highticket, globalSeenCities) }
+      ].filter(tier => tier.data.length > 0);
 
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   // Find the intended area based on props.intent
@@ -1068,9 +1120,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     target: casaRef,
     offset: ["start 90%", "start 40%"]
   });
-  const textScale = useTransform(casaProgress, [0, 1], [1.4, 1]);
-  const textOpacity = useTransform(casaProgress, [0, 1], [0, 1]);
-  const textBlur = useTransform(casaProgress, [0, 1], ["blur(16px)", "blur(0px)"]);
+  const textScale = useTransform(casaProgress, [0, 1], [1.12, 1]);
+  const textOpacity = useTransform(casaProgress, [0, 1], [0.25, 1]);
 
   return (
     <div className="min-h-screen text-[#f5f5f7] overflow-x-hidden font-sans transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${houseColor} 6%, #03100B)`, "--hc": houseColor, "--hc10": `${houseColor}1a`, "--hc15": `${houseColor}26`, "--hc20": `${houseColor}33`, "--hc30": `${houseColor}4d`, "--hc40": `${houseColor}66`, "--hc70": `${houseColor}b3` } as React.CSSProperties}>
@@ -1121,7 +1172,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         </motion.div>
         
         <motion.h2
-          style={{ scale: textScale, opacity: textOpacity, filter: textBlur, color: houseColor, backgroundImage: `linear-gradient(to bottom, ${houseColor}, #a7f3d0)` }}
+          style={{ scale: textScale, opacity: textOpacity, color: houseColor, backgroundImage: `linear-gradient(to bottom, ${houseColor}, #a7f3d0)` }}
           className="font-ps-display text-[15vw] sm:text-[18vw] md:text-[160px] font-bold tracking-tighter leading-[1] mb-8 pt-2 text-transparent bg-clip-text origin-center uppercase text-center break-words whitespace-normal px-2"
         >
           {P_DYNAMIC.city.split(', ')[0]}
@@ -2241,11 +2292,6 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {displayContinents.map((tier, idx) => (
-                {[
-                  { title: "Nacional", desc: "Rota Nacional Alternativa", data: citiesObj.nacional },
-                  { title: "Acessível", desc: "Rota Internacional Alternativa", data: citiesObj.acessivel },
-                  { title: "High Ticket", desc: "Destino Alternativo de Luxo", data: citiesObj.highticket }
-                ].map((tier, idx) => (
                   <div key={idx} className="flex flex-col gap-6">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center font-sans text-sm font-bold border" style={{ backgroundColor: `${currentActiveData?.color || '#10b981'}15`, color: currentActiveData?.color || '#10b981', borderColor: `${currentActiveData?.color || '#10b981'}30` }}>{idx+1}</div>
@@ -2280,7 +2326,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               <MapPin className="w-4 h-4" style={{ color: currentActiveData?.color || '#10b981' }} />
                               <span className="uppercase tracking-widest text-[10px]">{city.country}</span>
                             </div>
-                            <span className="font-sans text-[10px] font-bold px-3 py-1.5 rounded-full border" style={{ backgroundColor: `${currentActiveData?.color || '#10b981'}15`, color: currentActiveData?.color || '#10b981', borderColor: `${currentActiveData?.color || '#10b981'}30` }}>{Math.min(city.score || 98, 98)}% MATCH</span>
+                            <span className="font-sans text-[10px] font-bold px-3 py-1.5 rounded-full border" style={{ backgroundColor: `${currentActiveData?.color || '#10b981'}15`, color: currentActiveData?.color || '#10b981', borderColor: `${currentActiveData?.color || '#10b981'}30` }}>{normalizeMatchScore(city.score)}% MATCH</span>
                           </div>
                         </div>
                       </div>
@@ -2327,13 +2373,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   const label = dbData?.name?.split('—')[1]?.trim() || dbData?.label || "Área da Vida";
                   const isUnlocked = props.isHouseUnlocked ? props.isHouseUnlocked(num) : (isCurrent || unlockedItems.includes(num.toString()));
                   
-                  
                   const resultForHouse = props.allResults && props.allResults[num.toString()];
-                  const fallbackCity = "Desconhecido";
-                  const mappedCityName = resultForHouse && resultForHouse.city ? resultForHouse.city.city : fallbackCity;
+                  const houseFirstOption = resultForHouse?.options
+                    ? (Object.values(resultForHouse.options).flat().filter(Boolean)[0] as CityOption | undefined)
+                    : undefined;
+                  const houseBestCity = resultForHouse?.city || houseFirstOption;
+                  const mappedCityName = houseBestCity?.city ? canonicalCityName(houseBestCity.city) : "Desconhecido";
                   
-                  const cityForThisHouse = isCurrent ? P_DYNAMIC.city.split(", ")[0] : (isUnlocked ? mappedCityName.split(", ")[0] : "Bloqueado");
-                  const rawImg = resultForHouse?.options?.highticket?.img;
+                  const cityForThisHouse = isCurrent ? canonicalCityName(P_DYNAMIC.city.split(", ")[0]) : (isUnlocked ? mappedCityName.split(", ")[0] : "Bloqueado");
+                  const rawImg = (houseBestCity as any)?.img || (resultForHouse?.options as any)?.highticket?.img;
                   const imageForThisHouse = rawImg 
                     ? (rawImg.startsWith("http") ? rawImg : `https://images.unsplash.com/photo-${rawImg}?auto=format&fit=crop&w=1000&q=80`) 
                     : getAtmosphericFallback(num);

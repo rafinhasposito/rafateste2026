@@ -293,7 +293,6 @@ const Index = () => {
 
   return (
     <>
-      <StarryBackground />
       <ScanningOverlay visible={isScanning} mode={mode || "futuro"} year={year} />
 
       {/* ===== STEP 1: Temporal Selection — FULLSCREEN, outside the container ===== */}

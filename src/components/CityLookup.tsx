@@ -173,14 +173,18 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       }
       clearTimeout(timeoutId);
 
-      // Ensure the target-house entry reflects the user-chosen city
+      // Ensure the target-house entry reflects the user-chosen city while preserving dynamic continent options
+      const existingOptions = allResults[String(houseNum)]?.options;
       allResults[String(houseNum)] = {
+        ...allResults[String(houseNum)],
         city: masterCity,
-        options: {
-          highticket: masterCity,
-          acessivel: allResults[String(houseNum)]?.options?.acessivel ?? null,
-          nacional: allResults[String(houseNum)]?.options?.nacional ?? null,
-        },
+        options: existingOptions && Object.keys(existingOptions).length > 0
+          ? existingOptions
+          : {
+              highticket: [masterCity],
+              acessivel: [],
+              nacional: [],
+            },
       };
 
       const finalResultPayload = {
