@@ -1041,71 +1041,210 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     return Math.min(98, Math.max(80, Math.round(n)));
   };
 
-  const ALL_CONTINENT_NAMES = ["Américas", "Europa", "Ásia", "África", "Oceania"] as const;
-  type ContinentName = typeof ALL_CONTINENT_NAMES[number];
+  const MERIDIAN_CITY_CATALOG: Array<{
+    city: string;
+    country: string;
+    region: string;
+    lat: number;
+    lon: number;
+    score: number;
+  }> = [
+    // Faixa -160° a -110° (Pacífico Leste & Costa Oeste América do Norte)
+    { city: "Honolulu", country: "Havaí", region: "Oceania & Pacífico", lat: 21.31, lon: -157.86, score: 92 },
+    { city: "Maui", country: "Havaí", region: "Oceania & Pacífico", lat: 20.80, lon: -156.33, score: 91 },
+    { city: "Papeete", country: "Polinésia Francesa", region: "Oceania & Pacífico", lat: -17.55, lon: -149.56, score: 91 },
+    { city: "Bora Bora", country: "Polinésia Francesa", region: "Oceania & Pacífico", lat: -16.50, lon: -151.74, score: 94 },
+    { city: "Anchorage", country: "EUA", region: "América do Norte", lat: 61.22, lon: -149.90, score: 89 },
+    { city: "Vancouver", country: "Canadá", region: "América do Norte", lat: 49.28, lon: -123.12, score: 93 },
+    { city: "Seattle", country: "EUA", region: "América do Norte", lat: 47.61, lon: -122.33, score: 91 },
+    { city: "São Francisco", country: "EUA", region: "América do Norte", lat: 37.77, lon: -122.42, score: 94 },
+    { city: "Los Angeles", country: "EUA", region: "América do Norte", lat: 34.05, lon: -118.24, score: 94 },
+    { city: "San Diego", country: "EUA", region: "América do Norte", lat: 32.72, lon: -117.16, score: 91 },
+    { city: "Las Vegas", country: "EUA", region: "América do Norte", lat: 36.17, lon: -115.14, score: 92 },
+    { city: "Calgary", country: "Canadá", region: "América do Norte", lat: 51.04, lon: -114.07, score: 89 },
+    { city: "Los Cabos", country: "México", region: "Caribe & América Central", lat: 22.89, lon: -109.92, score: 91 },
 
-  const inferContinent = (city: string, country: string, rawCont?: string): ContinentName => {
-    if (rawCont) {
-      const rc = rawCont.trim().toLowerCase();
-      if (rc.includes("amer") || rc.includes("amér") || rc.includes("brasil") || rc.includes("sul") || rc.includes("norte")) return "Américas";
-      if (rc.includes("euro")) return "Europa";
-      if (rc.includes("asi") || rc.includes("ási") || rc.includes("oriente")) return "Ásia";
-      if (rc.includes("afri") || rc.includes("áfri")) return "África";
-      if (rc.includes("ocean")) return "Oceania";
+    // Faixa -109° a -70° (América do Norte, México, Caribe & Andes)
+    { city: "Denver", country: "EUA", region: "América do Norte", lat: 39.74, lon: -104.99, score: 90 },
+    { city: "Guadalajara", country: "México", region: "Caribe & América Central", lat: 20.66, lon: -103.35, score: 90 },
+    { city: "Cidade do México", country: "México", region: "Caribe & América Central", lat: 19.43, lon: -99.13, score: 93 },
+    { city: "Austin", country: "EUA", region: "América do Norte", lat: 30.27, lon: -97.74, score: 91 },
+    { city: "Nova Orleans", country: "EUA", region: "América do Norte", lat: 29.95, lon: -90.07, score: 90 },
+    { city: "Chicago", country: "EUA", region: "América do Norte", lat: 41.88, lon: -87.63, score: 92 },
+    { city: "Cancún", country: "México", region: "Caribe & América Central", lat: 21.16, lon: -86.85, score: 93 },
+    { city: "San José", country: "Costa Rica", region: "Caribe & América Central", lat: 9.93, lon: -84.09, score: 90 },
+    { city: "Miami", country: "EUA", region: "América do Norte", lat: 25.76, lon: -80.19, score: 94 },
+    { city: "Cidade do Panamá", country: "Panamá", region: "Caribe & América Central", lat: 8.98, lon: -79.52, score: 91 },
+    { city: "Toronto", country: "Canadá", region: "América do Norte", lat: 43.65, lon: -79.38, score: 92 },
+    { city: "Quito", country: "Equador", region: "América do Sul", lat: -0.18, lon: -78.47, score: 89 },
+    { city: "Nassau", country: "Bahamas", region: "Caribe & América Central", lat: 25.04, lon: -77.35, score: 91 },
+    { city: "Lima", country: "Peru", region: "América do Sul", lat: -12.05, lon: -77.04, score: 92 },
+    { city: "Cartagena", country: "Colômbia", region: "América do Sul", lat: 10.39, lon: -75.48, score: 92 },
+    { city: "Medellín", country: "Colômbia", region: "América do Sul", lat: 6.24, lon: -75.58, score: 91 },
+    { city: "Bogotá", country: "Colômbia", region: "América do Sul", lat: 4.71, lon: -74.07, score: 91 },
+    { city: "Nova York", country: "EUA", region: "América do Norte", lat: 40.71, lon: -74.01, score: 96 },
+    { city: "Montreal", country: "Canadá", region: "América do Norte", lat: 45.50, lon: -73.57, score: 91 },
+    { city: "Cusco", country: "Peru", region: "América do Sul", lat: -13.53, lon: -71.97, score: 92 },
+    { city: "Boston", country: "EUA", region: "América do Norte", lat: 42.36, lon: -71.06, score: 92 },
+    { city: "Santiago", country: "Chile", region: "América do Sul", lat: -33.45, lon: -70.67, score: 93 },
+
+    // Faixa -70° a -30° (Cone Sul, Brasil & Atlântico)
+    { city: "Bariloche", country: "Argentina", region: "América do Sul", lat: -41.13, lon: -71.31, score: 93 },
+    { city: "Mendoza", country: "Argentina", region: "América do Sul", lat: -32.89, lon: -68.85, score: 92 },
+    { city: "Punta Cana", country: "República Dominicana", region: "Caribe & América Central", lat: 18.56, lon: -68.37, score: 92 },
+    { city: "Ushuaia", country: "Argentina", region: "América do Sul", lat: -54.80, lon: -68.30, score: 91 },
+    { city: "San Juan", country: "Porto Rico", region: "Caribe & América Central", lat: 18.47, lon: -66.11, score: 90 },
+    { city: "Manaus", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -3.12, lon: -60.02, score: 90 },
+    { city: "Buenos Aires", country: "Argentina", region: "América do Sul", lat: -34.60, lon: -58.38, score: 94 },
+    { city: "Montevidéu", country: "Uruguai", region: "América do Sul", lat: -34.90, lon: -56.16, score: 92 },
+    { city: "Punta del Este", country: "Uruguai", region: "América do Sul", lat: -34.97, lon: -54.95, score: 93 },
+    { city: "Gramado", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -29.38, lon: -50.87, score: 92 },
+    { city: "Porto Alegre", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -30.03, lon: -51.22, score: 91 },
+    { city: "Curitiba", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -25.43, lon: -49.27, score: 91 },
+    { city: "Balneário Camboriú", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -26.99, lon: -48.63, score: 94 },
+    { city: "Florianópolis", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -27.60, lon: -48.55, score: 93 },
+    { city: "Brasília", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -15.80, lon: -47.89, score: 92 },
+    { city: "São Paulo", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -23.55, lon: -46.63, score: 96 },
+    { city: "Belo Horizonte", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -19.92, lon: -43.93, score: 91 },
+    { city: "Rio de Janeiro", country: "Brasil", region: "Brasil — Sul & Sudeste", lat: -22.91, lon: -43.17, score: 95 },
+    { city: "Salvador", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -12.97, lon: -38.50, score: 93 },
+    { city: "Fortaleza", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -3.72, lon: -38.54, score: 92 },
+    { city: "Maceió", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -9.67, lon: -35.74, score: 91 },
+    { city: "Natal", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -5.79, lon: -35.21, score: 91 },
+    { city: "Recife", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -8.05, lon: -34.88, score: 92 },
+    { city: "Fernando de Noronha", country: "Brasil", region: "Brasil — Nordeste & Centro", lat: -3.85, lon: -32.42, score: 93 },
+
+    // Faixa -29° a +20° (Atlântico, Europa Ocidental/Central & África)
+    { city: "Ponta Delgada", country: "Portugal", region: "Ilhas do Atlântico", lat: 37.74, lon: -25.68, score: 90 },
+    { city: "Ilha do Sal", country: "Cabo Verde", region: "Ilhas do Atlântico", lat: 16.74, lon: -22.94, score: 89 },
+    { city: "Reiquiavique", country: "Islândia", region: "Ilhas do Atlântico", lat: 64.15, lon: -21.94, score: 91 },
+    { city: "Dakar", country: "Senegal", region: "Norte & Oeste da África", lat: 14.72, lon: -17.47, score: 89 },
+    { city: "Funchal", country: "Portugal", region: "Ilhas do Atlântico", lat: 32.67, lon: -16.92, score: 91 },
+    { city: "Tenerife", country: "Espanha", region: "Ilhas do Atlântico", lat: 28.29, lon: -16.63, score: 91 },
+    { city: "Lisboa", country: "Portugal", region: "Europa Ocidental", lat: 38.72, lon: -9.14, score: 96 },
+    { city: "Porto", country: "Portugal", region: "Europa Ocidental", lat: 41.16, lon: -8.63, score: 93 },
+    { city: "Marraquexe", country: "Marrocos", region: "Norte & Oeste da África", lat: 31.63, lon: -7.98, score: 93 },
+    { city: "Casablanca", country: "Marrocos", region: "Norte & Oeste da África", lat: 33.57, lon: -7.59, score: 90 },
+    { city: "Dublin", country: "Irlanda", region: "Europa Ocidental", lat: 53.35, lon: -6.26, score: 94 },
+    { city: "Sevilha", country: "Espanha", region: "Europa Ocidental", lat: 37.39, lon: -5.98, score: 91 },
+    { city: "Madri", country: "Espanha", region: "Europa Ocidental", lat: 40.42, lon: -3.70, score: 95 },
+    { city: "Edimburgo", country: "Reino Unido", region: "Europa Ocidental", lat: 55.95, lon: -3.19, score: 92 },
+    { city: "Londres", country: "Reino Unido", region: "Europa Ocidental", lat: 51.51, lon: -0.13, score: 95 },
+    { city: "ibiza", country: "Espanha", region: "Europa Central & Mediterrâneo", lat: 38.91, lon: 1.43, score: 91 },
+    { city: "Barcelona", country: "Espanha", region: "Europa Central & Mediterrâneo", lat: 41.39, lon: 2.17, score: 94 },
+    { city: "Paris", country: "França", region: "Europa Ocidental", lat: 48.86, lon: 2.35, score: 95 },
+    { city: "Bruxelas", country: "Bélgica", region: "Europa Ocidental", lat: 50.85, lon: 4.35, score: 90 },
+    { city: "Amsterdã", country: "Holanda", region: "Europa Ocidental", lat: 52.37, lon: 4.90, score: 93 },
+    { city: "Genebra", country: "Suíça", region: "Europa Central & Mediterrâneo", lat: 46.20, lon: 6.14, score: 93 },
+    { city: "Nice", country: "França", region: "Europa Central & Mediterrâneo", lat: 43.71, lon: 7.26, score: 92 },
+    { city: "Mônaco", country: "Mônaco", region: "Europa Central & Mediterrâneo", lat: 43.74, lon: 7.42, score: 95 },
+    { city: "Zurique", country: "Suíça", region: "Europa Central & Mediterrâneo", lat: 47.37, lon: 8.54, score: 96 },
+    { city: "Milão", country: "Itália", region: "Europa Central & Mediterrâneo", lat: 45.46, lon: 9.19, score: 94 },
+    { city: "Túnis", country: "Tunísia", region: "Norte & Oeste da África", lat: 36.81, lon: 10.18, score: 89 },
+    { city: "Oslo", country: "Noruega", region: "Europa Central & Mediterrâneo", lat: 59.91, lon: 10.75, score: 91 },
+    { city: "Florença", country: "Itália", region: "Europa Central & Mediterrâneo", lat: 43.77, lon: 11.26, score: 93 },
+    { city: "Munique", country: "Alemanha", region: "Europa Central & Mediterrâneo", lat: 48.14, lon: 11.58, score: 93 },
+    { city: "Veneza", country: "Itália", region: "Europa Central & Mediterrâneo", lat: 45.44, lon: 12.32, score: 93 },
+    { city: "Roma", country: "Itália", region: "Europa Central & Mediterrâneo", lat: 41.90, lon: 12.50, score: 95 },
+    { city: "Copenhague", country: "Dinamarca", region: "Europa Central & Mediterrâneo", lat: 55.68, lon: 12.57, score: 92 },
+    { city: "Berlim", country: "Alemanha", region: "Europa Central & Mediterrâneo", lat: 52.52, lon: 13.41, score: 93 },
+    { city: "Praga", country: "República Tcheca", region: "Europa Central & Mediterrâneo", lat: 50.08, lon: 14.44, score: 92 },
+    { city: "Viena", country: "Áustria", region: "Europa Central & Mediterrâneo", lat: 48.21, lon: 16.37, score: 94 },
+    { city: "Estocolmo", country: "Suécia", region: "Europa Central & Mediterrâneo", lat: 59.33, lon: 18.07, score: 92 },
+    { city: "Cidade do Cabo", country: "África do Sul", region: "Sul & Leste da África", lat: -33.92, lon: 18.42, score: 93 },
+    { city: "Budapeste", country: "Hungria", region: "Leste Europeu & Egeu", lat: 47.50, lon: 19.04, score: 92 },
+
+    // Faixa +21° a +85° (Leste Europeu, África Oriental, Oriente Médio & Sul da Ásia)
+    { city: "Varsóvia", country: "Polônia", region: "Leste Europeu & Egeu", lat: 52.23, lon: 21.01, score: 90 },
+    { city: "Atenas", country: "Grécia", region: "Leste Europeu & Egeu", lat: 37.98, lon: 23.73, score: 93 },
+    { city: "Helsinque", country: "Finlândia", region: "Leste Europeu & Egeu", lat: 60.17, lon: 24.94, score: 91 },
+    { city: "Santorini", country: "Grécia", region: "Leste Europeu & Egeu", lat: 36.39, lon: 25.46, score: 94 },
+    { city: "Joanesburgo", country: "África do Sul", region: "Sul & Leste da África", lat: -26.20, lon: 28.05, score: 90 },
+    { city: "Istambul", country: "Turquia", region: "Leste Europeu & Egeu", lat: 41.01, lon: 28.98, score: 94 },
+    { city: "Cairo", country: "Egito", region: "Norte & Oeste da África", lat: 30.04, lon: 31.24, score: 93 },
+    { city: "Tel Aviv", country: "Israel", region: "Oriente Médio", lat: 32.09, lon: 34.78, score: 92 },
+    { city: "Jerusalém", country: "Israel", region: "Oriente Médio", lat: 31.77, lon: 35.21, score: 93 },
+    { city: "Nairobi", country: "Quênia", region: "Sul & Leste da África", lat: -1.29, lon: 36.82, score: 90 },
+    { city: "Zanzibar", country: "Tanzânia", region: "Sul & Leste da África", lat: -6.17, lon: 39.20, score: 93 },
+    { city: "Tbilisi", country: "Geórgia", region: "Oriente Médio", lat: 41.72, lon: 44.83, score: 90 },
+    { city: "Riade", country: "Arábia Saudita", region: "Oriente Médio", lat: 24.71, lon: 46.68, score: 91 },
+    { city: "Baku", country: "Azerbaijão", region: "Oriente Médio", lat: 40.41, lon: 49.87, score: 90 },
+    { city: "Doha", country: "Catar", region: "Oriente Médio", lat: 25.29, lon: 51.53, score: 93 },
+    { city: "Abu Dhabi", country: "Emirados Árabes", region: "Oriente Médio", lat: 24.45, lon: 54.38, score: 94 },
+    { city: "Dubai", country: "Emirados Árabes", region: "Oriente Médio", lat: 25.20, lon: 55.27, score: 96 },
+    { city: "Mahé", country: "Seicheles", region: "Sul & Leste da África", lat: -4.68, lon: 55.49, score: 93 },
+    { city: "Port Louis", country: "Maurícia", region: "Sul & Leste da África", lat: -20.16, lon: 57.50, score: 92 },
+    { city: "Mascate", country: "Omã", region: "Oriente Médio", lat: 23.59, lon: 58.38, score: 90 },
+    { city: "Malé", country: "Maldivas", region: "Sul da Ásia & Índico", lat: 4.18, lon: 73.51, score: 94 },
+    { city: "Goa", country: "Índia", region: "Sul da Ásia & Índico", lat: 15.30, lon: 74.12, score: 91 },
+    { city: "Jaipur", country: "Índia", region: "Sul da Ásia & Índico", lat: 26.91, lon: 75.79, score: 91 },
+    { city: "Nova Délhi", country: "Índia", region: "Sul da Ásia & Índico", lat: 28.61, lon: 77.21, score: 92 },
+    { city: "Colombo", country: "Sri Lanka", region: "Sul da Ásia & Índico", lat: 6.93, lon: 79.86, score: 90 },
+    { city: "Katmandu", country: "Nepal", region: "Sul da Ásia & Índico", lat: 27.72, lon: 85.32, score: 91 },
+
+    // Faixa +95° a +178° (Sudeste Asiático, Leste Asiático & Oceania)
+    { city: "Phuket", country: "Tailândia", region: "Sudeste Asiático", lat: 7.88, lon: 98.39, score: 92 },
+    { city: "Bangkok", country: "Tailândia", region: "Sudeste Asiático", lat: 13.76, lon: 100.50, score: 94 },
+    { city: "Kuala Lumpur", country: "Malásia", region: "Sudeste Asiático", lat: 3.14, lon: 101.69, score: 92 },
+    { city: "Cingapura", country: "Cingapura", region: "Sudeste Asiático", lat: 1.35, lon: 103.82, score: 96 },
+    { city: "Hanói", country: "Vietnã", region: "Sudeste Asiático", lat: 21.03, lon: 105.85, score: 91 },
+    { city: "Jacarta", country: "Indonésia", region: "Sudeste Asiático", lat: -6.21, lon: 106.85, score: 90 },
+    { city: "Hong Kong", country: "China", region: "Leste Asiático", lat: 22.32, lon: 114.17, score: 95 },
+    { city: "Bali", country: "Indonésia", region: "Sudeste Asiático", lat: -8.41, lon: 115.19, score: 95 },
+    { city: "Perth", country: "Austrália", region: "Oceania & Pacífico", lat: -31.95, lon: 115.86, score: 91 },
+    { city: "Pequim", country: "China", region: "Leste Asiático", lat: 39.90, lon: 116.41, score: 93 },
+    { city: "Manila", country: "Filipinas", region: "Sudeste Asiático", lat: 14.60, lon: 120.98, score: 90 },
+    { city: "Xangai", country: "China", region: "Leste Asiático", lat: 31.23, lon: 121.47, score: 94 },
+    { city: "Taipé", country: "Taiwan", region: "Leste Asiático", lat: 25.03, lon: 121.57, score: 92 },
+    { city: "Seul", country: "Coreia do Sul", region: "Leste Asiático", lat: 37.57, lon: 126.98, score: 94 },
+    { city: "Busan", country: "Coreia do Sul", region: "Leste Asiático", lat: 35.18, lon: 129.08, score: 91 },
+    { city: "Osaka", country: "Japão", region: "Leste Asiático", lat: 34.69, lon: 135.50, score: 93 },
+    { city: "Kyoto", country: "Japão", region: "Leste Asiático", lat: 35.01, lon: 135.77, score: 95 },
+    { city: "Tóquio", country: "Japão", region: "Leste Asiático", lat: 35.68, lon: 139.65, score: 96 },
+    { city: "Melbourne", country: "Austrália", region: "Oceania & Pacífico", lat: -37.81, lon: 144.96, score: 93 },
+    { city: "Sydney", country: "Austrália", region: "Oceania & Pacífico", lat: -33.87, lon: 151.21, score: 95 },
+    { city: "Brisbane", country: "Austrália", region: "Oceania & Pacífico", lat: -27.47, lon: 153.03, score: 91 },
+    { city: "Queenstown", country: "Nova Zelândia", region: "Oceania & Pacífico", lat: -45.03, lon: 168.66, score: 93 },
+    { city: "Auckland", country: "Nova Zelândia", region: "Oceania & Pacífico", lat: -36.85, lon: 174.76, score: 92 },
+  ];
+
+  const inferRegionForCity = (city: string, country: string, rawRegion?: string): string => {
+    const cleanKey = city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const matchInCatalog = MERIDIAN_CITY_CATALOG.find(
+      (c) => c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === cleanKey
+    );
+    if (matchInCatalog) return matchInCatalog.region;
+    if (rawRegion && !["Américas", "Europa", "Ásia", "África", "Oceania", "nacional", "acessivel", "highticket"].includes(rawRegion)) {
+      return rawRegion;
     }
-    const cKey = `${city} ${country}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    if (/(marrocos|marraquexe|egito|cairo|africa do sul|cidade do cabo|zanzibar|tanzania|quenia|nairobi|tunisia|tunis|mauricia|nigeria|ruanda)/.test(cKey)) {
-      return "África";
-    }
-    if (/(japao|toquio|quioto|osaka|china|pequim|xangai|hong kong|cingapura|singapura|tailandia|bangkok|indonesia|bali|coreia|seul|india|delhi|mumbai|maldivas|emirados|dubai|abu dhabi|catar|doha|israel|jerusalem|tel aviv|vietna|filipinas)/.test(cKey)) {
-      return "Ásia";
-    }
-    if (/(australia|sydney|melbourne|brisbane|perth|nova zelandia|auckland|wellington|polinesia|bora bora|fiji|havai|honolulu)/.test(cKey)) {
-      return "Oceania";
-    }
-    if (/(portugal|lisboa|porto|ponta delgada|espanha|madri|barcelona|sevilha|ibiza|franca|paris|nice|provence|italia|roma|milao|florenca|veneza|napoles|vaticano|suica|zurique|genebra|reino unido|londres|edimburgo|manchester|irlanda|dublin|alemanha|berlim|munique|hamburgo|holanda|amsterda|grecia|atenas|santorini|mykonos|turquia|istambul|austria|viena|innsbruck|praga|budapeste|estocolmo|copenhague|oslo|reiquiavique|islandia|monaco|monte carlo|bruxelas|varsovia|helsinque)/.test(cKey)) {
-      return "Europa";
-    }
-    return "Américas";
+    const cLow = country.toLowerCase();
+    if (cLow.includes("brasil")) return "Brasil — Sul & Sudeste";
+    if (/(argentina|uruguai|chile|peru|colombia|equador)/.test(cLow)) return "América do Sul";
+    if (/(mexico|panama|costa rica|bahamas|dominicana|porto rico)/.test(cLow)) return "Caribe & América Central";
+    if (/(eua|estados unidos|canada)/.test(cLow)) return "América do Norte";
+    if (/(portugal|espanha|franca|reino unido|irlanda|belgica|holanda)/.test(cLow)) return "Europa Ocidental";
+    if (/(suica|italia|alemanha|austria|dinamarca|noruega|suecia|tcheca|monaco)/.test(cLow)) return "Europa Central & Mediterrâneo";
+    if (/(grecia|turquia|polonia|hungria|finlandia)/.test(cLow)) return "Leste Europeu & Egeu";
+    if (/(marrocos|egito|tunisia|senegal)/.test(cLow)) return "Norte & Oeste da África";
+    if (/(africa do sul|tanzania|quenia|mauricia|seicheles)/.test(cLow)) return "Sul & Leste da África";
+    if (/(emirados|catar|israel|arabia|oma)/.test(cLow)) return "Oriente Médio";
+    if (/(india|maldivas|nepal|sri lanka)/.test(cLow)) return "Sul da Ásia & Índico";
+    if (/(tailandia|cingapura|singapura|indonesia|vietna|malasia|filipinas)/.test(cLow)) return "Sudeste Asiático";
+    if (/(japao|china|coreia|taiwan)/.test(cLow)) return "Leste Asiático";
+    return "Oceania & Pacífico";
   };
 
-  const CONTINENT_FALLBACK_POOL: Record<ContinentName, Array<{ city: string; country: string; score: number }>> = {
-    "Américas": [
-      { city: "Nova York", country: "EUA", score: 95 },
-      { city: "São Paulo", country: "Brasil", score: 94 },
-      { city: "Miami", country: "EUA", score: 92 },
-      { city: "Rio de Janeiro", country: "Brasil", score: 91 },
-      { city: "Buenos Aires", country: "Argentina", score: 90 },
-      { city: "Cidade do México", country: "México", score: 89 },
-    ],
-    "Europa": [
-      { city: "Lisboa", country: "Portugal", score: 96 },
-      { city: "Zurique", country: "Suíça", score: 95 },
-      { city: "Paris", country: "França", score: 94 },
-      { city: "Londres", country: "Reino Unido", score: 93 },
-      { city: "Roma", country: "Itália", score: 92 },
-      { city: "Madri", country: "Espanha", score: 90 },
-    ],
-    "Ásia": [
-      { city: "Tóquio", country: "Japão", score: 95 },
-      { city: "Dubai", country: "Emirados Árabes", score: 94 },
-      { city: "Cingapura", country: "Cingapura", score: 93 },
-      { city: "Bali", country: "Indonésia", score: 91 },
-      { city: "Bangkok", country: "Tailândia", score: 90 },
-      { city: "Seul", country: "Coreia do Sul", score: 89 },
-    ],
-    "África": [
-      { city: "Marraquexe", country: "Marrocos", score: 93 },
-      { city: "Cidade do Cabo", country: "África do Sul", score: 92 },
-      { city: "Cairo", country: "Egito", score: 90 },
-      { city: "Zanzibar", country: "Tanzânia", score: 89 },
-    ],
-    "Oceania": [
-      { city: "Sydney", country: "Austrália", score: 93 },
-      { city: "Bora Bora", country: "Polinésia Francesa", score: 92 },
-      { city: "Auckland", country: "Nova Zelândia", score: 90 },
-      { city: "Melbourne", country: "Austrália", score: 89 },
-    ],
+  const getCityLongitude = (cityName: string, rawLon?: number): number | null => {
+    if (typeof rawLon === "number" && !Number.isNaN(rawLon)) return rawLon;
+    const cleanKey = canonicalCityName(cityName).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const found = MERIDIAN_CITY_CATALOG.find(
+      (c) => c.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === cleanKey
+    );
+    return found ? found.lon : null;
+  };
+
+  const angularLonDiff = (lonA: number, lonB: number): number => {
+    return Math.abs((((lonA - lonB) % 360) + 540) % 360 - 180);
   };
 
   const formatRouteItem = (cityData: any) => {
@@ -1121,87 +1260,119 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
       ...cityData,
       city: cleanCity,
       country: cleanCountry,
-      continent: inferContinent(cleanCity, cleanCountry, cityData.continent),
+      region: inferRegionForCity(cleanCity, cleanCountry, cityData.region || cityData.continent),
+      lon: getCityLongitude(cleanCity, cityData.lon),
       score: normalizeMatchScore(cityData.score),
       img: resolvedImg,
     };
   };
 
-  // Monta SEMPRE 3 Continentes Reais x 3 Cidades cada (nunca mostra "Internacional" ou "Global Premium")
+  // Monta as 3 Colunas de Rotas Alternativas ESTRITAMENTE dentro do Meridiano Astrológico da Casa atual
+  // (Elimina qualquer cidade de outra Casa/outro lado do mundo como Dubai 85% em consultas antigas!)
   const displayContinents = (() => {
-    const seenCities = new Set<string>();
-    const byContinent: Record<ContinentName, any[]> = {
-      "Américas": [],
-      "Europa": [],
-      "Ásia": [],
-      "África": [],
-      "Oceania": [],
-    };
+    const mainCityClean = canonicalCityName(P_DYNAMIC.city.split(",")[0]);
+    const mainLon =
+      getCityLongitude(
+        mainCityClean,
+        currentHouseResult?.lon ?? currentHouseResult?.longitude ?? currentHouseResult?.city?.lon
+      ) ?? -46.63;
 
-    const addCityToContinent = (rawItem: any, forcedCont?: ContinentName) => {
+    const seenCities = new Set<string>();
+    const validHouseCities: any[] = [];
+
+    const tryAddMeridianCity = (rawItem: any, isFromCatalog = false) => {
       if (!rawItem) return;
+      // Bloqueia imediatamente cidades falsas do antigo global_fb (que vinham com score cravado <= 85 de outros continentes)
+      const rawNumericScore = Number(rawItem.score);
+      if (!isFromCatalog && !Number.isNaN(rawNumericScore) && rawNumericScore >= 75 && rawNumericScore <= 85) {
+        const candidateLon = getCityLongitude(rawItem.city || rawItem.name, rawItem.lon);
+        if (candidateLon !== null && angularLonDiff(candidateLon, mainLon) > 25) {
+          return;
+        }
+      }
+
       const item = formatRouteItem(rawItem);
       const key = item.city.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       if (!key || key === "destino" || seenCities.has(key)) return;
-      seenCities.add(key);
-      const cont: ContinentName = forcedCont || item.continent;
-      if (byContinent[cont].length < 3) {
-        byContinent[cont].push(item);
+
+      // Filtro estrito de Meridiano Astrológico: nenhuma cidade pode estar a mais de 32° de longitude do centro da Casa
+      if (item.lon !== null && angularLonDiff(item.lon, mainLon) > 32) {
+        return;
       }
+
+      seenCities.add(key);
+      validHouseCities.push(item);
     };
 
     const rawOptions = currentHouseResult?.options || {};
-    const optionEntries = Object.entries(rawOptions);
-    const hasNativeContinentKeys = optionEntries.some(([k]) =>
-      ALL_CONTINENT_NAMES.includes(k as ContinentName)
-    );
-
-    if (hasNativeContinentKeys) {
-      for (const [k, list] of optionEntries) {
-        if (ALL_CONTINENT_NAMES.includes(k as ContinentName)) {
-          const arr = Array.isArray(list) ? list : [list];
-          arr.forEach((c) => addCityToContinent(c, k as ContinentName));
-        }
-      }
-    } else {
-      // Converte consultas salvas antigas (nacional / acessivel / highticket) para Continentes Reais
-      for (const [, list] of optionEntries) {
-        const arr = Array.isArray(list) ? list : [list];
-        arr.forEach((c) => addCityToContinent(c));
-      }
-      // Também aproveita props.cities caso options estivesse vazio
-      [
-        ...(props.cities?.nacional || []),
-        ...(props.cities?.acessivel || []),
-        ...(props.cities?.highticket || []),
-      ].forEach((c) => addCityToContinent(c));
+    for (const [, list] of Object.entries(rawOptions)) {
+      const arr = Array.isArray(list) ? list : [list];
+      arr.forEach((c) => tryAddMeridianCity(c, false));
     }
 
-    // Escolhe os 3 Continentes mais fortes daquela Casa (priorizando quem já tem cidades reais da Casa)
-    const rankedContinents = [...ALL_CONTINENT_NAMES].sort((a, b) => {
-      const lenDiff = byContinent[b].length - byContinent[a].length;
+    // Se a consulta salva tinha menos de 9 cidades reais no meridiano (porque as outras eram falsas de outros continentes),
+    // preenche APENAS com cidades que pertencem à mesma faixa de longitude (±22° do meridiano da Casa)
+    if (validHouseCities.length < 9) {
+      const meridianCandidates = MERIDIAN_CITY_CATALOG
+        .filter((c) => angularLonDiff(c.lon, mainLon) <= 24)
+        .sort((a, b) => angularLonDiff(a.lon, mainLon) - angularLonDiff(b.lon, mainLon));
+
+      for (const mc of meridianCandidates) {
+        if (validHouseCities.length >= 12) break;
+        tryAddMeridianCity(mc, true);
+      }
+    }
+
+    // Agrupa as cidades válidas deste meridiano por sub-região geográfica real
+    const byRegion: Record<string, any[]> = {};
+    for (const c of validHouseCities) {
+      const reg = c.region || "Rota do Meridiano";
+      if (!byRegion[reg]) byRegion[reg] = [];
+      byRegion[reg].push(c);
+    }
+
+    const sortedRegions = Object.keys(byRegion).sort((a, b) => {
+      const lenDiff = byRegion[b].length - byRegion[a].length;
       if (lenDiff !== 0) return lenDiff;
-      const maxA = Math.max(0, ...byContinent[a].map((c) => c.score || 0));
-      const maxB = Math.max(0, ...byContinent[b].map((c) => c.score || 0));
+      const maxA = Math.max(0, ...byRegion[a].map((x) => x.score || 0));
+      const maxB = Math.max(0, ...byRegion[b].map((x) => x.score || 0));
       return maxB - maxA;
     });
 
-    const selectedContinents = rankedContinents.slice(0, 3);
+    const columns: Array<{ title: string; desc: string; data: any[] }> = [];
+    const usedInColumns = new Set<string>();
 
-    // Garante que cada um dos 3 Continentes tenha exatamente 3 cidades (3x3 = 9 destinos completos)
-    return selectedContinents.map((contName) => {
-      if (byContinent[contName].length < 3) {
-        for (const fb of CONTINENT_FALLBACK_POOL[contName]) {
-          if (byContinent[contName].length >= 3) break;
-          addCityToContinent(fb, contName);
-        }
+    for (const regName of sortedRegions) {
+      const citiesForCol = byRegion[regName].filter((c) => !usedInColumns.has(c.city)).slice(0, 3);
+      if (citiesForCol.length > 0) {
+        citiesForCol.forEach((c) => usedInColumns.add(c.city));
+        columns.push({
+          title: regName,
+          desc: "Mesma Faixa Astrológica",
+          data: citiesForCol,
+        });
       }
-      return {
-        title: contName,
-        desc: `Rota ${contName} Alternativa`,
-        data: byContinent[contName].slice(0, 3),
-      };
-    });
+      if (columns.length >= 3) break;
+    }
+
+    // Se o meridiano tiver 1 ou 2 sub-regiões com muitas cidades (ex: 9 cidades no Brasil),
+    // distribui as cidades excedentes do mesmo meridiano em até 3 colunas
+    const leftover = validHouseCities.filter((c) => !usedInColumns.has(c.city));
+    let extraIdx = 2;
+    while (columns.length < 3 && leftover.length > 0) {
+      const chunk = leftover.splice(0, 3);
+      const baseTitle = chunk[0]?.region || "Rota do Meridiano";
+      const titleExists = columns.some((col) => col.title === baseTitle);
+      const colTitle = titleExists ? `${baseTitle} II` : baseTitle;
+      columns.push({
+        title: colTitle,
+        desc: "Mesma Faixa Astrológica",
+        data: chunk,
+      });
+      extraIdx++;
+    }
+
+    return columns;
   })();
 
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
@@ -2619,7 +2790,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[1,2,3,4,5,6,7,8,9,10,11,12].map((num) => {
                   const isCurrent = num === P_DYNAMIC.house;
                   const dbData = cityDatabase[num as keyof typeof cityDatabase];
@@ -2635,14 +2806,12 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   
                   const cityForThisHouse = isCurrent
                     ? canonicalCityName(P_DYNAMIC.city.split(", ")[0])
-                    : (isUnlocked ? mappedCityName.split(", ")[0] : "Cidade Oculta");
+                    : (isUnlocked ? mappedCityName.split(", ")[0] : "Bloqueado");
                   const rawImg = (houseBestCity as any)?.img || (resultForHouse?.options as any)?.highticket?.img;
                   const imageForThisHouse = rawImg 
                     ? (rawImg.startsWith("http") ? rawImg : `https://images.unsplash.com/photo-${rawImg}?auto=format&fit=crop&w=1000&q=80`) 
                     : getHouseImageUrl(cityForThisHouse, num);
                   const areaColor = houseThemes[num]?.themeColor || '#10b981';
-                  const houseHook = HOUSE_CINEMATIC_TEXTS[num] || "ativar uma nova dimensão estratégica nos seus próximos 12 meses.";
-                  const singleHouseCost = props.houseCost ?? 1;
 
                   return (
                     <div 
@@ -2655,17 +2824,16 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                           props.onSelectHouse(num);
                         }
                       }}
-                      className={`relative rounded-[28px] border transition-all duration-500 ease-[0.19,1,0.22,1] overflow-hidden flex flex-col group min-h-[390px] ${
+                      className={`relative rounded-[28px] border transition-all duration-500 ease-[0.19,1,0.22,1] overflow-hidden flex flex-col group ${
                         isCurrent 
-                          ? 'bg-[#070B12] border-white/30 shadow-[0_0_45px_rgba(255,255,255,0.08)] scale-[1.01]' 
+                          ? 'bg-[#070B12] border-white/35 shadow-[0_0_40px_rgba(255,255,255,0.08)] scale-[1.02]' 
                           : isUnlocked 
-                            ? 'bg-[#06090F] cursor-pointer hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(0,0,0,0.7)]'
-                            : 'bg-[#05070C] border-white/10 hover:border-[#F5DE98]/45 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(201,162,39,0.14)] cursor-pointer'
+                            ? 'bg-[#06090F] border-white/15 cursor-pointer hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.65)]'
+                            : 'bg-[#05070C] border-white/10 hover:border-[#F5DE98]/40 hover:-translate-y-1 cursor-pointer'
                       }`}
-                      style={{ borderColor: isUnlocked && !isCurrent ? `${areaColor}45` : undefined }}
                     >
-                      {/* 1. FOTO NO TOPO (SEMPRE VISÍVEL — REAL SE DESBLOQUEADA, MISTERIOSA SE BLOQUEADA) */}
-                      <div className="relative h-[176px] w-full shrink-0 overflow-hidden bg-[#050505]">
+                      {/* 1. FOTO */}
+                      <div className="relative h-[160px] w-full shrink-0 overflow-hidden bg-[#050505]">
                         {isUnlocked ? (
                           <WikiImage 
                             cityName={cityForThisHouse} 
@@ -2681,129 +2849,51 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             alt={`Casa ${num}`}
                             loading="lazy"
                             decoding="async"
-                            className="w-full h-full object-cover scale-105 blur-[1.5px] brightness-[0.45] contrast-110 transition-all duration-700 group-hover:scale-110 group-hover:brightness-[0.65] group-hover:blur-0"
+                            className="w-full h-full object-cover brightness-[0.35] contrast-110 transition-all duration-700 group-hover:scale-105 group-hover:brightness-[0.55]"
                           />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#05070C] via-black/25 to-black/30" />
-
-                        {/* Badge Superior na Foto */}
-                        <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
-                          <span
-                            className="px-3 py-1 rounded-full text-[10px] font-sans font-bold uppercase tracking-[0.18em] backdrop-blur-md border"
-                            style={{
-                              backgroundColor: isUnlocked ? `${areaColor}25` : "rgba(0,0,0,0.65)",
-                              borderColor: isUnlocked ? `${areaColor}60` : "rgba(255,255,255,0.15)",
-                              color: isUnlocked ? "#ffffff" : "#F5DE98",
-                            }}
-                          >
-                            {isCurrent ? "Rota em Exibição" : isUnlocked ? "Rota Liberada" : "Coordenada Secreta"}
-                          </span>
-
-                          {isUnlocked ? (
-                            <div
-                              className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 bg-black/50 text-white group-hover:scale-110 transition-transform"
-                            >
-                              <ArrowUpRight className="w-4 h-4" />
-                            </div>
-                          ) : (
-                            <div className="px-2.5 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 backdrop-blur-md flex items-center gap-1.5">
-                              <Lock className="w-3 h-3 text-[#F5DE98]" />
-                              <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-[#F5DE98]">
-                                {singleHouseCost} {singleHouseCost === 1 ? "Crédito" : "Créditos"}
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                        {!isUnlocked && (
+                          <div className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center">
+                            <Lock className="w-3.5 h-3.5 text-[#F5DE98]" />
+                          </div>
+                        )}
                       </div>
 
-                      {/* 2. FAIXA DIVISÓRIA: CASA >>> CIDADE */}
+                      {/* 2. ------ / CASA >>> CIDADE / ------ */}
                       <div
-                        className="px-6 py-3.5 border-y flex items-center justify-between gap-3 relative z-10 shrink-0"
+                        className="px-5 py-3 border-y border-white/15 flex items-center justify-between gap-2 relative z-10 shrink-0"
                         style={{
-                          borderColor: isUnlocked ? `${areaColor}30` : "rgba(255,255,255,0.08)",
-                          background: isUnlocked
-                            ? `linear-gradient(90deg, ${areaColor}18 0%, rgba(255,255,255,0.02) 100%)`
-                            : "rgba(255,255,255,0.025)",
+                          backgroundColor: isUnlocked && !isCurrent ? `${areaColor}22` : "rgba(255,255,255,0.03)",
                         }}
                       >
                         <span
-                          className="font-sans text-[11px] tracking-[0.22em] uppercase font-bold shrink-0"
-                          style={{ color: isUnlocked ? areaColor : "#F5DE98" }}
+                          className="font-sans text-[10px] tracking-[0.18em] uppercase font-bold shrink-0"
+                          style={{ color: isUnlocked ? areaColor : "rgba(255,255,255,0.55)" }}
                         >
                           Casa {num}
                         </span>
 
-                        <span className="font-mono text-xs tracking-[0.25em] text-white/35 shrink-0">
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/35 shrink-0">
                           &gt;&gt;&gt;
                         </span>
 
-                        {isUnlocked ? (
-                          <span className="font-ps-display text-sm sm:text-base font-bold tracking-wide uppercase text-white truncate text-right">
-                            {cityForThisHouse}
-                          </span>
-                        ) : (
-                          <span className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[#F5DE98]/90 flex items-center gap-1.5 shrink-0">
-                            <Lock className="w-3 h-3 text-[#F5DE98]" />
-                            Cidade Oculta
-                          </span>
-                        )}
+                        <span className="font-sans text-[11px] font-bold tracking-[0.14em] uppercase text-white truncate text-right">
+                          {cityForThisHouse}
+                        </span>
                       </div>
 
-                      {/* 3. DESCRIÇÃO + CURIOSIDADE + BOTÃO DE AÇÃO (SEM ENCAVALAR) */}
-                      <div className="flex flex-col flex-1 px-6 py-5 justify-between relative overflow-hidden">
+                      {/* 3. DESCRIÇÃO */}
+                      <div className="relative flex-1 px-5 py-5 flex items-center overflow-hidden min-h-[110px]">
                         {isUnlocked && !isCurrent && (
                           <div
-                            className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"
+                            className="absolute inset-0 z-0 opacity-[0.18] pointer-events-none"
                             style={{ backgroundColor: areaColor }}
                           />
                         )}
-
-                        <div className="relative z-10">
-                          <h3 className="font-ps-display text-xl sm:text-2xl leading-[1.2] font-bold tracking-tight text-white mb-2.5">
-                            {label}
-                          </h3>
-                          <p className="font-sans text-xs sm:text-[13px] text-white/65 font-light leading-relaxed line-clamp-3">
-                            {isUnlocked
-                              ? `Veja como ${cityForThisHouse} atua para ${houseHook}`
-                              : `Descubra qual cidade do mundo foi calculada no seu mapa para ${houseHook}`}
-                          </p>
-                        </div>
-
-                        <div className="relative z-10 mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between">
-                          {isCurrent ? (
-                            <>
-                              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
-                                Status da Rota
-                              </span>
-                              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: areaColor }}>
-                                Visualizando Agora
-                              </span>
-                            </>
-                          ) : isUnlocked ? (
-                            <>
-                              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/60">
-                                Dossiê Completo
-                              </span>
-                              <span
-                                className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 group-hover:translate-x-1 transition-transform"
-                                style={{ color: areaColor }}
-                              >
-                                Abrir {cityForThisHouse}
-                                <ChevronRight className="w-4 h-4" />
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-white/45">
-                                + 9 Rotas Extras
-                              </span>
-                              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#F5DE98] text-[11px] font-bold uppercase tracking-wider group-hover:bg-[#C9A227] group-hover:text-[#02050A] transition-all">
-                                <Unlock className="w-3.5 h-3.5" />
-                                Revelar Cidade
-                              </span>
-                            </>
-                          )}
-                        </div>
+                        <h3 className="relative z-10 font-ps-display text-xl leading-[1.22] font-bold tracking-tight text-white">
+                          {label}
+                        </h3>
                       </div>
                     </div>
                   );

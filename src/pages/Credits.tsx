@@ -42,42 +42,31 @@ interface PixPaymentState {
 }
 
 function getPackageChecklist(credits: number): {
-  idealFor: string;
-  tagline: string;
   bullets: string[];
 } {
   if (credits <= 1) {
     return {
-      idealFor: "Para sua 1ª Descoberta",
-      tagline: "Tudo o que você precisa para fazer 1 consulta completa.",
       bullets: [
-        "Realiza 1 consulta completa (Por Cidade, Por Casa ou Por Intenção)",
-        "Inclui gratuitamente o seu 1º Foco Principal detalhado",
-        "Libera 9 Rotas Alternativas divididas em 3 Continentes",
-        "Ou pode ser usado para abrir +1 Casa extra ou +1 Foco extra no seu mapa",
+        "1 Consulta completa",
+        "1º Foco Principal incluso",
+        "Ou +1 Casa / Foco avulso",
       ],
     };
   }
   if (credits <= 5) {
     return {
-      idealFor: "Para Comparar Destinos & Áreas",
-      tagline: "O equilíbrio perfeito para testar cidades ou aprofundar seu mapa.",
       bullets: [
-        `Permite fazer até ${credits} consultas diferentes (ex: testar 3 cidades ou anos)`,
-        "Ou fazer 1 consulta principal + desbloquear novas Casas e Focos (Amor, Dinheiro, Carreira)",
-        "Libera todos os 6 Focos de uma Casa de uma só vez (custo: 3 créditos)",
-        "Créditos não expiram — use quando quiser",
+        `Até ${credits} Consultas completas`,
+        "Ou todos os 6 Focos da Casa",
+        "Ideal para comparar cidades",
       ],
     };
   }
   return {
-    idealFor: "Experiência Completa 360º",
-    tagline: "Para quem quer dominar todas as 12 áreas do ano com economia máxima.",
     bullets: [
-      "Faz sua consulta principal (1 crédito) + Desbloqueia o Mapa Completo com todas as 12 Casas (7 créditos)",
-      "Ainda sobram créditos para destravar Focos extras ou simular outros destinos",
-      "Acesso às 12 cidades titulares + 108 rotas alternativas globais do seu ano",
-      "Melhor custo por crédito da plataforma",
+      "Libera todas as 12 Casas",
+      "Visão 360º do seu ano",
+      "Melhor valor por crédito",
     ],
   };
 }
@@ -468,73 +457,41 @@ const Credits = () => {
 
           <div className="flex items-center gap-2 text-white/60 text-xs font-ps-ui">
             <ShieldCheck className="w-4 h-4 text-[#C9A227]" />
-            <span>Ambiente Criptografado • Liberação Automática</span>
+            <span>Pagamento Seguro • Liberação Imediata</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* COLUNA DA ESQUERDA (5 cols): RESUMO DO PACOTE ESCOLHIDO + TROCA RÁPIDA */}
+          {/* COLUNA DA ESQUERDA (5 cols): RESUMO LIMPO DO PACOTE ESCOLHIDO */}
           <div className="lg:col-span-5 flex flex-col gap-6">
             <div className="p-7 sm:p-8 rounded-3xl border border-[#C9A227]/45 bg-gradient-to-b from-[#101F3A]/95 via-[#091326]/95 to-[#060C18]/98 shadow-[0_20px_60px_rgba(0,0,0,0.65)] relative overflow-hidden">
-              <div className="flex items-center justify-between gap-2 mb-4">
-                <span className="px-3.5 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/40 text-[#F5DE98] text-[10px] font-bold uppercase tracking-[0.2em]">
-                  Pacote Selecionado
-                </span>
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#F5DE98]">
-                  +{selectedPkg.credits} Crédito{selectedPkg.credits > 1 ? "s" : ""}
-                </span>
-              </div>
+              <span className="inline-block px-3.5 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/40 text-[#F5DE98] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
+                +{selectedPkg.credits} Crédito{selectedPkg.credits > 1 ? "s" : ""}
+              </span>
 
-              <h2 className="font-ps-display text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
+              <h2 className="font-ps-display text-3xl sm:text-4xl font-bold text-white tracking-tight mb-6">
                 {selectedPkg.label}
               </h2>
-              <p className="text-white/65 text-sm font-light leading-relaxed mb-6">
-                {selectedPkg.description || checklist.tagline}
-              </p>
 
-              {/* Preço Total */}
-              <div className="p-5 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between mb-6">
-                <div>
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-white/45 block mb-1 font-semibold">
-                    Total a Pagar
-                  </span>
-                  <div className="flex items-baseline text-[#F5DE98]">
-                    <span className="text-sm font-bold mr-1">R$</span>
-                    <span className="font-ps-display text-4xl font-bold leading-none">{int}</span>
-                    <span className="text-base font-semibold">,{dec}</span>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-white/45 block mb-1 font-semibold">
-                    Seu Saldo Após a Compra
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
-                    {currentCredits} → {currentCredits + Number(selectedPkg.credits)} créditos
-                  </span>
-                </div>
+              <div className="flex items-baseline text-[#F5DE98] mb-6 pb-6 border-b border-white/10">
+                <span className="text-sm font-bold mr-1">R$</span>
+                <span className="font-ps-display text-5xl font-bold leading-none">{int}</span>
+                <span className="text-lg font-semibold">,{dec}</span>
               </div>
 
-              {/* O que está incluso neste pacote */}
-              <div className="space-y-3 mb-6">
-                <span className="text-[10px] uppercase tracking-[0.22em] text-[#F5DE98]/80 font-bold block">
-                  O que você poderá fazer com estes créditos:
-                </span>
+              <div className="space-y-3 mb-7">
                 {checklist.bullets.map((b, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-left">
-                    <CheckCircle2 className="w-4 h-4 text-[#C9A227] shrink-0 mt-0.5" />
-                    <span className="text-white/80 text-xs sm:text-[13px] leading-relaxed font-light">
-                      {b}
-                    </span>
+                  <div key={idx} className="flex items-center gap-2.5 text-left">
+                    <CheckCircle2 className="w-4 h-4 text-[#C9A227] shrink-0" />
+                    <span className="text-white/85 text-sm font-light">{b}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Trocar de pacote com 1 clique sem precisar voltar */}
               {packages.length > 1 && (
                 <div className="pt-5 border-t border-white/10">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-white/45 font-semibold block mb-3">
-                    Deseja alterar a quantidade de créditos?
+                    Trocar pacote:
                   </span>
                   <div className="grid grid-cols-3 gap-2">
                     {packages.map((p) => {
@@ -579,7 +536,7 @@ const Credits = () => {
                     Pagamento Confirmado!
                   </h3>
                   <p className="text-white/75 text-base max-w-md leading-relaxed">
-                    Seus <strong className="text-[#F5DE98]">{selectedPkg.credits} créditos</strong> já foram adicionados ao seu saldo e estão prontos para uso imediato.
+                    Seus <strong className="text-[#F5DE98]">{selectedPkg.credits} créditos</strong> já foram adicionados ao seu saldo.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
                     <button
@@ -594,20 +551,15 @@ const Credits = () => {
                       onClick={() => navigate("/history")}
                       className="px-6 py-4 rounded-2xl border border-white/15 bg-white/[0.04] hover:bg-white/[0.1] text-white font-bold text-xs uppercase tracking-[0.18em] transition-all"
                     >
-                      Ir para Minhas Consultas
+                      Minhas Consultas
                     </button>
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="mb-6">
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#F5DE98] font-bold block mb-1">
-                      Passo Final
-                    </span>
-                    <h3 className="font-ps-display text-2xl sm:text-3xl font-bold text-white">
-                      Como você prefere pagar?
-                    </h3>
-                  </div>
+                  <h3 className="font-ps-display text-2xl sm:text-3xl font-bold text-white mb-6">
+                    Forma de Pagamento
+                  </h3>
 
                   {/* Seletor de Método: PIX vs CARTÃO */}
                   <div className="grid grid-cols-2 gap-3 p-1.5 rounded-2xl bg-black/50 border border-white/10 mb-8">
@@ -621,7 +573,7 @@ const Credits = () => {
                       }`}
                     >
                       <QrCode className="w-4 h-4 shrink-0" />
-                      <span>Pix (Liberação Imediata)</span>
+                      <span>Pix Imediato</span>
                     </button>
                     <button
                       type="button"
@@ -674,15 +626,9 @@ const Credits = () => {
                             )}
 
                             <div className="md:col-span-7 text-left flex flex-col gap-4">
-                              <div className="space-y-2">
-                                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#F5DE98] block">
-                                  Pagamento Instantâneo via Pix
-                                </span>
-                                <p className="text-white/75 text-xs sm:text-sm leading-relaxed font-light">
-                                  1. Abra o aplicativo do seu banco e escolha <strong className="text-white">Pix → Ler QR Code</strong> ou <strong className="text-white">Pix Copia e Cola</strong>.<br />
-                                  2. Assim que finalizar, seus <strong className="text-[#F5DE98]">{selectedPkg.credits} créditos</strong> entram na conta em poucos segundos sem precisar atualizar a página.
-                                </p>
-                              </div>
+                              <p className="text-white/75 text-sm leading-relaxed font-light">
+                                Escaneie o QR Code no app do seu banco ou copie o código abaixo. Seus créditos são liberados automaticamente em segundos.
+                              </p>
 
                               {pixData.qrCode && (
                                 <div className="w-full">
@@ -712,7 +658,7 @@ const Credits = () => {
                                     ) : (
                                       <>
                                         <Copy className="w-4 h-4 shrink-0" />
-                                        <span>Copiar Código Pix (Copia e Cola)</span>
+                                        <span>Copiar Código Pix</span>
                                       </>
                                     )}
                                   </button>
@@ -725,7 +671,7 @@ const Credits = () => {
                             <div className="flex items-center gap-2.5 text-left">
                               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                               <span className="text-emerald-200/90 text-xs leading-snug">
-                                Aguardando confirmação do banco... Os créditos serão liberados automaticamente nesta tela.
+                                Aguardando confirmação do pagamento...
                               </span>
                             </div>
                             <button
@@ -759,7 +705,7 @@ const Credits = () => {
   }
 
   // ============================================================================
-  // TELA 1: VITRINE DE PACOTES + GUIA CLARO DE QUANTOS CRÉDITOS VOCÊ PRECISA
+  // TELA 1: VITRINE LIMPA E MINIMALISTA DE PACOTES
   // ============================================================================
   return (
     <div className="min-h-[100dvh] px-4 sm:px-6 pt-20 pb-28 md:pt-24 md:pb-24 max-w-6xl mx-auto relative z-10">
@@ -767,17 +713,17 @@ const Credits = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-10"
+        className="text-center mb-12"
       >
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A227]/35 bg-[#C9A227]/10 text-[#F5DE98] text-[10px] uppercase tracking-[0.24em] font-semibold mb-4">
           <Sparkles className="w-3.5 h-3.5 text-[#E5C158]" />
           Passaporte de Coordenadas
         </span>
         <h1 className="font-ps-display text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight leading-tight">
-          Escolha Seu Pacote de Créditos
+          Adquira Seus Créditos
         </h1>
-        <p className="text-white/65 text-sm sm:text-base md:text-lg font-light font-ps-ui max-w-2xl mx-auto leading-relaxed">
-          Entenda abaixo exatamente quantos créditos você precisa para o seu objetivo e libere seu mapa na hora via Pix ou Cartão.
+        <p className="text-white/60 text-sm sm:text-base font-light font-ps-ui max-w-xl mx-auto">
+          Desbloqueie novas consultas, casas astrais e focos do seu mapa.
         </p>
 
         {profile && (
@@ -796,98 +742,20 @@ const Credits = () => {
         )}
       </motion.div>
 
-      {/* GUIA RÁPIDO ANTES DOS PACOTES: "DE QUANTOS CRÉDITOS EU PRECISO?" */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="mb-12 p-6 sm:p-7 rounded-3xl border border-white/10 bg-[#07101E]/85 backdrop-blur-xl shadow-[0_16px_45px_rgba(0,0,0,0.45)]"
-      >
-        <div className="flex items-center justify-center gap-2 mb-5">
-          <HelpCircle className="w-4 h-4 text-[#C9A227]" />
-          <span className="text-[11px] font-ps-ui uppercase tracking-[0.22em] text-[#F5DE98] font-bold">
-            Como Funcionam os Créditos (Guia Rápido)
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">
-                  Objetivo 1 • Direto ao Ponto
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
-                  {costConsultation} Crédito
-                </span>
-              </div>
-              <h4 className="font-ps-display text-lg font-bold text-white mb-1.5">
-                Descobrir Meu Destino Principal
-              </h4>
-              <p className="text-white/60 text-xs leading-relaxed font-light">
-                Com apenas <strong className="text-white">1 crédito</strong> você calcula sua Revolução Solar (Por Cidade, Casa ou Intenção), recebe seu <strong className="text-white">1º Foco Principal grátis</strong> e vê <strong className="text-white">9 Rotas Alternativas</strong> em 3 Continentes.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#C9A227]/[0.06] border border-[#C9A227]/30 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#F5DE98]">
-                  Objetivo 2 • Mais Escolhido
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/40 text-[#F5DE98] text-[11px] font-bold">
-                  3 a 5 Créditos
-                </span>
-              </div>
-              <h4 className="font-ps-display text-lg font-bold text-white mb-1.5">
-                Comparar Cidades ou Abrir Focos
-              </h4>
-              <p className="text-white/65 text-xs leading-relaxed font-light">
-                Ideal se você quer testar mais de uma cidade para o aniversário, abrir uma <strong className="text-white">Casa extra ({costSingleHouse} créd.)</strong> ou destravar <strong className="text-white">todos os 6 Focos ({costAllFocuses} créd.)</strong> de Dinheiro, Amor, Carreira e Saúde.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-400">
-                  Objetivo 3 • Visão 360º
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[11px] font-bold">
-                  {costConsultation + costFullMap}+ Créditos
-                </span>
-              </div>
-              <h4 className="font-ps-display text-lg font-bold text-white mb-1.5">
-                Desbloquear Todas as 12 Casas
-              </h4>
-              <p className="text-white/60 text-xs leading-relaxed font-light">
-                Para fazer sua consulta inicial (<strong className="text-white">{costConsultation} créd.</strong>) e já liberar o <strong className="text-white">Mapa Completo com todas as 12 Casas ({costFullMap} créd.)</strong>, revelando qual cidade do mundo ativa cada área da sua vida.
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Packages Grid */}
       {loading ? (
         <div className="text-center py-20">
           <div className="w-7 h-7 border-2 border-[#C9A227]/30 border-t-[#C9A227] rounded-full animate-spin mx-auto mb-3" />
           <p className="text-[#F5DE98]/70 font-ps-ui text-[11px] uppercase tracking-[0.2em] font-semibold">
-            Carregando pacotes disponíveis...
+            Carregando pacotes...
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-7 max-w-6xl mx-auto items-stretch pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-7 max-w-5xl mx-auto items-stretch pt-2">
           {packages.map((pkg, i) => {
             const highlight = i === 1;
             const [int, dec] = fmt(pkg.price_brl);
             const checklist = getPackageChecklist(pkg.credits);
-            const perCredit =
-              pkg.price_brl && pkg.credits > 0
-                ? (pkg.price_brl / pkg.credits).toFixed(2).replace(".", ",")
-                : null;
 
             return (
               <motion.div
@@ -895,7 +763,7 @@ const Credits = () => {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className={`p-7 sm:p-8 text-left relative transition-all duration-400 flex flex-col justify-between rounded-3xl ${
+                className={`p-8 text-left relative transition-all duration-400 flex flex-col justify-between rounded-3xl ${
                   highlight
                     ? "border-2 border-[#C9A227]/70 bg-gradient-to-b from-[#101F3A]/95 via-[#091326]/95 to-[#060C18]/98 backdrop-blur-xl shadow-[0_22px_60px_rgba(201,162,39,0.18)] md:-translate-y-2 z-10"
                     : "border border-white/10 bg-[#08111F]/85 backdrop-blur-xl hover:border-[#C9A227]/35 hover:bg-[#0B172A]/90 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
@@ -909,67 +777,43 @@ const Credits = () => {
                 )}
 
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] font-ps-ui ${
-                        highlight
-                          ? "bg-[#C9A227]/20 text-[#F5DE98] border border-[#C9A227]/40"
-                          : "bg-white/[0.05] text-white/70 border border-white/10"
-                      }`}
-                    >
-                      {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}
-                    </span>
-                    <span className="text-[10px] uppercase tracking-[0.16em] text-white/45 font-medium">
-                      {checklist.idealFor}
-                    </span>
-                  </div>
-
-                  <h3
-                    className={`font-ps-display text-2xl sm:text-3xl font-bold tracking-tight mb-2 ${
-                      highlight ? "text-white" : "text-white/95"
+                  <span
+                    className={`inline-block px-3.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] font-ps-ui mb-4 ${
+                      highlight
+                        ? "bg-[#C9A227]/20 text-[#F5DE98] border border-[#C9A227]/40"
+                        : "bg-white/[0.05] text-white/70 border border-white/10"
                     }`}
                   >
+                    {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}
+                  </span>
+
+                  <h3 className="font-ps-display text-2xl sm:text-3xl font-bold tracking-tight text-white mb-6">
                     {pkg.label}
                   </h3>
 
-                  <p className="text-white/60 text-xs sm:text-sm font-light font-ps-ui mb-5 leading-relaxed">
-                    {pkg.description || checklist.tagline}
-                  </p>
-
-                  {/* Preço */}
-                  <div className="p-4 rounded-2xl bg-black/35 border border-white/[0.07] mb-6 flex items-baseline justify-between">
-                    <div className="flex items-start text-white">
-                      <span className="text-[#F5DE98]/70 text-xs font-bold mt-1.5 mr-1">R$</span>
-                      <span
-                        className={`font-ps-display text-4xl sm:text-5xl font-bold leading-none tracking-tight ${
-                          highlight ? "text-[#F5DE98]" : "text-white"
-                        }`}
-                      >
-                        {int}
-                      </span>
-                      <span className="text-white/60 text-sm mt-1">,{dec}</span>
-                    </div>
-
-                    {perCredit && pkg.credits > 1 && (
-                      <span className="text-[11px] text-emerald-300/90 font-medium">
-                        R$ {perCredit} / créd.
-                      </span>
-                    )}
+                  {/* Preço limpo sem caixa interna */}
+                  <div className="flex items-start text-white mb-7 pb-6 border-b border-white/10">
+                    <span className="text-[#F5DE98]/70 text-xs font-bold mt-2 mr-1">R$</span>
+                    <span
+                      className={`font-ps-display text-5xl sm:text-6xl font-bold leading-none tracking-tight ${
+                        highlight ? "text-[#F5DE98]" : "text-white"
+                      }`}
+                    >
+                      {int}
+                    </span>
+                    <span className="text-white/60 text-sm mt-1.5">,{dec}</span>
                   </div>
 
-                  {/* Checklist do que este pacote faz */}
-                  <div className="space-y-2.5 mb-7">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/45 font-bold block mb-2">
-                      O que você libera com este pacote:
-                    </span>
+                  {/* 3 itens curtos e diretos */}
+                  <div className="space-y-3 mb-8">
                     {checklist.bullets.map((bullet, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5">
+                      <div key={idx} className="flex items-center gap-2.5">
                         <CheckCircle2
-                          className={`w-4 h-4 shrink-0 mt-0.5 ${
+                          className={`w-4 h-4 shrink-0 ${
                             highlight ? "text-[#F5DE98]" : "text-[#C9A227]/80"
                           }`}
                         />
-                        <span className="text-white/80 text-xs leading-relaxed font-light">
+                        <span className="text-white/80 text-xs sm:text-sm font-light">
                           {bullet}
                         </span>
                       </div>
@@ -977,70 +821,44 @@ const Credits = () => {
                   </div>
                 </div>
 
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPackage(pkg)}
-                    className={`w-full py-4 text-xs font-ps-ui uppercase tracking-[0.18em] font-bold flex items-center justify-center gap-2 transition-all duration-300 rounded-2xl ${
-                      highlight
-                        ? "bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] shadow-[0_10px_30px_rgba(201,162,39,0.3)] hover:scale-[1.02] active:scale-95"
-                        : "bg-white/[0.07] border border-[#C9A227]/35 text-[#F5DE98] hover:bg-[#C9A227] hover:text-[#02050A] hover:border-[#C9A227] active:scale-95"
-                    }`}
-                  >
-                    <Zap className="w-4 h-4 shrink-0" />
-                    <span>Continuar para Pagamento</span>
-                    <ChevronRight className="w-4 h-4 opacity-80" />
-                  </button>
-                  <p className="text-center text-[10px] text-white/40 uppercase tracking-[0.16em] mt-3">
-                    Pix Imediato ou Cartão em até 12x
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSelectPackage(pkg)}
+                  className={`w-full py-4 text-xs font-ps-ui uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 transition-all duration-300 rounded-2xl ${
+                    highlight
+                      ? "bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] shadow-[0_10px_30px_rgba(201,162,39,0.3)] hover:scale-[1.02] active:scale-95"
+                      : "bg-white/[0.06] border border-[#C9A227]/35 text-[#F5DE98] hover:bg-[#C9A227] hover:text-[#02050A] hover:border-[#C9A227] active:scale-95"
+                  }`}
+                >
+                  <span>Comprar</span>
+                  <ChevronRight className="w-4 h-4 opacity-80" />
+                </button>
               </motion.div>
             );
           })}
         </div>
       )}
 
-      {/* Tabela de Custos Detalhada */}
+      {/* Barra Minimalista de Referência de Custos */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="mt-16 pt-12 border-t border-white/10"
+        transition={{ delay: 0.25 }}
+        className="mt-14 pt-8 border-t border-white/10 max-w-5xl mx-auto"
       >
-        <div className="text-center mb-8">
-          <span className="text-[10px] uppercase font-ps-ui tracking-[0.26em] text-[#F5DE98]/75 block mb-2 font-semibold">
-            Tabela de Uso no Sistema
-          </span>
-          <h3 className="font-ps-display text-2xl md:text-3xl text-white font-bold tracking-tight">
-            Quanto Custa Cada Recurso Dentro do Mapa
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           {costs.map((item) => {
             const Icon = ICONS[item.key] || Map;
             return (
               <div
                 key={item.key}
-                className="p-5 text-left rounded-2xl border border-white/[0.08] bg-[#08111F]/80 hover:border-[#C9A227]/30 transition-all duration-300 flex flex-col justify-between backdrop-blur-md"
+                className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs"
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="w-10 h-10 rounded-xl border border-[#C9A227]/25 bg-[#C9A227]/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-[#F5DE98]" />
-                    </div>
-                    <span className="px-2.5 py-1 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/30 text-[#F5DE98] font-ps-ui text-[10px] uppercase tracking-[0.15em] font-bold">
-                      {item.credits} crédito{item.credits > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <p className="font-ps-display text-base font-bold text-white mb-1.5">
-                    {item.label}
-                  </p>
-                </div>
-                <p className="text-white/55 text-xs font-ps-ui font-light leading-relaxed">
-                  {item.description}
-                </p>
+                <Icon className="w-3.5 h-3.5 text-[#C9A227]" />
+                <span className="text-white/75 font-light">{item.label}:</span>
+                <span className="text-[#F5DE98] font-bold">
+                  {item.credits} crédito{item.credits > 1 ? "s" : ""}
+                </span>
               </div>
             );
           })}
