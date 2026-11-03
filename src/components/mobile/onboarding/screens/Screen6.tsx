@@ -10,7 +10,7 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="relative w-full min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-start lg:justify-center overflow-y-auto overflow-x-hidden lg:overflow-hidden custom-scrollbar bg-[#030306]">
+    <div className="relative w-full min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-start lg:justify-center overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain lg:overflow-hidden custom-scrollbar bg-[#030306]">
       
       {/* Abstract starry background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -32,7 +32,7 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
       </div>
 
       {/* Main Content Layout */}
-      <div className="relative z-10 w-full max-w-[1200px] px-6 lg:px-12 pt-12 pb-32 lg:py-0 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-20">
+      <div className="relative z-10 w-full max-w-[1200px] px-6 lg:px-12 pt-20 pb-36 lg:py-0 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-20">
         
         {/* Left Column: Copy */}
         <motion.div

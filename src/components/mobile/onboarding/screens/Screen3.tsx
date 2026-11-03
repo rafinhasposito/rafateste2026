@@ -32,10 +32,10 @@ export const Screen3 = () => {
   }
 
   return (
-    <div className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden bg-[#030306] px-6 pt-20 pb-28">
+    <div className="relative w-full h-[100dvh] flex flex-col items-center justify-start overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain bg-[#030306] px-6 pt-20 pb-32">
       
       {/* Cinematic Stars Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <video 
           autoPlay loop muted playsInline preload="metadata"
           className="absolute inset-0 w-full h-full object-cover opacity-40 md:opacity-50 mix-blend-screen"
@@ -49,7 +49,7 @@ export const Screen3 = () => {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-10 w-full max-w-md md:max-w-4xl mx-auto flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-md md:max-w-4xl mx-auto my-auto flex flex-col items-center">
         <AnimatePresence mode="wait">
           {!done ? (
             <motion.div

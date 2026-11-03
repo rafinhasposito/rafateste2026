@@ -1,81 +1,62 @@
-# 📚 Arquitetura e Regras de Negócio: O Dossiê Final (AppleResultPreview.tsx)
+# 📚 Arquitetura e Regras de Negócio: O Dossiê Final (V3 - Oficial)
 
-**Status:** Atualizado no Checkpoint 5 (Bloco 3 Concluído)
-**Objetivo do Documento:** Servir como o "Guia Definitivo" para qualquer IA, desenvolvedor ou agente que venha a dar manutenção ou expandir esta página. NUNCA altere o comportamento estrutural desta página sem consultar este documento.
+**Status:** Atualizado para a Rota V3 (Produto Final Integrado)
+**Objetivo do Documento:** Servir como o "Guia Definitivo" para Engenheiros de Dados e Analistas de Prompt que vão conectar o motor de Inteligência Artificial ao Frontend. NUNCA altere o comportamento estrutural desta página sem consultar este documento.
 
 ---
 
 ## 1. O Que É a Página?
-A página `AppleResultPreview.tsx` é o entregável final do **Protocolo Solar** (Onde Passar Seu Aniversário). 
-Ela simula a experiência de um "Laudo de Inteligência Executiva". Quando o usuário descobre qual cidade ativa qual área da vida dele (ex: Tóquio ativa Dinheiro, Paris ativa Amor), é nesta página que ele lê o Dossiê completo daquela energia.
+A página `HouseResult.tsx` (ou o sandbox `AppleResultPreviewV3.tsx`) é o entregável final do **Protocolo Solar**. 
+Ela simula a experiência de um "Laudo de Inteligência Executiva". Quando o usuário descobre qual cidade ativa qual área da vida dele (ex: Tóquio ativa Dinheiro), é nesta página que ele lê o Dossiê completo.
 
 ## 2. Regras de Ouro do Produto
 
 ### A. Regra do UX Copy Seguro (Sem Determinismo)
-- **O Problema:** Prometer que "algo vai acontecer" (ex: "Você ficará rico", "Você será promovido") gera frustração e risco jurídico caso o evento não ocorra.
-- **A Solução:** O texto deve usar **Verbos de Propensão** e focar no "cenário" e na "ação do usuário".
-- **Vocabulário Permitido:** *A energia favorece, O magnetismo desta cidade atrai, O universo destrava, O terreno se torna fértil, Potencializa, Abre portas.*
+- O texto gerado pela IA deve usar **Verbos de Propensão** e focar no "cenário". Promessas exatas são proibidas.
+- **Exemplo Proibido:** "Como consequência inevitável..."
+- **Exemplo Aprovado:** "Eu sei o valor do meu trabalho e faço meu dinheiro render."
+- **Vocabulário:** *A energia favorece, O magnetismo atrai, O universo destrava, O terreno se torna fértil.*
 
-### B. Regra Estética (Padrão Apple / Anti-SaaS)
-- Não estamos construindo uma planilha, nem um dashboard B2B, nem um PowerPoint.
-- **Evitar:** Cardite (excesso de blocos de vidro um embaixo do outro), Ícones genéricos soltos (clip-art), abreviações ("Asc.").
-- **Abraçar:** Tipografia maciça (Display), espaços vazios amplos, Z-Patterns de leitura fluida, vídeos atmosféricos (Aura Loop), efeitos sutis de blur (Glassmorphism).
+### B. A Arquitetura Bipartida (Casa x Foco)
+Para evitar conflitos de dados ("O Bug Frankenstein"), a página segue estritamente a seguinte separação:
+- **A FUNDAÇÃO INVIOLÁVEL (A Rota/Casa):** Lida através da URL (`useParams`). Controla o Nome da Cidade, o País, as Coordenadas, o Vídeo de Fundo (Hero) e a Foto do Dossiê. **Isso nunca muda ao clicar no menu.**
+- **A LENTE DO USUÁRIO (O Foco/Matriz de 96):** Controla o Match %, Título de Venda, Cores, os 3 Pilares, a Linha do Tempo e o Ritual de 24h. Isso muda dinamicamente quando o usuário troca de foco na Sidebar, cruzando o desejo do usuário com a cidade.
 
 ### C. Regra do Fundo Camaleão
-- Como cada casa astrológica tem um "Neon" (Dinheiro = Verde, Amor = Vermelho), a página **inteira** precisa se adaptar.
-- A cor de fundo global usa \`color-mix(in srgb, currentActiveData.color 6%, #03100B)\` para garantir que a interface não tenha conflito cognitivo (ex: botão vermelho gritando num fundo verde escuro).
+- A página reage à cor astrológica da Casa Ativa (O Foco). O fundo usa \`color-mix(in srgb, color 6%, #03100B)\` para garantir que a interface respire o "Neon" do momento.
 
 ---
 
-## 3. A Estrutura da Página (Os Blocos)
+## 3. A Estrutura da Página (Ordem Exata de Renderização)
 
-### Sidebar (O Índice / Radar 360)
-Fica fixo na esquerda. Lista as 8 áreas da vida mapeadas (Dinheiro, Trabalho, Identidade, Rotina, Networking, Amor, Espiritual, Saúde).
-- **Interação:** Clicar em um item altera imediatamente o estado global (\`activeArea\`), mudando todo o conteúdo do Painel Direito.
+### Sidebar (O Radar 360) e o Fluxo de Desbloqueio (Opção C)
+Lista as áreas da vida mapeadas. Se a área estiver bloqueada e o usuário clicar, um Modal Glassmorphism de alta conversão sobe. Assim que a compra é confirmada (1 Crédito), a UI desativa o blur **automaticamente e de forma instantânea** sobre todo o conteúdo, sem a necessidade de um segundo clique na tela principal.
 
-### O Painel Direito (O Dossiê)
-É onde o conteúdo é renderizado, empilhado verticalmente na seguinte ordem:
+### O Painel Direito (O Dossiê) - A Cascata de Leitura
 
-#### 1. A Capa (O Hero)
-- Um banner gigante cobrindo 100% da tela inicial.
-- Possui um \`video\` em loop de uma aura abstrata no fundo.
-- **Estado Trancado:** O título principal é visível, mas o parágrafo explicativo tem \`filter: blur\`. Abaixo dele, existe o botão "Desbloquear com 1 Crédito".
-- **Estado Destrancado:** O blur some e os Blocos 2 e 3 são revelados abaixo da dobra.
+#### 1. A Capa (O Hero Cinemático)
+- Banner gigante cobrindo 100% da tela. Vídeo em loop roteado pela Casa base (ex: `tokyo.mp4`).
+- Letreiro tipográfico maciço apenas com o nome da Cidade isolado, e badge do País no topo superior direito.
 
-#### 2. Bloco 2: Os 3 Pilares (Bento Grid)
-- Três cartões (cards de vidro fosco) alinhados horizontalmente (Desktop) ou verticalmente (Mobile).
-- Cada pilar explica uma dinâmica específica de como a energia da cidade se manifesta naquela área da vida (ex: "Aumento de Ganhos", "Estabilidade").
+#### 2. Bloco 2: Os 3 Pilares Práticos (Bento Grid)
+- Três cartões de vidro explicando a dinâmica de como a energia da cidade se manifesta. Vêm da Matriz de 96 cruzamentos.
 
-#### 3. Bloco 3: O Seu DNA de Ativação (Apple Borderless)
-- O cruzamento de dados que prova a personalização do relatório.
-- Usa o **Z-Pattern (Tipografia Gigante, sem caixas/cards)**.
-- Explica a performance baseada em 3 variáveis fixas do usuário + a casa clicada:
-  1. **01. Sua Essência:** Como o Signo Solar da pessoa atua na casa ativa.
-  2. **02. Seu Método:** Como o Ascendente da pessoa executa os planos na casa ativa.
-  3. **03. Fase Atual:** Como a Idade da pessoa dita as prioridades na casa ativa.
+#### 3. Bloco 3: Seu DNA de Ativação (Apple Borderless)
+- Z-Pattern focado no mapa astral real do usuário cruzado com a cidade (Essência, Método, Fase Atual).
 
----
-
-## 4. O Motor de Dados (Mock vs Produção)
-
-**Estado Atual (Frontend):**
-Atualmente, as informações estão chumbadas no array \`LIFE_AREAS\` dentro da própria tela. Nós criamos uma **Persona Mockada** (Sol em Leão, Ascendente em Virgem, 41 Anos). O bloco 3 tem os textos dinâmicos programados apenas para variar a Casa (Focus) dessa persona.
-
-**Estado Final (Backend / LLM):**
-O motor final usará o serviço \`promptEngine.ts\`. Ele pegará o Sol real do cliente (ex: Áries), o Ascendente real (ex: Touro), a idade real e cruzará com a Casa Ativa para pedir à Inteligência Artificial (ChatGPT/Claude) que gere esse JSON padronizado e injete na página, seguindo rigorosamente a Regra do UX Copy.
-
-#### 4. Bloco 4: A Cidade e o Ritual (Painel Split)
-- **Visual:** Ocorre uma ruptura do fundo neutro. Uma imagem full-width da cidade destino aparece (ex: Nova York) com *Parallax real*.
-- **Estrutura:** Um painel de vidro lateral (Frosted Glass com `bg-black/20`) contendo a descrição do impacto do destino, além do Ritual Prático de 24 horas.
-- **Conceito Chave:** A cidade em si *não muda* quando o usuário clica em diferentes casas astrológicas. O usuário calcula *um* destino (ex: Onde passar o aniversário), e as instruções do ritual mudam de acordo com o foco da vida.
+#### 4. Bloco 4: O Dossiê Mestre (Expanding Bento Grid / Apple Standard)
+- Substituímos o excesso de texto e layouts estáticos por um "Expanding Bento Grid" construído via Flexbox (Two-Tier Flex Containers).
+- **Mecânica Two-Tier Flex:** O grid funciona em duas linhas horizontais independentes. Ao focar (hover/tap) num card de uma linha, ele se expande fluidamente (ganhando `flex: 2.5`), empurrando e comprimindo seu vizinho (que recua para `flex: 0.8`), enquanto a linha inferior permanece perfeitamente intacta. Isso extirpa bugs de colisão/quebra que ocorrem ao tentar animar larguras em CSS Grid nativa.
+- **Padrão "Capa Oculta":** Os cards parecem blocos de vidro com apenas um ícone e o título principal (Ex: "O Efeito", "O Ritual"). O texto real fica oculto (opacity 0) até o usuário interagir.
+- **Apple Typography:** O conteúdo interno do Dossiê eliminou "caixinhas" e bordas poluídas. Baseia-se integralmente em espaços em branco, hierarquia tipográfica gigantesca (`font-ps-display`) e blocos de leitura ultra-legíveis.
+- No **Mobile**, a expansão Flex horizontal é desativada e a matriz vira uma coluna empilhada, expandindo suavemente na altura ao receber um Tap.
 
 #### 5. Bloco 4.5: O Mantra de Ativação (Gradiente Cinemático)
-- **Visual:** Um texto Display maciço ocupando a largura central da tela, formatado com *background clip-text gradient* semelhante ao design da Apple.
-- **Objetivo:** Isolar a reprogramação neurolinguística e dar-lhe um peso editorial incomparável antes de avançar para as fases do ano.
+- Texto Display maciço reprogramando o usuário (Totalmente limpo de determinismo).
 
-#### 6. Bloco 5: A Linha do Tempo (Accordion Minimalista)
-- **Estrutura:** Lista em acordeão contendo as 3 Fases de desenvolvimento (Meses 1-4, 5-8, 9-12).
-- **Interação:** Quando expandido, exibe a narrativa de como o foco ativo do usuário se desdobra temporalmente na nova cidade.
+#### 6. Bloco 5: A Linha do Tempo
+- Acordeão minimalista temporal, ditando como o Foco escolhido evoluirá nos próximos 12 meses naquela cidade.
 
-#### 7. Bloco 6: Alertas e Pontos Cegos (PENDENTE)
-- **Objetivo:** Prevenir expectativas mágicas. A energia de um local possui "sombras" ou propensões à autossabotagem na casa ativa.
+#### 7. Bloco 7: Grid de 12 Casas (A Expansão / Upsell)
+- Fica no rodapé da página. Renderiza as cidades trancadas através de leitura real da matriz `ROUTES_MOCK_DATA`.
+- **Regra Visual:** Corte brutalista. Topo (130px) com foto limpa da cidade. Base com a tarja de cor astrológica contendo a cidade limpa sem a string do País acoplada.

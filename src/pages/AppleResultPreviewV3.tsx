@@ -804,7 +804,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     
     // Map verified video assets in /assets/
     if (baseCity.includes("york") || baseCity.includes("nova york") || baseCity.includes("new york")) {
-      return "/assets/newyork.mp4";
+      return "/assets/ny.mp4";
     }
     if (baseCity.includes("paris")) {
       return "/assets/paris.mp4";

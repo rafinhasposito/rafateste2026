@@ -1,0 +1,168 @@
+# Lista de Cidades que ainda NÃO possuem vídeo (Total: 166)
+
+- São Paulo
+- Rio de Janeiro
+- Salvador
+- Florianópolis
+- Foz do Iguaçu
+- Fernando de Noronha
+- Fortaleza
+- Natal
+- Recife
+- Maceió
+- Brasília
+- Belo Horizonte
+- Curitiba
+- Balneário Camboriú
+- Búzios
+- João Pessoa
+- Aracaju
+- Vitória
+- Porto Alegre
+- Porto Seguro
+- Angra dos Reis
+- Paraty
+- Ilhabela
+- Manaus
+- Belém
+- São Luís
+- Goiânia
+- Santos
+- Blumenau
+- Itajaí
+- Ilhéus
+- Cabo Frio
+- Ubatuba
+- Guarujá
+- São Sebastião
+- Cuiabá
+- Campo Grande
+- Juazeiro do Norte
+- Campina Grande
+- Caruaru
+- Bertioga
+- Caraguatatuba
+- Corumbá
+- Porto Velho
+- Teresina
+- Mendoza
+- Bariloche
+- Córdoba
+- Valparaíso
+- Punta del Este
+- Montevidéu
+- Bogotá
+- Medellín
+- Cartagena
+- Lima
+- Cusco
+- Quito
+- La Paz
+- Assunção
+- Caracas
+- Punta Cana
+- Cidade do Panamá
+- Havana
+- San Juan
+- Nassau
+- San José
+- Santo Domingo
+- Cidade da Guatemala
+- Nova Iorque
+- Chicago
+- Miami
+- Las Vegas
+- São Francisco
+- Toronto
+- Vancouver
+- Cidade do México
+- Boston
+- Washington D.C.
+- Seattle
+- Nova Orleans
+- Orlando
+- San Diego
+- Nashville
+- Aspen
+- Sedona
+- Montreal
+- Cancún
+- Tulum
+- Los Cabos
+- Denver
+- Atlanta
+- Dallas
+- Houston
+- Filadélfia
+- Portland
+- Charleston
+- Calgary
+- Québec
+- Guadalajara
+- Puerto Vallarta
+- Phoenix
+- Minneapolis
+- Memphis
+- Savannah
+- Ottawa
+- Monterrey
+- Detroit
+- St. Louis
+- Kansas City
+- Madrid
+- Barcelona
+- Milão
+- Berlim
+- Amesterdão
+- Istambul
+- Lisboa
+- Porto
+- Funchal
+- Ponta Delgada
+- Zurique
+- Genebra
+- Veneza
+- Florença
+- Copenhaga
+- Viena
+- Innsbruck
+- Munique
+- Frankfurt
+- Bruxelas
+- Edimburgo
+- Dublin
+- Estocolmo
+- Oslo
+- Praga
+- Budapeste
+- Dubrovnik
+- Atenas
+- Santorini
+- Monte Carlo
+- Cidade do Vaticano
+- Ibiza
+- Cannes
+- Nice
+- Marraquexe
+- Cairo
+- Cidade do Cabo
+- Zanzibar
+- Mahé
+- Abu Dhabi
+- Doha
+- Jerusalém
+- Banguecoque
+- Singapura
+- Kuala Lumpur
+- Hong Kong
+- Seul
+- Pequim
+- Xangai
+- Quioto
+- Mumbai
+- Nova Deli
+- Sydney
+- Melbourne
+- Bora Bora
+- Auckland
+- Honolulu

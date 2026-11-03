@@ -14,6 +14,7 @@ const destinationExamples = [
       beneficios: "Construção de autoridade, projeção de imagem e prestígio absoluto.",
       vidaReal: "Você para de ser um segredo bem guardado. O mercado te vê como referência, atraindo grandes contratos."
     },
+    poster: "https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?auto=format&fit=crop&w=800&q=75",
     video: "/assets/tokyo.mp4"
   },
   {
@@ -27,6 +28,7 @@ const destinationExamples = [
       beneficios: "Eficiência no trabalho, rotina blindada e foco extremo na saúde.",
       vidaReal: "Seu dia vira um relógio suíço: consistência para treinar, comer limpo e organizar a agenda."
     },
+    poster: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=75",
     video: "/assets/zurich.mp4"
   },
   {
@@ -40,7 +42,8 @@ const destinationExamples = [
       beneficios: "Poder de convencimento, clareza nas negociações e networking rápido.",
       vidaReal: "Sua comunicação vira uma máquina de vendas. Feche negócios e faça seu produto circular."
     },
-    video: "/assets/newyork.mp4"
+    poster: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=75",
+    video: "/assets/ny.mp4"
   }
 ];
 
@@ -104,6 +107,7 @@ const DesktopScreen2 = () => {
                 >
                   <video 
                     autoPlay loop muted playsInline preload="metadata"
+                    poster={dest.poster}
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ filter: "saturate(1.2) contrast(1.1)" }}
                   >
@@ -180,11 +184,11 @@ const MobileScreen2 = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null);
 
   return (
-    <div className="relative w-full h-[100dvh] flex flex-col justify-start overflow-hidden bg-[#030306]">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#C9A227]/5 via-[#030306] to-[#030306]" />
+    <div className="relative w-full h-[100dvh] flex flex-col justify-start overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain bg-[#030306]">
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#C9A227]/5 via-[#030306] to-[#030306]" />
 
       {/* Header */}
-      <div className="relative z-20 pt-10 pb-4 px-6 text-center">
+      <div className="relative z-20 pt-20 pb-4 px-6 text-center shrink-0">
         <span className="inline-block font-ps-ui text-[9px] tracking-[0.2em] text-[#C9A227] uppercase mb-2 drop-shadow-md">
           A geografia recalcula o seu destino
         </span>
@@ -197,76 +201,79 @@ const MobileScreen2 = () => {
       </div>
 
       {/* Accordion Cards */}
-      <div className="relative z-10 flex-1 flex flex-col gap-3 px-5 pb-24">
+      <div className="relative z-10 flex flex-col gap-3.5 px-5 pb-32 w-full max-w-md mx-auto">
         {destinationExamples.map((dest) => {
           const isActive = activeCard === dest.id;
           
           return (
             <motion.div
               key={dest.id}
+              layout
               onClick={() => setActiveCard(isActive ? null : dest.id)}
-              animate={{ flex: isActive ? 4 : 1 }}
-              transition={{ duration: 0.5, ease: 'easeInOut' }}
-              className={`relative rounded-2xl overflow-hidden border transition-colors duration-500 cursor-pointer flex-shrink-0 ${
-                isActive ? 'border-white/20 shadow-2xl' : 'border-white/5 shadow-md'
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              className={`relative rounded-2xl overflow-hidden border transition-colors duration-500 cursor-pointer shrink-0 ${
+                isActive ? 'border-[#C9A227]/40 shadow-2xl min-h-[260px]' : 'border-white/10 shadow-md min-h-[118px]'
               }`}
             >
               {/* Background Video */}
               <video 
                 autoPlay loop muted playsInline preload="metadata"
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isActive ? 'opacity-80' : 'opacity-40'}`}
+                poster={dest.poster}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none ${isActive ? 'opacity-80' : 'opacity-45'}`}
                 style={{ filter: "saturate(1.2) contrast(1.1)" }}
               >
                 <source src={dest.video} type={dest.video.endsWith('mov') ? 'video/quicktime' : 'video/mp4'} />
                 {dest.video.endsWith('mov') && <source src={dest.video} type="video/mp4" />}
               </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#030306]/80 via-[#030306]/40 to-[#030306]/80" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#030306]/90 via-[#030306]/45 to-[#030306]/80 pointer-events-none" />
               
               {/* Collapsed State: City and House centered */}
-              <motion.div 
-                animate={{ opacity: isActive ? 0 : 1 }}
-                className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"
-              >
-                <span className="font-ps-display text-2xl md:text-3xl text-white tracking-widest uppercase drop-shadow-lg">{dest.city}</span>
-                <span className="font-ps-ui text-[#C9A227] text-[10px] font-bold uppercase tracking-[0.2em] mt-2 drop-shadow-md">{dest.house}</span>
-                {!activeCard && (
-                  <span className="font-ps-ui text-white/30 text-[8px] uppercase tracking-widest mt-4 border border-white/10 rounded-full px-3 py-1">
+              {!isActive ? (
+                <div className="relative z-10 min-h-[118px] py-5 px-4 flex flex-col items-center justify-center text-center">
+                  <span className="font-ps-display text-2xl md:text-3xl text-white tracking-widest uppercase drop-shadow-lg">{dest.city}</span>
+                  <span className="font-ps-ui text-[#C9A227] text-[10px] font-bold uppercase tracking-[0.2em] mt-1.5 drop-shadow-md">{dest.house}</span>
+                  <span className="font-ps-ui text-white/45 text-[8px] uppercase tracking-widest mt-3 border border-white/15 bg-black/30 rounded-full px-3 py-1">
                     Toque para abrir
                   </span>
-                )}
-              </motion.div>
-
-              {/* Expanded State: Content Panel */}
-              <motion.div
-                initial={false}
-                animate={{ opacity: isActive ? 1 : 0 }}
-                className="absolute inset-0 flex flex-col justify-end p-4 pointer-events-none"
-              >
-                <div className="bg-black/70 backdrop-blur-md rounded-xl p-4 border border-white/10 flex flex-col gap-3 pointer-events-auto">
-                  
-                  {/* Title & Tag */}
-                  <div>
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-ps-display text-xl text-white">{dest.house}</h3>
-                      <span className="bg-white/10 px-2 py-0.5 rounded text-[9px] text-white/80 uppercase tracking-widest">{dest.city}</span>
-                    </div>
-                    <span className="font-ps-ui text-[#C9A227] text-[9px] font-bold uppercase tracking-[0.15em]">{dest.tag}</span>
-                  </div>
-                  
-                  {/* Highlight Box: Para Quem É */}
-                  <div className="bg-[#C9A227]/10 border-l-2 border-[#C9A227] p-2.5 rounded-r-md mt-1">
-                    <span className="block font-ps-ui text-[#C9A227] text-[9px] uppercase font-bold tracking-widest mb-1">Para quem é</span>
-                    <span className="block font-ps-ui text-white text-[11px] leading-snug">{dest.details.paraQuem}</span>
-                  </div>
-
-                  {/* Impact: Na Vida Real */}
-                  <div className="flex flex-col">
-                    <span className="font-ps-ui text-white/40 text-[9px] uppercase font-bold tracking-widest mb-0.5">Na Vida Real</span>
-                    <span className="font-ps-ui text-white/80 text-[11px] leading-snug">{dest.details.vidaReal}</span>
-                  </div>
-
                 </div>
-              </motion.div>
+              ) : (
+                /* Expanded State: Content Panel in natural flow so it never clips and allows scrolling */
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative z-10 p-3.5 pt-12 flex flex-col justify-end"
+                >
+                  <div className="bg-black/75 backdrop-blur-md rounded-xl p-4 border border-white/10 flex flex-col gap-3">
+                    {/* Title & Tag */}
+                    <div>
+                      <div className="flex justify-between items-start mb-1 gap-2">
+                        <h3 className="font-ps-display text-xl text-white leading-tight">{dest.house}</h3>
+                        <span className="bg-white/10 px-2.5 py-0.5 rounded text-[9px] text-white/90 uppercase tracking-widest shrink-0">{dest.city}</span>
+                      </div>
+                      <span className="font-ps-ui text-[#C9A227] text-[9px] font-bold uppercase tracking-[0.15em] block">{dest.tag}</span>
+                    </div>
+                    
+                    {/* Highlight Box: Para Quem É */}
+                    <div className="bg-[#C9A227]/10 border-l-2 border-[#C9A227] p-2.5 rounded-r-md">
+                      <span className="block font-ps-ui text-[#C9A227] text-[9px] uppercase font-bold tracking-widest mb-1">Para quem é</span>
+                      <span className="block font-ps-ui text-white text-[11px] leading-snug">{dest.details.paraQuem}</span>
+                    </div>
+
+                    {/* Benefícios */}
+                    <div className="flex flex-col">
+                      <span className="font-ps-ui text-white/45 text-[9px] uppercase font-bold tracking-widest mb-0.5">Benefícios</span>
+                      <span className="font-ps-ui text-white/85 text-[11px] leading-snug">{dest.details.beneficios}</span>
+                    </div>
+
+                    {/* Impact: Na Vida Real */}
+                    <div className="flex flex-col">
+                      <span className="font-ps-ui text-white/45 text-[9px] uppercase font-bold tracking-widest mb-0.5">Na Vida Real</span>
+                      <span className="font-ps-ui text-white/85 text-[11px] leading-snug">{dest.details.vidaReal}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
             </motion.div>
           );
