@@ -184,7 +184,10 @@ const MobileScreen2 = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null);
 
   return (
-    <div className="relative w-full h-[100dvh] flex flex-col justify-start overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain bg-[#030306]">
+    <div
+      data-onboarding-scroll
+      className="relative w-full h-full overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain touch-pan-y bg-[#030306]"
+    >
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#C9A227]/5 via-[#030306] to-[#030306]" />
 
       {/* Header */}

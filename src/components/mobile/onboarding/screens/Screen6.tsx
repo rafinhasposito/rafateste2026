@@ -10,7 +10,10 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="relative w-full min-h-[100dvh] h-[100dvh] flex flex-col items-center justify-start lg:justify-center overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain lg:overflow-hidden custom-scrollbar bg-[#030306]">
+    <div
+      data-onboarding-scroll
+      className="relative w-full h-full flex flex-col items-center justify-start lg:justify-center overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain touch-pan-y lg:overflow-hidden custom-scrollbar bg-[#030306]"
+    >
       
       {/* Abstract starry background */}
       <div className="fixed inset-0 z-0 pointer-events-none">

@@ -27,12 +27,12 @@ export function OnboardingNav({
   return (
     <>
       {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 z-40 bg-gradient-to-b from-[#030306] via-[#030306]/80 to-transparent pointer-events-none">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-6 md:px-12 pt-5 md:pt-12 pb-5 pointer-events-auto">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#030306] via-[#030306]/85 to-transparent pointer-events-none">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between px-6 md:px-12 pt-[max(1rem,env(safe-area-inset-top))] md:pt-10 pb-4 pointer-events-auto">
           {step > 1 ? (
             <button
               onClick={onPrev}
-              className="h-10 w-10 md:h-12 md:w-12 flex items-center justify-center border border-white/15 bg-black/40 backdrop-blur-md text-white/70 hover:text-white hover:border-white/30 hover:bg-white/10 rounded-full transition-all"
+              className="h-10 w-10 md:h-12 md:w-12 flex items-center justify-center border border-white/15 bg-black/50 backdrop-blur-md text-white/80 hover:text-white hover:border-white/30 hover:bg-white/10 rounded-full transition-all"
               aria-label="Voltar"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -41,19 +41,19 @@ export function OnboardingNav({
             <img
               src="/brand/protocolo-solar-logo-horizontal-4096.png"
               alt="Protocolo Solar"
-              className="w-[160px] md:w-[320px] h-auto opacity-95 drop-shadow-md"
+              className="w-[150px] md:w-[300px] h-auto opacity-95 drop-shadow-md"
               draggable={false}
             />
           )}
 
           <div className="flex items-center gap-3">
-            <span className="font-mono text-[10px] md:text-[11px] text-white/50 tracking-[0.2em]">{step} de {totalSteps}</span>
+            <span className="font-mono text-[10px] md:text-[11px] text-white/60 tracking-[0.2em]">{step} de {totalSteps}</span>
             <button
               onClick={() => {
                 localStorage.setItem('ps_onboarding_completed', 'true');
                 navigate('/');
               }}
-              className="h-8 w-8 flex items-center justify-center border border-white/15 hover:border-white/30 bg-black/40 backdrop-blur-md hover:bg-white/10 text-white/70 hover:text-white rounded-full transition-all active:scale-95"
+              className="h-8 w-8 flex items-center justify-center border border-white/15 hover:border-white/30 bg-black/50 backdrop-blur-md hover:bg-white/10 text-white/80 hover:text-white rounded-full transition-all active:scale-95"
               aria-label="Fechar Onboarding"
               title="Fechar"
             >
@@ -64,8 +64,8 @@ export function OnboardingNav({
       </div>
 
       {/* Bottom CTA */}
-      <div className={`absolute bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#030306] via-[#030306]/85 to-transparent pointer-events-none pt-6 ${isFinal ? 'lg:hidden' : ''}`}>
-        <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row md:items-end md:justify-end px-6 md:px-12 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pb-12 pointer-events-auto">
+      <div className={`fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-[#030306] via-[#030306]/90 to-transparent pointer-events-none pt-5 ${isFinal ? 'lg:hidden' : ''}`}>
+        <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row md:items-end md:justify-end px-6 md:px-12 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:pb-10 pointer-events-auto">
           <div className="w-full md:w-auto md:min-w-[240px]">
             <button
               onClick={onNext}

@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --prefer-offline || npm install
 
+      - name: Clean broken symlinks
+        run: find public -type l -delete || true
+
       - name: Build
         run: npm run build
 

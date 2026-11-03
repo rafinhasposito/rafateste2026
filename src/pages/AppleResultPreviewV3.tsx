@@ -2415,6 +2415,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
             </div>
 
 </Reveal>
+        </div>
       </section>
 
       {/* Rodapé de Ações & Navegação Mobile/Desktop */}

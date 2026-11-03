@@ -9,7 +9,10 @@ export const Screen1 = () => {
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   return (
-    <div className="relative w-full h-[100dvh] overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain flex flex-col bg-[#030306]">
+    <div
+      data-onboarding-scroll
+      className="relative w-full h-full overflow-y-auto overflow-x-hidden [-webkit-overflow-scrolling:touch] overscroll-y-contain touch-pan-y flex flex-col bg-[#030306]"
+    >
       {/* Earth + Milky Way — Ken Burns Instant Layer + Progressive Video Crossfade */}
       <div className="fixed inset-0 w-full h-full pointer-events-none" style={{ filter: 'contrast(1.08) saturate(1.15) brightness(1.05)' }}>
         {/* Camada 1: Imagem da Terra com movimento lento contínuo (0.1s de abertura) */}
