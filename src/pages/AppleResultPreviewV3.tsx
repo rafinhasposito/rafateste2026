@@ -977,7 +977,16 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         <motion.div style={{ scale: vidScale, opacity: vidOpacity }} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#03100B] z-10" />
           {heroVideoSrc ? (
-            <video autoPlay muted loop playsInline className="w-full h-full object-cover" key={heroVideoSrc}>
+            <video 
+              autoPlay 
+              muted 
+              loop 
+              playsInline 
+              preload="metadata"
+              poster={bestCity?.img || getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
+              className="w-full h-full object-cover" 
+              key={heroVideoSrc}
+            >
               <source src={heroVideoSrc} type={heroVideoSrc?.endsWith('.mov') ? 'video/quicktime' : 'video/mp4'} />
             </video>
           ) : (
@@ -1205,7 +1214,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest">Compatibilidade da Escolha</p>
                            <div className="flex items-center justify-center gap-3 bg-[var(--hc20)] px-6 py-3 rounded-full border border-[var(--hc30)] shadow-[0_0_30px_var(--hc20)]">
                              <div className="w-2.5 h-2.5 rounded-full bg-[var(--hc)] animate-pulse"></div>
-                             <span className="text-[var(--hc)] font-bold tracking-widest text-lg">{P.match}% MATCH</span>
+                             <span className="text-[var(--hc)] font-bold tracking-widest text-lg">{Math.min(P.match, 98)}% MATCH</span>
                            </div>
                          </div>
                        </div>
@@ -1673,7 +1682,16 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                     className="w-full h-full"
                                   >
                                     {heroVideoSrc ? (
-                                      <video autoPlay muted loop playsInline className="w-full h-full object-cover object-center" key={heroVideoSrc}>
+                                      <video 
+                                        autoPlay 
+                                        muted 
+                                        loop 
+                                        playsInline 
+                                        preload="metadata"
+                                        poster={bestCity?.img || getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house)}
+                                        className="w-full h-full object-cover object-center" 
+                                        key={heroVideoSrc}
+                                      >
                                         <source src={heroVideoSrc} type="video/mp4" />
                                       </video>
                                     ) : (
@@ -2072,7 +2090,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               <MapPin className="w-4 h-4" style={{ color: currentActiveData?.color || '#10b981' }} />
                               <span className="uppercase tracking-widest text-[10px]">{city.country}</span>
                             </div>
-                            <span className="font-sans text-[10px] font-bold px-3 py-1.5 rounded-full border" style={{ backgroundColor: `${currentActiveData?.color || '#10b981'}15`, color: currentActiveData?.color || '#10b981', borderColor: `${currentActiveData?.color || '#10b981'}30` }}>{city.score}% MATCH</span>
+                            <span className="font-sans text-[10px] font-bold px-3 py-1.5 rounded-full border" style={{ backgroundColor: `${currentActiveData?.color || '#10b981'}15`, color: currentActiveData?.color || '#10b981', borderColor: `${currentActiveData?.color || '#10b981'}30` }}>{Math.min(city.score || 98, 98)}% MATCH</span>
                           </div>
                         </div>
                       </div>

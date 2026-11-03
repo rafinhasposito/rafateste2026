@@ -343,11 +343,11 @@ const Dashboard = () => {
       await refreshProfile();
       if (isUnlockAll) {
         showAlert(`Visão 360 desbloqueada com sucesso!`);
+        document.getElementById("visao-360")?.scrollIntoView({ behavior: "smooth" });
       } else {
         showAlert(`Casa ${targetHouse} desbloqueada com sucesso.`);
         setSelectedHouse(targetHouse);
       }
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: any) {
       console.error(error);
       showAlert(error.message || "Falha ao desbloquear. Tente novamente.");
