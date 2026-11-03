@@ -871,32 +871,35 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual (P_DYNAMIC.house)
   const currentHouseResult = props.allResults ? props.allResults[P_DYNAMIC.house.toString()] : null;
   
-  const extractRoutes = (tierData: any, fallbackName: string): any[] => {
+  // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual
+  const extractRoutes = (tierData: any): any[] => {
     if (!tierData) return [];
     const arr = Array.isArray(tierData) ? tierData : [tierData];
     return arr.filter(Boolean).map(cityData => ({
       ...cityData,
       city: cityData.city || cityData.name || "Destino",
-      score: cityData.score || (fallbackName === 'Nacional' ? 96 : fallbackName === 'Acessível' ? 94 : 98),
+      score: cityData.score || 98,
       img: (cityData.img && cityData.img.startsWith('http')) ? cityData.img : getAtmosphericFallback(P_DYNAMIC.house)
     }));
   };
 
-  const htRoutes = extractRoutes(currentHouseResult?.options?.highticket, 'High-Ticket');
-  const acRoutes = extractRoutes(currentHouseResult?.options?.acessivel, 'Acessível');
-  const naRoutes = extractRoutes(currentHouseResult?.options?.nacional, 'Nacional');
+  // NOVO: Cria os cards dinamicamente baseado nos continentes que o backend mandou
+  const dynamicContinents = currentHouseResult?.options 
+    ? Object.entries(currentHouseResult.options).map(([contName, cities]) => ({
+        title: contName,
+        desc: `Rota ${contName} Alternativa`,
+        data: extractRoutes(cities)
+      }))
+    : [];
 
-  // Somente usa o props.cities genérico se currentHouseResult não existir E estivermos na mesma casa inicial
-  const isInitialHouse = !props.allResults || (props.consultationId && P_DYNAMIC.house === props.house);
-  const fallbackNa = isInitialHouse ? props.cities?.nacional : [];
-  const fallbackAc = isInitialHouse ? props.cities?.acessivel : [];
-  const fallbackHt = isInitialHouse ? props.cities?.highticket : [];
-  
-  const citiesObj = {
-    nacional: naRoutes.length > 0 ? naRoutes : fallbackNa || [],
-    acessivel: acRoutes.length > 0 ? acRoutes : fallbackAc || [],
-    highticket: htRoutes.length > 0 ? htRoutes : fallbackHt || []
-  };
+  // Fallback caso o backend não mande nada (ex: consultas antigas)
+  const displayContinents = dynamicContinents.length > 0 
+    ? dynamicContinents 
+    : [
+        { title: "Nacional", desc: "Rota Nacional Alternativa", data: extractRoutes(props.cities?.nacional) },
+        { title: "Acessível", desc: "Rota Internacional Alternativa", data: extractRoutes(props.cities?.acessivel) },
+        { title: "High Ticket", desc: "Destino Alternativo de Luxo", data: extractRoutes(props.cities?.highticket) }
+      ];
 
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
   // Find the intended area based on props.intent
