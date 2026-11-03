@@ -2619,7 +2619,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {[1,2,3,4,5,6,7,8,9,10,11,12].map((num) => {
                   const isCurrent = num === P_DYNAMIC.house;
                   const dbData = cityDatabase[num as keyof typeof cityDatabase];
@@ -2633,86 +2633,178 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   const houseBestCity = resultForHouse?.city || houseFirstOption;
                   const mappedCityName = houseBestCity?.city ? canonicalCityName(houseBestCity.city) : "Desconhecido";
                   
-                  const cityForThisHouse = isCurrent ? canonicalCityName(P_DYNAMIC.city.split(", ")[0]) : (isUnlocked ? mappedCityName.split(", ")[0] : "Bloqueado");
+                  const cityForThisHouse = isCurrent
+                    ? canonicalCityName(P_DYNAMIC.city.split(", ")[0])
+                    : (isUnlocked ? mappedCityName.split(", ")[0] : "Cidade Oculta");
                   const rawImg = (houseBestCity as any)?.img || (resultForHouse?.options as any)?.highticket?.img;
                   const imageForThisHouse = rawImg 
                     ? (rawImg.startsWith("http") ? rawImg : `https://images.unsplash.com/photo-${rawImg}?auto=format&fit=crop&w=1000&q=80`) 
-                    : getAtmosphericFallback(num);
+                    : getHouseImageUrl(cityForThisHouse, num);
                   const areaColor = houseThemes[num]?.themeColor || '#10b981';
+                  const houseHook = HOUSE_CINEMATIC_TEXTS[num] || "ativar uma nova dimensão estratégica nos seus próximos 12 meses.";
+                  const singleHouseCost = props.houseCost ?? 1;
 
                   return (
                     <div 
                       key={num}
                       onClick={() => {
                         if (!isUnlocked) {
-                          setTargetLockedArea({ label: label, color: areaColor, id: num.toString(), type: 'rota', houseNum: num }); setIsPaywallOpen(true);
+                          setTargetLockedArea({ label: label, color: areaColor, id: num.toString(), type: 'rota', houseNum: num });
+                          setIsPaywallOpen(true);
                         } else if (!isCurrent && props.onSelectHouse) {
                           props.onSelectHouse(num);
                         }
                       }}
-                      className={`relative rounded-[32px] border transition-all duration-500 ease-[0.19,1,0.22,1] overflow-hidden flex flex-col group h-[260px] ${
+                      className={`relative rounded-[28px] border transition-all duration-500 ease-[0.19,1,0.22,1] overflow-hidden flex flex-col group min-h-[390px] ${
                         isCurrent 
-                          ? 'bg-[#050505] border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)] scale-[1.02]' 
+                          ? 'bg-[#070B12] border-white/30 shadow-[0_0_45px_rgba(255,255,255,0.08)] scale-[1.01]' 
                           : isUnlocked 
-                            ? 'bg-[#050505] cursor-pointer hover:border-white/20'
-                            : 'bg-[#050505] border-white/5 hover:border-white/20 hover:bg-white/[0.02] cursor-pointer p-6 justify-between'
+                            ? 'bg-[#06090F] cursor-pointer hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(0,0,0,0.7)]'
+                            : 'bg-[#05070C] border-white/10 hover:border-[#F5DE98]/45 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(201,162,39,0.14)] cursor-pointer'
                       }`}
-                      style={{ borderColor: isUnlocked && !isCurrent ? `${areaColor}30` : undefined }}
+                      style={{ borderColor: isUnlocked && !isCurrent ? `${areaColor}45` : undefined }}
                     >
-                      {isUnlocked ? (
-                        <>
-                          {/* FOTO TOP (Corte Seco) */}
-                          <div className="relative h-[130px] w-full shrink-0 overflow-hidden bg-[#050505]">
-                            <WikiImage 
-                              cityName={cityForThisHouse} 
-                              initialSrc={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} 
-                              fallbackSrc={getAtmosphericFallback(num)} 
-                              localFallback={getHouseImageUrl(cityForThisHouse, num)}
-                              alt={cityForThisHouse} 
-                              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
-                            />
-                            {isCurrent && (
-                              <div className="absolute inset-0 bg-white/5 mix-blend-overlay"></div>
-                            )}
-                          </div>
-                          
-                          {/* TEXT BOTTOM (Fundo colorido sólido e reto) */}
-                          <div className="flex flex-col flex-1 px-6 pb-6 pt-5 justify-end relative overflow-hidden">
-                            {/* Tarja com a cor da casa */}
-                            {(!isCurrent) && (
-                              <div className="absolute inset-0 z-0 opacity-25" style={{ backgroundColor: areaColor }}></div>
-                            )}
-                            
-                            <div className="relative z-10 flex items-center justify-between mb-2">
-                              <span className="font-sans text-[10px] tracking-widest uppercase font-bold" style={{ color: isCurrent ? 'white' : areaColor }}>Casa {num}</span>
-                              <span className="font-sans text-[10px] tracking-widest uppercase font-bold text-white/80">{cityForThisHouse}</span>
-                            </div>
-                            <div className="relative z-10 min-h-[66px] flex items-end">
-                              <h3 className="font-ps-display text-xl sm:text-2xl leading-[1.15] font-bold tracking-tight text-white pr-2 line-clamp-3">{label}</h3>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          {/* LOCKED STATE */}
-                          <div className="relative z-10 flex justify-between items-start">
-                            <div>
-                              <span className="font-sans text-[10px] tracking-widest uppercase font-bold block mb-2 text-white/30">Casa {num}</span>
-                              <div className="min-h-[66px] flex items-start">
-                                <h3 className="font-ps-display text-xl sm:text-2xl leading-[1.15] font-bold tracking-tight text-white/60 group-hover:text-white pr-2 line-clamp-3">{label}</h3>
-                              </div>
-                            </div>
-                            <div className="w-10 h-10 rounded-full border border-white/5 bg-black/40 flex items-center justify-center shrink-0 transition-colors duration-500 group-hover:border-white/20">
-                              <Lock className="w-4 h-4 text-white/30 group-hover:text-white/70 transition-colors" />
-                            </div>
-                          </div>
+                      {/* 1. FOTO NO TOPO (SEMPRE VISÍVEL — REAL SE DESBLOQUEADA, MISTERIOSA SE BLOQUEADA) */}
+                      <div className="relative h-[176px] w-full shrink-0 overflow-hidden bg-[#050505]">
+                        {isUnlocked ? (
+                          <WikiImage 
+                            cityName={cityForThisHouse} 
+                            initialSrc={isCurrent ? getHouseImageUrl(P_DYNAMIC.city, P_DYNAMIC.house, bestCity?.img) : imageForThisHouse} 
+                            fallbackSrc={getAtmosphericFallback(num)} 
+                            localFallback={getHouseImageUrl(cityForThisHouse, num)}
+                            alt={cityForThisHouse} 
+                            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
+                          />
+                        ) : (
+                          <img
+                            src={optimizeImageForDevice(getAtmosphericFallback(num))}
+                            alt={`Casa ${num}`}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover scale-105 blur-[1.5px] brightness-[0.45] contrast-110 transition-all duration-700 group-hover:scale-110 group-hover:brightness-[0.65] group-hover:blur-0"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#05070C] via-black/25 to-black/30" />
 
-                          <div className="relative z-10 mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
-                            <span className="text-[10px] uppercase tracking-widest font-bold text-white/20">Destino Restrito</span>
-                            <span className="font-bold text-white/20 text-base">Bloqueado</span>
-                          </div>
-                        </>
-                      )}
+                        {/* Badge Superior na Foto */}
+                        <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
+                          <span
+                            className="px-3 py-1 rounded-full text-[10px] font-sans font-bold uppercase tracking-[0.18em] backdrop-blur-md border"
+                            style={{
+                              backgroundColor: isUnlocked ? `${areaColor}25` : "rgba(0,0,0,0.65)",
+                              borderColor: isUnlocked ? `${areaColor}60` : "rgba(255,255,255,0.15)",
+                              color: isUnlocked ? "#ffffff" : "#F5DE98",
+                            }}
+                          >
+                            {isCurrent ? "Rota em Exibição" : isUnlocked ? "Rota Liberada" : "Coordenada Secreta"}
+                          </span>
+
+                          {isUnlocked ? (
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 bg-black/50 text-white group-hover:scale-110 transition-transform"
+                            >
+                              <ArrowUpRight className="w-4 h-4" />
+                            </div>
+                          ) : (
+                            <div className="px-2.5 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 backdrop-blur-md flex items-center gap-1.5">
+                              <Lock className="w-3 h-3 text-[#F5DE98]" />
+                              <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-[#F5DE98]">
+                                {singleHouseCost} {singleHouseCost === 1 ? "Crédito" : "Créditos"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 2. FAIXA DIVISÓRIA: CASA >>> CIDADE */}
+                      <div
+                        className="px-6 py-3.5 border-y flex items-center justify-between gap-3 relative z-10 shrink-0"
+                        style={{
+                          borderColor: isUnlocked ? `${areaColor}30` : "rgba(255,255,255,0.08)",
+                          background: isUnlocked
+                            ? `linear-gradient(90deg, ${areaColor}18 0%, rgba(255,255,255,0.02) 100%)`
+                            : "rgba(255,255,255,0.025)",
+                        }}
+                      >
+                        <span
+                          className="font-sans text-[11px] tracking-[0.22em] uppercase font-bold shrink-0"
+                          style={{ color: isUnlocked ? areaColor : "#F5DE98" }}
+                        >
+                          Casa {num}
+                        </span>
+
+                        <span className="font-mono text-xs tracking-[0.25em] text-white/35 shrink-0">
+                          &gt;&gt;&gt;
+                        </span>
+
+                        {isUnlocked ? (
+                          <span className="font-ps-display text-sm sm:text-base font-bold tracking-wide uppercase text-white truncate text-right">
+                            {cityForThisHouse}
+                          </span>
+                        ) : (
+                          <span className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[#F5DE98]/90 flex items-center gap-1.5 shrink-0">
+                            <Lock className="w-3 h-3 text-[#F5DE98]" />
+                            Cidade Oculta
+                          </span>
+                        )}
+                      </div>
+
+                      {/* 3. DESCRIÇÃO + CURIOSIDADE + BOTÃO DE AÇÃO (SEM ENCAVALAR) */}
+                      <div className="flex flex-col flex-1 px-6 py-5 justify-between relative overflow-hidden">
+                        {isUnlocked && !isCurrent && (
+                          <div
+                            className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"
+                            style={{ backgroundColor: areaColor }}
+                          />
+                        )}
+
+                        <div className="relative z-10">
+                          <h3 className="font-ps-display text-xl sm:text-2xl leading-[1.2] font-bold tracking-tight text-white mb-2.5">
+                            {label}
+                          </h3>
+                          <p className="font-sans text-xs sm:text-[13px] text-white/65 font-light leading-relaxed line-clamp-3">
+                            {isUnlocked
+                              ? `Veja como ${cityForThisHouse} atua para ${houseHook}`
+                              : `Descubra qual cidade do mundo foi calculada no seu mapa para ${houseHook}`}
+                          </p>
+                        </div>
+
+                        <div className="relative z-10 mt-5 pt-3.5 border-t border-white/10 flex items-center justify-between">
+                          {isCurrent ? (
+                            <>
+                              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
+                                Status da Rota
+                              </span>
+                              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: areaColor }}>
+                                Visualizando Agora
+                              </span>
+                            </>
+                          ) : isUnlocked ? (
+                            <>
+                              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/60">
+                                Dossiê Completo
+                              </span>
+                              <span
+                                className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 group-hover:translate-x-1 transition-transform"
+                                style={{ color: areaColor }}
+                              >
+                                Abrir {cityForThisHouse}
+                                <ChevronRight className="w-4 h-4" />
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-white/45">
+                                + 9 Rotas Extras
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#F5DE98] text-[11px] font-bold uppercase tracking-wider group-hover:bg-[#C9A227] group-hover:text-[#02050A] transition-all">
+                                <Unlock className="w-3.5 h-3.5" />
+                                Revelar Cidade
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
