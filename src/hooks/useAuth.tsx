@@ -42,6 +42,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
+    try {
+      const pendingRaw = localStorage.getItem("ps_pending_natal_passport");
+      if (pendingRaw) {
+        const pending = JSON.parse(pendingRaw);
+        if (pending && pending.full_name && pending.birth_date && pending.birth_time && pending.birth_city) {
+          const parts = String(pending.birth_city).split(",").map((s: string) => s.trim());
+          const country = parts.length > 1 ? parts[parts.length - 1] : null;
+          await supabase
+            .from("profiles")
+            .update({
+              full_name: pending.full_name,
+              display_name: pending.full_name,
+              birth_date: pending.birth_date,
+              birth_time: pending.birth_time,
+              birth_city: pending.birth_city,
+              birth_country: country,
+              birth_lat: pending.birth_lat ?? null,
+              birth_lon: pending.birth_lon ?? null,
+            })
+            .eq("user_id", userId);
+          localStorage.removeItem("ps_pending_natal_passport");
+        }
+      }
+    } catch (e) {
+      console.error("Failed to sync pending natal passport:", e);
+    }
+
     const { data } = await supabase
       .from("profiles")
       .select("display_name, avatar_url, email, credits, full_name, birth_date, birth_time, birth_city, birth_lat, birth_lon")

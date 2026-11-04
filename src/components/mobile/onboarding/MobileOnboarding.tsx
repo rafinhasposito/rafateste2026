@@ -44,10 +44,11 @@ export default function MobileOnboarding() {
       setStep(s => s + 1);
     } else {
       localStorage.setItem('ps_onboarding_completed', 'true');
+      sessionStorage.setItem('ps_pending_mode', 'futuro');
       if (user) {
-        navigate('/');
+        navigate('/?mode=futuro');
       } else {
-        navigate('/auth');
+        navigate('/auth?setup=true');
       }
     }
   };

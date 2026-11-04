@@ -41,19 +41,19 @@ export const Screen4 = () => {
       {/* Deep ambient background */}
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/[0.02] via-[#010103] to-[#010103]" />
 
-      <div className="relative z-10 min-h-[100svh] w-full flex flex-col justify-start md:justify-center pt-20 pb-32 md:py-24">
+      <div className="relative z-10 min-h-[100svh] w-full flex flex-col justify-start md:justify-center pt-[72px] pb-28 sm:pt-20 sm:pb-32 md:py-24">
         {/* Title */}
-        <div className="relative z-20 text-center shrink-0 pb-4 px-6 md:pb-12">
-          <h2 className="font-ps-display text-[22px] sm:text-3xl md:text-5xl text-white mb-1.5 md:mb-4 leading-tight drop-shadow-lg">
+        <div className="relative z-20 text-center shrink-0 pb-3 sm:pb-5 px-5 md:pb-12">
+          <h2 className="font-ps-display text-[20px] sm:text-3xl md:text-5xl text-white mb-1 md:mb-4 leading-snug drop-shadow-lg">
             Como você quer transformar seu ano?
           </h2>
-          <p className="font-ps-ui text-[#C9A227] text-[10px] md:text-xs tracking-[0.26em] uppercase drop-shadow-md">
+          <p className="font-ps-ui text-[#C9A227] text-[9px] sm:text-[10px] md:text-xs tracking-[0.22em] sm:tracking-[0.26em] uppercase drop-shadow-md">
             Três caminhos para mudar a sua realidade.
           </p>
         </div>
 
         {/* Cinematic Cards */}
-        <div className="relative z-10 flex flex-col md:flex-row justify-start md:justify-center items-stretch gap-3 md:gap-6 px-5 sm:px-6 max-w-7xl mx-auto w-full shrink-0">
+        <div className="relative z-10 flex flex-col md:flex-row justify-start md:justify-center items-stretch gap-2.5 sm:gap-3.5 md:gap-6 px-5 sm:px-6 max-w-7xl mx-auto w-full shrink-0">
           {paths.map((p, i) => {
             const isOtherHovered = hovered !== null && hovered !== i;
             const isVideoReady = Boolean(playingVideos[i]);
@@ -63,11 +63,11 @@ export const Screen4 = () => {
                 key={p.title}
                 onMouseEnter={() => setHovered(i)}
                 onMouseLeave={() => setHovered(null)}
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.06 + i * 0.08, duration: 0.4, ease: 'easeOut' }}
+                transition={{ delay: 0.05 + i * 0.07, duration: 0.35, ease: 'easeOut' }}
                 className={`
-                  group relative shrink-0 md:flex-1 rounded-2xl md:rounded-3xl overflow-hidden border border-white/10 shadow-2xl cursor-crosshair transition-all duration-500 bg-[#080B14]
+                  group relative shrink-0 md:flex-1 rounded-2xl md:rounded-3xl overflow-hidden border border-white/15 shadow-xl cursor-pointer transition-all duration-500 bg-[#080B14]
                   ${isOtherHovered ? 'md:flex-[0.7] opacity-60 grayscale' : 'md:flex-[1.2] opacity-100'}
                 `}
               >
@@ -98,21 +98,21 @@ export const Screen4 = () => {
                 </video>
 
                 {/* Gradient Mask */}
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-r md:bg-gradient-to-t from-[#010103]/95 via-[#010103]/70 to-[#010103]/30" />
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-r md:bg-gradient-to-t from-[#010103]/95 via-[#010103]/75 to-[#010103]/35" />
                 
                 {/* Content */}
-                <div className="relative z-10 flex md:flex-col items-center md:items-start md:justify-end p-4 sm:p-5 md:p-10 gap-3.5 sm:gap-5 md:gap-4">
-                  <span className="font-ps-display text-3xl sm:text-4xl md:text-6xl font-bold opacity-35 text-white shrink-0 group-hover:text-[#C9A227] group-hover:opacity-80 transition-all duration-500">
+                <div className="relative z-10 flex md:flex-col items-center md:items-start md:justify-end px-4 py-3 sm:p-5 md:p-10 gap-3 sm:gap-5 md:gap-4">
+                  <span className="font-ps-display text-2xl sm:text-4xl md:text-6xl font-bold opacity-40 text-[#C9A227] md:text-white shrink-0 group-hover:text-[#C9A227] group-hover:opacity-85 transition-all duration-500 w-8 sm:w-auto text-center">
                     {p.num}
                   </span>
-                  <div>
-                    <h3 className="font-ps-display text-base sm:text-xl md:text-3xl text-white mb-0.5 md:mb-3 drop-shadow-lg">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-ps-display text-[15px] sm:text-xl md:text-3xl text-white mb-0.5 md:mb-3 drop-shadow-lg leading-tight">
                       {p.title}
                     </h3>
-                    <p className="font-ps-ui text-[11px] md:text-sm font-semibold mb-1 md:mb-4 text-[#C9A227] drop-shadow-md">
+                    <p className="font-ps-ui text-[10.5px] sm:text-xs md:text-sm font-semibold mb-0.5 md:mb-4 text-[#C9A227] drop-shadow-md">
                       "{p.hook}"
                     </p>
-                    <p className="font-ps-ui text-white/75 text-[11px] md:text-sm font-light leading-snug md:leading-relaxed max-w-[280px]">
+                    <p className="font-ps-ui text-white/80 text-[10.5px] sm:text-xs md:text-sm font-light leading-tight md:leading-relaxed max-w-[300px]">
                       {p.desc}
                     </p>
                   </div>

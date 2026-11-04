@@ -13,6 +13,7 @@ import { TemporalSelection } from "@/components/TemporalSelection";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { detectUserLocation } from "@/lib/astro";
+import { getSunSignFromDate } from "./Auth";
 
 type Mode = "futuro" | "passado" | "presente";
 type SearchPath = "cidade" | "casa" | "intencao" | null;
@@ -372,6 +373,8 @@ const Index = () => {
                   profile?.display_name?.split(' ')[0] ||
                   user?.user_metadata?.name?.split(' ')[0] ||
                   'Viajante';
+                const sunSign = profile?.birth_date ? getSunSignFromDate(profile.birth_date) : null;
+                const userCredits = profile?.credits ?? 0;
                 const step2Subtitle =
                   mode === "passado"
                     ? "Reveja um aniversário anterior e comprove o que aquela virada ativou no seu ano."
@@ -380,22 +383,61 @@ const Index = () => {
                     : "Escolha por onde você prefere começar a planejar seu próximo aniversário.";
 
                 return (
-                  <div className="text-center mb-6 sm:mb-10">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-ps-display text-white mb-2.5 tracking-tight leading-tight">
-                      Pronto,{" "}
-                      <span
-                        className="text-transparent bg-clip-text"
-                        style={{
-                          backgroundImage: `linear-gradient(90deg, ${theme.light} 0%, ${theme.accent} 100%)`,
-                        }}
-                      >
-                        {firstName}
-                      </span>
-                      ?
-                    </h1>
-                    <p className="text-white/65 text-sm sm:text-base font-ps-ui max-w-md mx-auto font-light leading-relaxed">
-                      {step2Subtitle}
-                    </p>
+                  <div className="w-full flex flex-col items-center mb-6 sm:mb-9">
+                    <div className="text-center mb-5">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl font-ps-display text-white mb-2.5 tracking-tight leading-tight">
+                        Pronto,{" "}
+                        <span
+                          className="text-transparent bg-clip-text"
+                          style={{
+                            backgroundImage: `linear-gradient(90deg, ${theme.light} 0%, ${theme.accent} 100%)`,
+                          }}
+                        >
+                          {firstName}
+                        </span>
+                        ?
+                      </h1>
+                      <p className="text-white/65 text-sm sm:text-base font-ps-ui max-w-md mx-auto font-light leading-relaxed">
+                        {step2Subtitle}
+                      </p>
+                    </div>
+
+                    {/* Barra de Passaporte Calibrado + Incentivo de Créditos */}
+                    {user && isNatalProfileComplete(profile) && (
+                      <div className="w-full rounded-2xl border border-[#C9A227]/35 bg-[#08111F]/90 backdrop-blur-xl px-4 py-3.5 sm:px-6 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3.5 shadow-[0_14px_34px_rgba(0,0,0,0.45)]">
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 text-center md:text-left">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#F5DE98] text-[10px] font-ps-ui uppercase tracking-[0.15em] font-bold">
+                            <Sparkles className="w-3 h-3" />
+                            Passaporte Calibrado
+                          </span>
+                          <span className="text-white font-ps-ui text-xs sm:text-sm font-medium">
+                            {profile?.full_name}
+                            {sunSign ? ` • ${sunSign.symbol} Sol em ${sunSign.name}` : ""}
+                          </span>
+                          <span className="text-white/50 font-ps-ui text-xs hidden sm:inline">
+                            • 📍 {profile?.birth_city}
+                          </span>
+                        </div>
+
+                        {userCredits === 0 ? (
+                          <Link
+                            to="/credits"
+                            className="w-full md:w-auto shrink-0 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#C9A227] to-[#E5C158] hover:brightness-110 text-[#02050A] font-ps-ui text-[11px] font-bold uppercase tracking-[0.14em] flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(201,162,39,0.3)] transition-all active:scale-95"
+                          >
+                            <span>⚡ Ativar Meus Créditos (A partir de R$ 19,90)</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </Link>
+                        ) : (
+                          <Link
+                            to="/credits"
+                            className="shrink-0 px-3.5 py-1.5 rounded-xl border border-[#C9A227]/40 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#F5DE98] font-ps-ui text-[11px] font-semibold uppercase tracking-[0.14em] flex items-center gap-1.5 transition-all"
+                          >
+                            <span>⚡ {userCredits} {userCredits === 1 ? "Crédito ativo" : "Créditos ativos"}</span>
+                            <span className="text-white/50">• + Comprar</span>
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -594,34 +636,51 @@ const Index = () => {
               </motion.div>
 
               {/* ── Dados de Nascimento — Apple Glass Card ── */}
-              {isNatalProfileComplete(profile) && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-10 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
-                  style={{
-                    borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.30)` : 'rgba(201,162,39,0.30)',
-                    background: 'rgba(8, 15, 28, 0.80)'
-                  }}>
-                  <div className="flex flex-wrap gap-6 sm:gap-10">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Viajante</span>
-                      <span className="font-ps-display text-white/95 text-base sm:text-lg tracking-wide">{profile?.full_name}</span>
+              {isNatalProfileComplete(profile) && (() => {
+                const sunSign = profile?.birth_date ? getSunSignFromDate(profile.birth_date) : null;
+                const userCredits = profile?.credits ?? 0;
+                return (
+                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-10 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
+                    style={{
+                      borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.30)` : 'rgba(201,162,39,0.30)',
+                      background: 'rgba(8, 15, 28, 0.80)'
+                    }}>
+                    <div className="flex flex-wrap gap-6 sm:gap-10">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Passaporte Natal</span>
+                        <span className="font-ps-display text-white/95 text-base sm:text-lg tracking-wide">
+                          {profile?.full_name}
+                          {sunSign ? ` • ${sunSign.symbol} ${sunSign.name}` : ""}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Cidade de Nascimento</span>
+                        <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_city}</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Nascimento</span>
+                        <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Cidade de Nascimento</span>
-                      <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_city}</span>
+                    <div className="flex items-center gap-3">
+                      {userCredits === 0 && (
+                        <Link
+                          to="/credits"
+                          className="px-3 py-1.5 rounded-lg bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-ps-ui text-[10px] font-bold uppercase tracking-[0.14em] transition-all"
+                        >
+                          ⚡ Ativar Créditos
+                        </Link>
+                      )}
+                      <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
+                        className="text-[10px] uppercase tracking-[0.2em] font-bold hover:scale-105 transition-transform"
+                        style={{ color: activeTheme ? activeTheme.light : '#F5DE98' }}>
+                        Editar
+                      </button>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Nascimento</span>
-                      <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}</span>
-                    </div>
-                  </div>
-                  <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
-                    className="text-[10px] uppercase tracking-[0.2em] font-bold hover:scale-105 transition-transform"
-                    style={{ color: activeTheme ? activeTheme.light : '#F5DE98' }}>
-                    Editar
-                  </button>
-                </motion.div>
-              )}
+                  </motion.div>
+                );
+              })()}
 
               {/* ── ANO HERO — Design Luxo Adaptado à Cor do Modo ── */}
               {(() => {
