@@ -2836,6 +2836,34 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                     : <>Você desbloqueou a Rota principal para: <strong className="text-white font-medium">{cityDatabase[P_DYNAMIC.house as keyof typeof cityDatabase]?.name?.split('—')[1]?.trim() || P_DYNAMIC.houseLabel}</strong>. Descubra quais cidades do mundo ativam a sua saúde, seu amor e as outras 11 dimensões da sua vida.</>
                   }
                 </p>
+
+                {!isAllHousesUnlocked && (
+                  <div className="mt-8 flex flex-col items-center gap-2">
+                    <button
+                      onClick={() => {
+                        if (props.onUnlock) {
+                          props.onUnlock(0);
+                        } else {
+                          const allIds = [
+                            ...LIFE_AREAS.map(a => a.id),
+                            ..."1,2,3,4,5,6,7,8,9,10,11,12".split(',')
+                          ];
+                          setUnlockedItems(allIds);
+                        }
+                      }}
+                      className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-gradient-to-r from-[#E5C158] to-[#C9A227] hover:brightness-110 text-[#050811] font-bold text-xs sm:text-sm uppercase tracking-[0.14em] shadow-[0_12px_40px_rgba(229,193,88,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+                    >
+                      <Sparkles className="w-4 h-4 text-[#050811]" />
+                      <span>Desbloquear Mapa Completo (Todas as 12 Casas)</span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-black/20 text-[#050811] text-[10px] font-extrabold tracking-wider">
+                        {props.fullMapCost ?? 6} Créd.
+                      </span>
+                    </button>
+                    <span className="text-[11px] text-white/45 font-light">
+                      Ou clique em qualquer Casa abaixo para liberar individualmente por {props.houseCost ?? 1} crédito
+                    </span>
+                  </div>
+                )}
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

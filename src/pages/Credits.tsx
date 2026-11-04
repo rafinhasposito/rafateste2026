@@ -42,31 +42,47 @@ interface PixPaymentState {
 }
 
 function getPackageChecklist(credits: number): {
+  badge: string;
+  displayTitle: string;
+  subtitle: string;
+  ctaLabel: string;
   bullets: string[];
 } {
   if (credits <= 1) {
     return {
+      badge: "Crédito Avulso • 1 Crédito",
+      displayTitle: "1 Cidade ou Casa",
+      subtitle: "Ideal para revelar 1 destino pontual ou abrir +1 Casa avulsa.",
+      ctaLabel: "Comprar 1 Crédito Avulso",
       bullets: [
-        "1 Consulta completa",
-        "1º Foco Principal incluso",
-        "Ou +1 Casa / Foco avulso",
+        "Revela 1 Casa ou Cidade escolhida",
+        "Inclui 1º Foco Principal + Rotas da Casa",
+        "Ou abre +1 Casa / +1 Foco avulso no mapa",
       ],
     };
   }
   if (credits <= 5) {
     return {
+      badge: "Pacote Expansão • 3 Créditos",
+      displayTitle: "3 Destinos ou Focos",
+      subtitle: "Perfeito para comparar até 3 cidades ou destravar todos os focos.",
+      ctaLabel: "Escolher Pacote de 3 Créditos",
       bullets: [
-        `Até ${credits} Consultas completas`,
-        "Ou todos os 6 Focos da Casa",
-        "Ideal para comparar cidades",
+        `Revela até ${credits} Cidades ou Casas diferentes`,
+        "Ou abre 1 Casa + todos os 6 Focos dela",
+        "Economia real para comparar seus destinos",
       ],
     };
   }
   return {
+    badge: "Acesso Total 360º • 7 Créditos",
+    displayTitle: "Mapa Completo (12 Casas)",
+    subtitle: "Desbloqueia todas as 12 áreas do seu ano de uma só vez.",
+    ctaLabel: "Desbloquear Mapa Completo",
     bullets: [
-      "Libera todas as 12 Casas",
-      "Visão 360º do seu ano",
-      "Melhor valor por crédito",
+      "Libera TODAS as 12 Casas do seu aniversário",
+      "Veja a melhor cidade do mundo para cada área",
+      "Use direto (7 créd.) ou após 1ª Casa (+6 créd.)",
     ],
   };
 }
@@ -240,6 +256,19 @@ const Credits = () => {
     setPaymentApproved(false);
     window.scrollTo({ top: 0, behavior: "auto" });
   };
+
+  // Auto-seleciona o pacote Mapa Completo quando o usuário vem do botão "Desbloquear Mapa Completo" (?pkg=full)
+  useEffect(() => {
+    if (loading || selectedPkg || !profile || packages.length === 0) return;
+    const requestedPkg = searchParams.get("pkg");
+    if (requestedPkg === "full") {
+      const fullPkg = packages.find(p => p.credits >= 6) || packages[packages.length - 1];
+      if (fullPkg) {
+        handleSelectPackage(fullPkg);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, packages.length, profile, searchParams]);
 
   // Polling automático a cada 3.5s enquanto o Pix estiver na tela
   useEffect(() => {
@@ -466,12 +495,15 @@ const Credits = () => {
           <div className="lg:col-span-5 flex flex-col gap-6">
             <div className="p-7 sm:p-8 rounded-3xl border border-[#C9A227]/45 bg-gradient-to-b from-[#101F3A]/95 via-[#091326]/95 to-[#060C18]/98 shadow-[0_20px_60px_rgba(0,0,0,0.65)] relative overflow-hidden">
               <span className="inline-block px-3.5 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/40 text-[#F5DE98] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
-                +{selectedPkg.credits} Crédito{selectedPkg.credits > 1 ? "s" : ""}
+                {checklist.badge}
               </span>
 
-              <h2 className="font-ps-display text-3xl sm:text-4xl font-bold text-white tracking-tight mb-6">
-                {selectedPkg.label}
+              <h2 className="font-ps-display text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
+                {checklist.displayTitle}
               </h2>
+              <p className="text-white/65 text-xs sm:text-sm font-light mb-6">
+                {checklist.subtitle}
+              </p>
 
               <div className="flex items-baseline text-[#F5DE98] mb-6 pb-6 border-b border-white/10">
                 <span className="text-sm font-bold mr-1">R$</span>
@@ -491,11 +523,13 @@ const Credits = () => {
               {packages.length > 1 && (
                 <div className="pt-5 border-t border-white/10">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-white/45 font-semibold block mb-3">
-                    Trocar pacote:
+                    Trocar opção:
                   </span>
                   <div className="grid grid-cols-3 gap-2">
                     {packages.map((p) => {
                       const isCurrent = p.key === selectedPkg.key;
+                      const formattedPrice = Number(p.price_brl || 0).toFixed(2).replace(".", ",");
+                      const shortTitle = p.credits <= 1 ? "1 Casa Avulsa" : p.credits <= 5 ? "3 Destinos" : "Mapa 12 Casas";
                       return (
                         <button
                           key={p.key}
@@ -509,11 +543,11 @@ const Credits = () => {
                               : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white hover:border-white/25"
                           }`}
                         >
-                          <span className="block text-[11px] font-bold">
-                            {p.credits} Créd.
+                          <span className="block text-[10px] font-bold truncate">
+                            {shortTitle}
                           </span>
-                          <span className="block text-[10px] text-[#F5DE98]/80">
-                            R$ {Number(p.price_brl || 0).toFixed(0)}
+                          <span className="block text-[10px] text-[#F5DE98]/90 font-semibold mt-0.5">
+                            R$ {formattedPrice}
                           </span>
                         </button>
                       );
@@ -754,6 +788,7 @@ const Credits = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-7 max-w-5xl mx-auto items-stretch pt-2">
           {packages.map((pkg, i) => {
             const highlight = i === 1;
+            const isFullMap = pkg.credits >= 6;
             const [int, dec] = fmt(pkg.price_brl);
             const checklist = getPackageChecklist(pkg.credits);
 
@@ -766,6 +801,8 @@ const Credits = () => {
                 className={`p-8 text-left relative transition-all duration-400 flex flex-col justify-between rounded-3xl ${
                   highlight
                     ? "border-2 border-[#C9A227]/70 bg-gradient-to-b from-[#101F3A]/95 via-[#091326]/95 to-[#060C18]/98 backdrop-blur-xl shadow-[0_22px_60px_rgba(201,162,39,0.18)] md:-translate-y-2 z-10"
+                    : isFullMap
+                    ? "border border-[#C9A227]/40 bg-gradient-to-b from-[#0C182D]/95 to-[#070E1B]/95 backdrop-blur-xl hover:border-[#C9A227]/70 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
                     : "border border-white/10 bg-[#08111F]/85 backdrop-blur-xl hover:border-[#C9A227]/35 hover:bg-[#0B172A]/90 shadow-[0_16px_40px_rgba(0,0,0,0.45)]"
                 }`}
               >
@@ -776,27 +813,37 @@ const Credits = () => {
                   </div>
                 )}
 
+                {isFullMap && !highlight && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#101F3A] border border-[#C9A227]/60 text-[#F5DE98] text-[10px] font-bold uppercase tracking-[0.2em] rounded-full shadow-lg flex items-center gap-1.5 whitespace-nowrap">
+                    <Compass className="w-3 h-3 text-[#C9A227] shrink-0" />
+                    Todas as 12 Casas
+                  </div>
+                )}
+
                 <div>
                   <span
-                    className={`inline-block px-3.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] font-ps-ui mb-4 ${
-                      highlight
+                    className={`inline-block px-3.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] font-ps-ui mb-4 ${
+                      highlight || isFullMap
                         ? "bg-[#C9A227]/20 text-[#F5DE98] border border-[#C9A227]/40"
                         : "bg-white/[0.05] text-white/70 border border-white/10"
                     }`}
                   >
-                    {pkg.credits} crédito{pkg.credits > 1 ? "s" : ""}
+                    {checklist.badge}
                   </span>
 
-                  <h3 className="font-ps-display text-2xl sm:text-3xl font-bold tracking-tight text-white mb-6">
-                    {pkg.label}
+                  <h3 className="font-ps-display text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1.5">
+                    {checklist.displayTitle}
                   </h3>
+                  <p className="text-white/55 text-xs font-light mb-5 leading-relaxed">
+                    {checklist.subtitle}
+                  </p>
 
                   {/* Preço limpo sem caixa interna */}
-                  <div className="flex items-start text-white mb-7 pb-6 border-b border-white/10">
+                  <div className="flex items-start text-white mb-6 pb-6 border-b border-white/10">
                     <span className="text-[#F5DE98]/70 text-xs font-bold mt-2 mr-1">R$</span>
                     <span
                       className={`font-ps-display text-5xl sm:text-6xl font-bold leading-none tracking-tight ${
-                        highlight ? "text-[#F5DE98]" : "text-white"
+                        highlight || isFullMap ? "text-[#F5DE98]" : "text-white"
                       }`}
                     >
                       {int}
@@ -810,7 +857,7 @@ const Credits = () => {
                       <div key={idx} className="flex items-center gap-2.5">
                         <CheckCircle2
                           className={`w-4 h-4 shrink-0 ${
-                            highlight ? "text-[#F5DE98]" : "text-[#C9A227]/80"
+                            highlight || isFullMap ? "text-[#F5DE98]" : "text-[#C9A227]/80"
                           }`}
                         />
                         <span className="text-white/80 text-xs sm:text-sm font-light">
@@ -824,14 +871,14 @@ const Credits = () => {
                 <button
                   type="button"
                   onClick={() => handleSelectPackage(pkg)}
-                  className={`w-full py-4 text-xs font-ps-ui uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 transition-all duration-300 rounded-2xl ${
+                  className={`w-full py-4 text-xs font-ps-ui uppercase tracking-[0.16em] font-bold flex items-center justify-center gap-2 transition-all duration-300 rounded-2xl ${
                     highlight
                       ? "bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] shadow-[0_10px_30px_rgba(201,162,39,0.3)] hover:scale-[1.02] active:scale-95"
                       : "bg-white/[0.06] border border-[#C9A227]/35 text-[#F5DE98] hover:bg-[#C9A227] hover:text-[#02050A] hover:border-[#C9A227] active:scale-95"
                   }`}
                 >
-                  <span>Comprar</span>
-                  <ChevronRight className="w-4 h-4 opacity-80" />
+                  <span>{checklist.ctaLabel}</span>
+                  <ChevronRight className="w-4 h-4 opacity-80 shrink-0" />
                 </button>
               </motion.div>
             );
@@ -839,7 +886,7 @@ const Credits = () => {
         </div>
       )}
 
-      {/* Barra Minimalista de Referência de Custos */}
+      {/* Barra Minimalista e Clara de Como Usar Seus Créditos */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -847,21 +894,26 @@ const Credits = () => {
         className="mt-14 pt-8 border-t border-white/10 max-w-5xl mx-auto"
       >
         <div className="flex flex-wrap items-center justify-center gap-3">
-          {costs.map((item) => {
-            const Icon = ICONS[item.key] || Map;
-            return (
-              <div
-                key={item.key}
-                className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs"
-              >
-                <Icon className="w-3.5 h-3.5 text-[#C9A227]" />
-                <span className="text-white/75 font-light">{item.label}:</span>
-                <span className="text-[#F5DE98] font-bold">
-                  {item.credits} crédito{item.credits > 1 ? "s" : ""}
-                </span>
-              </div>
-            );
-          })}
+          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
+            <MapPin className="w-3.5 h-3.5 text-[#C9A227]" />
+            <span className="text-white/75 font-light">1 Cidade ou Casa:</span>
+            <span className="text-[#F5DE98] font-bold">1 crédito</span>
+          </div>
+          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
+            <span className="text-white/75 font-light">+1 Foco Extra:</span>
+            <span className="text-[#F5DE98] font-bold">1 crédito</span>
+          </div>
+          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
+            <Crown className="w-3.5 h-3.5 text-[#C9A227]" />
+            <span className="text-white/75 font-light">Todos os Focos da Casa:</span>
+            <span className="text-[#F5DE98] font-bold">3 créditos</span>
+          </div>
+          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#C9A227]/30 bg-[#C9A227]/10 text-xs">
+            <Compass className="w-3.5 h-3.5 text-[#F5DE98]" />
+            <span className="text-white/85 font-light">Mapa Completo (12 Casas):</span>
+            <span className="text-[#F5DE98] font-bold">7 créditos (ou +6 créd. após 1ª Casa)</span>
+          </div>
         </div>
       </motion.div>
     </div>

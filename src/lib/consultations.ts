@@ -14,6 +14,8 @@ export interface SaveConsultationArgs {
   intent?: string | null;
   origin?: string | null;
   result: any; // full API payload (contains .results for future unlocks)
+  houses_unlocked?: number;
+  unlocked_houses?: number[];
 }
 
 /**
@@ -36,7 +38,8 @@ export const saveConsultation = async (args: SaveConsultationArgs): Promise<stri
       intent: args.intent ?? null,
       origin: args.origin ?? null,
       result: args.result,
-      houses_unlocked: 1,
+      houses_unlocked: args.houses_unlocked ?? 1,
+      ...(args.unlocked_houses ? { unlocked_houses: args.unlocked_houses } : {}),
     })
     .select("id")
     .single();

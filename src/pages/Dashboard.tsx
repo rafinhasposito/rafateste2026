@@ -114,6 +114,8 @@ const getConsultationGoalHouse = (consultation: ConsultationRow | null): number 
 };
 
 const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: number) => {
+  if ((consultation.result as any)?.full_map_unlocked === true) return false;
+  if (Array.isArray((consultation.result as any)?.unlocked_houses_list) && (consultation.result as any).unlocked_houses_list.includes(houseNum)) return false;
   if (consultation.unlocked_houses?.includes(houseNum)) return false;
 
   const unlockedCount = Math.max(consultation.houses_unlocked, 0);
@@ -309,11 +311,15 @@ const Dashboard = () => {
     if (!user || !profile || !consultation || unlocking) return;
 
     const isUnlockAll = targetHouse === 0;
-    const requiredCredits = isUnlockAll ? getCost("cost_full_map", 7) : getCost("cost_house_1", 1);
+    const currentUnlockedCount = Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).filter(
+      (h) => !isHouseLockedByConsultation(consultation, h)
+    ).length;
+    const upgradeToFullCost = Math.max(1, getCost("cost_full_map", 7) - currentUnlockedCount);
+    const requiredCredits = isUnlockAll ? upgradeToFullCost : getCost("cost_house_1", 1);
 
     if (!isAdmin && credits < requiredCredits) {
-      showAlert(`Você não tem créditos suficientes. Adquira mais no menu.`);
-      navigate("/credits");
+      showAlert(`Você precisa de ${requiredCredits} crédito${requiredCredits > 1 ? "s" : ""} para esta liberação.`);
+      navigate(isUnlockAll ? "/credits?pkg=full" : "/credits");
       return;
     }
 
@@ -325,29 +331,64 @@ const Dashboard = () => {
     setUnlocking(true);
 
     try {
-      // The RPC 'unlock_consultation_houses' handles both single house and '0' (Visao 360) natively, 
-      // AND it deducts credits automatically if the user is not an admin.
-      const { error: rpcError } = await supabase.rpc("unlock_consultation_houses", {
-        p_consultation_id: consultation.id,
-        p_target_house: targetHouse
-      });
-
-      if (rpcError) throw rpcError;
-
-      const { data: refreshedConsultation, error: fetchError } = await supabase
-        .from("consultations")
-        .select("*")
-        .eq("id", consultation.id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      setConsultation(refreshedConsultation as ConsultationRow);
-      await refreshProfile();
       if (isUnlockAll) {
-        showAlert(`Visão 360 desbloqueada com sucesso!`);
+        if (!isAdmin) {
+          const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
+            p_amount: requiredCredits,
+            p_description: "Desbloqueio do Mapa Completo (12 Casas)",
+            p_type: "cost_full_map",
+          });
+          if (chargeErr || !chargeSuccess) {
+            throw new Error(chargeErr?.message || "Erro ao debitar créditos do Mapa Completo.");
+          }
+        }
+
+        const allTwelve = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        const currentResult = (consultation.result || {}) as Record<string, any>;
+        const newResult = {
+          ...currentResult,
+          full_map_unlocked: true,
+          unlocked_houses_list: allTwelve,
+        };
+
+        const { error: updateErr } = await supabase
+          .from("consultations")
+          .update({ result: newResult })
+          .eq("id", consultation.id);
+
+        if (updateErr) throw updateErr;
+
+        setConsultation((prev) =>
+          prev
+            ? {
+                ...prev,
+                houses_unlocked: 12,
+                unlocked_houses: allTwelve,
+                result: newResult as any,
+              }
+            : null
+        );
+        await refreshProfile();
+        showAlert("Mapa Completo (12 Casas) desbloqueado com sucesso!", "success");
         document.getElementById("visao-360")?.scrollIntoView({ behavior: "smooth" });
       } else {
+        const { error: rpcError } = await supabase.rpc("unlock_consultation_houses", {
+          p_consultation_id: consultation.id,
+          p_target_house: targetHouse
+        });
+
+        if (rpcError) throw rpcError;
+
+        const { data: refreshedConsultation, error: fetchError } = await supabase
+          .from("consultations")
+          .select("*")
+          .eq("id", consultation.id)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        setConsultation(refreshedConsultation as ConsultationRow);
+        await refreshProfile();
         showAlert(`Casa ${targetHouse} desbloqueada com sucesso.`);
         setSelectedHouse(targetHouse);
       }
@@ -397,7 +438,11 @@ const Dashboard = () => {
 
   const goalHouse = getConsultationGoalHouse(consultation);
   const currentMode = (consultation.mode || "futuro") as "passado" | "presente" | "futuro";
-  const lockedCount = Math.max(0, TOTAL_HOUSES - consultation.houses_unlocked);
+  const actualUnlockedCount = Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).filter(
+    (h) => !isHouseLockedByConsultation(consultation, h)
+  ).length;
+  const remainingFullMapCost = Math.max(1, getCost("cost_full_map", 7) - actualUnlockedCount);
+  const lockedCount = Math.max(0, TOTAL_HOUSES - actualUnlockedCount);
   const credits = profile?.credits ?? 0;
 
 
@@ -411,7 +456,7 @@ const Dashboard = () => {
   if (lockedCount > 0) {
     if (lockedCount >= 1) unlockOptions.push({ amount: 1, label: "+1 Casa", cost: 1 });
     if (lockedCount >= 3) unlockOptions.push({ amount: 3, label: "+3 Casas", cost: 3 });
-    if (lockedCount > 3) unlockOptions.push({ amount: lockedCount, label: `Todas (${lockedCount})`, cost: lockedCount });
+    if (lockedCount > 3) unlockOptions.push({ amount: lockedCount, label: `Todas (${lockedCount})`, cost: remainingFullMapCost });
     else if (lockedCount === 3) {
       // already have +3 option, skip "todas"
     } else if (lockedCount === 2) {
@@ -481,14 +526,14 @@ const Dashboard = () => {
             isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
             onSelectHouse={(h) => setSelectedHouse(h)}
             mode={currentMode}
-            unlockedCount={consultation.houses_unlocked}
-            fullMapCost={getCost("cost_full_map", 7)}
+            unlockedCount={actualUnlockedCount}
+            fullMapCost={remainingFullMapCost}
             houseCost={getCost("cost_house_1", 1)}
             focusCost={getCost("cost_focus", 1)}
             allFocusesCost={getCost("cost_all_focuses", 3)}
           />
           <ConfirmCreditAction
-            fullMapCost={getCost("cost_full_map", 7)}
+            fullMapCost={remainingFullMapCost}
             houseCost={getCost("cost_house_1", 1)}
             open={pendingUnlock !== null}
             onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}

@@ -75,7 +75,7 @@ export default function HouseTrailerApp() {
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
 
-  const handleRevelarCidades = async () => {
+  const handleRevelarCidades = async (unlockFullMap: boolean = false) => {
     const id = searchParams.get('id');
     if (id) {
       navigate(`/dashboard?id=${id}`);
@@ -104,24 +104,39 @@ export default function HouseTrailerApp() {
       return;
     }
 
+    const requiredCredits = unlockFullMap ? 7 : 1;
+    if (!isAdmin && (profile?.credits ?? 0) < requiredCredits) {
+      if (unlockFullMap) {
+        toast.info("Ative o Pacote Mapa Completo (7 Créditos) para desbloquear todas as 12 Casas de uma vez!");
+        navigate("/credits?pkg=full");
+      } else {
+        toast.error("Você não possui créditos suficientes. Adquira seu crédito avulso ou o Mapa Completo.");
+        navigate("/credits");
+      }
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       const houseData0 = cityDatabase[target];
       const year = yearStr ? parseInt(yearStr) : new Date().getFullYear();
-      const description = `Consulta por Intenção — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`;
+      const description = unlockFullMap
+        ? `Mapa Completo (12 Casas) — Foco Inicial Casa ${target} (${houseData0?.label ?? ""}) em ${year}`
+        : `Consulta por Intenção — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`;
 
       const charge = await chargeConsultation({
         userId: user.id,
         currentCredits: profile?.credits ?? 0,
         isAdmin,
         description,
+        amount: requiredCredits,
       });
 
       if (!charge.ok) {
         if (charge.reason === "no_credits") {
           toast.error("Você não possui créditos suficientes. Adquira mais na loja.");
-          navigate("/credits");
+          navigate(unlockFullMap ? "/credits?pkg=full" : "/credits");
         } else {
           toast.error("Erro ao debitar créditos.");
         }
@@ -163,6 +178,7 @@ export default function HouseTrailerApp() {
       }
 
       const houseIntent = houseData0?.intent || "";
+      const allTwelveHouses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
       const consultationId = await saveConsultation({
         userId: user.id,
@@ -174,7 +190,13 @@ export default function HouseTrailerApp() {
         mode,
         goal: target,
         intent: selectedIntention || houseIntent,
-        result: { results: allResults, house: target },
+        houses_unlocked: unlockFullMap ? 12 : 1,
+        unlocked_houses: unlockFullMap ? allTwelveHouses : [target],
+        result: {
+          results: allResults,
+          house: target,
+          ...(unlockFullMap ? { full_map_unlocked: true, unlocked_houses_list: allTwelveHouses } : {}),
+        },
       });
 
       // Transição suave para contemplação cósmica
@@ -611,33 +633,50 @@ export default function HouseTrailerApp() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
-              className="fixed bottom-0 left-0 w-full z-50 p-4 md:p-6 pointer-events-none"
+              className="fixed bottom-0 left-0 w-full z-50 p-3 md:p-6 pointer-events-none"
             >
-              <div className="max-w-4xl mx-auto pointer-events-auto">
-                <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/10 p-4 md:p-6 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row items-center justify-between gap-6" style={{ backgroundColor: navBg }}>
+              <div className="max-w-5xl mx-auto pointer-events-auto">
+                <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/15 p-4 md:p-6 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.85)] flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6" style={{ backgroundColor: navBg }}>
                   
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>
+                  <div className="flex items-center gap-3.5 w-full lg:w-auto">
+                    <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>
                       <Sparkles className="w-5 h-5" style={{ color }} />
                     </div>
                     <div>
-                      <h4 className="text-white font-ps-display text-xl font-bold">Foco Definido</h4>
-                      <p className="text-white/60 text-sm">Agora veja as cidades que combinam com você.</p>
+                      <h4 className="text-white font-ps-display text-lg md:text-xl font-bold leading-tight">Foco Definido</h4>
+                      <p className="text-white/65 text-xs md:text-sm">Agora escolha revelar esta Casa ou desbloquear seu Mapa Completo (12 Casas).</p>
                     </div>
                   </div>
 
-                  <button 
-                    onClick={handleRevelarCidades}
-                    disabled={isProcessing}
-                    className="w-full md:w-auto px-10 py-4 font-bold uppercase tracking-widest text-sm rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-white"
-                    style={{
-                      backgroundColor: color,
-                      boxShadow: `0 0 40px ${color}60`,
-                    }}
-                  >
-                    <Globe className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''}`} />
-                    {isProcessing ? 'Calculando...' : 'Revelar Cidades'}
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto shrink-0">
+                    <button 
+                      onClick={() => handleRevelarCidades(false)}
+                      disabled={isProcessing}
+                      className="px-6 py-3.5 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-white"
+                      style={{
+                        backgroundColor: color,
+                        boxShadow: `0 0 32px ${color}55`,
+                      }}
+                    >
+                      <Globe className={`w-4 h-4 shrink-0 ${isProcessing ? 'animate-spin' : ''}`} />
+                      <span>{isProcessing ? 'Calculando...' : 'Revelar Cidades'}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] font-bold tracking-wider">
+                        1 Créd.
+                      </span>
+                    </button>
+
+                    <button 
+                      onClick={() => handleRevelarCidades(true)}
+                      disabled={isProcessing}
+                      className="px-5 py-3.5 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(229,193,88,0.2)]"
+                    >
+                      <Sparkles className="w-4 h-4 shrink-0 text-[#E5C158]" />
+                      <span>Desbloquear Mapa Completo</span>
+                      <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold tracking-wider">
+                        12 Casas • 7 Créd.
+                      </span>
+                    </button>
+                  </div>
                   
                 </div>
               </div>

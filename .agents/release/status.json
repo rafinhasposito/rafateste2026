@@ -1,7 +1,7 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-03T16:04:00-03:00 — Corrigidos: (1) Bug crítico da Casa 2 (São Paulo abrindo Ponta Delgada) em AppleResultPreviewV3.tsx unificando bestCity do Hero com resultForHouse.city do card; (2) Motor de Continentes dinâmicos no Backend Python (protocolo-solar-api/house_scanner.py e app.py) com scores calibrados entre 80% e 98% e nomes canônicos PT-BR; (3) Onboarding Mobile iniciando direto em 1 de 6 (sem tela de preview poluída), fotos pré-carregadas em RAM na abertura e camada <img> instantânea sob <video> (opacity-0 até onPlaying) nas telas 1, 2, 4 e 6; (4) Destravamento total do scroll nativo do iPhone removendo nested overflow-y-auto, filtro SVG feTurbulence e blur vinculado a scroll.",
+  "last_verification": "2026-11-03T22:15:00-03:00 — Corrigidos: (1) Arquitetura unificada Crédito Avulso (R$ 19,90) vs. Pacote Expansão (R$ 49,90) vs. Mapa Completo 12 Casas (R$ 99,90 — 7 créditos total: 1 na 1ª Casa + 6 para liberar as 11 restantes, ou 7 direto); (2) Preços exatos com centavos (R$ 19,90 / R$ 49,90 / R$ 99,90) no seletor 'Trocar opção' do checkout em Credits.tsx; (3) Dupla escolha na barra 'Foco Definido' (Revelar Esta Casa por 1 Créd. OU Desbloquear Mapa Completo • 12 Casas por 7 Créd.) em HouseTrailerApp.tsx, HouseLookup.tsx e IntentLookup.tsx + botão direto na seção Visão 360º do resultado; (4) Wizard guiado de Passaporte Natal em 2 passos em Auth.tsx com detecção ao vivo do Signo Solar e barra de ativação de créditos na Home.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br) + Render Python API (protocolo-solar-api.onrender.com) + Supabase Edge Functions (gvqdlsflrbctfiorimcl)",
   "deploy_instructions": {
@@ -10,12 +10,17 @@
   },
   "notes": {
     "videos": "Todos os 46 vídeos de cidades e vídeos do Onboarding comprimidos abaixo de 4.5MB com +faststart, acompanhados de camada <img> pré-carregada em RAM que mantém a foto visível até o frame 1 do vídeo tocar.",
-    "continents_engine": "Rotas Alternativas agrupadas dinamicamente por Continente (Américas, Europa, Ásia, África, Oceania) sem repetição de cidades e com scores calibrados (80% a 98%).",
+    "continents_engine": "Rotas Alternativas agrupadas dinamicamente por Continente (Américas, Europa, Ásia, África, Oceania) exibindo 100% apenas cidades matematicamente reais da Casa (sem fallback global).",
     "mercadopago": "Checkout Transparente 100% in-site (Pix QR Code + Copia e Cola + Cartão via Brick) ativo na Edge Function create-mercadopago-checkout.",
     "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
   },
   "blockers_open": [],
   "blockers_fixed": [
+    "Unificação Crédito Avulso vs. Mapa Completo (12 Casas): Eliminada a contradição de 7 vs. 8 créditos; agora o Mapa Completo custa 7 créditos no total (desbloqueio direto por 7 créditos no 'Foco Definido' ou upgrade por +6 créditos após abrir a 1ª Casa)",
+    "Preços Exatos no Seletor do Checkout (Credits.tsx): Corrigido o arredondamento R$ 20 / R$ 50 / R$ 100 para exibir exatamente R$ 19,90 / R$ 49,90 / R$ 99,90",
+    "Dupla Escolha no 'Foco Definido': Adicionados lado a lado os botões 'Revelar Cidades (1 Créd.)' e 'Desbloquear Mapa Completo • 12 Casas (7 Créd.)' em HouseTrailerApp.tsx, HouseLookup.tsx e IntentLookup.tsx, além de botão direto no topo da grade das 12 Casas em AppleResultPreviewV3.tsx",
+    "Passaporte Natal Guiado + UX Mobile (Screen4.tsx, Auth.tsx, Index.tsx): Corrigido corte na Tela 4 do Onboarding, sobreposição do botão Voltar em Auth.tsx, explicação em português sobre o e-mail do Supabase e wizard de 2 passos que já coleta Nome, Data, Hora e Cidade de Nascimento com detecção ao vivo do Signo Solar",
+    "Remoção de Fallback Global (house_scanner.py): O motor astronômico retorna exclusivamente cidades que caem matematicamente na Casa solicitada via Swiss Ephemeris",
     "Bug Crítico Casa 2 (São Paulo -> Ponta Delgada): Hero de AppleResultPreviewV3.tsx agora prioriza exatamente activeHouseResult.city (mesma fonte do card no Mapa Completo Desbloqueado), garantindo 100% de consistência ao clicar em qualquer Casa",
     "Backend Python (protocolo-solar-api/house_scanner.py): Calibrados scores astrológicos para 88%-98% (cidades reais da casa) e 80%-94% (fallbacks), corrigindo o bug do código do DeepSeek onde cidades reais exibiam 10%-12% MATCH e perdiam para fallbacks de 50%",
     "Onboarding Sem Tela de Preview Poluída: Removido step 0; Onboarding abre direto na página 1 de 6 com cabeçalho e rodapé fixos ao viewport e scroll nativo do window no iPhone",

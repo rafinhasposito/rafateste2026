@@ -75,12 +75,8 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
     if (mode) sessionStorage.setItem('ps_natal_mode', mode);
   };
 
-  const handleLookup = async () => {
+  const handleLookup = async (unlockFullMap: boolean = false) => {
     const target = overrideTargetHouse !== undefined ? overrideTargetHouse : selectedHouse;
-    
-    // If target is null, it means General Dashboard unlock. 
-    // We pass null to the backend (backend usually handles `alvoId: null` or doesn't filter).
-    // Let's assume backend accepts null.
     
     if (target === undefined) { showAlert("Selecione uma opção."); return; }
     if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
@@ -90,21 +86,36 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
     }
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
 
+    const requiredCredits = unlockFullMap ? 7 : 1;
+    if (!isAdmin && (profile?.credits ?? 0) < requiredCredits) {
+      if (unlockFullMap) {
+        showAlert("Ative o Pacote Mapa Completo (7 Créditos) para desbloquear todas as 12 Casas de uma vez!");
+        navigate("/credits?pkg=full");
+      } else {
+        showAlert("Você não possui créditos suficientes. Adquira seu crédito avulso ou o Mapa Completo.");
+        navigate("/credits");
+      }
+      return;
+    }
+
     const houseData0 = target ? cityDatabase[target] : null;
-    const description = target 
-      ? `Consulta por Intenção — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`
-      : `Consulta Completa (12 Casas) em ${year}`;
+    const description = unlockFullMap
+      ? `Mapa Completo (12 Casas) — Casa Inicial ${target} (${houseData0?.label ?? ""}) em ${year}`
+      : target 
+        ? `Consulta por Intenção — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`
+        : `Consulta Completa (12 Casas) em ${year}`;
       
     const charge = await chargeConsultation({
       userId: user.id,
       currentCredits: profile?.credits ?? 0,
       isAdmin,
       description,
+      amount: requiredCredits,
     });
     if (!charge.ok) {
       if (charge.reason === "no_credits") {
-        showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
-        navigate("/credits");
+        showAlert("Você não possui créditos suficientes.");
+        navigate(unlockFullMap ? "/credits?pkg=full" : "/credits");
       } else {
         showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
       }
@@ -160,6 +171,8 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         }
       }
 
+      const allTwelveHouses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
       const consultationId = await saveConsultation({
         userId: user.id,
         name: name.trim(),
@@ -169,6 +182,8 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         year,
         mode,
         goal: target,
+        houses_unlocked: unlockFullMap ? 12 : 1,
+        unlocked_houses: unlockFullMap ? allTwelveHouses : target ? [target] : [],
         result: {
           results: allResults,
           house: target,
@@ -176,6 +191,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
           return_date: data?.return_date || null,
           sun_sign: data?.sun_sign || null,
           ascendant: data?.ascendant || null,
+          ...(unlockFullMap ? { full_map_unlocked: true, unlocked_houses_list: allTwelveHouses } : {}),
         },
       }) ?? undefined;
 
@@ -215,24 +231,24 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
             exit={{ opacity: 0, y: 10, height: 0 }}
             className="flex flex-col items-center w-full mt-6 overflow-hidden"
           >
-            <div className="flex flex-col md:flex-row items-center justify-between w-full p-5 md:p-6 bg-[#08111F]/90 border border-white/[0.1] rounded-2xl md:rounded-3xl backdrop-blur-xl gap-6 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
+            <div className="flex flex-col lg:flex-row items-center justify-between w-full p-5 md:p-6 bg-[#08111F]/90 border border-white/[0.12] rounded-2xl md:rounded-3xl backdrop-blur-xl gap-5 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
               
-              <div className="flex items-center gap-4 w-full md:w-auto">
+              <div className="flex items-center gap-4 w-full lg:w-auto">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
                   style={{ backgroundColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}18`, borderColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}40` }}>
                   <Crown className="w-5 h-5" style={{ color: mode === 'passado' ? '#E2E8F0' : mode === 'presente' ? '#A7F3D0' : '#F5DE98' }} />
                 </div>
                 <div className="text-left">
                   <h4 className="text-white font-ps-display text-lg md:text-xl font-bold">Foco Definido</h4>
-                  <p className="text-white/60 text-xs md:text-sm">Agora veja as cidades que ativam essa área para você.</p>
+                  <p className="text-white/60 text-xs md:text-sm">Escolha revelar apenas esta Casa ou desbloquear seu Mapa Completo (12 Casas).</p>
                 </div>
               </div>
 
-              <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
                 <button
-                  onClick={handleLookup}
+                  onClick={() => handleLookup(false)}
                   disabled={loading}
-                  className="w-full md:w-auto px-8 md:px-10 py-3.5 md:py-4 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-[#02050A] shadow-lg"
+                  className="px-6 md:px-7 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-[#02050A] shadow-lg"
                   style={{
                     backgroundColor: mode === 'passado' ? '#CBD5E1' : mode === 'presente' ? '#10B981' : '#C9A227',
                     boxShadow: `0 0 30px ${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}40`,
@@ -243,12 +259,23 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
                   ) : (
                     <Search className="w-4 h-4" />
                   )}
-                  {loading ? "Calculando..." : "Revelar Cidades"}
+                  <span>{loading ? "Calculando..." : "Revelar Esta Casa"}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-black/20 text-[10px] font-bold">
+                    1 Créd.
+                  </span>
                 </button>
-                <p className="font-ps-ui text-[10px] uppercase tracking-[0.14em] text-white/55 font-semibold flex items-center justify-center">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227' }} />
-                  Consome 1 crédito • Leitura completa
-                </p>
+
+                <button
+                  onClick={() => handleLookup(true)}
+                  disabled={loading}
+                  className="px-5 md:px-6 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(229,193,88,0.18)]"
+                >
+                  <Crown className="w-3.5 h-3.5 text-[#E5C158]" />
+                  <span>Desbloquear Mapa Completo</span>
+                  <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold">
+                    12 Casas • 7 Créd.
+                  </span>
+                </button>
               </div>
 
             </div>
