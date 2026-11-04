@@ -269,26 +269,26 @@ const Index = () => {
   const natalDataReady = !!(name.trim() && birthdate && birthtime && birthPlaceValid);
 
   const yearLabel =
-    mode === "passado" ? "Ano a Auditar" :
+    mode === "passado" ? "Ano que Você Quer Rever" :
     mode === "presente" ? "Ano Atual" :
     "Ano do Próximo Aniversário";
 
   const formTitle =
-    mode === "passado" ? "Resgate da Linha do Tempo" :
-    mode === "presente" ? "Análise do Ciclo Atual" :
-    "Calibração Estelar";
+    mode === "passado" ? "Rever Ano Passado" :
+    mode === "presente" ? "Leitura do Ano Atual" :
+    "Planejar Próximo Aniversário";
 
   const formSubtitle = isNatalProfileComplete(profile)
     ? searchPath === "cidade"
-      ? "Seus dados de nascimento já estão ancorados no sistema. Qual cidade você deseja simular para o seu próximo aniversário?"
+      ? "Seus dados de nascimento já estão salvos. Qual cidade você quer consultar para o seu aniversário?"
       : searchPath === "casa"
-      ? "Seus dados natais estão prontos. Escolha o objetivo astrológico que deseja focar neste ano."
-      : "Seus dados natais estão prontos. Escolha a sua intenção principal para o próximo ciclo."
+      ? "Seus dados de nascimento estão prontos. Escolha a área da vida que você quer priorizar neste ano."
+      : "Seus dados de nascimento estão prontos. Escolha o objetivo principal para o seu próximo ciclo."
     : mode === "passado"
-      ? "Insira suas coordenadas natais e o ano que deseja auditar para descobrir o que o Universo havia preparado para você."
+      ? "Informe seus dados de nascimento e o ano que deseja rever para descobrir qual área da vida esteve em destaque."
       : mode === "presente"
-      ? "Insira suas coordenadas natais para analisar a configuração energética do seu ano atual."
-      : "Insira suas coordenadas natais para que o algoritmo astrofísico calcule a rota exata da sua prosperidade.";
+      ? "Informe seus dados de nascimento para ler a energia que está guiando o seu ano atual."
+      : "Informe seus dados de nascimento para descobrir as melhores cidades para o seu próximo aniversário.";
 
   const activeTheme = mode ? modeThemes[mode] : null;
 
@@ -377,9 +377,9 @@ const Index = () => {
                 const userCredits = profile?.credits ?? 0;
                 const step2Subtitle =
                   mode === "passado"
-                    ? "Reveja um aniversário anterior e comprove o que aquela virada ativou no seu ano."
+                    ? "Reveja um aniversário anterior e descubra qual área da vida esteve em destaque naquele ano."
                     : mode === "presente"
-                    ? "Escolha como você quer ler as energias que estão regendo o seu ciclo atual."
+                    ? "Veja como estão as energias do seu ano atual a partir de onde você passou seu último aniversário."
                     : "Escolha por onde você prefere começar a planejar seu próximo aniversário.";
 
                 return (
@@ -402,13 +402,13 @@ const Index = () => {
                       </p>
                     </div>
 
-                    {/* Barra de Passaporte Calibrado + Incentivo de Créditos */}
+                    {/* Barra de Dados de Nascimento + Incentivo de Créditos */}
                     {user && isNatalProfileComplete(profile) && (
                       <div className="w-full rounded-2xl border border-[#C9A227]/35 bg-[#08111F]/90 backdrop-blur-xl px-4 py-3.5 sm:px-6 sm:py-4 flex flex-col md:flex-row items-center justify-between gap-3.5 shadow-[0_14px_34px_rgba(0,0,0,0.45)]">
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 text-center md:text-left">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#F5DE98] text-[10px] font-ps-ui uppercase tracking-[0.15em] font-bold">
                             <Sparkles className="w-3 h-3" />
-                            Passaporte Calibrado
+                            Dados Salvos
                           </span>
                           <span className="text-white font-ps-ui text-xs sm:text-sm font-medium">
                             {profile?.full_name}
@@ -454,18 +454,18 @@ const Index = () => {
                             ? "Digite a cidade onde você passou um aniversário anterior e veja qual área da sua vida ela ativou naquele ano."
                             : opt.id === "casa"
                             ? "Descubra quais cidades teriam ativado dinheiro, amor, carreira ou saúde naquele ano específico."
-                            : "Veja onde teria sido o melhor lugar do mundo para destravar o que você buscava naquele ciclo."
+                            : "Veja onde teria sido o melhor lugar do mundo para viver o que você buscava naquele ano."
                           : mode === "presente"
                           ? opt.id === "cidade"
-                            ? "Informe a cidade onde você passou seu último aniversário para revelar a leitura do seu ano atual."
+                            ? "Informe a cidade onde você passou seu último aniversário para ver a leitura completa do seu ano atual."
                             : opt.id === "casa"
-                            ? "Veja quais cidades ativam dinheiro, amor, carreira ou saúde na configuração do seu ciclo atual."
-                            : "Compare onde seus objetivos atuais estariam mais favorecidos na virada deste ciclo."
+                            ? "Veja quais cidades ativam dinheiro, amor, carreira ou saúde na configuração do seu ano atual."
+                            : "Compare onde seus objetivos atuais estariam mais favorecidos neste ciclo."
                           : opt.id === "cidade"
                           ? "Já tem uma viagem ou cidade em mente? Veja o que passar a virada do seu aniversário lá ativa no seu ano."
                           : opt.id === "casa"
                           ? "Escolha a área que você quer priorizar agora: dinheiro, amor, carreira, saúde, visibilidade ou recomeço."
-                          : "Diga o que você quer destravar nos próximos 12 meses e descubra as melhores cidades do mundo para isso.";
+                          : "Diga o que você quer viver nos próximos 12 meses e descubra as melhores cidades do mundo para isso.";
                      
                      const cardTag =
                         opt.id === "cidade"
@@ -606,7 +606,7 @@ const Index = () => {
               );
             })()}
 
-            <div className="w-full max-w-4xl mx-auto px-5 sm:px-8 flex flex-col items-center relative z-10">
+            <div className="w-full max-w-5xl mx-auto px-5 sm:px-8 flex flex-col items-center relative z-10">
 
               {/* ── Nav Row — Voltar + Modo Ativo ── */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
@@ -641,14 +641,14 @@ const Index = () => {
                 const userCredits = profile?.credits ?? 0;
                 return (
                   <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="w-full max-w-3xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-10 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
+                    className="w-full max-w-4xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-10 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
                     style={{
                       borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.30)` : 'rgba(201,162,39,0.30)',
                       background: 'rgba(8, 15, 28, 0.80)'
                     }}>
                     <div className="flex flex-wrap gap-6 sm:gap-10">
                       <div className="flex flex-col gap-1">
-                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Passaporte Natal</span>
+                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Viajante</span>
                         <span className="font-ps-display text-white/95 text-base sm:text-lg tracking-wide">
                           {profile?.full_name}
                           {sunSign ? ` • ${sunSign.symbol} ${sunSign.name}` : ""}
@@ -659,7 +659,7 @@ const Index = () => {
                         <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_city}</span>
                       </div>
                       <div className="flex flex-col gap-1">
-                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Nascimento</span>
+                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Data e Horário</span>
                         <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}</span>
                       </div>
                     </div>
@@ -689,7 +689,7 @@ const Index = () => {
                   <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
                     className="flex flex-col items-center mb-6 md:mb-10 relative w-full">
                     <span className="text-[10px] uppercase tracking-[0.42em] font-bold mb-2 md:mb-3" style={{ color: theme.light }}>
-                      {mode === "passado" ? "Ano que Você Quer Rever" : mode === "presente" ? "Seu Ciclo Atual" : "Ano do Seu Aniversário"}
+                      {mode === "passado" ? "Ano que Você Quer Rever" : mode === "presente" ? "Seu Ano Atual" : "Ano do Seu Aniversário"}
                     </span>
                     <div className="relative flex items-center justify-center gap-3 sm:gap-6">
                       {mode !== "presente" && (
@@ -737,11 +737,11 @@ const Index = () => {
                     </div>
                     {mode === "presente" ? (
                       <div className="mt-3 px-4 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
-                        <span className="text-[9px] uppercase tracking-widest text-white/60">Ciclo Atual Fixado</span>
+                        <span className="text-[9px] uppercase tracking-widest text-white/60">Ano Atual</span>
                       </div>
                     ) : (
                       <span className="mt-2 text-[10px] font-ps-ui text-white/45 tracking-wide">
-                        Use os botões ou toque no número para mudar o ano
+                        Use os botões − e + ou toque no número para mudar o ano
                       </span>
                     )}
                   </motion.div>
@@ -768,9 +768,9 @@ const Index = () => {
                 </h1>
               </motion.div>
 
-              {/* ── Campo de busca — Full width ── */}
+              {/* ── Campo de busca — Largura ampla e simétrica para grids ── */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
-                className="w-full max-w-2xl">
+                className={searchPath === "cidade" ? "w-full max-w-2xl" : "w-full max-w-5xl"}>
                 {searchPath === "cidade" && (
                   <CityLookup mode={mode || "futuro"} name={name} birthdate={birthdate} birthtime={birthtime} birthPlace={birthPlace} year={year} onLoadingChange={setIsScanning} />
                 )}

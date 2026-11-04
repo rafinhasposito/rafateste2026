@@ -54,17 +54,33 @@ export default function HouseTrailerApp() {
   const [hoveredArea, setHoveredArea] = useState<string | null>(null);
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [selectedIntention, setSelectedIntention] = useState<string | null>(null);
-  const [currentHouse, setCurrentHouse] = useState(urlHouse ? parseInt(urlHouse) : P.house);
+  const [currentHouse, setCurrentHouse] = useState(() => {
+    const parsed = urlHouse ? parseInt(urlHouse, 10) : P.house;
+    return Number.isFinite(parsed) && parsed >= 1 && parsed <= 12 ? parsed : P.house;
+  });
 
   useEffect(() => {
-    // Força o scroll para o topo imediatamente e sem animação
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    if (urlHouse) {
+      const parsed = parseInt(urlHouse, 10);
+      if (Number.isFinite(parsed) && parsed >= 1 && parsed <= 12) {
+        setCurrentHouse(parsed);
+      }
+    }
+  }, [urlHouse]);
+
+  useEffect(() => {
+    try {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    } catch (_) {
+      // Ignore scroll errors on older WebKit
+    }
     
-    // Fallback: se o React Router atrasar a montagem, garante o scroll após o render
     const timeout = setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      try {
+        window.scrollTo(0, 0);
+      } catch (_) {}
     }, 50);
 
     return () => clearTimeout(timeout);
@@ -83,23 +99,23 @@ export default function HouseTrailerApp() {
     }
 
     const target = currentHouse;
-    const name = sessionStorage.getItem('ps_natal_name');
-    const birthdate = sessionStorage.getItem('ps_natal_date');
-    const birthtime = sessionStorage.getItem('ps_natal_time');
-    const birthPlace = sessionStorage.getItem('ps_natal_place');
+    const name = sessionStorage.getItem('ps_natal_name') || profile?.full_name || '';
+    const birthdate = sessionStorage.getItem('ps_natal_date') || profile?.birth_date || '';
+    const birthtime = sessionStorage.getItem('ps_natal_time') || (profile?.birth_time ? profile.birth_time.slice(0, 5) : '');
+    const birthPlace = sessionStorage.getItem('ps_natal_place') || profile?.birth_city || '';
     const yearStr = sessionStorage.getItem('ps_natal_year');
     const mode = sessionStorage.getItem('ps_natal_mode') || searchParams.get('mode') || 'futuro';
 
     if (!target) return;
 
     if (!name || !birthdate || !birthtime || !birthPlace) {
-      toast.error("Faltam dados natais! Volte à tela anterior e preencha tudo.");
-      navigate('/dashboard');
+      toast.error("Complete seus dados de nascimento na tela inicial para revelar suas cidades.");
+      navigate('/? calculate=true'.replace(' ', ''));
       return;
     }
 
     if (!user) {
-      toast.error("Você precisa estar logado para gerar o mapa.");
+      toast.error("Entre na sua conta para revelar as cidades do seu mapa.");
       navigate("/auth");
       return;
     }
@@ -120,10 +136,10 @@ export default function HouseTrailerApp() {
 
     try {
       const houseData0 = cityDatabase[target];
-      const year = yearStr ? parseInt(yearStr) : new Date().getFullYear();
+      const year = yearStr ? parseInt(yearStr, 10) : new Date().getFullYear();
       const description = unlockFullMap
         ? `Mapa Completo (12 Casas) — Foco Inicial Casa ${target} (${houseData0?.label ?? ""}) em ${year}`
-        : `Consulta por Intenção — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`;
+        : `Consulta por Área da Vida — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`;
 
       const charge = await chargeConsultation({
         userId: user.id,
@@ -167,9 +183,12 @@ export default function HouseTrailerApp() {
 
       const allResults: Record<string, any> = {};
       if (data.results) {
-        // Hotfix: Filtra Mumbai no frontend até o backend (Render) ser atualizado
         let safeData = JSON.stringify(data.results);
-        safeData = safeData.replace(/Mumbai/g, "Nova York").replace(/mumbai.avif/g, "new_york.mp4");
+        safeData = safeData
+          .replace(/Mumbai/g, "Singapura")
+          .replace(/Nova Délhi/gi, "Malé (Ilhas Maldivas)")
+          .replace(/Nova Delhi/gi, "Malé (Ilhas Maldivas)")
+          .replace(/New Delhi/gi, "Malé (Ilhas Maldivas)");
         const parsedData = JSON.parse(safeData);
 
         for (const [key, val] of Object.entries(parsedData)) {
@@ -195,12 +214,15 @@ export default function HouseTrailerApp() {
         result: {
           results: allResults,
           house: target,
+          return_time_utc: data?.return_time_utc || null,
+          return_date: data?.return_date || null,
+          sun_sign: data?.sun_sign || null,
+          ascendant: data?.ascendant || null,
           ...(unlockFullMap ? { full_map_unlocked: true, unlocked_houses_list: allTwelveHouses } : {}),
         },
       });
 
-      // Transição suave para contemplação cósmica
-      await new Promise((resolve) => setTimeout(resolve, 900));
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       if (consultationId) {
         navigate("/dashboard?id=" + consultationId);
@@ -220,6 +242,9 @@ export default function HouseTrailerApp() {
     score: AFFINITY_MATRIX[currentHouse]?.[area.id] || 50
   })).sort((a, b) => b.score - a.score);
 
+  // Garante que o foco de maior afinidade já venha pré-selecionado para exibir a barra de ação imediatamente
+  const activeIntentionId = selectedIntention || sortedAreas[0]?.id || "identidade";
+
   const handleSelectIntention = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedIntention(id);
@@ -231,11 +256,25 @@ export default function HouseTrailerApp() {
   const heroGradient = `linear-gradient(to bottom, transparent, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.8)) 60%, ${bgBase} 100%)`;
 
   return (
-    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-32 relative transition-colors duration-1000 pt-16 md:pt-20" style={{ backgroundColor: bgBase }}>
+    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-36 relative transition-colors duration-1000 pt-16 md:pt-20" style={{ backgroundColor: bgBase }}>
 
+      {/* TOP BAR COM BOTÃO VOLTAR */}
+      <div className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-3.5 backdrop-blur-xl border-b border-white/[0.08] flex items-center justify-between" style={{ backgroundColor: navBg }}>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-xs font-semibold uppercase tracking-[0.16em] text-white/90 transition-all"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Voltar
+        </button>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
+          Casa {String(currentHouse).padStart(2, "0")} • {theme.subtitle}
+        </span>
+      </div>
 
       {/* HERO E VÍDEO (EXATAMENTE COMO NO FINAL) */}
-      <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-center pt-24 pb-20">
+      <section className="relative w-full min-h-[85vh] flex flex-col items-center justify-center pt-20 pb-16">
         <div className="w-[100vw] absolute left-1/2 -translate-x-1/2 top-0 h-[100vh] z-0 pointer-events-none" style={{ maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%)", WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%)" }}>
           
           {/* TINT OVERLAY PARA O VÍDEO */}
@@ -556,12 +595,12 @@ export default function HouseTrailerApp() {
               </div>
 
 
-              {/* COLUNA DIREITA: O PAINEL DE CINEMA — quando mouse entra aqui a sidebar encolhe pra ícones */}
+              {/* COLUNA DIREITA: O PAINEL DE CINEMA — apenas desktop (hidden lg:block) para não duplicar no mobile */}
               <motion.div
                 layout
                 onMouseEnter={() => setIsPanelHovered(true)}
                 onMouseLeave={() => setIsPanelHovered(false)}
-                className="flex-1 h-[600px] lg:h-full relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: bgBase }}
+                className="hidden lg:block flex-1 h-[600px] lg:h-full relative rounded-[32px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10 transition-colors duration-1000" style={{ backgroundColor: bgBase }}
               >
                 <AnimatePresence mode="wait">
                   {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
@@ -575,7 +614,6 @@ export default function HouseTrailerApp() {
                     >
                       {/* BACKGROUNDS PREMIUM */}
                       <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none" style={{ backgroundImage: `radial-gradient(circle at top right, ${activeArea.color} 0%, transparent 80%)` }} />
-                      <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-60 pointer-events-none" src="/videos/aura-loop.mp4" />
                       <div className="absolute inset-0 mix-blend-color opacity-80 pointer-events-none" style={{ backgroundColor: activeArea.color }} />
                       <div className="absolute inset-0 pointer-events-none transition-colors duration-1000" style={{ background: `linear-gradient(to top, ${bgBase}, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.8)) 50%, transparent)` }} />
                       
@@ -606,11 +644,11 @@ export default function HouseTrailerApp() {
                         <div>
                           <button 
                             onClick={(e) => { e.stopPropagation(); handleSelectIntention(activeArea.id, e); }}
-                            className={`w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 ${selectedIntention !== activeArea.id && 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 hover:bg-gray-100'}`}
-                            style={selectedIntention === activeArea.id ? { backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` } : {}}
+                            className={`w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 ${activeIntentionId !== activeArea.id && 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 hover:bg-gray-100'}`}
+                            style={activeIntentionId === activeArea.id ? { backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` } : {}}
                           >
-                            {selectedIntention === activeArea.id ? <Sparkles className="w-4 h-4 shrink-0" /> : <Target className="w-4 h-4 shrink-0" />}
-                            {selectedIntention === activeArea.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
+                            {activeIntentionId === activeArea.id ? <Sparkles className="w-4 h-4 shrink-0" /> : <Target className="w-4 h-4 shrink-0" />}
+                            {activeIntentionId === activeArea.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
                           </button>
                         </div>
                         
@@ -623,11 +661,11 @@ export default function HouseTrailerApp() {
           </motion.div>
       </section>
       
-      {/* STICKY BOTTOM BAR (Aparece quando escolhe) */}
+      {/* STICKY BOTTOM BAR (Sempre acessível com o Foco Principal ou o Foco Escolhido) */}
       <AnimatePresence>
-        {selectedIntention && (() => {
-          const chosen = LIFE_AREAS.find(a => a.id === selectedIntention);
-          const color = chosen?.color || '#ffffff';
+        {activeIntentionId && (() => {
+          const chosen = LIFE_AREAS.find(a => a.id === activeIntentionId) || sortedAreas[0];
+          const color = chosen?.color || '#C9A227';
           return (
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -643,8 +681,10 @@ export default function HouseTrailerApp() {
                       <Sparkles className="w-5 h-5" style={{ color }} />
                     </div>
                     <div>
-                      <h4 className="text-white font-ps-display text-lg md:text-xl font-bold leading-tight">Foco Definido</h4>
-                      <p className="text-white/65 text-xs md:text-sm">Agora escolha revelar esta Casa ou desbloquear seu Mapa Completo (12 Casas).</p>
+                      <h4 className="text-white font-ps-display text-base md:text-lg font-bold leading-tight">
+                        Foco: {chosen?.label || `Casa ${currentHouse}`}
+                      </h4>
+                      <p className="text-white/65 text-xs md:text-sm">Escolha revelar as cidades desta Casa ou desbloquear seu Mapa Completo (12 Casas).</p>
                     </div>
                   </div>
 

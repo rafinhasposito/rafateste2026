@@ -66,22 +66,33 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
   const handleSelect = (houseNum: number) => {
     setSelectedHouse(houseNum);
     setResult(null);
-    // Armazena no sessionStorage para o Trailer processar a API
-    sessionStorage.setItem('ps_natal_name', name);
-    sessionStorage.setItem('ps_natal_date', birthdate);
-    sessionStorage.setItem('ps_natal_time', birthtime);
-    sessionStorage.setItem('ps_natal_place', birthPlace);
+    // Armazena no sessionStorage (com fallback para o perfil salvo) para o Trailer processar a API
+    const safeName = name || profile?.full_name || "";
+    const safeDate = birthdate || profile?.birth_date || "";
+    const safeTime = birthtime || (profile?.birth_time ? profile.birth_time.slice(0, 5) : "");
+    const safePlace = birthPlace || profile?.birth_city || "";
+
+    if (safeName) sessionStorage.setItem('ps_natal_name', safeName);
+    if (safeDate) sessionStorage.setItem('ps_natal_date', safeDate);
+    if (safeTime) sessionStorage.setItem('ps_natal_time', safeTime);
+    if (safePlace) sessionStorage.setItem('ps_natal_place', safePlace);
     if (year) sessionStorage.setItem('ps_natal_year', year.toString());
     if (mode) sessionStorage.setItem('ps_natal_mode', mode);
+
+    navigate(`/app/trailer?house=${houseNum}&mode=${mode}`);
   };
 
   const handleLookup = async (unlockFullMap: boolean = false) => {
     const target = overrideTargetHouse !== undefined ? overrideTargetHouse : selectedHouse;
+    const safeName = name || profile?.full_name || "";
+    const safeDate = birthdate || profile?.birth_date || "";
+    const safeTime = birthtime || (profile?.birth_time ? profile.birth_time.slice(0, 5) : "");
+    const safePlace = birthPlace || profile?.birth_city || "";
     
     if (target === undefined) { showAlert("Selecione uma opção."); return; }
-    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
-    if (birthtime === "00:00" || birthtime === "00:00:00") {
-      showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora real de nascimento (ex: 07:30, 14:15).");
+    if (!safeName || !safeDate || !safeTime || !safePlace) { showAlert("Preencha seus dados de nascimento antes de continuar."); return; }
+    if (safeTime === "00:00" || safeTime === "00:00:00") {
+      showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora aproximada ou real de nascimento (ex: 07:30, 14:15).");
       return;
     }
     if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
@@ -127,17 +138,17 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
     setResult(null);
 
     try {
-      const [ano, mes, dia] = birthdate.split("-");
+      const [ano, mes, dia] = safeDate.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
 
       const response = await fetch(`${API_URL}/find_all_cities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          place_of_birth: birthPlace.trim(),
+          name: safeName.trim(),
+          place_of_birth: safePlace.trim(),
           dob: dataFormatada,
-          time: birthtime,
+          time: safeTime,
           target_year: year,
           alvoId: target,
         }),
@@ -145,23 +156,6 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
-
-      // Se for consulta geral (target null), passamos pra frente sem focar em uma casa
-      const houseResult = target ? data.results?.[String(target)] : null;
-      const houseData = target ? cityDatabase[target] : null;
-      const rawOptions = houseResult?.options || {};
-
-      const toArray = (v: any): CityOption[] => {
-        if (!v) return [];
-        if (Array.isArray(v)) return v;
-        return [v];
-      };
-
-      const cities = {
-        highticket: toArray(rawOptions.highticket),
-        acessivel: toArray(rawOptions.acessivel),
-        nacional: toArray(rawOptions.nacional),
-      };
 
       // Build allResults from the full API response
       const allResults: Record<string, any> = {};
@@ -175,10 +169,10 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
 
       const consultationId = await saveConsultation({
         userId: user.id,
-        name: name.trim(),
-        birthdate,
-        birthtime,
-        birth_place: birthPlace.trim(),
+        name: safeName.trim(),
+        birthdate: safeDate,
+        birthtime: safeTime,
+        birth_place: safePlace.trim(),
         year,
         mode,
         goal: target,
@@ -196,7 +190,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       }) ?? undefined;
 
       // Transição suave para contemplação cósmica
-      await new Promise((resolve) => setTimeout(resolve, 900));
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       if (consultationId) navigate("/dashboard?id=" + consultationId);
       if (target) onHouseSelected?.(target);
@@ -212,9 +206,9 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
   return (
     <div className="space-y-6">
       {overrideTargetHouse === undefined && (
-        <div className="flex flex-col items-center text-center mb-8">
-          <p className="text-white/50 text-sm md:text-base font-light max-w-lg">
-            Cada área do grid abaixo corresponde a um foco diferente para o seu ano de {year}. Selecione a energia que você mais precisa atrair.
+        <div className="flex flex-col items-center text-center mb-6">
+          <p className="text-white/60 text-sm md:text-base font-light max-w-lg leading-relaxed">
+            Escolha a área da vida que você quer fortalecer em {year} para entender como ela funciona e ver quais cidades ativam essa energia.
           </p>
         </div>
       )}
@@ -224,7 +218,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       )}
 
       <AnimatePresence>
-        {selectedHouse && (
+        {overrideTargetHouse !== undefined && selectedHouse && (
           <motion.div
             initial={{ opacity: 0, y: 10, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}

@@ -64,6 +64,35 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
 
   const handleSelectIntent = (houseId: number) => {
     setSelectedHouse(houseId);
+    const finalName = (name || profile?.full_name || user?.user_metadata?.name || "Viajante").trim();
+    const finalBirthdate = birthdate || profile?.birth_date || "";
+    const finalBirthtime = birthtime || (profile?.birth_time ? String(profile.birth_time).slice(0, 5) : "");
+    const finalBirthPlace = (birthPlace || profile?.birth_city || "").trim();
+
+    if (!finalBirthdate || !finalBirthtime || !finalBirthPlace) {
+      showAlert("Complete sua data, horário e cidade de nascimento antes de continuar.");
+      return;
+    }
+    if (finalBirthtime === "00:00" || finalBirthtime === "00:00:00") {
+      showAlert("A hora de nascimento '00:00' não é processável. Informe sua hora real de nascimento (ex: 07:30, 14:15).");
+      return;
+    }
+    try {
+      sessionStorage.setItem(
+        "ps_natal_data",
+        JSON.stringify({
+          name: finalName,
+          birthdate: finalBirthdate,
+          birthtime: finalBirthtime,
+          birthPlace: finalBirthPlace,
+          year: year || "2026",
+          mode: mode || "futuro",
+        })
+      );
+    } catch (err) {
+      console.warn("[IntentLookup] sessionStorage write failed:", err);
+    }
+    navigate(`/app/trailer?house=${houseId}&mode=${mode || "futuro"}`);
   };
 
   const handleConfirmIntent = async (unlockFullMap: boolean = false) => {
@@ -202,45 +231,46 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
   const softHex = mode === 'passado' ? '#E2E8F0' : mode === 'presente' ? '#A7F3D0' : '#F5DE98';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {!result && !loading && (
-        <div className="flex flex-col gap-3.5 pb-12">
-          {Object.values(cityDatabase).map((house, index) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8">
+          {Object.values(cityDatabase).map((house) => {
             const isSelected = selectedHouse === house.id;
             return (
-              <motion.button
+              <button
                 key={house.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.45, delay: index * 0.04 }}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
+                type="button"
                 onClick={() => handleSelectIntent(house.id)}
-                className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 group flex items-start justify-between gap-4 backdrop-blur-md ${
-                  isSelected ? "bg-[#0D1A2F]/95" : "bg-[#08111F]/80 border-white/[0.08] hover:bg-[#0C182B]/90 hover:border-white/20"
+                className={`w-full text-left p-5 sm:p-6 rounded-2xl border transition-all duration-300 group flex items-start justify-between gap-4 backdrop-blur-md hover:-translate-y-0.5 active:scale-[0.99] ${
+                  isSelected ? "bg-[#0D1A2F]/95" : "bg-[#08111F]/80 border-white/[0.10] hover:bg-[#0C182B]/90 hover:border-white/25"
                 }`}
                 style={{
                   borderColor: isSelected ? `${hexColor}65` : undefined,
-                  boxShadow: isSelected ? `0 0 28px ${hexColor}1F` : 'none',
+                  boxShadow: isSelected ? `0 0 28px ${hexColor}1F` : '0 10px 30px rgba(0,0,0,0.35)',
                 }}
               >
                 <div className="flex-1">
-                  <h3 className="text-sm sm:text-base font-medium mb-1 transition-colors leading-snug group-hover:opacity-100"
-                      style={{ color: isSelected ? softHex : 'white' }}>
+                  <span
+                    className="inline-block text-[10px] font-bold uppercase tracking-[0.22em] mb-2"
+                    style={{ color: softHex }}
+                  >
+                    Casa {String(house.id).padStart(2, "0")} • {house.label}
+                  </span>
+                  <h3 className="font-ps-display text-base sm:text-lg font-bold mb-1.5 transition-colors leading-snug text-white">
                     {house.intent}
                   </h3>
-                  <p className="text-white/60 text-xs font-light leading-relaxed">
+                  <p className="text-white/65 text-xs sm:text-sm font-light leading-relaxed">
                     {house.realLife}
                   </p>
                 </div>
-                <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all mt-0.5"
+                <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all mt-1"
                      style={{ 
-                       backgroundColor: isSelected ? `${hexColor}20` : 'rgba(255,255,255,0.03)',
-                       borderColor: isSelected ? `${hexColor}50` : 'rgba(255,255,255,0.1)',
+                       backgroundColor: isSelected ? `${hexColor}20` : 'rgba(255,255,255,0.04)',
+                       borderColor: isSelected ? `${hexColor}50` : 'rgba(255,255,255,0.12)',
                      }}>
-                  <ArrowRight className="w-4 h-4 transition-colors" style={{ color: isSelected ? softHex : 'rgba(255,255,255,0.4)' }} />
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" style={{ color: softHex }} />
                 </div>
-              </motion.button>
+              </button>
             );
           })}
         </div>
