@@ -6,7 +6,7 @@ const paths = [
     title: 'Por Cidade',
     hook: 'Já sei para onde quero viajar.',
     desc: 'Descubra exatamente como essa coordenada vai ativar novos acontecimentos e transformar seu novo ciclo.',
-    poster: 'https://images.unsplash.com/photo-1502602898657-3e907a5ea071?auto=format&fit=crop&w=800&q=75',
+    poster: '/images/abertura/paris.jpg',
     video: '/assets/paris.mp4',
     num: '01',
   },
@@ -14,15 +14,15 @@ const paths = [
     title: 'Por Casa Astrológica',
     hook: 'Quero virar a chave em uma área.',
     desc: 'Destrave finanças, carreira ou amor. Escolha a mudança que você precisa e encontre os destinos ideais.',
-    poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=75',
+    poster: '/images/abertura/stars.jpg',
     video: '/assets/stars.mp4',
     num: '02',
   },
   {
     title: 'Por Intenção',
     hook: 'Sei o resultado que quero alcançar.',
-    desc: 'Escreva o seu maior objetivo e a inteligência do sistema revela a cidade perfeita no mundo para torná-lo real.',
-    poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=75',
+    desc: 'Escolha o que quer viver neste ano e descubra os destinos ligados ao seu objetivo.',
+    poster: '/images/abertura/particles.jpg',
     video: '/assets/particles.mp4',
     num: '03',
   },
@@ -74,7 +74,7 @@ export const Screen4 = () => {
                 {/* Camada 1: Imagem Pré-carregada Instantânea (0.00s, nunca fica preta) */}
                 <img
                   src={p.poster}
-                  alt={p.title}
+                  alt=""
                   loading="eager"
                   decoding="sync"
                   className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-transform duration-[10s] ease-linear group-hover:scale-110 ${

@@ -181,20 +181,7 @@ export default function HouseTrailerApp() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta astronômica.");
 
-      const allResults: Record<string, any> = {};
-      if (data.results) {
-        let safeData = JSON.stringify(data.results);
-        safeData = safeData
-          .replace(/Mumbai/g, "Singapura")
-          .replace(/Nova Délhi/gi, "Malé (Ilhas Maldivas)")
-          .replace(/Nova Delhi/gi, "Malé (Ilhas Maldivas)")
-          .replace(/New Delhi/gi, "Malé (Ilhas Maldivas)");
-        const parsedData = JSON.parse(safeData);
-
-        for (const [key, val] of Object.entries(parsedData)) {
-          allResults[key] = val;
-        }
-      }
+      const allResults = data.results || {};
 
       const houseIntent = houseData0?.intent || "";
       const allTwelveHouses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -674,9 +661,9 @@ export default function HouseTrailerApp() {
               className="fixed bottom-0 left-0 w-full z-50 p-3 md:p-6 pointer-events-none"
             >
               <div className="max-w-5xl mx-auto pointer-events-auto">
-                <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/15 p-4 md:p-6 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.85)] flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6" style={{ backgroundColor: navBg }}>
+                <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/15 p-4 md:p-6 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.85)] flex flex-wrap items-center justify-between gap-3 md:gap-4" style={{ backgroundColor: navBg }}>
                   
-                  <div className="flex items-center gap-3.5 w-full lg:w-auto">
+                  <div className="flex items-center gap-3.5 flex-[1_1_16rem] min-w-0">
                     <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>
                       <Sparkles className="w-5 h-5" style={{ color }} />
                     </div>
@@ -688,7 +675,7 @@ export default function HouseTrailerApp() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto shrink-0">
+                  <div className="grid flex-[2_1_36rem] min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-2.5">
                     <button 
                       onClick={() => handleRevelarCidades(false)}
                       disabled={isProcessing}

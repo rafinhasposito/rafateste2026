@@ -225,9 +225,9 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
             exit={{ opacity: 0, y: 10, height: 0 }}
             className="flex flex-col items-center w-full mt-6 overflow-hidden"
           >
-            <div className="flex flex-col lg:flex-row items-center justify-between w-full p-5 md:p-6 bg-[#08111F]/90 border border-white/[0.12] rounded-2xl md:rounded-3xl backdrop-blur-xl gap-5 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
+            <div className="flex flex-col items-stretch w-full min-w-0 p-5 md:p-6 bg-[#08111F]/90 border border-white/[0.12] rounded-2xl md:rounded-3xl backdrop-blur-xl gap-5 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
               
-              <div className="flex items-center gap-4 w-full lg:w-auto">
+              <div className="flex items-center gap-4 w-full">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
                   style={{ backgroundColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}18`, borderColor: `${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}40` }}>
                   <Crown className="w-5 h-5" style={{ color: mode === 'passado' ? '#E2E8F0' : mode === 'presente' ? '#A7F3D0' : '#F5DE98' }} />
@@ -238,11 +238,11 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
+              <div className="grid w-full gap-3 grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))]">
                 <button
                   onClick={() => handleLookup(false)}
                   disabled={loading}
-                  className="px-6 md:px-7 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-[#02050A] shadow-lg"
+                  className="min-w-0 flex-wrap px-3 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-[#02050A] shadow-lg"
                   style={{
                     backgroundColor: mode === 'passado' ? '#CBD5E1' : mode === 'presente' ? '#10B981' : '#C9A227',
                     boxShadow: `0 0 30px ${mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227'}40`,
@@ -262,7 +262,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
                 <button
                   onClick={() => handleLookup(true)}
                   disabled={loading}
-                  className="px-5 md:px-6 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(229,193,88,0.18)]"
+                  className="min-w-0 flex-wrap px-3 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(229,193,88,0.18)]"
                 >
                   <Crown className="w-3.5 h-3.5 text-[#E5C158]" />
                   <span>Desbloquear Mapa Completo</span>

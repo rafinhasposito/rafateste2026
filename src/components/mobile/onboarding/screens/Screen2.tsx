@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { ChevronDown } from 'lucide-react';
 
 const destinationExamples = [
   {
@@ -14,7 +13,7 @@ const destinationExamples = [
       beneficios: "Construção de autoridade, projeção de imagem e prestígio absoluto.",
       vidaReal: "Você para de ser um segredo bem guardado. O mercado te vê como referência, atraindo grandes contratos."
     },
-    poster: "https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?auto=format&fit=crop&w=800&q=75",
+    poster: "/images/abertura/tokyo.jpg",
     video: "/assets/tokyo.mp4"
   },
   {
@@ -28,7 +27,7 @@ const destinationExamples = [
       beneficios: "Eficiência no trabalho, rotina blindada e foco extremo na saúde.",
       vidaReal: "Seu dia vira um relógio suíço: consistência para treinar, comer limpo e organizar a agenda."
     },
-    poster: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=75",
+    poster: "/images/abertura/zurich.jpg",
     video: "/assets/zurich.mp4"
   },
   {
@@ -42,267 +41,57 @@ const destinationExamples = [
       beneficios: "Poder de convencimento, clareza nas negociações e networking rápido.",
       vidaReal: "Sua comunicação vira uma máquina de vendas. Feche negócios e faça seu produto circular."
     },
-    poster: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=75",
+    poster: "/images/abertura/ny.jpg",
     video: "/assets/ny.mp4"
   }
 ];
 
-// ─── Desktop View ────────────────────────────────────────────────────────
-const DesktopScreen2 = () => {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+export const Screen2 = () => {
+  const [openCity, setOpenCity] = useState<string | null>(null);
 
   return (
-    <div className="relative w-full h-[100dvh] flex items-center justify-center overflow-hidden px-12 bg-[#030306]">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-[#C9A227]/5 via-[#030306] to-[#030306]" />
-
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto flex flex-row items-center justify-between gap-8 xl:gap-12">
-        {/* Text Section */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: 'easeOut' }}
-          className="w-[30%] flex flex-col justify-center pr-4"
-        >
-          <span className="inline-block font-ps-ui text-[10px] tracking-[0.3em] text-[#C9A227] uppercase mb-5 drop-shadow-md">
-            A geografia recalcula o seu destino
-          </span>
-          <h2 className="font-ps-display text-4xl xl:text-5xl text-white mb-4 leading-[1.1]">
-            Mesmo dia.<br />Mesma pessoa.
-          </h2>
-          <h3 className="font-ps-ui text-xl text-white/80 mb-6 font-medium">
-            Resultados totalmente diferentes.
-          </h3>
-          <p className="font-ps-ui text-white/60 text-sm xl:text-base leading-relaxed mb-6">
-            O lugar onde você comemora o seu aniversário define qual área da sua vida vai virar a chave nos próximos 12 meses.
-          </p>
-          <p className="font-ps-ui text-[#C9A227]/60 text-xs italic">
-            (Passe o mouse nos destinos para ver a transformação em cada cidade)
-          </p>
-        </motion.div>
-
-        {/* Cards Section */}
-        <div className="w-[65%] h-[65vh] xl:h-[70vh] flex gap-4">
-          {destinationExamples.map((dest) => {
-            const isHovered = hoveredCard === dest.id;
-            const isOtherHovered = hoveredCard !== null && hoveredCard !== dest.id;
-            
+    <section className="min-h-[100svh] bg-[#030306] px-4 sm:px-8 pt-20 md:pt-28 pb-28 md:pb-36 flex flex-col justify-center">
+      <div className="mx-auto w-full max-w-6xl">
+        <header className="mb-5 md:mb-8 text-center">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-[#C9A227] mb-2">A geografia recalcula o seu destino</p>
+          <h2 className="font-ps-display text-3xl md:text-5xl leading-tight text-white">Mesmo dia. Mesma pessoa.</h2>
+          <p className="mt-2 text-sm md:text-base text-white/70">O lugar do seu aniversário define qual área da vida ganha destaque nos próximos 12 meses.</p>
+        </header>
+        <div className="grid gap-3 md:gap-5 md:grid-cols-3 items-start">
+          {destinationExamples.map(dest => {
+            const expanded = openCity === dest.id;
             return (
-              <motion.div
-                key={dest.id}
-                onMouseEnter={() => setHoveredCard(dest.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-                animate={{
-                  width: isHovered ? '65%' : hoveredCard ? '17.5%' : '33.33%',
-                  opacity: isOtherHovered ? 0.6 : 1,
-                  filter: isOtherHovered ? 'grayscale(50%) brightness(0.7)' : 'grayscale(0%) brightness(1)',
-                }}
-                transition={{ duration: 0.6, type: 'spring', bounce: 0.2 }}
-                className="relative h-full rounded-3xl overflow-hidden shadow-2xl border border-white/10 cursor-crosshair bg-[#0A0A0F] flex flex-col"
-              >
-                {/* Video Header Area */}
-                <motion.div
-                  animate={{ height: isHovered ? '35%' : '100%' }}
-                  transition={{ duration: 0.5, ease: 'easeInOut' }}
-                  className="relative w-full shrink-0 overflow-hidden"
-                >
-                  <video 
-                    autoPlay loop muted playsInline preload="metadata"
-                    poster={dest.poster}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{ filter: "saturate(1.2) contrast(1.1)" }}
-                  >
-                    <source src={dest.video} type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0F] via-[#0A0A0F]/30 to-transparent" />
-                  
-                  {/* Floating City Badge (Centered at the top) */}
-                  <div className="absolute top-6 left-0 right-0 z-20 flex justify-center">
-                    <div className="bg-black/50 backdrop-blur-md border border-white/10 px-6 py-2 rounded-full shadow-lg">
-                      <span className="font-ps-ui text-white/90 text-xs font-bold uppercase tracking-[0.3em]">
-                        {dest.city}
-                      </span>
-                    </div>
+              <article key={dest.id} className="overflow-hidden rounded-2xl border border-white/15 bg-[#101117]">
+                <button type="button" aria-expanded={expanded} aria-controls={`details-${dest.id}`}
+                  onClick={() => setOpenCity(expanded ? null : dest.id)}
+                  className="group w-full text-left focus-visible:outline-offset-[-3px]">
+                  <div className="relative h-24 sm:h-32 md:h-auto md:aspect-[16/10] overflow-hidden">
+                    <video autoPlay muted loop playsInline preload="metadata" poster={dest.poster}
+                      className="absolute inset-0 w-full h-full object-cover" src={dest.video} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
+                    <span className="absolute bottom-3 left-4 font-ps-display text-2xl md:text-3xl text-white">{dest.city}</span>
                   </div>
-
-                  {/* Floating Title (Only visible when NOT hovered) */}
-                  <motion.div 
-                    animate={{ opacity: isHovered ? 0 : 1 }} 
-                    transition={{ duration: 0.2 }}
-                    className="absolute bottom-0 left-0 p-6 xl:p-8 w-full flex flex-col justify-end text-center"
-                  >
-                    <h3 className="font-ps-display text-2xl xl:text-3xl text-white mb-2">{dest.house}</h3>
-                    <span className="font-ps-ui text-[#C9A227] text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] drop-shadow-md">{dest.tag}</span>
-                  </motion.div>
-                </motion.div>
-                
-                {/* Solid Background Details Area (Visible only when hovered) */}
-                <motion.div 
-                  initial={false}
-                  animate={{ opacity: isHovered ? 1 : 0 }}
-                  transition={{ duration: 0.4, delay: isHovered ? 0.2 : 0 }}
-                  className="flex-1 p-6 xl:p-8 pt-6 flex flex-col min-w-[320px] overflow-hidden"
-                >
-                  <h3 className="font-ps-display text-3xl xl:text-4xl text-white mb-1">{dest.house}</h3>
-                  <span className="font-ps-ui text-[#C9A227] text-[11px] font-bold uppercase tracking-[0.15em] mb-4">{dest.tag}</span>
-                  
-                  <p className="font-ps-ui text-white/90 text-xs xl:text-[13px] italic mb-3 leading-relaxed border-b border-white/10 pb-3">
-                    "{dest.subtitle}"
-                  </p>
-                  
-                  <div className="flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
-                    {/* HIGHLIGHT BOX: Para quem é */}
-                    <div className="bg-[#C9A227]/10 border-l-2 border-[#C9A227] p-3 xl:p-4 rounded-r-md">
-                      <span className="block font-ps-ui text-[#C9A227] text-[10px] xl:text-[11px] uppercase font-bold tracking-wider mb-1">Para quem é</span>
-                      <span className="block font-ps-ui text-white text-xs xl:text-[13px] leading-snug">{dest.details.paraQuem}</span>
+                  <div className="p-4 md:p-5 flex items-center justify-between gap-2">
+                    <div>
+                      <h3 className="font-ps-display text-xl md:text-2xl text-[#F5DE98]">{dest.house}</h3>
+                      <p className="mt-1 text-sm text-white/75">{dest.tag}</p>
                     </div>
-
-                    <div className="grid grid-cols-1 gap-3 xl:gap-4">
-                      <div className="flex flex-col">
-                        <span className="font-ps-ui text-white/40 text-[10px] xl:text-[11px] uppercase font-bold tracking-wider mb-1">Benefícios</span>
-                        <span className="font-ps-ui text-white/80 text-[11px] xl:text-[12px] leading-snug">{dest.details.beneficios}</span>
-                      </div>
-                      
-                      <div className="flex flex-col">
-                        <span className="font-ps-ui text-white/40 text-[10px] xl:text-[11px] uppercase font-bold tracking-wider mb-1">Na Vida Real</span>
-                        <span className="font-ps-ui text-white/80 text-[11px] xl:text-[12px] leading-snug">{dest.details.vidaReal}</span>
-                      </div>
-                    </div>
+                    <ChevronDown aria-hidden="true" className={`w-5 h-5 shrink-0 text-[#F5DE98] transition-transform ${expanded ? 'rotate-180' : ''}`} />
                   </div>
-                </motion.div>
-              </motion.div>
+                </button>
+                <div hidden={!expanded} id={`details-${dest.id}`} className="border-t border-white/10 p-4 md:p-5 text-sm leading-relaxed text-white/80">
+                  <p className="mb-4 text-white">{dest.subtitle}</p>
+                  <dl className="space-y-3">
+                    {Object.entries({ 'Para quem é': dest.details.paraQuem, 'Benefícios': dest.details.beneficios, 'Na vida real': dest.details.vidaReal }).map(([label, value]) => (
+                      <div key={label}><dt className="font-semibold text-[#F5DE98]">{label}</dt><dd>{value}</dd></div>
+                    ))}
+                  </dl>
+                </div>
+              </article>
             );
           })}
         </div>
       </div>
-    </div>
-  );
-};
-
-// ─── Mobile View ─────────────────────────────────────────────────────────
-const MobileScreen2 = () => {
-  const [activeCard, setActiveCard] = useState<string | null>(null);
-  const [playingVideos, setPlayingVideos] = useState<Record<string, boolean>>({});
-
-  return (
-    <div className="relative w-full min-h-[100svh] bg-[#030306]">
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#C9A227]/5 via-[#030306] to-[#030306]" />
-
-      {/* Header */}
-      <div className="relative z-20 pt-20 pb-4 px-6 text-center shrink-0">
-        <span className="inline-block font-ps-ui text-[9px] tracking-[0.2em] text-[#C9A227] uppercase mb-2 drop-shadow-md">
-          A geografia recalcula o seu destino
-        </span>
-        <h2 className="font-ps-display text-2xl text-white mb-1 leading-tight">
-          Mesmo dia. Mesma pessoa.
-        </h2>
-        <p className="font-ps-ui text-white/60 text-[11px] leading-relaxed max-w-[280px] mx-auto">
-          Resultados totalmente diferentes dependendo da sua escolha.
-        </p>
-      </div>
-
-      {/* Accordion Cards */}
-      <div className="relative z-10 flex flex-col gap-3.5 px-5 pb-32 w-full max-w-md mx-auto">
-        {destinationExamples.map((dest) => {
-          const isActive = activeCard === dest.id;
-          const isVideoReady = Boolean(playingVideos[dest.id]);
-          
-          return (
-            <div
-              key={dest.id}
-              onClick={() => setActiveCard(isActive ? null : dest.id)}
-              className={`relative rounded-2xl overflow-hidden border transition-all duration-300 cursor-pointer shrink-0 bg-[#0A0A12] ${
-                isActive ? 'border-[#C9A227]/40 shadow-2xl min-h-[260px]' : 'border-white/10 shadow-md min-h-[118px]'
-              }`}
-            >
-              {/* Camada 1: Foto Pré-carregada Instantânea (0.00s, nunca fica preta) */}
-              <img
-                src={dest.poster}
-                alt={dest.city}
-                loading="eager"
-                decoding="sync"
-                className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500 ${
-                  isActive ? 'opacity-85' : 'opacity-55'
-                }`}
-                style={{ filter: "saturate(1.15) contrast(1.08)" }}
-              />
-
-              {/* Camada 2: Vídeo em Crossfade Suave (só aparece se estiver rodando) */}
-              {isActive && (
-                <video 
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  onPlaying={() => setPlayingVideos(prev => ({ ...prev, [dest.id]: true }))}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none ${
-                    isVideoReady ? 'opacity-85' : 'opacity-0'
-                  }`}
-                  style={{ filter: "saturate(1.2) contrast(1.1)" }}
-                >
-                  <source src={dest.video} type="video/mp4" />
-                </video>
-              )}
-
-              <div className="absolute inset-0 bg-gradient-to-t from-[#030306]/90 via-[#030306]/40 to-[#030306]/75 pointer-events-none" />
-              
-              {/* Collapsed State: City and House centered */}
-              {!isActive ? (
-                <div className="relative z-10 min-h-[118px] py-5 px-4 flex flex-col items-center justify-center text-center">
-                  <span className="font-ps-display text-2xl md:text-3xl text-white tracking-widest uppercase drop-shadow-lg">{dest.city}</span>
-                  <span className="font-ps-ui text-[#C9A227] text-[10px] font-bold uppercase tracking-[0.2em] mt-1.5 drop-shadow-md">{dest.house}</span>
-                  <span className="font-ps-ui text-white/55 text-[8px] uppercase tracking-widest mt-3 border border-white/15 bg-black/40 rounded-full px-3 py-1">
-                    Toque para abrir
-                  </span>
-                </div>
-              ) : (
-                /* Expanded State: Content Panel in natural flow */
-                <div className="relative z-10 p-3.5 pt-10 flex flex-col justify-end">
-                  <div className="bg-black/75 backdrop-blur-md rounded-xl p-4 border border-white/10 flex flex-col gap-3">
-                    {/* Title & Tag */}
-                    <div>
-                      <div className="flex justify-between items-start mb-1 gap-2">
-                        <h3 className="font-ps-display text-xl text-white leading-tight">{dest.house}</h3>
-                        <span className="bg-white/10 px-2.5 py-0.5 rounded text-[9px] text-white/90 uppercase tracking-widest shrink-0">{dest.city}</span>
-                      </div>
-                      <span className="font-ps-ui text-[#C9A227] text-[9px] font-bold uppercase tracking-[0.15em] block">{dest.tag}</span>
-                    </div>
-                    
-                    {/* Highlight Box: Para Quem É */}
-                    <div className="bg-[#C9A227]/10 border-l-2 border-[#C9A227] p-2.5 rounded-r-md">
-                      <span className="block font-ps-ui text-[#C9A227] text-[9px] uppercase font-bold tracking-widest mb-1">Para quem é</span>
-                      <span className="block font-ps-ui text-white text-[11px] leading-snug">{dest.details.paraQuem}</span>
-                    </div>
-
-                    {/* Benefícios */}
-                    <div className="flex flex-col">
-                      <span className="font-ps-ui text-white/45 text-[9px] uppercase font-bold tracking-widest mb-0.5">Benefícios</span>
-                      <span className="font-ps-ui text-white/85 text-[11px] leading-snug">{dest.details.beneficios}</span>
-                    </div>
-
-                    {/* Impact: Na Vida Real */}
-                    <div className="flex flex-col">
-                      <span className="font-ps-ui text-white/45 text-[9px] uppercase font-bold tracking-widest mb-0.5">Na Vida Real</span>
-                      <span className="font-ps-ui text-white/85 text-[11px] leading-snug">{dest.details.vidaReal}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-// ─── Main Export ─────────────────────────────────────────────────────────
-export const Screen2 = () => {
-  const isMobile = useIsMobile();
-  return (
-    <div className="w-full h-full">
-      {isMobile ? <MobileScreen2 /> : <DesktopScreen2 />}
-    </div>
+    </section>
   );
 };

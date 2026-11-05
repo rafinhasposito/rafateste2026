@@ -1,71 +1,47 @@
-import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import { MobileOnboarding, ONBOARDING_SCREENS } from "../components/mobile/onboarding/MobileOnboarding";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import MobileOnboarding from "../components/mobile/onboarding/MobileOnboarding";
 
-describe("MobileOnboarding 6 Screens Flow", () => {
-  it("has exactly 6 approved screens configured", () => {
-    expect(ONBOARDING_SCREENS).toHaveLength(6);
+function abrirApresentacao() {
+  render(<MemoryRouter><MobileOnboarding /></MemoryRouter>);
+}
+
+async function continuar(etapa: number) {
+  fireEvent.click(screen.getByRole("button", { name: "CONTINUAR" }));
+  await screen.findByText(`${etapa} de 6`);
+}
+
+describe("Apresentação de seis telas", () => {
+  beforeEach(() => vi.stubGlobal("scrollTo", vi.fn()));
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("mostra marca, título, etapa inicial e botão de navegação", () => {
+    abrirApresentacao();
+    expect(screen.getByRole("img", { name: "Protocolo Solar" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Descubra onde passar/ })).toBeInTheDocument();
+    expect(screen.getByText("1 de 6")).toBeVisible();
+    expect(screen.getByRole("button", { name: "CONTINUAR" })).toBeVisible();
   });
 
-  it("renders screen 1 with Protocolo Solar branding, title and CTA button", () => {
-    render(
-      <BrowserRouter>
-        <MobileOnboarding />
-      </BrowserRouter>
-    );
-
-    // Header checks
-    expect(screen.getByText(/PROTOCOLO SOLAR/i)).toBeDefined();
-    expect(screen.getByText("01/06")).toBeDefined();
-
-    // CTA & Privacy Lock
-    expect(screen.getByText(/Iniciar Exploração/i)).toBeDefined();
+  it("abre os detalhes de uma cidade na segunda tela e permite voltar", async () => {
+    abrirApresentacao();
+    await continuar(2);
+    const cidade = await screen.findByRole("button", { name: /Tóquio/ });
+    fireEvent.click(cidade);
+    expect(cidade).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getAllByText("Para quem é").filter(el => !el.closest("[hidden]"))).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Voltar" }));
+    expect(await screen.findByText("1 de 6")).toBeVisible();
   });
 
-  it("navigates forward through all 6 screens via next button and progress indicators", () => {
-    render(
-      <BrowserRouter>
-        <MobileOnboarding />
-      </BrowserRouter>
-    );
-
-    // Step 1
-    expect(screen.getByText("01/06")).toBeDefined();
-    const btnScreen1 = screen.getByText(/Iniciar Exploração/i);
-    
-    // Step 1 -> 2
-    fireEvent.click(btnScreen1);
-    expect(screen.getByText("2/6")).toBeDefined();
-
-    // From Screen 2 onwards, we have the old Footer
-    const nextBtn = screen.getByLabelText(/Próxima tela/i);
-
-    // Step 2 -> 3
-    fireEvent.click(nextBtn);
-    expect(screen.getByText("3/6")).toBeDefined();
-    expect(screen.getByText(/12 CASAS/i)).toBeDefined();
-    expect(screen.getAllByText(/PLANETAS/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/NOVOS CENÁRIOS/i)).toBeDefined();
-    expect(screen.getByText(/ESCOLHAS/i)).toBeDefined();
-
-    // Step 3 -> 4
-    fireEvent.click(nextBtn);
-    expect(screen.getByText("4/6")).toBeDefined();
-    expect(screen.getByText(/SÃO PAULO/i)).toBeDefined();
-    expect(screen.getByText(/NOVA YORK/i)).toBeDefined();
-
-    // Step 4 -> 5
-    fireEvent.click(nextBtn);
-    expect(screen.getByText("5/6")).toBeDefined();
-    expect(screen.getByText(/PASSADO/i)).toBeDefined();
-    expect(screen.getByText(/PRESENTE/i)).toBeDefined();
-    expect(screen.getByText(/FUTURO/i)).toBeDefined();
-
-    // Step 5 -> 6
-    fireEvent.click(nextBtn);
-    expect(screen.getByText("6/6")).toBeDefined();
-    expect(screen.getByText(/DESCOBRIR MEU DESTINO →/i)).toBeDefined();
-    expect(screen.getAllByText(/DADOS 100% PRIVADOS/i).length).toBeGreaterThanOrEqual(1);
+  it("percorre as seis telas até a prévia de Roma", async () => {
+    abrirApresentacao();
+    for (let etapa = 2; etapa <= 6; etapa++) await continuar(etapa);
+    expect(await screen.findByRole("heading", { name: "Roma, Itália" })).toBeInTheDocument();
+    const previa = screen.getByRole("button", { name: "Ver prévia das mudanças" });
+    fireEvent.click(previa);
+    expect(previa).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "REVELAR MEU DESTINO" })).toBeInTheDocument();
   });
 });

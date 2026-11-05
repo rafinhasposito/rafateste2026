@@ -12,13 +12,13 @@ import { useAuth } from '@/hooks/useAuth';
 
 const ONBOARDING_PRELOAD_IMAGES = [
   '/assets/earth-blue.jpg',
-  'https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?auto=format&fit=crop&w=800&q=75',
-  'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=75',
-  'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=75',
-  'https://images.unsplash.com/photo-1502602898657-3e907a5ea071?auto=format&fit=crop&w=800&q=75',
-  'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=75',
-  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=75',
-  'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=75',
+  '/images/abertura/tokyo.jpg',
+  '/images/abertura/zurich.jpg',
+  '/images/abertura/ny.jpg',
+  '/images/abertura/paris.jpg',
+  '/images/abertura/stars.jpg',
+  '/images/abertura/particles.jpg',
+  '/images/abertura/roma.jpg',
 ];
 
 export default function MobileOnboarding() {

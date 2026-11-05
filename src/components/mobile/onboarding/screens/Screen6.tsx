@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
 /**
@@ -20,20 +20,20 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
       </div>
 
       {/* Main Content Layout */}
-      <div className="relative z-10 w-full max-w-[1200px] px-6 lg:px-12 pt-20 pb-36 lg:py-0 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-20">
+      <div className="relative z-10 w-full max-w-7xl px-4 sm:px-8 lg:px-12 pt-20 pb-32 lg:pt-28 lg:pb-12 grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] items-center gap-6 lg:gap-12">
         
         {/* Left Column: Copy */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="w-full lg:w-[45%] text-center lg:text-left flex flex-col items-center lg:items-start"
+          className="w-full min-w-0 text-center lg:text-left flex flex-col items-center lg:items-start"
         >
           <span className="inline-block font-ps-ui text-[10px] md:text-[11px] tracking-[0.3em] text-[#C9A227] uppercase mb-5 drop-shadow-md">
             O Seu Mapa de Virada de Chave
           </span>
           
-          <h2 className="font-ps-display text-3xl md:text-5xl lg:text-6xl text-white mb-6 leading-[1.1] drop-shadow-lg">
+          <h2 className="font-ps-display text-3xl md:text-5xl xl:text-6xl text-white mb-6 leading-[1.1] drop-shadow-lg">
             Você está a um clique de gerar a{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-[#C9A227] to-[#C9A227]/70">
               análise exata
@@ -71,7 +71,7 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.6, ease: 'easeOut' }}
-          className="w-full lg:w-[45%] max-w-md flex flex-col items-center justify-center mx-auto"
+          className="w-full min-w-0 max-w-2xl flex flex-col items-center justify-center mx-auto"
         >
           <div className="relative w-full bg-[#08090F]/95 border border-white/10 rounded-2xl overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
             
@@ -79,9 +79,9 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
             <div className="absolute -inset-0.5 bg-gradient-to-b from-[#C9A227]/20 to-transparent opacity-30 rounded-2xl blur-md pointer-events-none" />
 
             {/* Header with Instant Preloaded Rome Photo + Progressive Video Crossfade */}
-            <div className="relative h-40 md:h-48 overflow-hidden border-b border-white/[0.05] bg-[#0B0E17]">
+            <div className="relative w-full h-36 sm:h-auto sm:aspect-[2.7/1] overflow-hidden border-b border-white/[0.05] bg-[#0B0E17]">
               <img
-                src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=75"
+                src="/images/abertura/roma.jpg"
                 alt="Roma, Itália"
                 loading="eager"
                 decoding="sync"
@@ -123,24 +123,24 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
             </div>
 
             {/* Mobile Accordion Trigger */}
-            <div 
-              className="lg:hidden flex items-center justify-between px-5 py-4 border-y border-white/[0.05] cursor-pointer bg-white/[0.02]"
+            <button type="button" aria-expanded={isExpanded} aria-controls="previa-roma"
+              className="w-full lg:hidden flex items-center justify-between px-5 py-4 border-y border-white/[0.05] cursor-pointer bg-white/[0.02]"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               <span className="font-ps-ui text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Ver prévia das mudanças</span>
               <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
                 <ChevronDown className="w-4 h-4 text-white/50" />
               </motion.div>
-            </div>
+            </button>
 
             {/* High-Impact Area Previews */}
-            <motion.div 
+            <motion.div id="previa-roma"
               initial={false}
               animate={{ height: isExpanded ? 'auto' : 0, opacity: isExpanded ? 1 : 0 }}
               className="overflow-hidden lg:!h-auto lg:!opacity-100"
             >
               <div className="px-5 pb-6 pt-4 lg:pt-0 md:px-7">
-                <div className="flex flex-col gap-3">
+                <div className="grid sm:grid-cols-2 gap-3">
                   
                   <div className="bg-white/[0.02] border border-white/[0.05] p-4 md:p-5 rounded-xl">
                     <h5 className="font-ps-ui text-white/90 text-[13px] md:text-[14px] font-bold uppercase tracking-widest mb-1.5">

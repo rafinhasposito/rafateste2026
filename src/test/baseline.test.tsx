@@ -1,29 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { MobileOnboarding } from '../components/mobile/onboarding/MobileOnboarding';
-
-// Mocking framer-motion to avoid complex animation rendering issues in JSDOM
-vi.mock('framer-motion', async () => {
-  const actual = await vi.importActual('framer-motion');
-  return {
-    ...actual as any,
-    AnimatePresence: ({ children }: any) => <>{children}</>,
-    motion: {
-      div: ({ children, className, onClick }: any) => <div className={className} onClick={onClick}>{children}</div>,
-      p: ({ children, className }: any) => <p className={className}>{children}</p>,
-      h1: ({ children, className }: any) => <h1 className={className}>{children}</h1>,
-      h2: ({ children, className }: any) => <h2 className={className}>{children}</h2>,
-      h3: ({ children, className }: any) => <h3 className={className}>{children}</h3>,
-      span: ({ children, className }: any) => <span className={className}>{children}</span>,
-      button: ({ children, className, onClick }: any) => <button className={className} onClick={onClick}>{children}</button>,
-    }
-  };
-});
+import MobileOnboarding from '../components/mobile/onboarding/MobileOnboarding';
 
 describe('Phase 0 Baseline: Critical Flow Smoke Tests', () => {
   
   it('should render the Onboarding flow without crashing', () => {
+    vi.spyOn(window, "scrollTo").mockImplementation(() => {});
     render(
       <BrowserRouter>
         <MobileOnboarding />
@@ -31,7 +14,8 @@ describe('Phase 0 Baseline: Critical Flow Smoke Tests', () => {
     );
     
     // Checks if the Onboarding mounts properly by looking for the "Protocolo Solar" brand header or similar
-    expect(screen.getByText(/Protocolo Solar/i)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Protocolo Solar" })).toBeInTheDocument();
+    vi.restoreAllMocks();
   });
 
   // TECHNICAL DEBT DOCUMENTATION (Phase 0 Baseline):

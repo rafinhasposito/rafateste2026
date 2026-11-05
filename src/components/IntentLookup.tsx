@@ -2,7 +2,23 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Scroll, Sparkles, ArrowRight, HelpCircle, Search, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { matchIntentToHouse } from "@/lib/intentMap";
+import { fotoDaCasa } from "@/lib/fotosEditoriais";
+import { Compass, Wallet, MessagesSquare, House, Palette, Activity, HeartHandshake, RefreshCw, Globe, Briefcase, Users, Moon } from "lucide-react";
+
+const objetivos = [
+  { titulo: "Começar de novo", Icon: Compass },
+  { titulo: "Fortalecer minhas finanças", Icon: Wallet },
+  { titulo: "Comunicar e vender melhor", Icon: MessagesSquare },
+  { titulo: "Cuidar da casa e da família", Icon: House },
+  { titulo: "Viver romances e criar", Icon: Palette },
+  { titulo: "Ganhar saúde e rotina", Icon: Activity },
+  { titulo: "Firmar uma parceria", Icon: HeartHandshake },
+  { titulo: "Transformar minha vida", Icon: RefreshCw },
+  { titulo: "Viajar e ampliar horizontes", Icon: Globe },
+  { titulo: "Avançar na carreira", Icon: Briefcase },
+  { titulo: "Encontrar minha comunidade", Icon: Users },
+  { titulo: "Ter tempo para mim", Icon: Moon },
+];
 import { cityDatabase } from "@/data/houses";
 import { API_URL } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
@@ -63,7 +79,6 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
   };
 
   const handleSelectIntent = (houseId: number) => {
-    setSelectedHouse(houseId);
     const finalName = (name || profile?.full_name || user?.user_metadata?.name || "Viajante").trim();
     const finalBirthdate = birthdate || profile?.birth_date || "";
     const finalBirthtime = birthtime || (profile?.birth_time ? String(profile.birth_time).slice(0, 5) : "");
@@ -78,20 +93,16 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       return;
     }
     try {
-      sessionStorage.setItem(
-        "ps_natal_data",
-        JSON.stringify({
-          name: finalName,
-          birthdate: finalBirthdate,
-          birthtime: finalBirthtime,
-          birthPlace: finalBirthPlace,
-          year: year || "2026",
-          mode: mode || "futuro",
-        })
-      );
+      sessionStorage.setItem("ps_natal_name", finalName);
+      sessionStorage.setItem("ps_natal_date", finalBirthdate);
+      sessionStorage.setItem("ps_natal_time", finalBirthtime);
+      sessionStorage.setItem("ps_natal_place", finalBirthPlace);
+      sessionStorage.setItem("ps_natal_year", year);
+      sessionStorage.setItem("ps_natal_mode", mode);
     } catch (err) {
       console.warn("[IntentLookup] sessionStorage write failed:", err);
     }
+    setSelectedHouse(houseId);
     navigate(`/app/trailer?house=${houseId}&mode=${mode || "futuro"}`);
   };
 
@@ -233,15 +244,17 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
   return (
     <div className="space-y-6 w-full">
       {!result && !loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pb-8">
           {Object.values(cityDatabase).map((house) => {
             const isSelected = selectedHouse === house.id;
+            const { titulo, Icon } = objetivos[house.id - 1];
+            const foto = fotoDaCasa(house.id);
             return (
               <button
                 key={house.id}
                 type="button"
                 onClick={() => handleSelectIntent(house.id)}
-                className={`w-full text-left p-5 sm:p-6 rounded-2xl border transition-all duration-300 group flex items-start justify-between gap-4 backdrop-blur-md hover:-translate-y-0.5 active:scale-[0.99] ${
+                className={`relative overflow-hidden w-full text-left p-5 sm:p-6 rounded-2xl border transition-all duration-300 group flex items-start justify-between gap-4 backdrop-blur-md hover:-translate-y-0.5 active:scale-[0.99] ${
                   isSelected ? "bg-[#0D1A2F]/95" : "bg-[#08111F]/80 border-white/[0.10] hover:bg-[#0C182B]/90 hover:border-white/25"
                 }`}
                 style={{
@@ -249,21 +262,23 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                   boxShadow: isSelected ? `0 0 28px ${hexColor}1F` : '0 10px 30px rgba(0,0,0,0.35)',
                 }}
               >
-                <div className="flex-1">
+                {foto && <img src={foto} alt="" loading="lazy" className="absolute inset-0 size-full object-cover opacity-20" />}
+                <div className="relative flex-1">
+                  <Icon className="w-6 h-6 mb-4" style={{ color: softHex }} aria-hidden="true" />
                   <span
                     className="inline-block text-[10px] font-bold uppercase tracking-[0.22em] mb-2"
                     style={{ color: softHex }}
                   >
-                    Casa {String(house.id).padStart(2, "0")} • {house.label}
+                    Casa {house.id}
                   </span>
-                  <h3 className="font-ps-display text-base sm:text-lg font-bold mb-1.5 transition-colors leading-snug text-white">
-                    {house.intent}
+                  <h3 className="font-ps-display text-xl sm:text-2xl font-bold mb-1.5 transition-colors leading-snug text-white">
+                    {titulo}
                   </h3>
                   <p className="text-white/65 text-xs sm:text-sm font-light leading-relaxed">
                     {house.realLife}
                   </p>
                 </div>
-                <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all mt-1"
+                <div className="relative w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all mt-1"
                      style={{ 
                        backgroundColor: isSelected ? `${hexColor}20` : 'rgba(255,255,255,0.04)',
                        borderColor: isSelected ? `${hexColor}50` : 'rgba(255,255,255,0.12)',
@@ -285,9 +300,9 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
             exit={{ opacity: 0, y: 10, height: 0 }}
             className="flex flex-col items-center w-full mt-6 overflow-hidden"
           >
-            <div className="flex flex-col lg:flex-row items-center justify-between w-full p-5 md:p-6 bg-[#08111F]/90 border border-white/[0.12] rounded-2xl md:rounded-3xl backdrop-blur-xl gap-5 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
+            <div className="flex flex-col items-stretch w-full min-w-0 p-5 md:p-6 bg-[#08111F]/90 border border-white/[0.12] rounded-2xl md:rounded-3xl backdrop-blur-xl gap-5 shadow-[0_18px_45px_rgba(0,0,0,0.55)]">
               
-              <div className="flex items-center gap-4 w-full lg:w-auto">
+              <div className="flex items-center gap-4 w-full">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center border shrink-0"
                   style={{ backgroundColor: `${hexColor}18`, borderColor: `${hexColor}40` }}>
                   <Sparkles className="w-5 h-5" style={{ color: softHex }} />
@@ -298,11 +313,11 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
+              <div className="grid w-full gap-3 grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))]">
                 <button
                   onClick={() => handleConfirmIntent(false)}
                   disabled={loading}
-                  className="px-6 md:px-7 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-[#02050A] shadow-lg"
+                  className="min-w-0 flex-wrap px-3 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-[#02050A] shadow-lg"
                   style={{
                     backgroundColor: mode === 'passado' ? '#CBD5E1' : hexColor,
                     boxShadow: `0 0 30px ${hexColor}40`,
@@ -318,7 +333,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                 <button
                   onClick={() => handleConfirmIntent(true)}
                   disabled={loading}
-                  className="px-5 md:px-6 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(229,193,88,0.18)]"
+                  className="min-w-0 flex-wrap px-3 py-3.5 font-bold uppercase tracking-widest text-[11px] md:text-xs rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(229,193,88,0.18)]"
                 >
                   <Crown className="w-3.5 h-3.5 text-[#E5C158]" />
                   <span>Desbloquear Mapa Completo</span>
