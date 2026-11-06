@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -46,6 +47,8 @@ import Technology from "./pages/Technology";
 import MobileOnboarding from "./components/mobile/onboarding/MobileOnboarding";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { UsersTable } from "./components/admin/UsersTable";
+
+const OnboardingV2 = lazy(() => import("./components/onboarding-v2/OnboardingV2"));
 
 const AdminShowcase = () => (
   <AdminLayout title="User management" description="Manage your team members and their account permissions here.">
@@ -101,6 +104,7 @@ const App = () => (
             <Route path="/v2/game" element={<SolarGameV2 />} />
             <Route path="/northstar" element={<NorthStarFlow />} />
             <Route path="/apple-3d" element={<AppleScrollExplosion />} />
+            <Route path="/app/onboarding-v2" element={<Suspense fallback={<div className="min-h-screen bg-black" />}><OnboardingV2 /></Suspense>} />
             <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
             <Route path="/v2-preview" element={<AppleResultPreview />} />

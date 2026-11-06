@@ -151,6 +151,13 @@ const Auth = () => {
           }
         }
 
+        const previewPath = sessionStorage.getItem("ps_onboarding_v2_path");
+        if (previewPath && ["cidade", "casa", "intencao"].includes(previewPath)) {
+          sessionStorage.removeItem("ps_onboarding_v2_path");
+          sessionStorage.removeItem("ps_pending_mode");
+          navigate(`/?mode=futuro&path=${previewPath}`, { replace: true });
+          return;
+        }
         const pendingMode = sessionStorage.getItem("ps_pending_mode");
         if (pendingMode && ["futuro", "presente", "passado"].includes(pendingMode)) {
           sessionStorage.removeItem("ps_pending_mode");
