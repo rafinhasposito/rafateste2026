@@ -51,7 +51,7 @@
   letter-spacing: .22em;
   text-transform: uppercase;
 }
-.solar-heading h1, .solar-universe h1 {
+.solar-heading h1, .solar-universe h1, .solar-universe h2 {
   font-family: "PS Marcellus", serif;
   font-weight: 400;
   font-size: clamp(32px, 3.7vw, 54px);
@@ -121,11 +121,27 @@
 .solar-opening .text-center.lg\:text-left::before { content: ""; position: absolute; inset: -40px -60px; background: radial-gradient(ellipse,#030306a8 25%,#03030600 72%); z-index: -1; }
 .solar-opening p { color: #ffffffe0; }
 .solar-opening .text-white\/35 { color: #ffffffb3; }
-.solar-universe { position: relative; min-height: 100svh; background: #03080c; overflow: hidden; }
+.solar-step-5 .solar-top { position: fixed; }
+.solar-universe { position: relative; height: 320svh; background: #03080c; }
+.solar-universe-frame { position: sticky; top: 0; height: 100svh; overflow: hidden; background: radial-gradient(ellipse at 72% 45%,#0c1720 0%,#03080c 62%); }
 .solar-orbit-sky { position: absolute; inset: 0; width: 100%; height: 100%; }
-.solar-universe-copy { position: relative; z-index: 1; max-width: 1320px; margin: auto; padding: 30vh 48px 150px; pointer-events: none; }
-.solar-universe-copy h1 { font-size: clamp(42px,5.3vw,78px); max-width: 590px; line-height: 1.1; text-shadow: 0 3px 22px #000; }
-.solar-universe-copy>p:last-child { max-width: 355px; font-size: 16px; line-height: 1.85; color: #ffffffb8; margin-top: 26px; text-shadow: 0 2px 15px #000; }
+.solar-house-wheel { position: absolute; left: 70%; top: 47%; width: min(48vw,72svh); height: min(48vw,72svh); transform: translate(-50%,-50%); pointer-events: none; }
+.solar-universe-copy { position: absolute; z-index: 2; top: 27%; left: max(48px,calc((100vw - 1224px)/2)); width: 41%; max-width: 570px; pointer-events: none; }
+.solar-universe-chapter { position: absolute; inset: 0 0 auto; will-change: opacity, transform; }
+.solar-universe-copy h1, .solar-universe-copy h2 { font-size: clamp(42px,4.9vw,72px); line-height: 1.12; text-shadow: 0 3px 22px #000; }
+.solar-universe-copy h2 em { font-style: normal; color: #e5c77f; }
+.solar-universe-chapter>p:last-of-type { max-width: 370px; font-size: 16px; line-height: 1.8; color: #d2d9df; margin-top: 24px; text-shadow: 0 2px 15px #000; }
+.solar-illustration-note { display: block; max-width: 340px; color: #9ba6b2; font-size: 10px; line-height: 1.6; margin-top: 20px; }
+.solar-scroll-cue { position: absolute; bottom: 130px; left: 50%; display: flex; flex-direction: column; align-items: center; gap: 12px; color: #b9c5d0; font-size: 9px; letter-spacing: .22em; pointer-events: none; }
+.solar-universe-nav { position: absolute; z-index: 10; inset: auto 0 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 35px 48px 30px; background: linear-gradient(0deg,#03080cf5,transparent); }
+.solar-chapters { display: grid; grid-template-columns: repeat(3,1fr); width: 410px; gap: 20px; padding-bottom: 5px; }
+.solar-chapters button { text-align: left; color: #94a0ac; padding: 12px 0; }
+.solar-chapter-line { display: block; height: 1px; background: #ffffff30; margin-bottom: 14px; }
+.solar-chapter-label { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+.solar-chapter-label b { font-weight: 400; margin-left: 7px; }
+.solar-chapters [aria-current=step] { color: #efd293; }
+.solar-chapters [aria-current=step] .solar-chapter-line { background: #efd293; box-shadow: 0 0 10px #efd29350; }
+.solar-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 .solar-lesson { padding: 24px; margin-bottom: 24px; background: #0e1420; border: 1px solid #dfbe6c40; border-radius: 20px; }
 .solar-row { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
 .solar-lesson p { font-size: 14px; line-height: 1.7; color: #d1d7e0; margin-top: 10px; }
@@ -145,6 +161,24 @@
   .solar-cards { grid-template-columns: 1fr; max-width: 620px; width: 100%; margin-inline: auto; }
   .solar-card { height: 430px; }
 }
+@media(max-width:1023px) {
+  .solar-house-wheel { left: 50%; top: 30.5%; width: min(88vw,45svh); height: min(88vw,45svh); }
+  .solar-universe-frame { background: radial-gradient(ellipse at 50% 30%,#0c1720 0%,#03080c 62%); }
+  .solar-universe-copy { top: 52%; left: 24px; width: calc(100% - 48px); max-width: 620px; }
+  .solar-universe-copy h1, .solar-universe-copy h2 { font-size: clamp(34px,5.5vw,48px); margin-top: 10px; margin-bottom: 12px; }
+  .solar-universe-chapter>p:last-of-type { max-width: 520px; font-size: 14px; line-height: 1.6; margin-top: 14px; }
+  .solar-universe-copy .solar-label { font-size: 9px; }
+  .solar-desktop-break { display: none; }
+  .solar-illustration-note { font-size: 9px; margin-top: 10px; }
+  .solar-universe-nav { flex-direction: column; align-items: stretch; gap: 10px; padding: 24px 24px max(20px,env(safe-area-inset-bottom)); }
+  .solar-universe-nav .solar-primary { width: 100%; height: 55px; min-width: 0; padding-inline: 20px; font-size: 12px; letter-spacing: .06em; gap: 12px; }
+  .solar-chapters { width: 100%; gap: 18px; padding: 0; }
+  .solar-chapters button { padding: 8px 0; }
+  .solar-chapter-line { margin-bottom: 8px; }
+  .solar-chapter-label { font-size: 8px; letter-spacing: .04em; }
+  .solar-chapter-label b { margin-left: 4px; }
+  .solar-scroll-cue { top: 10%; bottom: auto; left: auto; right: 24px; align-items: flex-end; font-size: 8px; gap: 6px; }
+}
 @media(max-width:767px) {
   .solar-top { padding: 20px; }
   .solar-brand { width: 140px; }
@@ -157,10 +191,27 @@
   .solar-card-copy h2 { font-size: 30px; }
   .solar-nav { padding: 20px 24px max(20px,env(safe-area-inset-bottom)); }
   .solar-primary { width: 100%; height: 55px; }
-  .solar-universe { min-height: max(100svh,780px); }
-  .solar-universe-copy { padding: 53svh 24px 130px; }
-  .solar-universe-copy h1 { font-size: 42px; }
-  .solar-universe-copy>p:last-child { font-size: 14px; margin-top: 18px; }
   .solar-diagram { grid-template-columns: 1fr 100px; }
   .solar-diagram>div:last-child { grid-column: 1/-1; }
+}
+@media(max-width:1023px) and (max-height:740px) {
+  .solar-universe-copy { top: 49%; }
+  .solar-universe-copy h1, .solar-universe-copy h2 { font-size: 32px; line-height: 1.07; }
+  .solar-universe-chapter>p:last-of-type { font-size: 12px; margin-top: 10px; }
+  .solar-illustration-note { font-size: 8px; margin-top: 7px; }
+  .solar-chapter-label { display: none; }
+  .solar-chapter-line { margin: 0; }
+  .solar-universe-nav { gap: 6px; padding-top: 16px; }
+  .solar-scroll-cue { display: none; }
+}
+@media(min-width:600px) and (max-width:1023px) and (max-height:520px) {
+  .solar-step-5 .solar-top { padding: 12px 24px; }
+  .solar-step-5 .solar-round { width: 30px; height: 30px; }
+  .solar-house-wheel { left: 70%; top: 47%; width: min(48vw,72svh); height: min(48vw,72svh); }
+  .solar-universe-copy { top: 23%; width: 43%; }
+  .solar-universe-copy h1, .solar-universe-copy h2 { font-size: 28px; }
+  .solar-universe-chapter>p:last-of-type { font-size: 11px; line-height: 1.5; }
+  .solar-universe-nav { flex-direction: row; align-items: center; gap: 24px; padding: 12px 24px; }
+  .solar-universe-nav .solar-primary { width: auto; height: 42px; flex-shrink: 0; font-size: 10px; }
+  .solar-chapters { width: 230px; }
 }

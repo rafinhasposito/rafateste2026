@@ -7,7 +7,7 @@ import { Screen1 } from "@/components/mobile/onboarding/screens/Screen1";
 import { Screen6 } from "@/components/mobile/onboarding/screens/Screen6";
 import { PriorityScreen } from "./PriorityScreen";
 import { cities } from "./example";
-import { OrbitSky } from "./OrbitSky";
+import { UniverseJourney } from "./UniverseJourney";
 import { MapLesson } from "./MapLesson";
 import "./onboarding.css";
 
@@ -176,24 +176,15 @@ export default function OnboardingV2() {
         </section>
       )}
 
-      {step === 5 && (
-        <section className="solar-universe">
-          <OrbitSky playing={playing} />
-          <div className="solar-universe-copy">
-            <p className="solar-label">Tecnologia & Precisão Astronômica</p>
-            <h1>O Universo mapeado<br />para você.</h1>
-            <p>Cruzamos a exatidão do seu nascimento com a rotação dos astros em milissegundos.</p>
-          </div>
-        </section>
-      )}
+      {step === 5 && <UniverseJourney playing={playing} reduced={reduced} onComplete={advance} />}
 
       {step === 6 && <div className="solar-original solar-finish"><Screen6 onComplete={advance} /></div>}
 
-      <footer className={`solar-nav ${step === 6 ? "solar-final-nav" : ""}`}>
+      {step !== 5 && <footer className={`solar-nav ${step === 6 ? "solar-final-nav" : ""}`}>
         <button className="solar-primary" onClick={advance}>
           {step === 6 ? "REVELAR MEU DESTINO" : "CONTINUAR"} <ArrowRight size={17} />
         </button>
-      </footer>
+      </footer>}
     </main>
   );
 }
