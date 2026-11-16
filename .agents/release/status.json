@@ -16,6 +16,7 @@
   },
   "blockers_open": [],
   "blockers_fixed": [
+    "Erradicação definitiva do rodapé dividido (split footer) com seta para baixo no canto esquerdo e barra de progresso no canto direito (#cue, .direction, .track, #bottomBar) em todos os arquivos de onboarding e prévias (01-abertura.html, 01-abertura-theo.html, abertura-com-voz.html, theo-e-ana.html, theo-e-ana-mobile.html, guia-pessoal-theo-pergunta.html), consolidando 100% da navegação em cliques discretos centrados e unificados",
     "Remoção 100% de Nova Délhi (Nova Delhi / New Delhi) em house_scanner.py, HouseTrailerApp.tsx e AppleResultPreviewV3.tsx",
     "Fim do 'Desconhecido' na Casa 11 (mesmo quando Nova York é a cidade titular): Adicionadas cidades reais nas faixas longitudinais oceânicas/asiáticas em house_scanner.py + fallback de ponto exato Placidus (get_house_superposition) + helper unificado resolveHouseCity(num) no Hero e na Grade de 12 Casas em AppleResultPreviewV3.tsx",
     "Correção do crash 'Conexão Interrompida' (ErrorBoundary) em 'Por Área da Vida': Removidos os 12 <video autoPlay> simultâneos em GoalCards.tsx, corrigido ReferenceError de isAllHousesUnlocked antes de unlockedItems e P.onUnlockFocus em AppleResultPreviewV3.tsx, e adicionado fallback de profile em HouseLookup.tsx, IntentLookup.tsx e HouseTrailerApp.tsx",

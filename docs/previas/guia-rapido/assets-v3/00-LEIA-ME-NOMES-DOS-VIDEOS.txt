@@ -1,0 +1,35 @@
+================================================================================
+MAPA OFICIAL DOS VÍDEOS DA V3 (ONDE SALVAR E SUBSTITUIR)
+================================================================================
+
+Coloque seus novos arquivos .mp4 nesta pasta (`assets-v3/`) com o MESMO NOME
+numerado abaixo para o onboarding-v3.html carregar automaticamente:
+
+1) TELA 0 — Abertura do Theo (corta aos 6,35s para a Terra; editável em V3_MEDIA)
+   Vídeo : 01-abertura.mp4
+   Capa  : 01-abertura-poster.jpg
+
+2) TELA 1 — Terra Orbital / Nascer do Sol (loop mudo de fundo)
+   Vídeo : 02-terra-sunrise.mp4
+   Capa  : 02-terra-sunrise-poster.jpg
+
+3) TELA 2 — Theo explicando Zurique, Paris e Nova York (avança ao acabar)
+   Vídeo : 03-transicoes-cidades.mp4
+   Capa  : 03-transicoes-cidades-poster.jpg
+
+4) TELA 3 — Theo perguntando "Qual é o seu nome?" (pausa no final esperando digitar)
+   Vídeo : 04-pergunta-nome.mp4
+   Capa  : 04-pergunta-nome-poster.jpg
+
+5) TELA 5 — Vídeo principal do Theo após cidade/data/hora
+   Vídeo : 05-master-cidades.mp4
+   Capa  : 05-master-cidades-poster.jpg
+
+DICA DE BACKUP:
+Arraste os arquivos antigos para `_backup-originais/` antes de colar os novos,
+se quiser guardar uma cópia de segurança.
+
+IMPORTANTE:
+Não mova `onboarding-v3.html` para outra subpasta (ele depende dos caminhos
+relativos para fontes, vídeos das cidades e index.html principal).
+================================================================================

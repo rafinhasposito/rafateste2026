@@ -11,7 +11,8 @@ import { prefixosSol, prefixosAscendente, prefixosFase } from "@/data/modifiers"
 import { BASE_HOUSE_PROFILES } from "@/data/baseHouseProfiles";
 import { houseThemes } from "@/data/houseThemes";
 import { REAL_HOUSES_DATA } from "@/data/houses_content";
-import UnlockPremiumModal from "@/components/UnlockPremiumModal";
+import UnlockPremiumModal, { type UnlockTargetArea } from "@/components/UnlockPremiumModal";
+import { getHouseIntendedFocusId, computeAllFocusesCost } from "@/lib/consultationUnlocks";
 import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, ShieldAlert, Eye, Clock, Hourglass, BookOpen, Plane, QrCode, Fingerprint, Hash, CreditCard, Compass, Plus, Unlock, Scroll } from "lucide-react";
 
 /* ══════════════════════════════════════════════════
@@ -220,7 +221,7 @@ const LIFE_AREAS = [
     cityDesc: "A cidade eterna. A vibração deste destino afasta paixões rasas e convida à fundação de laços profundos. É um terreno magnético para estabilizar romances e torná-los fortalezas.",
     image: "https://images.unsplash.com/photo-1516483638261-f40889eba30e?q=80&w=1980&auto=format&fit=crop",
     dna: {
-      essencia: "O seu Leão pede admiração mútua. No Amor, o destino afasta relações em que você precise se diminuir e atrai parcerias onde o seu brilho é celebrado e protegido.",
+      essencia: "Sua essência pede admiração mútua. No Amor, o destino afasta relações em que você precise se diminuir e atrai parcerias onde o seu brilho é celebrado e protegido.",
       metodo: "O romantismo encontra a praticidade. O universo favorece parceiros que trazem ordem, cuidado diário e que saibam construir uma vida a dois sem dramas desnecessários.",
       fase: "A fase de montanha-russa emocional já passou. O que você busca e atrai agora é paz, previsibilidade e alguém para ser o seu porto seguro nas conquistas da vida."
     },
@@ -269,7 +270,7 @@ const LIFE_AREAS = [
     image: "https://images.unsplash.com/photo-1559511260-66a654ae982a?q=80&w=2118&auto=format&fit=crop",
     dna: {
       essencia: "A sua vitalidade é naturalmente alta, mas aqui ela é direcionada para a manutenção da máquina. A energia foca em preservar o seu corpo para aguentar o teto do sucesso.",
-      metodo: "O Virgem assume o controle absoluto da sua biologia. O universo favorece protocolos de biohacking, rotinas de sono e uma alimentação milimetricamente ajustada.",
+      metodo: "A disciplina assume o controle absoluto da sua biologia. O universo favorece protocolos de biohacking, rotinas de sono e uma alimentação milimetricamente ajustada.",
       fase: "O corpo já não aceita abusos como antes. O seu momento de vida exige que o autocuidado seja tratado com a mesma prioridade e respeito que a sua conta bancária."
     },
     ritual: "Comece o dia com um choque biológico (um banho gelado ou um treino intenso). Depois, faça a sua primeira refeição no melhor e mais limpo restaurante que encontrar, tratando o alimento como combustível premium.",
@@ -373,19 +374,22 @@ export interface DestinyResultsProps {
   };
   allResults?: Record<string, HouseResult> | undefined;
   unlockedFocuses?: Record<string, string[]>;
+  unlockedHousesList?: number[];
+  goalHouse?: number | null;
   userCredits?: number;
+  isAdmin?: boolean;
   isAuthenticated?: boolean;
   consultationId?: string;
   autoUnlocked?: boolean;
-  onUnlock?: (n: number) => void;
-  onUnlockFocus?: (focusId: string, houseNum: number) => Promise<void>;
+  onUnlock?: (n: number) => Promise<boolean | void> | void;
+  onUnlockFocus?: (focusId: string, houseNum: number) => Promise<boolean | void>;
   focusCostLabel?: string;
-  onUnlockAllFocuses?: (allFocusIds: string[], houseNum: number) => Promise<void>;
+  onUnlockAllFocuses?: (allFocusIds: string[], houseNum: number) => Promise<boolean | void>;
   allFocusesCostLabel?: string;
-  unlockedFocuses?: Record<string, string[]>;
   embedded?: boolean;
   isHouseUnlocked?: (h: number) => boolean;
   onSelectHouse?: (h: number) => void;
+  onNavigateCredits?: (pkg?: string) => void;
   mode?: string;
   unlockedCount?: number;
   intent?: string | null;
@@ -608,8 +612,8 @@ function getAscendant(birthdate?: string, birthtime?: string, birthPlace?: strin
   const latRad = (lat * Math.PI) / 180;
   const y = -Math.cos(ramcRad);
   const x = Math.sin(ramcRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
-  let ascRad = Math.atan2(y, x);
-  let ascDeg = ((ascRad * 180 / Math.PI) % 360 + 360) % 360;
+  const ascRad = Math.atan2(y, x);
+  const ascDeg = ((ascRad * 180 / Math.PI) % 360 + 360) % 360;
   const signs = ["Áries", "Touro", "Gêmeos", "Câncer", "Leão", "Virgem", "Libra", "Escorpião", "Sagitário", "Capricórnio", "Aquário", "Peixes"];
   return signs[Math.floor(ascDeg / 30) % 12];
 }
@@ -676,7 +680,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     const timer = setTimeout(() => {
       try {
         window.scrollTo(0, 0);
-      } catch (_) {}
+      } catch {
+        // ignore scroll error
+      }
     }, 100);
     return () => clearTimeout(timer);
   }, [props.house]);
@@ -730,7 +736,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     return bestCandidate;
   };
 
-  const bestCity = resolveHouseCity(urlHouseIndex);
+  const [selectedAltCity, setSelectedAltCity] = useState<any | null>(null);
+  React.useEffect(() => {
+    setSelectedAltCity(null);
+  }, [urlHouseIndex]);
+
+  const defaultHouseCity = resolveHouseCity(urlHouseIndex);
+  const bestCity = selectedAltCity || defaultHouseCity;
   const cityStr = `${canonicalCityName(bestCity.city)}, ${canonicalCountryName(bestCity.country)}`;
 
   // P_DYNAMIC uses real user profile data if available
@@ -763,6 +775,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     time: _srTime,
     sign: _sunSign,
     ascendant: _ascendant,
+    phase: props.birthDate ? "Ciclo Atual" : P.phase,
     house: urlHouseIndex,
     houseLabel: props.houseName || "Casa",
     city: cityStr,
@@ -893,7 +906,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const scrollCar = (d: number) => carRef.current?.scrollBy({ left: d, behavior: "smooth" });
   const [openArea, setOpenArea] = useState<string>("dinheiro");
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-  const [targetLockedArea, setTargetLockedArea] = useState<{ id: string; label: string; color: string; type: 'foco' | 'rota', houseNum?: number } | null>(null);
+  const [targetLockedArea, setTargetLockedArea] = useState<UnlockTargetArea | null>(null);
   // Fallbacks genéricos e atmosféricos baseados no luxo e não em cidades específicas
   const getAtmosphericFallback = (house: number) => {
     const fallbacks: Record<number, string> = {
@@ -1196,12 +1209,11 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   })();
 
   const [isBoardingPassOpen, setIsBoardingPassOpen] = useState(false);
-  // Find the intended area based on props.intent
-  const intendedAreaId = React.useMemo(() => {
-    if (!props.intent) return null;
-    const matched = [...LIFE_AREAS].find(a => a.id.toLowerCase() === props.intent?.toLowerCase() || a.label.toLowerCase().includes(props.intent?.toLowerCase() || ""));
-    return matched ? matched.id : null;
-  }, [props.intent]);
+  // Find the intended area based on props.intent, scoped strictly to the original consultation House
+  const intendedAreaId = React.useMemo(
+    () => getHouseIntendedFocusId(props.intent, P_DYNAMIC.house, props.goalHouse),
+    [props.intent, P_DYNAMIC.house, props.goalHouse]
+  );
 
   const savedHouseFocuses = props.unlockedFocuses?.[String(P_DYNAMIC.house)] || [];
   const [hoveredArea, setHoveredArea] = useState<string | null>(intendedAreaId || savedHouseFocuses[0] || LIFE_AREAS[0].id);
@@ -1226,13 +1238,27 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     setUnlockedItems(intendedAreaId ? [...new Set([intendedAreaId, ...saved])] : [...saved]);
   }, [props.unlockedFocuses, P_DYNAMIC.house, intendedAreaId]);
 
+  const unlockedHousesListProp = props.unlockedHousesList;
+  const isHouseUnlockedProp = props.isHouseUnlocked;
+  const activeUnlockedHouses = React.useMemo(() => {
+    if (unlockedHousesListProp && unlockedHousesListProp.length > 0) {
+      return unlockedHousesListProp;
+    }
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter((num) =>
+      isHouseUnlockedProp ? isHouseUnlockedProp(num) : (num === P_DYNAMIC.house || unlockedItems.includes(num.toString()))
+    );
+  }, [unlockedHousesListProp, isHouseUnlockedProp, P_DYNAMIC.house, unlockedItems]);
+
+  const remainingHousesCount = Math.max(0, 12 - activeUnlockedHouses.length);
+
   // Todas as 12 Casas desbloqueadas (declarado após unlockedItems para evitar ReferenceError)
   const isAllHousesUnlocked = (props.unlockedCount !== undefined && props.unlockedCount >= 12)
+    || (props.unlockedHousesList !== undefined && props.unlockedHousesList.length >= 12)
     || [1,2,3,4,5,6,7,8,9,10,11,12].every(num => props.isHouseUnlocked ? props.isHouseUnlocked(num) : unlockedItems.includes(num.toString()));
 
   const hasFreeFirstFocus = !intendedAreaId && !LIFE_AREAS.some(a => unlockedItems.includes(a.id) || (props.unlockedFocuses?.[String(P_DYNAMIC.house)] || []).includes(a.id));
   const [activeDossierCard, setActiveDossierCard] = useState<number | null>(0);
-  const baseHouseId = P_DYNAMIC.house as keyof typeof BASE_HOUSE_PROFILES;
+  const baseHouseId = String(P_DYNAMIC.house) as keyof typeof BASE_HOUSE_PROFILES;
   const houseBaseData = (BASE_HOUSE_PROFILES as any)[baseHouseId];
 
   
@@ -1277,18 +1303,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     };
   };
 
-  const mergedAreas = areas.map(area => {
+  const mergedAreas: any[] = areas.map((area: any) => {
     const focusData = currentHouseProfiles[area.id];
     
     let finalScore = focusData ? (focusData.match || area.score) : area.score;
     
-    if (props.intent) {
-      const intentNorm = props.intent.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-      const areaLabelNorm = area.label.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-      const areaIdNorm = area.id.toLowerCase();
-      if (areaLabelNorm.includes(intentNorm) || intentNorm.includes(areaLabelNorm.split(' ')[0]) || intentNorm.includes(areaIdNorm)) {
-        finalScore = 98;
-      }
+    if (intendedAreaId && area.id === intendedAreaId) {
+      finalScore = 98;
     }
 
     if (!focusData) {
@@ -1333,6 +1354,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     return b.score - a.score;
   });
   const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id)) || sortedAreas[0];
+  const lockedFocusesForCurrentHouse = sortedAreas.filter(
+    (a) => !(a.unlocked || unlockedItems.includes(a.id))
+  );
+  const remainingFocusesCount = lockedFocusesForCurrentHouse.length;
+  const effectiveAllFocusesCost = computeAllFocusesCost(
+    remainingFocusesCount,
+    props.focusCost ?? 1,
+    props.allFocusesCost ?? 3
+  );
 
   const [showSummary, setShowSummary] = useState<boolean>(false);
 
@@ -1424,7 +1454,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const textOpacity = useTransform(casaProgress, [0, 1], [0.25, 1]);
 
   return (
-    <div className="min-h-screen text-[#f5f5f7] overflow-x-hidden font-sans transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${houseColor} 6%, #03100B)`, "--hc": houseColor, "--hc10": `${houseColor}1a`, "--hc15": `${houseColor}26`, "--hc20": `${houseColor}33`, "--hc30": `${houseColor}4d`, "--hc40": `${houseColor}66`, "--hc70": `${houseColor}b3` } as React.CSSProperties}>
+    <div className="min-h-screen text-[#f5f5f7] overflow-x-clip font-sans transition-colors duration-1000" style={{ backgroundColor: `color-mix(in srgb, ${houseColor} 6%, #03100B)`, "--hc": houseColor, "--hc10": `${houseColor}1a`, "--hc15": `${houseColor}26`, "--hc20": `${houseColor}33`, "--hc30": `${houseColor}4d`, "--hc40": `${houseColor}66`, "--hc70": `${houseColor}b3` } as React.CSSProperties}>
       
       {/* ── NAVBAR PADRÃO (RESPONSIVA) ── */}
       <div className="hidden lg:block">
@@ -1497,6 +1527,54 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
          3. PERSONALIZAÇÃO & A REAL DA CASA
          ══════════════════════════════════════════════════ */}
       <section className="relative pt-8 pb-20 md:pb-32">
+        {activeUnlockedHouses.length > 1 && props.onSelectHouse && (
+          <div className="sticky top-[62px] lg:top-[84px] z-30 max-w-[1000px] mx-auto px-4 sm:px-6 mb-8">
+            <div className="bg-[#050811]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-[0_12px_40px_rgba(0,0,0,0.65)] flex items-center gap-2 overflow-x-auto no-scrollbar">
+              <span className="shrink-0 text-[10px] font-mono uppercase tracking-[0.18em] text-white/45 px-2.5">
+                Suas Casas ({activeUnlockedHouses.length})
+              </span>
+              {activeUnlockedHouses.map((num) => {
+                const isSelected = num === P_DYNAMIC.house;
+                const houseCity = canonicalCityName(resolveHouseCity(num).city).split(",")[0];
+                const hColor = houseThemes[num]?.themeColor || "#10b981";
+                return (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => props.onSelectHouse?.(num)}
+                    className={`shrink-0 min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 border cursor-pointer ${
+                      isSelected
+                        ? "text-white shadow-lg"
+                        : "bg-white/[0.03] border-white/10 text-white/70 hover:text-white hover:bg-white/[0.08]"
+                    }`}
+                    style={
+                      isSelected
+                        ? { backgroundColor: `${hColor}22`, borderColor: `${hColor}70` }
+                        : undefined
+                    }
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: hColor }}
+                    />
+                    <span>Casa {num}</span>
+                    <span className="text-white/45 font-normal">· {houseCity}</span>
+                  </button>
+                );
+              })}
+              {remainingHousesCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("visao-360")?.scrollIntoView({ behavior: "smooth" })}
+                  className="shrink-0 min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-semibold text-[#F5DE98] border border-[#F5DE98]/25 bg-[#F5DE98]/10 hover:bg-[#F5DE98]/20 transition-all cursor-pointer flex items-center gap-1.5 ml-auto"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Explorar (+{remainingHousesCount})</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
           <Reveal className="mb-24 max-w-[1000px] mx-auto">
             <div className="bg-transparent border-0 p-0 md:bg-white/[0.02] md:border md:border-white/[0.04] md:rounded-[32px] md:p-12 relative overflow-hidden">
@@ -1615,7 +1693,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                              <div className="flex-1 min-w-0">
                                <p className="text-white font-medium text-xl md:text-2xl flex items-center gap-2">
                                  <MapPin className="w-5 h-5 text-white/50 shrink-0"/> 
-                                 <span className="truncate">{P_DYNAMIC.origin} <span className="text-white/30 text-sm ml-1">(BR)</span></span>
+                                 <span className="truncate">{P_DYNAMIC.origin}</span>
                                </p>
                                <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Cidade de Nascimento</p>
                              </div>
@@ -1843,33 +1921,34 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   
 {/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
                   <div className="w-full mt-4 flex flex-col lg:flex-row gap-6 lg:min-h-[700px] text-left">
-                                  {/* COLUNA ESQUERDA: SIDEBAR — expandida por padrão, encolhe pra ícones quando mouse vai pro painel */}
+                                  {/* COLUNA ESQUERDA: SIDEBAR COM NOME, ÍCONE E STATUS DE CADA FOCO */}
               <div
-                className="hidden lg:flex w-[72px] shrink-0 flex-col gap-2 items-stretch min-h-[700px]"
+                className="hidden lg:flex w-[260px] shrink-0 flex-col gap-2 items-stretch min-h-[700px]"
               >
                 {sortedAreas.map((area) => {
                   const currentActive = hoveredArea || sortedAreas[0].id;
                   const isActive = currentActive === area.id;
-                  const isUnlockedLocally = unlockedItems.includes(area.id);
+                  const isAreaOpen = Boolean(area.unlocked || unlockedItems.includes(area.id));
 
                   return (
-                    <div
+                    <button
+                      type="button"
                       key={area.id}
                       onClick={() => {
-                        if (!isUnlockedLocally && !hasFreeFirstFocus) {
-                          setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house }); setIsPaywallOpen(true);
+                        if (!isAreaOpen && !hasFreeFirstFocus) {
+                          setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house });
+                          setIsPaywallOpen(true);
                         } else {
                           setHoveredArea(area.id);
                         }
                       }}
-                      className="relative flex-1 rounded-2xl border flex items-center justify-center cursor-pointer group transition-all duration-300"
+                      className="relative flex-1 rounded-2xl border px-3.5 py-2.5 flex items-center gap-3 text-left cursor-pointer group transition-all duration-300"
                       style={{
                         backgroundColor: isActive ? `${area.color}18` : `${area.color}08`,
-                        borderColor: isActive ? `${area.color}44` : 'rgba(255,255,255,0.05)',
+                        borderColor: isActive ? `${area.color}55` : 'rgba(255,255,255,0.06)',
                         boxShadow: isActive ? `0 0 20px ${area.color}20` : 'none',
                       }}
                     >
-                      {/* Aura sutil para o item ativo */}
                       {isActive && (
                         <div
                           className="absolute inset-0 pointer-events-none opacity-10 rounded-2xl"
@@ -1877,15 +1956,32 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         />
                       )}
                       <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-110 z-10"
-                          style={{
-                            backgroundColor: isActive ? `${area.color}33` : `${area.color}15`,
-                            borderColor: isActive ? `${area.color}55` : `${area.color}30`,
-                          }}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-105 z-10"
+                        style={{
+                          backgroundColor: isActive ? `${area.color}33` : `${area.color}15`,
+                          borderColor: isActive ? `${area.color}55` : `${area.color}30`,
+                        }}
                       >
-                          <area.icon className="w-4 h-4" style={{ color: isActive ? area.color : `${area.color}80` }} />
+                        <area.icon className="w-4 h-4" style={{ color: isActive ? area.color : `${area.color}95` }} />
                       </div>
-                    </div>
+                      <div className="flex-1 min-w-0 z-10">
+                        <span className={`block font-ps-display text-sm font-bold truncate ${isActive ? 'text-white' : 'text-white/80'}`}>
+                          {area.label}
+                        </span>
+                        <span className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider mt-0.5 text-white/45">
+                          {isAreaOpen ? (
+                            <span style={{ color: area.color }}>● Aberto</span>
+                          ) : hasFreeFirstFocus ? (
+                            <span className="text-emerald-300/90">● 1º Foco Incluso</span>
+                          ) : (
+                            <>
+                              <Lock className="w-2.5 h-2.5 shrink-0" />
+                              <span>{props.focusCost ?? 1} Créd.</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </button>
                   );
                 })}
               </div>
@@ -1901,9 +1997,12 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                     <div key={area.id} className="flex flex-col">
                       {/* Cabeçalho do item (sempre visível) */}
                       <button
+                        type="button"
                         onClick={() => {
-                          if (!isUnlockedLocally && !hasFreeFirstFocus) {
-                            setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house }); setIsPaywallOpen(true);
+                          const isAreaOpen = Boolean(area.unlocked || isUnlockedLocally);
+                          if (!isAreaOpen && !hasFreeFirstFocus) {
+                            setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house });
+                            setIsPaywallOpen(true);
                           } else {
                             setHoveredArea(isActive ? null : area.id);
                           }
@@ -1927,9 +2026,24 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         </div>
 
                         <div className="flex-1 min-w-0 relative z-10">
-                          <span className={`block font-ps-display text-base font-bold mb-2 transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/70'}`}>
-                            {area.label}
-                          </span>
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className={`block font-ps-display text-base font-bold truncate transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/75'}`}>
+                              {area.label}
+                            </span>
+                            {(area.unlocked || isUnlockedLocally) ? (
+                              <span className="shrink-0 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/15 bg-white/5" style={{ color: area.color }}>
+                                Aberto
+                              </span>
+                            ) : hasFreeFirstFocus ? (
+                              <span className="shrink-0 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
+                                Incluso
+                              </span>
+                            ) : (
+                              <span className="shrink-0 inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/15 bg-black/40 text-white/60">
+                                <Lock className="w-2.5 h-2.5" /> {props.focusCost ?? 1} Créd.
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-3">
                             <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
                               <motion.div
@@ -1999,16 +2113,22 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                       Ative este foco para revelar os 3 pilares, a linha do tempo de 12 meses e o ritual de ativação de {P_DYNAMIC.city.split(", ")[0]} para {area.label.toLowerCase()}.
                                     </p>
                                     <button
+                                      type="button"
                                       onClick={async (e) => {
                                         e.stopPropagation();
-                                        setUnlockedItems(prev => [...new Set([...prev, area.id])]);
-                                        setHoveredArea(area.id);
                                         if (props.onUnlockFocus) {
                                           setUnlockingFocus(area.id);
                                           try {
-                                            await props.onUnlockFocus(area.id, P_DYNAMIC.house);
-                                          } catch(err) {}
+                                            const ok = await props.onUnlockFocus(area.id, P_DYNAMIC.house);
+                                            if (ok !== false) {
+                                              setUnlockedItems(prev => [...new Set([...prev, area.id])]);
+                                              setHoveredArea(area.id);
+                                            }
+                                          } catch(err) { console.error(err); }
                                           finally { setUnlockingFocus(null); }
+                                        } else {
+                                          setUnlockedItems(prev => [...new Set([...prev, area.id])]);
+                                          setHoveredArea(area.id);
                                         }
                                       }}
                                       disabled={unlockingFocus === area.id}
@@ -2024,22 +2144,19 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                     <h3 className="font-ps-display text-3xl font-bold text-white/20 leading-tight mb-4 select-none" style={{ filter: 'blur(4px)' }}>{area.label}</h3>
                                     <div className="w-12 h-px mb-4 opacity-20" style={{ backgroundColor: `${area.color}80` }} />
                                     <p className="text-white/10 text-sm font-light leading-relaxed mb-6 select-none" style={{ filter: 'blur(6px)' }}>{area.full}</p>
-                                    <button onClick={async (e) => { 
-                                      e.stopPropagation(); 
-                                      if (props.onUnlockFocus) {
-                                        setUnlockingFocus(area.id);
-                                        try {
-                                          await props.onUnlockFocus(area.id, P_DYNAMIC.house);
-                                        } catch(err) {}
-                                        finally { setUnlockingFocus(null); }
-                                      } else {
-                                        setUnlockedItems(prev => [...prev, area.id]); 
-                                      }
-                                    }}
-                                    disabled={unlockingFocus === area.id} className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform">
-    <CreditCard className="w-4 h-4" />
-    {unlockingFocus === area.id ? "Desbloqueando..." : `Desbloquear com ${props.focusCostLabel || "1 Crédito"}`}
-  </button>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setTargetLockedArea({ id: area.id, label: area.label, color: area.color, type: 'foco', houseNum: P_DYNAMIC.house });
+                                        setIsPaywallOpen(true);
+                                      }}
+                                      disabled={unlockingFocus === area.id}
+                                      className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 bg-white text-black hover:scale-105 active:scale-95 transition-transform"
+                                    >
+                                      <CreditCard className="w-4 h-4" />
+                                      {unlockingFocus === area.id ? "Desbloqueando..." : `Desbloquear com ${props.focusCostLabel || "1 Crédito"}`}
+                                    </button>
                                   </>
                                 )}
                               </div>
@@ -2115,16 +2232,22 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             </p>
                             <div className="flex flex-col items-center md:items-start gap-4">
                               <button
+                                type="button"
                                 onClick={async (e) => { 
                                   e.stopPropagation(); 
-                                  setUnlockedItems(prev => [...new Set([...prev, activeArea.id])]);
-                                  setHoveredArea(activeArea.id);
                                   if (props.onUnlockFocus) {
                                     setUnlockingFocus(activeArea.id);
                                     try {
-                                      await props.onUnlockFocus(activeArea.id, P_DYNAMIC.house);
-                                    } catch(err) {}
+                                      const ok = await props.onUnlockFocus(activeArea.id, P_DYNAMIC.house);
+                                      if (ok !== false) {
+                                        setUnlockedItems(prev => [...new Set([...prev, activeArea.id])]);
+                                        setHoveredArea(activeArea.id);
+                                      }
+                                    } catch(err) { console.error(err); }
                                     finally { setUnlockingFocus(null); }
+                                  } else {
+                                    setUnlockedItems(prev => [...new Set([...prev, activeArea.id])]);
+                                    setHoveredArea(activeArea.id);
                                   }
                                 }}
                                 disabled={unlockingFocus === activeArea.id}
@@ -2152,17 +2275,11 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                 <span className="text-white/50 text-sm font-medium">Conteúdo personalizado bloqueado</span>
                               </div>
                               <button
-                                onClick={async (e) => { 
+                                type="button"
+                                onClick={(e) => { 
                                   e.stopPropagation(); 
-                                  if (props.onUnlockFocus) {
-                                    setUnlockingFocus(activeArea.id);
-                                    try {
-                                      await props.onUnlockFocus(activeArea.id, P_DYNAMIC.house);
-                                    } catch(err) {}
-                                    finally { setUnlockingFocus(null); }
-                                  } else {
-                                    setUnlockedItems(prev => [...prev, activeArea.id]); 
-                                  }
+                                  setTargetLockedArea({ id: activeArea.id, label: activeArea.label, color: activeArea.color, type: 'foco', houseNum: P_DYNAMIC.house });
+                                  setIsPaywallOpen(true);
                                 }}
                                 disabled={unlockingFocus === activeArea.id}
                                 className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
@@ -2183,27 +2300,28 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   </div>
 
                   {/* Botão "Desbloquear Todos os Focos" (aparece após ativar o 1º foco) */}
-                  {!hasFreeFirstFocus && props.onUnlockAllFocuses && (() => {
-                    const lockedFocuses = sortedAreas.filter(a => !(a.unlocked || unlockedItems.includes(a.id)));
-                    if (lockedFocuses.length <= 1) return null;
-                    return (
-                      <button
-                        onClick={async () => {
-                          const allIds = sortedAreas.map(a => a.id);
-                          setUnlockingFocus("__all__");
-                          try {
-                            await props.onUnlockAllFocuses!(allIds, P_DYNAMIC.house);
-                          } catch(err) {}
-                          finally { setUnlockingFocus(null); }
-                        }}
-                        disabled={unlockingFocus === "__all__"}
-                        className="w-full mt-4 px-6 py-4 font-bold text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 border border-white/10 bg-white/5 text-white hover:bg-white/10 active:scale-95 transition-all backdrop-blur-md"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        {unlockingFocus === "__all__" ? "Desbloqueando..." : `Desbloquear Todos os Focos · ${props.allFocusesCostLabel || "3 Créditos"}`}
-                      </button>
-                    );
-                  })()}
+                  {!hasFreeFirstFocus && (props.onUnlockAllFocuses || !props.onUnlock) && remainingFocusesCount > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTargetLockedArea({
+                          id: '__all_focuses__',
+                          label: `Todos os Focos (${remainingFocusesCount})`,
+                          color: houseColor,
+                          type: 'all_focuses',
+                          houseNum: P_DYNAMIC.house,
+                        });
+                        setIsPaywallOpen(true);
+                      }}
+                      disabled={unlockingFocus === "__all__"}
+                      className="w-full mt-4 px-6 py-4 font-bold text-xs uppercase tracking-[0.2em] rounded-2xl flex items-center justify-center gap-3 border border-white/10 bg-white/5 text-white hover:bg-white/10 active:scale-95 transition-all backdrop-blur-md cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      {unlockingFocus === "__all__"
+                        ? "Desbloqueando..."
+                        : `Desbloquear Todos os Focos (${remainingFocusesCount}) · ${effectiveAllFocusesCost} Crédito${effectiveAllFocusesCost > 1 ? "s" : ""}`}
+                    </button>
+                  )}
                   
                   {/* ÁREA DE CONTEÚDO DESBLOQUEADO (DOSSIÊ) */}
                   {(currentActiveData?.unlocked || (currentActiveData && unlockedItems.includes(currentActiveData.id))) && (
@@ -2333,7 +2451,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                           };
                           const itemVariants = {
                             hidden: { opacity: 0, y: 20 },
-                            show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+                            show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
                           };
 
                           return (
@@ -2507,56 +2625,32 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                      }
                                    ];
 
-                                   const ExpandingRow = ({ cardsRow }: { cardsRow: typeof cardData }) => {
-                                      const [activeCardId, setActiveCardId] = useState<number | null>(null);
-
-                                      return (
-                                        <div className="hidden lg:flex flex-row gap-8 w-full h-[450px]">
-                                           {cardsRow.map((card) => {
-                                              const isHovered = activeCardId === card.id;
-                                              const isNeighborHovered = activeCardId !== null && activeCardId !== card.id;
-
-                                              return (
-                                                <motion.div
-                                                   key={card.id}
-                                                   onMouseEnter={() => setActiveCardId(card.id)}
-                                                   onMouseLeave={() => setActiveCardId(null)}
-                                                   initial={false}
-                                                   animate={{ 
-                                                     flex: isHovered ? 2.5 : isNeighborHovered ? 0.8 : 1
-                                                   }}
-                                                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                                                   className="group relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[32px] overflow-hidden cursor-pointer shadow-2xl flex-shrink-0 h-full"
-                                                >
-                                                   <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none z-0"></div>
-                                                   
-                                                   {/* Estado: CAPA (Desaparece no hover) */}
-                                                   <motion.div 
-                                                     animate={{ opacity: isHovered ? 0 : 1, scale: isHovered ? 0.95 : 1 }}
-                                                     transition={{ duration: 0.5 }}
-                                                     className="absolute inset-0 p-12 flex flex-col items-center justify-center text-center z-20 pointer-events-none bg-[#030306]/40 backdrop-blur-sm"
-                                                   >
-                                                      <div className="p-4 rounded-full bg-white/5 mb-6 shadow-[0_0_30px_rgba(255,255,255,0.05)]" style={{ color: activeColor }}>
-                                                        {card.icon}
-                                                      </div>
-                                                      <h3 className="font-ps-display text-4xl text-white mb-3" style={{ opacity: isNeighborHovered ? 0.3 : 1, transition: 'opacity 0.5s' }}>{card.title}</h3>
-                                                      <span className="font-ps-ui text-[10px] uppercase font-bold tracking-[0.2em] text-white/40">{card.subtitle}</span>
-                                                   </motion.div>
-
-                                                   {/* Estado: CONTEÚDO (Aparece no hover) */}
-                                                   <motion.div 
-                                                     animate={{ opacity: isHovered ? 1 : 0 }}
-                                                     transition={{ duration: 0.6, delay: isHovered ? 0.1 : 0 }}
-                                                     className={`absolute inset-0 p-12 flex flex-col justify-center z-10 ${isHovered ? 'pointer-events-auto' : 'pointer-events-none'}`}
-                                                   >
-                                                      {card.content}
-                                                   </motion.div>
-                                                </motion.div>
-                                              );
-                                           })}
-                                        </div>
-                                      );
-                                   };
+                                   const ExpandingRow = ({ cardsRow }: { cardsRow: typeof cardData }) => (
+                                     <div className="hidden lg:grid grid-cols-2 gap-6 w-full">
+                                       {cardsRow.map((card) => (
+                                         <div
+                                           key={card.id}
+                                           className="group relative bg-white/[0.03] hover:bg-white/[0.05] backdrop-blur-xl border border-white/10 hover:border-white/25 rounded-[32px] p-10 shadow-2xl transition-all duration-300 flex flex-col justify-between"
+                                         >
+                                           <div>
+                                             <div className="flex items-center gap-4 pb-5 mb-6 border-b border-white/10">
+                                               <div
+                                                 className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0"
+                                                 style={{ color: activeColor }}
+                                               >
+                                                 {card.icon}
+                                               </div>
+                                               <div>
+                                                 <h3 className="font-ps-display text-2xl xl:text-3xl text-white font-bold leading-tight">{card.title}</h3>
+                                                 <span className="font-ps-ui text-[10px] uppercase font-bold tracking-[0.2em] text-white/45 block mt-0.5">{card.subtitle}</span>
+                                               </div>
+                                             </div>
+                                             {card.content}
+                                           </div>
+                                         </div>
+                                       ))}
+                                     </div>
+                                   );
 
                                    return (
                                      <>
@@ -2789,7 +2883,35 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       </div>
                     </div>
                     {tier.data.length > 0 ? tier.data.map((city, i) => (
-                      <div key={i} className="bg-black border rounded-[28px] overflow-hidden transition-all group relative h-56 flex flex-col justify-end p-6 cursor-pointer" style={{ borderColor: 'rgba(255,255,255,0.05)' }}
+                      <div
+                        key={i}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          setSelectedAltCity({
+                            ...defaultHouseCity,
+                            city: city.city || city.name,
+                            country: city.country || defaultHouseCity.country,
+                            score: city.score ?? defaultHouseCity.score,
+                            img: city.img,
+                          });
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSelectedAltCity({
+                              ...defaultHouseCity,
+                              city: city.city || city.name,
+                              country: city.country || defaultHouseCity.country,
+                              score: city.score ?? defaultHouseCity.score,
+                              img: city.img,
+                            });
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }
+                        }}
+                        className="bg-black border rounded-[28px] overflow-hidden transition-all group relative h-56 flex flex-col justify-end p-6 cursor-pointer focus:outline-none"
+                        style={{ borderColor: 'rgba(255,255,255,0.05)' }}
                         onMouseEnter={(e) => e.currentTarget.style.borderColor = currentActiveData?.color || '#10b981'}
                         onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'}
                       >
@@ -2856,23 +2978,22 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 {!isAllHousesUnlocked && (
                   <div className="mt-8 flex flex-col items-center gap-2">
                     <button
+                      type="button"
                       onClick={() => {
-                        if (props.onUnlock) {
-                          props.onUnlock(0);
-                        } else {
-                          const allIds = [
-                            ...LIFE_AREAS.map(a => a.id),
-                            ..."1,2,3,4,5,6,7,8,9,10,11,12".split(',')
-                          ];
-                          setUnlockedItems(allIds);
-                        }
+                        setTargetLockedArea({
+                          id: '0',
+                          label: 'Mapa Completo (Todas as 12 Casas)',
+                          color: '#F5DE98',
+                          type: 'full_map',
+                        });
+                        setIsPaywallOpen(true);
                       }}
-                      className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-gradient-to-r from-[#E5C158] to-[#C9A227] hover:brightness-110 text-[#050811] font-bold text-xs sm:text-sm uppercase tracking-[0.14em] shadow-[0_12px_40px_rgba(229,193,88,0.3)] hover:scale-[1.02] active:scale-95 transition-all"
+                      className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-gradient-to-r from-[#E5C158] to-[#C9A227] hover:brightness-110 text-[#050811] font-bold text-xs sm:text-sm uppercase tracking-[0.14em] shadow-[0_12px_40px_rgba(229,193,88,0.3)] hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4 text-[#050811]" />
                       <span>Desbloquear Mapa Completo (Todas as 12 Casas)</span>
                       <span className="px-2.5 py-0.5 rounded-full bg-black/20 text-[#050811] text-[10px] font-extrabold tracking-wider">
-                        {props.fullMapCost ?? 6} Créd.
+                        {props.fullMapCost ?? 7} Créd.
                       </span>
                     </button>
                     <span className="text-[11px] text-white/45 font-light">
@@ -3011,57 +3132,90 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
           </p>
         </div>
       </footer>
-      <UnlockPremiumModal 
-        isOpen={isPaywallOpen} 
+      <UnlockPremiumModal
+        isOpen={isPaywallOpen}
         isEmbedded={!!props.onUnlock}
         userCredits={props.userCredits}
+        isAdmin={props.isAdmin}
         houseCost={props.houseCost}
         fullMapCost={props.fullMapCost}
         focusCost={props.focusCost}
-        allFocusesCost={props.allFocusesCost}
-        onClose={() => setIsPaywallOpen(false)} 
-        onSuccess={(id, purchaseType) => {
-          if (targetLockedArea?.type === 'foco') {
-             if (purchaseType === 'single' && props.onUnlockFocus && targetLockedArea.houseNum) {
-                setUnlockedItems(prev => [...prev, id]);
+        allFocusesCost={effectiveAllFocusesCost}
+        remainingHousesCount={remainingHousesCount}
+        remainingFocusesCount={remainingFocusesCount}
+        onBuyCredits={() => {
+          const pkg = targetLockedArea?.type === 'full_map' ? 'full' : undefined;
+          props.onNavigateCredits?.(pkg);
+        }}
+        onClose={() => setIsPaywallOpen(false)}
+        onSuccess={async (id, purchaseType) => {
+          const actionType = targetLockedArea?.type;
+          const targetHouseNum = targetLockedArea?.houseNum ?? P_DYNAMIC.house;
+
+          if (actionType === 'foco') {
+            if (purchaseType === 'single') {
+              if (props.onUnlockFocus) {
+                const ok = await props.onUnlockFocus(id, targetHouseNum);
+                if (ok !== false) {
+                  setUnlockedItems((prev) => [...new Set([...prev, id])]);
+                  setHoveredArea(id);
+                }
+              } else {
+                setUnlockedItems((prev) => [...new Set([...prev, id])]);
                 setHoveredArea(id);
-                props.onUnlockFocus(id, targetLockedArea.houseNum);
-             } else if (purchaseType === 'full' && props.onUnlockAllFocuses && targetLockedArea.houseNum) {
-                const allIds = LIFE_AREAS.map(a => a.id);
-                setUnlockedItems(prev => [...new Set([...prev, ...allIds])]);
+              }
+            } else {
+              const allIds = LIFE_AREAS.map((a) => a.id);
+              if (props.onUnlockAllFocuses) {
+                const ok = await props.onUnlockAllFocuses(allIds, targetHouseNum);
+                if (ok !== false) {
+                  setUnlockedItems((prev) => [...new Set([...prev, ...allIds])]);
+                  setHoveredArea(id);
+                }
+              } else {
+                setUnlockedItems((prev) => [...new Set([...prev, ...allIds])]);
                 setHoveredArea(id);
-                props.onUnlockAllFocuses(allIds, targetLockedArea.houseNum);
-             }
-             return;
+              }
+            }
+            return;
           }
-          
-          if (targetLockedArea?.type === 'rota' && props.onUnlock && targetLockedArea?.houseNum) {
-             props.onUnlock(purchaseType === 'full' ? 0 : targetLockedArea.houseNum);
-             const el = document.getElementById("visao-360");
-             if (el) {
-               el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-             }
-          } else if (!props.onUnlock) {
-             // Sandbox / Preview mode behavior
-             if (purchaseType === 'single') {
-               setUnlockedItems(prev => [...prev, id]);
-               if (targetLockedArea?.type === 'foco') {
-                 setHoveredArea(id);
-               }
-             } else {
-               // Full unlock (all 12 houses and focuses)
-               const allIds = [
-                 ...LIFE_AREAS.map(a => a.id),
-                 ..."1,2,3,4,5,6,7,8,9,10,11,12".split(',')
-               ];
-               setUnlockedItems(allIds);
-               if (targetLockedArea?.type === 'foco') {
-                 setHoveredArea(id);
-               }
-             }
+
+          if (actionType === 'all_focuses') {
+            const allIds = LIFE_AREAS.map((a) => a.id);
+            if (props.onUnlockAllFocuses) {
+              const ok = await props.onUnlockAllFocuses(allIds, targetHouseNum);
+              if (ok !== false) {
+                setUnlockedItems((prev) => [...new Set([...prev, ...allIds])]);
+              }
+            } else {
+              setUnlockedItems((prev) => [...new Set([...prev, ...allIds])]);
+            }
+            return;
+          }
+
+          if (actionType === 'full_map' || (actionType === 'rota' && purchaseType === 'full')) {
+            if (props.onUnlock) {
+              await props.onUnlock(0);
+            } else {
+              const allIds = [
+                ...LIFE_AREAS.map((a) => a.id),
+                ..."1,2,3,4,5,6,7,8,9,10,11,12".split(','),
+              ];
+              setUnlockedItems(allIds);
+            }
+            return;
+          }
+
+          if (actionType === 'rota') {
+            const parsedHouse = targetLockedArea?.houseNum ?? parseInt(id, 10);
+            if (props.onUnlock && parsedHouse) {
+              await props.onUnlock(parsedHouse);
+            } else if (!props.onUnlock) {
+              setUnlockedItems((prev) => [...new Set([...prev, id])]);
+            }
           }
         }}
-        targetArea={targetLockedArea} 
+        targetArea={targetLockedArea}
       />
       <style dangerouslySetInnerHTML={{__html: `.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}} />
     </div>

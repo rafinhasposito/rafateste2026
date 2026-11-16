@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Briefcase, DollarSign, Leaf, Users, Calendar, Sparkles, Crown, MapPin, ChevronLeft, ChevronDown, ChevronRight, Target, Lock } from "lucide-react";
+import { Heart, Briefcase, DollarSign, Leaf, Users, Calendar, Sparkles, Crown, MapPin, ChevronLeft, ChevronDown, ChevronRight, Target, Lock, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const P = {

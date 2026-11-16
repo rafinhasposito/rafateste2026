@@ -2,13 +2,20 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Compass, Search, MapPin, Globe } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
-import { API_URL } from "@/lib/astro";
+import { API_URL, normalizeBirthTime } from "@/lib/astro";
 import { cityDatabase } from "@/data/houses";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { saveConsultation, chargeAndSaveConsultationV1 } from "@/lib/consultations";
+import { saveConsultation, chargeAndSaveConsultationV1, enrichResultForTier } from "@/lib/consultations";
+import { chargeConsultation } from "@/lib/credits";
+import {
+  ALL_TWELVE_HOUSES,
+  detectDefaultConsultationTier,
+  getTierRequiredCredits,
+  type ConsultationUnlockTier,
+} from "@/lib/consultationUnlocks";
 import DestinyResults from "@/components/DestinyResults";
 import { PremiumButton } from "@/components/shell";
 
@@ -57,6 +64,11 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
   const [cityCoords, setCityCoords] = useState<CityCoords | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LookupResult | null>(null);
+  const [usePassNow, setUsePassNow] = useState(true);
+
+  const userCredits = profile?.credits ?? 0;
+  const availablePassTier = detectDefaultConsultationTier(userCredits);
+  const activeTier: ConsultationUnlockTier = usePassNow ? availablePassTier : "single";
 
   const lookupSignatureRef = useRef<string>("");
   const idempotencyKeyRef = useRef<string>(crypto.randomUUID());
@@ -71,27 +83,29 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
       showAlert("Selecione uma cidade da lista.");
       return;
     }
-    if (!name || !birthdate || !birthtime || !birthPlace) {
+    const safeBirthtime = normalizeBirthTime(birthtime);
+    if (!name || !birthdate || !safeBirthtime || !birthPlace) {
       showAlert("Preencha seus dados natais acima antes de continuar.");
       return;
     }
-    if (birthtime === "00:00" || birthtime === "00:00:00") {
-      showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora real de nascimento (ex: 07:30, 14:15).");
+    const returnUrl = `/?mode=${encodeURIComponent(mode)}&path=cidade`;
+    if (!user) {
+      showAlert("Entre na sua conta para realizar a consulta.");
+      navigate(`/auth?returnTo=${encodeURIComponent(returnUrl)}`);
       return;
     }
-    if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
     
     // VERIFICAR SALDO ANTES DE CALCULOS PESADOS
     if (!isAdmin && (profile?.credits ?? 0) < 1) {
       showAlert("Você não possui créditos suficientes. Cada consulta custa 1 crédito.");
-      navigate("/credits");
+      navigate(`/credits?pkg=1&returnTo=${encodeURIComponent(returnUrl)}`);
       return;
     }
 
     setLoadingState(true);
     setResult(null);
 
-    const currentSignature = `${name}|${birthdate}|${birthtime}|${birthPlace}|${year}|${city}`;
+    const currentSignature = `${name}|${birthdate}|${safeBirthtime}|${birthPlace}|${year}|${city}`;
     if (lookupSignatureRef.current !== currentSignature) {
       idempotencyKeyRef.current = crypto.randomUUID();
       lookupSignatureRef.current = currentSignature;
@@ -106,7 +120,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         name: name.trim(),
         place_of_birth: birthPlace.trim(),
         dob: dataFormatada,
-        time: birthtime,
+        time: safeBirthtime,
         target_year: year,
       };
 
@@ -187,25 +201,29 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
             },
       };
 
-      const finalResultPayload = {
-        results: allResults,
-        house: houseNum,
-        return_time_utc: returnTimeUtc,
-        return_date: returnDate,
-        sun_sign: sunSign,
-        ascendant: ascendant,
-      };
+      const finalResultPayload = enrichResultForTier(
+        {
+          results: allResults,
+          house: houseNum,
+          return_time_utc: returnTimeUtc,
+          return_date: returnDate,
+          sun_sign: sunSign,
+          ascendant: ascendant,
+        },
+        activeTier,
+        houseNum
+      );
 
       // ATOMIC CHARGE AND SAVE
       let consultationId: string | undefined = undefined;
       
-      if (!isAdmin) {
+      if (!isAdmin && activeTier === "single") {
         const savedId = await chargeAndSaveConsultationV1({
           id: consultationIdToUse,
           userId: user.id,
           name: name.trim(),
           birthdate,
-          birthtime,
+          birthtime: safeBirthtime,
           birth_place: birthPlace.trim(),
           year,
           mode,
@@ -220,17 +238,37 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
         consultationId = savedId;
         await refreshProfile();
       } else {
+        const requiredCredits = getTierRequiredCredits(activeTier);
+        const charge = await chargeConsultation({
+          userId: user.id,
+          currentCredits: profile?.credits ?? 0,
+          isAdmin,
+          description:
+            activeTier === "full_map"
+              ? `Passe Mapa Completo (12 Casas + Todos os Focos) — ${city.trim()} em ${year}`
+              : activeTier === "expansao"
+              ? `Passe Expansão (Casa ${houseNum} + Todos os Focos) — ${city.trim()} em ${year}`
+              : `Consulta por Cidade — ${city.trim()} em ${year}`,
+          amount: requiredCredits,
+        });
+        if (!charge.ok) {
+          throw new Error("Saldo insuficiente para aplicar este passe.");
+        }
+        await refreshProfile();
+
         const savedId = await saveConsultation({
           id: consultationIdToUse,
           userId: user.id,
           name: name.trim(),
           birthdate,
-          birthtime,
+          birthtime: safeBirthtime,
           birth_place: birthPlace.trim(),
           year,
           mode,
           goal: houseNum,
           origin: city.trim(),
+          houses_unlocked: activeTier === "full_map" ? 12 : 1,
+          unlocked_houses: activeTier === "full_map" ? ALL_TWELVE_HOUSES : [houseNum],
           result: finalResultPayload,
         });
         if (savedId) consultationId = savedId;
@@ -347,9 +385,24 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
                   )}
                   {loading ? "Analisando Destino..." : "Ver Leitura desta Cidade"}
                 </button>
-                <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/50 font-semibold flex items-center justify-center">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227' }} />
-                  Consome 1 crédito • Leitura completa
+                <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/60 font-semibold flex flex-wrap items-center justify-center gap-2">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227' }} />
+                  {activeTier === "full_map" ? (
+                    <span>Passe Mapa Completo Ativo: libera todas as 12 Casas + Todos os Focos</span>
+                  ) : activeTier === "expansao" ? (
+                    <span>Passe Expansão Ativo: libera a Casa + Todos os 8 Focos</span>
+                  ) : (
+                    <span>Consome 1 crédito • Libera 1 Casa</span>
+                  )}
+                  {availablePassTier !== "single" && (
+                    <button
+                      type="button"
+                      onClick={() => setUsePassNow((v) => !v)}
+                      className="underline text-[#F5DE98] hover:text-white transition-colors ml-1"
+                    >
+                      {usePassNow ? "(Guardar passe e usar só 1 crédito)" : "(Usar meu passe agora)"}
+                    </button>
+                  )}
                 </p>
               </div>
 

@@ -23,7 +23,7 @@ export const usePricing = () => {
       .select("*")
       .order("category", { ascending: true })
       .order("sort_order", { ascending: true });
-    if (data) setItems(data as PricingItem[]);
+    if (data) setItems(data as unknown as PricingItem[]);
     setLoading(false);
   };
 

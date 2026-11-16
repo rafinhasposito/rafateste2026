@@ -61,6 +61,20 @@ serve(async (req) => {
         });
       }
 
+      const { data: ownedOrder, error: ownedOrderErr } = await supabaseAdmin
+        .from('credit_orders')
+        .select('id, user_id, amount, status')
+        .eq('id', order_id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (ownedOrderErr || !ownedOrder) {
+        return new Response(JSON.stringify({ error: 'Pedido não encontrado para este usuário' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
       const mpRes = await fetch(`https://api.mercadopago.com/v1/payments/${payment_id}`, {
         headers: {
           "Authorization": `Bearer ${mpAccessToken}`,
@@ -75,9 +89,25 @@ serve(async (req) => {
       }
 
       const paymentData = await mpRes.json();
+      const refMatches = String(paymentData.external_reference || '') === String(ownedOrder.id);
+      const amountMatches = Number(paymentData.transaction_amount || 0) >= Number(ownedOrder.amount) - 0.01;
+
+      if (!refMatches || !amountMatches) {
+        console.error("[create-checkout] Payment validation mismatch:", {
+          orderId: ownedOrder.id,
+          external_reference: paymentData.external_reference,
+          expectedAmount: ownedOrder.amount,
+          paidAmount: paymentData.transaction_amount,
+        });
+        return new Response(JSON.stringify({ error: 'Pagamento não corresponde ao pedido' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
       if (paymentData.status === 'approved') {
         await supabaseAdmin.rpc('process_mercadopago_payment', {
-          p_order_id: order_id,
+          p_order_id: ownedOrder.id,
           p_payment_id: String(payment_id)
         });
       }
@@ -116,7 +146,7 @@ serve(async (req) => {
       throw new Error(`Preço inválido para o pacote ${pricingConfig.key}`);
     }
 
-    // Cria ou reutiliza pedido pendente
+    // Cria ou reutiliza pedido pendente do mesmo pacote
     let order: any = null;
     if (order_id) {
       const { data: existingOrder } = await supabaseAdmin
@@ -124,6 +154,8 @@ serve(async (req) => {
         .select('*')
         .eq('id', order_id)
         .eq('user_id', user.id)
+        .eq('status', 'pending')
+        .eq('pricing_config_id', pricingConfig.key)
         .single();
       order = existingOrder;
     }
@@ -177,21 +209,32 @@ serve(async (req) => {
       });
 
       // Se o usuário estiver testando com o mesmo e-mail da conta Mercado Pago vendedora,
-      // o MP bloqueia auto-pagamento; refazemos automaticamente com e-mail de comprador.
-      if (!mpRes.ok && primaryEmail !== fallbackBuyerEmail) {
-        mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${mpAccessToken}`,
-            "Content-Type": "application/json",
-            "X-Idempotency-Key": `pix-${order.id}-2`
-          },
-          body: JSON.stringify(buildPixPayload(fallbackBuyerEmail))
-        });
+      // o MP bloqueia auto-pagamento; refazemos apenas se o erro indicar conflito de payer/email.
+      let firstPixErrText = "";
+      if (!mpRes.ok) {
+        firstPixErrText = await mpRes.text();
+        const lowerErr = firstPixErrText.toLowerCase();
+        const isSelfPayerError =
+          lowerErr.includes("payer") ||
+          lowerErr.includes("collector") ||
+          lowerErr.includes("email") ||
+          lowerErr.includes("same user");
+
+        if (primaryEmail !== fallbackBuyerEmail && isSelfPayerError) {
+          mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${mpAccessToken}`,
+              "Content-Type": "application/json",
+              "X-Idempotency-Key": `pix-${order.id}-2`
+            },
+            body: JSON.stringify(buildPixPayload(fallbackBuyerEmail))
+          });
+        }
       }
 
       if (!mpRes.ok) {
-        const errText = await mpRes.text();
+        const errText = firstPixErrText || (await mpRes.text());
         console.error("[create-checkout] Pix Error:", mpRes.status, errText);
         let msg = errText;
         try {
@@ -244,30 +287,42 @@ serve(async (req) => {
       });
 
       const cardPayerEmail = card_data.payer?.email || primaryEmail;
+      const tokenKey = String(card_data.token).slice(0, 24);
       let mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${mpAccessToken}`,
           "Content-Type": "application/json",
-          "X-Idempotency-Key": `card-${order.id}-${Date.now()}`
+          "X-Idempotency-Key": `card-${order.id}-${tokenKey}-1`
         },
         body: JSON.stringify(buildCardPayload(cardPayerEmail))
       });
 
-      if (!mpRes.ok && cardPayerEmail !== fallbackBuyerEmail) {
-        mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${mpAccessToken}`,
-            "Content-Type": "application/json",
-            "X-Idempotency-Key": `card-${order.id}-retry-${Date.now()}`
-          },
-          body: JSON.stringify(buildCardPayload(fallbackBuyerEmail))
-        });
+      let firstCardErrText = "";
+      if (!mpRes.ok) {
+        firstCardErrText = await mpRes.text();
+        const lowerErr = firstCardErrText.toLowerCase();
+        const isSelfPayerError =
+          lowerErr.includes("payer") ||
+          lowerErr.includes("collector") ||
+          lowerErr.includes("email") ||
+          lowerErr.includes("same user");
+
+        if (cardPayerEmail !== fallbackBuyerEmail && isSelfPayerError) {
+          mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${mpAccessToken}`,
+              "Content-Type": "application/json",
+              "X-Idempotency-Key": `card-${order.id}-${tokenKey}-2`
+            },
+            body: JSON.stringify(buildCardPayload(fallbackBuyerEmail))
+          });
+        }
       }
 
       if (!mpRes.ok) {
-        const errText = await mpRes.text();
+        const errText = firstCardErrText || (await mpRes.text());
         console.error("[create-checkout] Card Error:", mpRes.status, errText);
         let msg = "Não foi possível processar o cartão. Verifique os dados ou tente via Pix.";
         try {
@@ -302,7 +357,8 @@ serve(async (req) => {
     const isProduction = mpAccessToken.startsWith('APP_USR-') ||
                          Deno.env.get('MP_ENVIRONMENT')?.trim().toLowerCase() === 'production';
 
-    const appUrl = 'https://protocolosolar.com.br';
+    const reqOrigin = req.headers.get('origin')?.trim().replace(/\/$/, '');
+    const appUrl = (reqOrigin && /^https?:\/\//i.test(reqOrigin)) ? reqOrigin : 'https://protocolosolar.com.br';
     const preferencePayload: Record<string, any> = {
       items: [
         {

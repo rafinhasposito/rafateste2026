@@ -46,6 +46,10 @@ export interface HouseData {
   pdfUrl?: string;
   conselhoCosmico?: string;
   mantra?: string;
+  regente?: string;
+  tags?: string[];
+  cristal?: string;
+  areasDaVida?: Record<string, string>;
 }
 
 export const houseColors: Record<number, string> = {

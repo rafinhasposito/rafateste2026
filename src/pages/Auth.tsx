@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { TERMS_VERSION, PRIVACY_VERSION, TERMS_TEXT, PRIVACY_TEXT } from "@/constants/legal";
+import { normalizeBirthTime } from "@/lib/astro";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -151,6 +152,13 @@ const Auth = () => {
           }
         }
 
+        const returnToParam = searchParams.get("returnTo") || sessionStorage.getItem("ps_auth_return_to");
+        if (returnToParam && returnToParam.startsWith("/")) {
+          sessionStorage.removeItem("ps_auth_return_to");
+          navigate(returnToParam, { replace: true });
+          return;
+        }
+
         const previewPath = sessionStorage.getItem("ps_onboarding_v2_path");
         if (previewPath && ["cidade", "casa", "intencao"].includes(previewPath)) {
           sessionStorage.removeItem("ps_onboarding_v2_path");
@@ -168,7 +176,7 @@ const Auth = () => {
       };
       finalizeLogin();
     }
-  }, [user, loading, navigate, refreshProfile]);
+  }, [user, loading, navigate, refreshProfile, searchParams]);
 
   const handleAdvanceToStep2 = (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,8 +188,8 @@ const Auth = () => {
       toast.error("Informe sua data de nascimento.");
       return;
     }
-    if (!birthTime || birthTime === "00:00") {
-      toast.error("Informe seu horário exato de nascimento (se for meia-noite, use 00:01).");
+    if (!birthTime) {
+      toast.error("Informe seu horário exato de nascimento.");
       return;
     }
     if (!birthCity.trim() || (!birthCityValid && !birthCity.includes(","))) {
@@ -189,10 +197,11 @@ const Auth = () => {
       return;
     }
 
+    const normalizedTime = normalizeBirthTime(birthTime);
     const passportPayload = {
       full_name: name.trim(),
       birth_date: birthDate,
-      birth_time: birthTime,
+      birth_time: normalizedTime,
       birth_city: birthCity.trim(),
       birth_lat: birthCoords?.lat ?? null,
       birth_lon: birthCoords?.lon ?? null,
@@ -212,10 +221,15 @@ const Auth = () => {
       localStorage.setItem("pending_terms_acceptance", "true");
     }
 
+    const returnToParam = searchParams.get("returnTo");
+    if (returnToParam && returnToParam.startsWith("/")) {
+      sessionStorage.setItem("ps_auth_return_to", returnToParam);
+    }
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo: `${window.location.origin}/auth${returnToParam ? `?returnTo=${encodeURIComponent(returnToParam)}` : ""}`,
       },
     });
     if (error) toast.error("Erro no login com Google");
@@ -473,7 +487,7 @@ const Auth = () => {
                         placeholder="Ex: Rafael Sposito"
                         value={name}
                         onChange={e => setName(e.target.value)}
-                        className="w-full bg-[#040914]/90 border border-white/15 text-white pl-10 pr-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-sm placeholder:text-white/30"
+                        className="w-full bg-[#040914]/90 border border-white/15 text-white pl-10 pr-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-base sm:text-sm placeholder:text-white/30"
                       />
                     </div>
                   </div>
@@ -491,7 +505,7 @@ const Auth = () => {
                           required
                           value={birthDate}
                           onChange={e => setBirthDate(e.target.value)}
-                          className="w-full bg-[#040914]/90 border border-white/15 text-white pl-10 pr-3 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-sm [color-scheme:dark]"
+                          className="w-full bg-[#040914]/90 border border-white/15 text-white pl-10 pr-3 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-base sm:text-sm [color-scheme:dark]"
                         />
                       </div>
                     </div>
@@ -507,7 +521,7 @@ const Auth = () => {
                           required
                           value={birthTime}
                           onChange={e => setBirthTime(e.target.value)}
-                          className="w-full bg-[#040914]/90 border border-white/15 text-white pl-10 pr-3 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-sm [color-scheme:dark]"
+                          className="w-full bg-[#040914]/90 border border-white/15 text-white pl-10 pr-3 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-base sm:text-sm [color-scheme:dark]"
                         />
                       </div>
                     </div>
@@ -648,7 +662,7 @@ const Auth = () => {
                       placeholder="Digite seu melhor e-mail"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-sm placeholder:text-white/35"
+                      className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-base sm:text-sm placeholder:text-white/35"
                     />
                     <input
                       type="password"
@@ -657,7 +671,7 @@ const Auth = () => {
                       minLength={8}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-sm placeholder:text-white/35"
+                      className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-base sm:text-sm placeholder:text-white/35"
                     />
 
                     <button
@@ -726,7 +740,7 @@ const Auth = () => {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-sm placeholder:text-white/35"
+                  className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-base sm:text-sm placeholder:text-white/35"
                 />
               </div>
               {mode !== "forgot" && (
@@ -738,7 +752,7 @@ const Auth = () => {
                     minLength={8}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-sm placeholder:text-white/35"
+                    className="w-full bg-[#040914]/90 border border-white/15 text-white px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#C9A227] transition-all font-ps-ui text-base sm:text-sm placeholder:text-white/35"
                   />
                 </div>
               )}

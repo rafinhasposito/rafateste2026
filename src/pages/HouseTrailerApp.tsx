@@ -4,9 +4,15 @@ import { Heart, Briefcase, DollarSign, Leaf, Users, Calendar, Sparkles, Crown, M
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { API_URL } from "@/lib/astro";
+import { API_URL, getNextBirthdayYear, normalizeBirthTime } from "@/lib/astro";
 import { chargeConsultation } from "@/lib/credits";
-import { saveConsultation } from "@/lib/consultations";
+import { saveConsultation, chargeAndSaveConsultationV1, enrichResultForTier } from "@/lib/consultations";
+import {
+  ALL_TWELVE_HOUSES,
+  detectDefaultConsultationTier,
+  getTierRequiredCredits,
+  type ConsultationUnlockTier,
+} from "@/lib/consultationUnlocks";
 import { cityDatabase } from "@/data/houses";
 import { toast } from "sonner";
 import { houseThemes } from "@/data/houseThemes";
@@ -80,7 +86,9 @@ export default function HouseTrailerApp() {
     const timeout = setTimeout(() => {
       try {
         window.scrollTo(0, 0);
-      } catch (_) {}
+      } catch (_) {
+        // Ignore scroll errors on older WebKit
+      }
     }, 50);
 
     return () => clearTimeout(timeout);
@@ -88,8 +96,12 @@ export default function HouseTrailerApp() {
 
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [usePassNow, setUsePassNow] = useState(true);
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const userCredits = profile?.credits ?? 0;
+  const availablePassTier = detectDefaultConsultationTier(userCredits);
+  const activeTier: ConsultationUnlockTier = usePassNow ? availablePassTier : "single";
 
   const handleRevelarCidades = async (unlockFullMap: boolean = false) => {
     const id = searchParams.get('id');
@@ -101,33 +113,36 @@ export default function HouseTrailerApp() {
     const target = currentHouse;
     const name = sessionStorage.getItem('ps_natal_name') || profile?.full_name || '';
     const birthdate = sessionStorage.getItem('ps_natal_date') || profile?.birth_date || '';
-    const birthtime = sessionStorage.getItem('ps_natal_time') || (profile?.birth_time ? profile.birth_time.slice(0, 5) : '');
+    const rawBirthtime = sessionStorage.getItem('ps_natal_time') || (profile?.birth_time ? profile.birth_time.slice(0, 5) : '');
+    const birthtime = normalizeBirthTime(rawBirthtime);
     const birthPlace = sessionStorage.getItem('ps_natal_place') || profile?.birth_city || '';
-    const yearStr = sessionStorage.getItem('ps_natal_year');
-    const mode = sessionStorage.getItem('ps_natal_mode') || searchParams.get('mode') || 'futuro';
+    const yearStr = searchParams.get('year') || sessionStorage.getItem('ps_natal_year');
+    const mode = searchParams.get('mode') || sessionStorage.getItem('ps_natal_mode') || 'futuro';
+    const currentReturnUrl = `/app/trailer?house=${target}&mode=${encodeURIComponent(mode)}${yearStr ? `&year=${encodeURIComponent(yearStr)}` : ''}`;
 
     if (!target) return;
 
     if (!name || !birthdate || !birthtime || !birthPlace) {
-      toast.error("Complete seus dados de nascimento na tela inicial para revelar suas cidades.");
-      navigate('/? calculate=true'.replace(' ', ''));
+      toast.error("Complete seus dados de nascimento para revelar suas cidades.");
+      navigate(`/perfil?returnTo=${encodeURIComponent(currentReturnUrl)}`);
       return;
     }
 
     if (!user) {
       toast.error("Entre na sua conta para revelar as cidades do seu mapa.");
-      navigate("/auth");
+      navigate(`/auth?returnTo=${encodeURIComponent(currentReturnUrl)}`);
       return;
     }
 
-    const requiredCredits = unlockFullMap ? 7 : 1;
-    if (!isAdmin && (profile?.credits ?? 0) < requiredCredits) {
+    const tier: ConsultationUnlockTier = unlockFullMap ? "full_map" : activeTier;
+    const requiredCredits = getTierRequiredCredits(tier);
+    if (!isAdmin && userCredits < requiredCredits) {
       if (unlockFullMap) {
-        toast.info("Ative o Pacote Mapa Completo (7 Créditos) para desbloquear todas as 12 Casas de uma vez!");
-        navigate("/credits?pkg=full");
+        toast.info("Ative o Passe Mapa Completo para desbloquear todas as 12 Casas + Todos os Focos de uma vez!");
+        navigate(`/credits?pkg=full&returnTo=${encodeURIComponent(currentReturnUrl)}`);
       } else {
-        toast.error("Você não possui créditos suficientes. Adquira seu crédito avulso ou o Mapa Completo.");
-        navigate("/credits");
+        toast.error("Você não possui créditos suficientes. Adquira 1 Casa Avulsa, o Pacote Expansão ou o Mapa Completo.");
+        navigate(`/credits?pkg=1&returnTo=${encodeURIComponent(currentReturnUrl)}`);
       }
       return;
     }
@@ -136,78 +151,117 @@ export default function HouseTrailerApp() {
 
     try {
       const houseData0 = cityDatabase[target];
-      const year = yearStr ? parseInt(yearStr, 10) : new Date().getFullYear();
-      const description = unlockFullMap
-        ? `Mapa Completo (12 Casas) — Foco Inicial Casa ${target} (${houseData0?.label ?? ""}) em ${year}`
-        : `Consulta por Área da Vida — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`;
-
-      const charge = await chargeConsultation({
-        userId: user.id,
-        currentCredits: profile?.credits ?? 0,
-        isAdmin,
-        description,
-        amount: requiredCredits,
-      });
-
-      if (!charge.ok) {
-        if (charge.reason === "no_credits") {
-          toast.error("Você não possui créditos suficientes. Adquira mais na loja.");
-          navigate(unlockFullMap ? "/credits?pkg=full" : "/credits");
-        } else {
-          toast.error("Erro ao debitar créditos.");
-        }
-        setIsProcessing(false);
-        return;
-      }
-      
-      await refreshProfile();
+      const fallbackYear = parseInt(getNextBirthdayYear(birthdate), 10);
+      const year = yearStr ? (parseInt(yearStr, 10) || fallbackYear) : fallbackYear;
 
       const [ano, mes, dia] = birthdate.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
 
-      const response = await fetch(`${API_URL}/find_all_cities`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          place_of_birth: birthPlace.trim(),
-          dob: dataFormatada,
-          time: birthtime,
-          target_year: year,
-          alvoId: target,
-        }),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      let response: Response;
+      try {
+        response = await fetch(`${API_URL}/find_all_cities`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            name: name.trim(),
+            place_of_birth: birthPlace.trim(),
+            dob: dataFormatada,
+            time: birthtime,
+            target_year: year,
+            alvoId: target,
+          }),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta astronômica.");
 
       const allResults = data.results || {};
-
       const houseIntent = houseData0?.intent || "";
-      const allTwelveHouses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-      const consultationId = await saveConsultation({
-        userId: user.id,
-        name: name.trim(),
-        birthdate,
-        birthtime,
-        birth_place: birthPlace.trim(),
-        year: year.toString(),
-        mode,
-        goal: target,
-        intent: selectedIntention || houseIntent,
-        houses_unlocked: unlockFullMap ? 12 : 1,
-        unlocked_houses: unlockFullMap ? allTwelveHouses : [target],
-        result: {
+      const resultPayload = enrichResultForTier(
+        {
           results: allResults,
           house: target,
           return_time_utc: data?.return_time_utc || null,
           return_date: data?.return_date || null,
           sun_sign: data?.sun_sign || null,
           ascendant: data?.ascendant || null,
-          ...(unlockFullMap ? { full_map_unlocked: true, unlocked_houses_list: allTwelveHouses } : {}),
         },
-      });
+        tier,
+        target
+      );
+
+      let consultationId: string | null = null;
+
+      if (!isAdmin && tier === "single") {
+        consultationId = await chargeAndSaveConsultationV1({
+          id: crypto.randomUUID(),
+          userId: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime,
+          birth_place: birthPlace.trim(),
+          year: year.toString(),
+          mode,
+          goal: target,
+          intent: selectedIntention || houseIntent,
+          result: resultPayload,
+        });
+
+        if (!consultationId) {
+          throw new Error("Não foi possível debitar o crédito e salvar sua consulta.");
+        }
+        await refreshProfile();
+      } else {
+        const description =
+          tier === "full_map"
+            ? `Passe Mapa Completo (12 Casas + Todos os Focos) — Casa Inicial ${target} (${houseData0?.label ?? ""}) em ${year}`
+            : tier === "expansao"
+            ? `Passe Expansão (Casa ${target} + Todos os Focos) em ${year}`
+            : `Consulta por Área da Vida — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`;
+
+        const charge = await chargeConsultation({
+          userId: user.id,
+          currentCredits: profile?.credits ?? 0,
+          isAdmin,
+          description,
+          amount: requiredCredits,
+        });
+
+        if (!charge.ok) {
+          if (charge.reason === "no_credits") {
+            toast.error("Você não possui créditos suficientes. Adquira mais na loja.");
+            navigate(`/credits?pkg=${tier === "full_map" ? "full" : tier === "expansao" ? "3" : "1"}&returnTo=${encodeURIComponent(currentReturnUrl)}`);
+          } else {
+            toast.error("Erro ao debitar créditos.");
+          }
+          setIsProcessing(false);
+          return;
+        }
+
+        await refreshProfile();
+
+        consultationId = await saveConsultation({
+          userId: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime,
+          birth_place: birthPlace.trim(),
+          year: year.toString(),
+          mode,
+          goal: target,
+          intent: selectedIntention || houseIntent,
+          houses_unlocked: tier === "full_map" ? 12 : 1,
+          unlocked_houses: tier === "full_map" ? ALL_TWELVE_HOUSES : [target],
+          result: resultPayload,
+        });
+      }
 
       await new Promise((resolve) => setTimeout(resolve, 600));
 
@@ -217,7 +271,11 @@ export default function HouseTrailerApp() {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      toast.error("Falha na consulta: " + err.message);
+      if (err?.name === "AbortError") {
+        toast.error("O servidor demorou muito para responder. Nenhum crédito foi descontado — tente novamente.");
+      } else {
+        toast.error("Falha na consulta: " + err.message);
+      }
       setIsProcessing(false);
     }
   };
@@ -275,7 +333,7 @@ export default function HouseTrailerApp() {
 
         <motion.div className="relative z-20 flex flex-col items-center text-center px-6 max-w-4xl mx-auto">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: "easeOut" }}>
-            <h1 className="text-[140px] md:text-[220px] font-ps-display font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/30 uppercase pb-6 md:pb-12" style={{ filter: `drop-shadow(0px 20px 40px ${theme.themeColor}33)` }}>
+            <h1 className="text-[clamp(3.75rem,18vw,13.75rem)] font-ps-display font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/30 uppercase pb-6 md:pb-12" style={{ filter: `drop-shadow(0px 20px 40px ${theme.themeColor}33)` }}>
               Casa {currentHouse}
             </h1>
           </motion.div>
@@ -671,7 +729,22 @@ export default function HouseTrailerApp() {
                       <h4 className="text-white font-ps-display text-base md:text-lg font-bold leading-tight">
                         Foco: {chosen?.label || `Casa ${currentHouse}`}
                       </h4>
-                      <p className="text-white/65 text-xs md:text-sm">Escolha revelar as cidades desta Casa ou desbloquear seu Mapa Completo (12 Casas).</p>
+                      <p className="text-white/65 text-xs md:text-sm">
+                        {activeTier === "full_map"
+                          ? "Passe Mapa Completo ativo: sua consulta já libera todas as 12 Casas + Todos os Focos."
+                          : activeTier === "expansao"
+                          ? "Passe Expansão ativo: sua consulta já libera esta Casa + Todos os 8 Focos."
+                          : "Escolha revelar as cidades desta Casa ou desbloquear seu Mapa Completo (12 Casas + Todos os Focos)."}
+                        {availablePassTier !== "single" && (
+                          <button
+                            type="button"
+                            onClick={() => setUsePassNow((v) => !v)}
+                            className="ml-2 underline text-[#F5DE98] hover:text-white text-xs font-semibold"
+                          >
+                            {usePassNow ? "(Guardar passe e usar só 1 crédito)" : "(Usar meu passe agora)"}
+                          </button>
+                        )}
+                      </p>
                     </div>
                   </div>
 
@@ -686,23 +759,33 @@ export default function HouseTrailerApp() {
                       }}
                     >
                       <Globe className={`w-4 h-4 shrink-0 ${isProcessing ? 'animate-spin' : ''}`} />
-                      <span>{isProcessing ? 'Calculando...' : 'Revelar Cidades'}</span>
+                      <span>
+                        {isProcessing
+                          ? 'Calculando...'
+                          : activeTier === "full_map"
+                          ? 'Revelar Mapa Completo'
+                          : activeTier === "expansao"
+                          ? 'Revelar Casa + Focos'
+                          : 'Revelar Cidades'}
+                      </span>
                       <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] font-bold tracking-wider">
-                        1 Créd.
+                        {activeTier === "full_map" ? "Passe Total" : activeTier === "expansao" ? "Passe Expansão" : "1 Créd."}
                       </span>
                     </button>
 
-                    <button 
-                      onClick={() => handleRevelarCidades(true)}
-                      disabled={isProcessing}
-                      className="px-5 py-3.5 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(229,193,88,0.2)]"
-                    >
-                      <Sparkles className="w-4 h-4 shrink-0 text-[#E5C158]" />
-                      <span>Desbloquear Mapa Completo</span>
-                      <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold tracking-wider">
-                        12 Casas • 7 Créd.
-                      </span>
-                    </button>
+                    {activeTier !== "full_map" && (
+                      <button 
+                        onClick={() => handleRevelarCidades(true)}
+                        disabled={isProcessing}
+                        className="px-5 py-3.5 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(229,193,88,0.2)]"
+                      >
+                        <Sparkles className="w-4 h-4 shrink-0 text-[#E5C158]" />
+                        <span>Desbloquear Mapa Completo</span>
+                        <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold tracking-wider">
+                          12 Casas + Todos os Focos
+                        </span>
+                      </button>
+                    )}
                   </div>
                   
                 </div>

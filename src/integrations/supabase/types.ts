@@ -320,12 +320,20 @@ export type Database = {
         Args: { p_amount: number; p_description: string; p_type: string }
         Returns: boolean
       }
+      admin_adjust_credits: {
+        Args: { p_target_user_id: string; p_amount: number; p_reason: string }
+        Returns: undefined
+      }
       process_mercadopago_payment: {
         Args: { p_order_id: string; p_payment_id: string }
         Returns: boolean
       }
       unlock_consultation_houses: {
         Args: { p_consultation_id: string; p_target_house: number }
+        Returns: Json
+      }
+      unlock_full_map_v1: {
+        Args: { p_consultation_id: string }
         Returns: Json
       }
     }

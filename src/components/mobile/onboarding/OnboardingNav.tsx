@@ -2,7 +2,7 @@ import { ChevronLeft, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface OnboardingNavProps {
-  step: number; // 1‑6
+  step: number; // 1-6
   totalSteps?: number;
   onNext: () => void;
   onPrev: () => void;
@@ -11,7 +11,7 @@ interface OnboardingNavProps {
 
 /**
  * Shared navigation for the onboarding flow.
- * - Top bar: back button (hidden on step 1) + "X de 6" counter.
+ * - Top bar: back button (hidden on step 1) + "X de 6" counter.
  * - Bottom bar: primary CTA (Continuar or Começar Minha Análise).
  * All buttons have identical size, style and placement on every screen.
  */

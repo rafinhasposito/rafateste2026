@@ -19,11 +19,13 @@ import {
   CheckCircle2,
   Zap,
   HelpCircle,
+  Ticket,
 } from "lucide-react";
 import { usePricing, type PricingItem } from "@/hooks/usePricing";
+import { redeemCouponCode } from "@/lib/coupons";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 const ICONS: Record<string, any> = {
   cost_city: MapPin,
@@ -50,12 +52,12 @@ function getPackageChecklist(credits: number): {
 } {
   if (credits <= 1) {
     return {
-      badge: "Crédito Avulso • 1 Crédito",
-      displayTitle: "1 Cidade ou Casa",
-      subtitle: "Ideal para revelar 1 destino pontual ou abrir +1 Casa avulsa.",
+      badge: "Crédito Avulso • 1 Casa",
+      displayTitle: "1 Casa Avulsa",
+      subtitle: "Para revelar 1 Casa ou Cidade escolhida (já com o 1º Foco Principal incluso).",
       ctaLabel: "Comprar 1 Crédito Avulso",
       bullets: [
-        "Revela 1 Casa ou Cidade escolhida",
+        "Libera 1 Casa ou Cidade escolhida",
         "Inclui 1º Foco Principal + Rotas da Casa",
         "Ou abre +1 Casa / +1 Foco avulso no mapa",
       ],
@@ -63,35 +65,40 @@ function getPackageChecklist(credits: number): {
   }
   if (credits <= 5) {
     return {
-      badge: "Pacote Expansão • 3 Créditos",
-      displayTitle: "3 Destinos ou Focos",
-      subtitle: "Perfeito para comparar até 3 cidades ou destravar todos os focos.",
-      ctaLabel: "Escolher Pacote de 3 Créditos",
+      badge: "Passe Expansão • Casa + Focos",
+      displayTitle: "Pacote Expansão",
+      subtitle: "Passe válido para qualquer consulta: libera 1 Casa escolhida com TODOS os Focos desbloqueados.",
+      ctaLabel: "Escolher Pacote Expansão",
       bullets: [
-        `Revela até ${credits} Cidades ou Casas diferentes`,
-        "Ou abre 1 Casa + todos os 6 Focos dela",
-        "Economia real para comparar seus destinos",
+        "Desbloqueia 1 Casa escolhida + TODOS os 8 Focos",
+        "Serve para qualquer consulta que você escolher",
+        "Abre todas as áreas da vida naquela Casa de uma vez",
       ],
     };
   }
   return {
-    badge: "Acesso Total 360º • 7 Créditos",
-    displayTitle: "Mapa Completo (12 Casas)",
-    subtitle: "Desbloqueia todas as 12 áreas do seu ano de uma só vez.",
+    badge: "Super Promoção • Acesso Total",
+    displayTitle: "Mapa Completo",
+    subtitle: "Passe válido para qualquer consulta: desbloqueia TODAS as 12 Casas + TODOS os Focos de uma só vez.",
     ctaLabel: "Desbloquear Mapa Completo",
     bullets: [
       "Libera TODAS as 12 Casas do seu aniversário",
-      "Veja a melhor cidade do mundo para cada área",
-      "Use direto (7 créd.) ou após 1ª Casa (+6 créd.)",
+      "Inclui TODOS os 8 Focos em todas as 12 Casas",
+      "Na consulta escolhida, o sistema já libera TUDO",
     ],
   };
 }
 
 const Credits = () => {
-  const { profile, session, refreshProfile } = useAuth();
+  const { user, profile, session, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { packages, costs, loading, getCost } = usePricing();
+
+  const initialCoupon = (searchParams.get("code") || searchParams.get("redeem") || "").toUpperCase();
+  const [couponCode, setCouponCode] = useState(initialCoupon);
+  const [redeemingCoupon, setRedeemingCoupon] = useState(false);
+  const [redeemedLabel, setRedeemedLabel] = useState<string | null>(null);
 
   // Estado da Tela de Checkout Dedicada (Lado a Lado, sem pop-up apertado)
   const [selectedPkg, setSelectedPkg] = useState<PricingItem | null>(null);
@@ -103,6 +110,13 @@ const Credits = () => {
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [paymentApproved, setPaymentApproved] = useState(false);
   const cardBrickControllerRef = useRef<any>(null);
+  const currentOrderIdRef = useRef<string | undefined>(undefined);
+  const rawReturnTo = searchParams.get("returnTo");
+  const safeReturnTo = rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : null;
+
+  useEffect(() => {
+    currentOrderIdRef.current = pixData?.orderId;
+  }, [pixData?.orderId]);
 
   useEffect(() => {
     const status = searchParams.get("status");
@@ -133,13 +147,15 @@ const Credits = () => {
     }
   }, [searchParams, refreshProfile]);
 
-  const resolveAccessToken = async (): Promise<string | null> => {
+  const resolveAccessToken = useCallback(async (): Promise<string | null> => {
     let accessToken: string | null = session?.access_token || null;
     if (!accessToken) {
       try {
         const { data: sessionData } = await supabase.auth.getSession();
         accessToken = sessionData?.session?.access_token ?? null;
-      } catch {}
+      } catch {
+        // Ignore session lookup fallback errors
+      }
     }
     if (!accessToken) {
       try {
@@ -160,10 +176,12 @@ const Credits = () => {
             }
           }
         }
-      } catch {}
+      } catch {
+        // Ignore localStorage parse errors
+      }
     }
     return accessToken;
-  };
+  }, [session?.access_token]);
 
   const extractFunctionError = async (error: any): Promise<string> => {
     let detail = error?.message || "Erro ao comunicar com o servidor de pagamentos.";
@@ -179,7 +197,9 @@ const Credits = () => {
           if (parsed?.error) detail = parsed.error;
         }
       }
-    } catch {}
+    } catch {
+      // Ignore context extraction errors
+    }
     return detail;
   };
 
@@ -227,13 +247,18 @@ const Credits = () => {
   const handleSelectPackage = (pkg: PricingItem) => {
     if (!profile) {
       toast.error("Você precisa estar logado para adquirir créditos.");
-      navigate("/auth");
+      const authTarget = safeReturnTo
+        ? `/auth?returnTo=${encodeURIComponent(`/credits?pkg=${pkg.key}&returnTo=${encodeURIComponent(safeReturnTo)}`)}`
+        : `/auth?returnTo=${encodeURIComponent(`/credits?pkg=${pkg.key}`)}`;
+      navigate(authTarget);
       return;
     }
     if (cardBrickControllerRef.current) {
       try {
         cardBrickControllerRef.current.unmount();
-      } catch {}
+      } catch {
+        // Ignore unmount error
+      }
       cardBrickControllerRef.current = null;
     }
     setSelectedPkg(pkg);
@@ -247,7 +272,9 @@ const Credits = () => {
     if (cardBrickControllerRef.current) {
       try {
         cardBrickControllerRef.current.unmount();
-      } catch {}
+      } catch {
+        // Ignore unmount error
+      }
       cardBrickControllerRef.current = null;
     }
     setSelectedPkg(null);
@@ -257,15 +284,25 @@ const Credits = () => {
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
-  // Auto-seleciona o pacote Mapa Completo quando o usuário vem do botão "Desbloquear Mapa Completo" (?pkg=full)
+  // Auto-seleciona o pacote solicitado via ?pkg= (full, 3/focuses, 1/single ou key exata)
   useEffect(() => {
     if (loading || selectedPkg || !profile || packages.length === 0) return;
     const requestedPkg = searchParams.get("pkg");
+    if (!requestedPkg) return;
+
+    let targetPkg: PricingItem | undefined;
     if (requestedPkg === "full") {
-      const fullPkg = packages.find(p => p.credits >= 6) || packages[packages.length - 1];
-      if (fullPkg) {
-        handleSelectPackage(fullPkg);
-      }
+      targetPkg = packages.find(p => p.credits >= 6) || packages[packages.length - 1];
+    } else if (requestedPkg === "3" || requestedPkg === "focuses") {
+      targetPkg = packages.find(p => p.credits >= 3 && p.credits <= 5);
+    } else if (requestedPkg === "1" || requestedPkg === "single") {
+      targetPkg = packages.find(p => p.credits === 1) || packages[0];
+    } else {
+      targetPkg = packages.find(p => p.key === requestedPkg);
+    }
+
+    if (targetPkg) {
+      handleSelectPackage(targetPkg);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, packages.length, profile, searchParams]);
@@ -293,11 +330,13 @@ const Credits = () => {
           await refreshProfile();
           toast.success("Pix confirmado! Seus créditos foram liberados.");
         }
-      } catch {}
+      } catch {
+        // Ignore transient polling error
+      }
     }, 3500);
 
     return () => clearInterval(interval);
-  }, [selectedPkg, paymentTab, pixData, paymentApproved, refreshProfile]);
+  }, [selectedPkg, paymentTab, pixData, paymentApproved, refreshProfile, resolveAccessToken]);
 
   const handleManualCheckPix = async () => {
     if (!pixData?.paymentId) return;
@@ -335,7 +374,9 @@ const Credits = () => {
       if (cardBrickControllerRef.current) {
         try {
           cardBrickControllerRef.current.unmount();
-        } catch {}
+        } catch {
+          // Ignore unmount error
+        }
         cardBrickControllerRef.current = null;
       }
       return;
@@ -398,7 +439,7 @@ const Credits = () => {
                       body: {
                         action: "process_card",
                         pricing_config_id: selectedPkg.key,
-                        order_id: pixData?.orderId,
+                        order_id: currentOrderIdRef.current,
                         card_data: cardFormData,
                       },
                       headers: { Authorization: `Bearer ${accessToken}` },
@@ -449,13 +490,43 @@ const Credits = () => {
       if (cardBrickControllerRef.current) {
         try {
           cardBrickControllerRef.current.unmount();
-        } catch {}
+        } catch {
+          // Ignore unmount error
+        }
         cardBrickControllerRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPkg, paymentTab, paymentApproved]);
 
   const fmt = (n: number | null) => (n == null ? ["0", "00"] : n.toFixed(2).split("."));
+
+  const handleRedeemCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = couponCode.trim().toUpperCase();
+    if (!clean) {
+      toast.error("Digite o código do seu cupom de presente.");
+      return;
+    }
+    if (!user) {
+      toast.info("Entre na sua conta para ativar seu presente.");
+      navigate(`/auth?returnTo=${encodeURIComponent(`/resgatar?code=${encodeURIComponent(clean)}`)}`);
+      return;
+    }
+
+    setRedeemingCoupon(true);
+    try {
+      const res = await redeemCouponCode({ code: clean, userId: user.id });
+      await refreshProfile();
+      setRedeemedLabel(res.label);
+      setCouponCode("");
+      toast.success(`Presente ativado: ${res.label}!`);
+    } catch (err: any) {
+      toast.error(err?.message || "Não foi possível resgatar este código.");
+    } finally {
+      setRedeemingCoupon(false);
+    }
+  };
 
   const costConsultation = 1;
   const costSingleHouse = getCost("cost_house_1", 1);
@@ -529,7 +600,7 @@ const Credits = () => {
                     {packages.map((p) => {
                       const isCurrent = p.key === selectedPkg.key;
                       const formattedPrice = Number(p.price_brl || 0).toFixed(2).replace(".", ",");
-                      const shortTitle = p.credits <= 1 ? "1 Casa Avulsa" : p.credits <= 5 ? "3 Destinos" : "Mapa 12 Casas";
+                      const shortTitle = p.credits <= 1 ? "1 Casa Avulsa" : p.credits <= 5 ? "Pacote Expansão" : "Mapa Completo";
                       return (
                         <button
                           key={p.key}
@@ -573,13 +644,23 @@ const Credits = () => {
                     Seus <strong className="text-[#F5DE98]">{selectedPkg.credits} créditos</strong> já foram adicionados ao seu saldo.
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
-                    <button
-                      type="button"
-                      onClick={() => navigate("/")}
-                      className="px-8 py-4 rounded-2xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-xs uppercase tracking-[0.2em] transition-all shadow-[0_10px_30px_rgba(201,162,39,0.3)]"
-                    >
-                      Iniciar Consulta Agora
-                    </button>
+                    {safeReturnTo ? (
+                      <button
+                        type="button"
+                        onClick={() => navigate(safeReturnTo)}
+                        className="px-8 py-4 rounded-2xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-xs uppercase tracking-[0.2em] transition-all shadow-[0_10px_30px_rgba(201,162,39,0.3)]"
+                      >
+                        Voltar para Minha Consulta
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => navigate("/")}
+                        className="px-8 py-4 rounded-2xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-xs uppercase tracking-[0.2em] transition-all shadow-[0_10px_30px_rgba(201,162,39,0.3)]"
+                      >
+                        Iniciar Consulta Agora
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => navigate("/history")}
@@ -671,7 +752,7 @@ const Credits = () => {
                                       type="text"
                                       readOnly
                                       value={pixData.qrCode}
-                                      className="w-full bg-transparent text-white/60 text-xs font-mono truncate focus:outline-none"
+                                      className="w-full bg-transparent text-white/60 text-base sm:text-xs font-mono truncate focus:outline-none"
                                     />
                                   </div>
                                   <button
@@ -754,14 +835,14 @@ const Credits = () => {
           Passaporte de Coordenadas
         </span>
         <h1 className="font-ps-display text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight leading-tight">
-          Adquira Seus Créditos
+          Escolha Seu Passe Solar
         </h1>
         <p className="text-white/60 text-sm sm:text-base font-light font-ps-ui max-w-xl mx-auto">
-          Desbloqueie novas consultas, casas astrais e focos do seu mapa.
+          1 crédito libera 1 Casa. Os pacotes Expansão e Mapa Completo funcionam como passes que liberam tudo de uma vez na consulta que você escolher.
         </p>
 
         {profile && (
-          <div className="mt-6 inline-flex items-center gap-4 py-3 px-6 rounded-2xl bg-[#08111F]/90 border border-[#C9A227]/30 backdrop-blur-xl shadow-[0_14px_35px_rgba(0,0,0,0.45)]">
+          <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-4 py-3 px-6 rounded-2xl bg-[#08111F]/90 border border-[#C9A227]/30 backdrop-blur-xl shadow-[0_14px_35px_rgba(0,0,0,0.45)]">
             <span className="text-white/55 text-[11px] uppercase tracking-[0.2em] font-semibold">
               Seu Saldo Atual
             </span>
@@ -772,8 +853,87 @@ const Credits = () => {
                 crédito{profile.credits === 1 ? "" : "s"}
               </span>
             </span>
+            {profile.credits >= 7 && (
+              <span className="px-3 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 text-[#F5DE98] text-[10px] font-bold uppercase tracking-wider">
+                Passe Mapa Completo Ativo (12 Casas + Focos)
+              </span>
+            )}
+            {profile.credits >= 3 && profile.credits < 7 && (
+              <span className="px-3 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 text-[#F5DE98] text-[10px] font-bold uppercase tracking-wider">
+                Passe Expansão Ativo (1 Casa + Todos os Focos)
+              </span>
+            )}
           </div>
         )}
+      </motion.div>
+
+      {/* Bloco de Resgate de Cupom / Mídia Kit */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-3xl mx-auto mb-10"
+      >
+        <div className="p-5 sm:p-6 rounded-3xl border border-[#C9A227]/35 bg-[#08111F]/90 backdrop-blur-xl shadow-[0_14px_40px_rgba(0,0,0,0.5)]">
+          {redeemedLabel ? (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Check className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-bold">
+                    Presente Ativado com Sucesso
+                  </p>
+                  <p className="text-white font-ps-display text-lg font-bold">
+                    {redeemedLabel}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate(safeReturnTo || "/")}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-xs uppercase tracking-[0.18em] transition-all"
+              >
+                {safeReturnTo ? "Voltar para Minha Consulta" : "Iniciar Minha Consulta Agora"}
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleRedeemCoupon}
+              className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5"
+            >
+              <div className="flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-[#C9A227]/15 border border-[#C9A227]/35 flex items-center justify-center text-[#F5DE98] shrink-0">
+                  <Ticket className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-white font-ps-display text-sm sm:text-base font-bold">
+                    Possui um Código de Presente ou Mídia Kit?
+                  </p>
+                  <p className="text-white/55 text-xs font-light">
+                    Insira seu cupom para liberar sua Casa, Passe Expansão ou Mapa Completo.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="EX: SOLAR-VIP"
+                  className="w-full sm:w-44 px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] font-mono text-xs sm:text-sm font-bold uppercase tracking-wider placeholder:text-white/25 focus:outline-none focus:border-[#C9A227]"
+                />
+                <button
+                  type="submit"
+                  disabled={redeemingCoupon}
+                  className="shrink-0 px-5 py-3 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-xs uppercase tracking-[0.16em] transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {redeemingCoupon ? "Validando..." : "Resgatar"}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </motion.div>
 
       {/* Packages Grid */}
@@ -896,23 +1056,18 @@ const Credits = () => {
         <div className="flex flex-wrap items-center justify-center gap-3">
           <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
             <MapPin className="w-3.5 h-3.5 text-[#C9A227]" />
-            <span className="text-white/75 font-light">1 Cidade ou Casa:</span>
-            <span className="text-[#F5DE98] font-bold">1 crédito</span>
-          </div>
-          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-            <span className="text-white/75 font-light">+1 Foco Extra:</span>
-            <span className="text-[#F5DE98] font-bold">1 crédito</span>
+            <span className="text-white/75 font-light">1 Crédito Avulso (R$ 19,90):</span>
+            <span className="text-[#F5DE98] font-bold">Libera 1 Casa</span>
           </div>
           <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
             <Crown className="w-3.5 h-3.5 text-[#C9A227]" />
-            <span className="text-white/75 font-light">Todos os Focos da Casa:</span>
-            <span className="text-[#F5DE98] font-bold">3 créditos</span>
+            <span className="text-white/75 font-light">Pacote Expansão (R$ 49,90):</span>
+            <span className="text-[#F5DE98] font-bold">1 Casa + Todos os 8 Focos</span>
           </div>
           <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#C9A227]/30 bg-[#C9A227]/10 text-xs">
             <Compass className="w-3.5 h-3.5 text-[#F5DE98]" />
-            <span className="text-white/85 font-light">Mapa Completo (12 Casas):</span>
-            <span className="text-[#F5DE98] font-bold">7 créditos (ou +6 créd. após 1ª Casa)</span>
+            <span className="text-white/85 font-light">Mapa Completo (R$ 99,90):</span>
+            <span className="text-[#F5DE98] font-bold">Todas as 12 Casas + Todos os Focos</span>
           </div>
         </div>
       </motion.div>

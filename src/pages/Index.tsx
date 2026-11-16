@@ -12,7 +12,7 @@ import { TemporalSelection } from "@/components/TemporalSelection";
 
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
-import { detectUserLocation } from "@/lib/astro";
+import { detectUserLocation, getNextBirthdayYear, normalizeBirthTime } from "@/lib/astro";
 import { getSunSignFromDate } from "./Auth";
 
 type Mode = "futuro" | "passado" | "presente";
@@ -154,7 +154,7 @@ const Index = () => {
   const [birthtime, setBirthtime] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
   const [birthPlaceValid, setBirthPlaceValid] = useState(false);
-  const [year, setYear] = useState("2026");
+  const [year, setYear] = useState(() => getNextBirthdayYear(profile?.birth_date));
 
   const [submitted, setSubmitted] = useState(false);
   const [mantraIndex, setMantraIndex] = useState(0);
@@ -184,7 +184,7 @@ const Index = () => {
       setMode(targetMode);
       if (targetMode === "presente") setYear(currentYear);
       else if (targetMode === "passado") setYear(String(Number(currentYear) - 1));
-      else setYear("2026");
+      else setYear(getNextBirthdayYear(profile?.birth_date || birthdate));
       
       if (targetPath && ["cidade", "casa", "intencao"].includes(targetPath)) {
         setSearchPath(targetPath);
@@ -197,6 +197,7 @@ const Index = () => {
         document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" });
       }, 300);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, user, profile, loading, navigate]);
 
   useEffect(() => {
@@ -210,17 +211,21 @@ const Index = () => {
   useEffect(() => {
     if (profile) {
       if (profile.full_name && !name) setName(profile.full_name);
-      if (profile.birth_date && !birthdate) setBirthdate(profile.birth_date);
+      if (profile.birth_date && !birthdate) {
+        setBirthdate(profile.birth_date);
+        if (!mode || mode === "futuro") {
+          setYear(getNextBirthdayYear(profile.birth_date));
+        }
+      }
       if (profile.birth_time && !birthtime) {
-        const t = String(profile.birth_time).slice(0, 5);
-        // Don't auto-fill "00:00" — backend rejects it. Leave blank so user fills in real time.
-        if (t !== "00:00") setBirthtime(t);
+        setBirthtime(normalizeBirthTime(profile.birth_time));
       }
       if (profile.birth_city && !birthPlace) {
         setBirthPlace(profile.birth_city);
         setBirthPlaceValid(true);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
   const handleSelectMode = (m: Mode) => {
@@ -234,7 +239,7 @@ const Index = () => {
     // 2. Onboarding completo mas sem login → auth (modo preservado)
     if (!user) {
       sessionStorage.setItem("ps_pending_mode", m);
-      navigate("/auth");
+      navigate(`/auth?returnTo=${encodeURIComponent(`/?mode=${m}`)}`);
       return;
     }
     // 3. Logado mas sem perfil natal → completar perfil
@@ -247,7 +252,7 @@ const Index = () => {
     setSearchPath(null);
     if (m === "presente") setYear(currentYear);
     else if (m === "passado") setYear(String(Number(currentYear) - 1));
-    else setYear("2026");
+    else setYear(getNextBirthdayYear(profile?.birth_date || birthdate));
     setStep(2);
   };
 

@@ -20,6 +20,52 @@ serve(async (req) => {
     const reqBody = await req.json()
     const { user_id, terms_version, privacy_version, terms_hash, privacy_hash } = reqBody
 
+    if (!user_id || !terms_version || !privacy_version || !terms_hash || !privacy_hash) {
+      return new Response(
+        JSON.stringify({ error: 'Parâmetros obrigatórios ausentes' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
+    // Verify caller identity: either a valid Bearer token matching user_id,
+    // or a newly registered user (within 10 min) who hasn't recorded this terms version yet.
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization')
+    const token = authHeader?.replace(/^Bearer\s+/i, '')?.trim()
+    let isVerifiedCaller = false
+
+    if (token) {
+      const { data: { user: authUser } } = await supabaseClient.auth.getUser(token)
+      if (authUser && authUser.id === user_id) {
+        isVerifiedCaller = true
+      }
+    }
+
+    if (!isVerifiedCaller) {
+      const { data: adminUserRes, error: adminUserErr } = await supabaseClient.auth.admin.getUserById(user_id)
+      const createdAtMs = adminUserRes?.user?.created_at ? new Date(adminUserRes.user.created_at).getTime() : 0
+      const isRecentSignup = createdAtMs > 0 && (Date.now() - createdAtMs) <= 10 * 60 * 1000
+
+      if (adminUserErr || !adminUserRes?.user || !isRecentSignup) {
+        return new Response(
+          JSON.stringify({ error: 'Não autorizado a registrar aceite para este usuário' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+        )
+      }
+
+      const { count } = await supabaseClient
+        .from('terms_acceptance')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user_id)
+        .eq('terms_version', terms_version)
+
+      if ((count ?? 0) > 0) {
+        return new Response(
+          JSON.stringify({ success: true, alreadyRecorded: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
     // Extract real IP from headers (x-forwarded-for or similar)
     // Deno/Supabase standard:
     let ip = req.headers.get('x-forwarded-for')

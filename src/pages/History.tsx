@@ -7,8 +7,9 @@ import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Finger
 import StarryBackground from "@/components/StarryBackground";
 import { cityDatabase } from "@/data/houses";
 import { BackButton } from "@/components/ui/BackButton";
+import { countUnlockedHouses, type ConsultationUnlockRecord } from "@/lib/consultationUnlocks";
 
-interface ConsultationRow {
+interface ConsultationRow extends ConsultationUnlockRecord {
   id: string;
   name: string;
   created_at: string;
@@ -17,6 +18,7 @@ interface ConsultationRow {
   intent: string | null;
   origin: string | null;
   houses_unlocked: number;
+  unlocked_houses?: number[] | null;
 }
 
 
@@ -52,12 +54,12 @@ export default function History() {
         setLoading(true);
         const { data, error } = await supabase
           .from("consultations")
-          .select("id, name, created_at, mode, goal, intent, origin, houses_unlocked")
+          .select("id, name, created_at, mode, goal, intent, origin, houses_unlocked, unlocked_houses, result")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        setConsultations(data as ConsultationRow[]);
+        setConsultations((data || []) as unknown as ConsultationRow[]);
       } catch (err) {
         console.error("Erro ao buscar histórico:", err);
       } finally {
@@ -182,7 +184,10 @@ export default function History() {
                       
                       <div className="flex items-center gap-1.5 text-white/55 text-[11px] font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5 text-[#C9A227]" />
-                        {c.houses_unlocked} {c.houses_unlocked === 1 ? 'Casa aberta' : 'Casas abertas'}
+                        {(() => {
+                          const unlockedCount = countUnlockedHouses(c);
+                          return `${unlockedCount} ${unlockedCount === 1 ? "Casa aberta" : "Casas abertas"}`;
+                        })()}
                       </div>
                     </div>
 

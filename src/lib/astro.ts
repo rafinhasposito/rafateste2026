@@ -1,5 +1,40 @@
 export const API_URL = "https://protocolo-solar-api.onrender.com";
 
+/**
+ * Calcula dinamicamente o ano do próximo aniversário a partir da data de nascimento (YYYY-MM-DD).
+ * Se o aniversário deste ano já passou (ou hoje é após a data), retorna o ano seguinte.
+ */
+export function getNextBirthdayYear(birthDateStr?: string | null): string {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  if (birthDateStr && /^\d{4}-\d{2}-\d{2}/.test(birthDateStr)) {
+    const parts = birthDateStr.split("-");
+    const birthMonth = parseInt(parts[1], 10);
+    const birthDay = parseInt(parts[2], 10);
+    const curMonth = now.getMonth() + 1;
+    const curDay = now.getDate();
+
+    if (curMonth > birthMonth || (curMonth === birthMonth && curDay > birthDay)) {
+      return String(currentYear + 1);
+    }
+    return String(currentYear);
+  }
+
+  // Sem data de nascimento conhecida: em nov/dez o próximo aniversário quase sempre é no ano seguinte
+  return now.getMonth() >= 10 ? String(currentYear + 1) : String(currentYear);
+}
+
+/**
+ * Normaliza horários "00:00" ou "00:00:00" para "00:01" para evitar bloqueios em nascimentos à meia-noite.
+ */
+export function normalizeBirthTime(timeStr?: string | null): string {
+  if (!timeStr) return "";
+  const trimmed = String(timeStr).trim().slice(0, 5);
+  if (trimmed === "00:00") return "00:01";
+  return trimmed;
+}
+
 export interface DetectedLocation {
   label: string;
   coords: {

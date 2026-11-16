@@ -20,12 +20,18 @@ const objetivos = [
   { titulo: "Ter tempo para mim", Icon: Moon },
 ];
 import { cityDatabase } from "@/data/houses";
-import { API_URL } from "@/lib/astro";
+import { API_URL, normalizeBirthTime } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { chargeConsultation } from "@/lib/credits";
-import { saveConsultation } from "@/lib/consultations";
+import { saveConsultation, chargeAndSaveConsultationV1, enrichResultForTier } from "@/lib/consultations";
+import {
+  ALL_TWELVE_HOUSES,
+  detectDefaultConsultationTier,
+  getTierRequiredCredits,
+  type ConsultationUnlockTier,
+} from "@/lib/consultationUnlocks";
 import DestinyResults from "@/components/DestinyResults";
 import { PremiumButton } from "@/components/shell";
 
@@ -81,15 +87,11 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
   const handleSelectIntent = (houseId: number) => {
     const finalName = (name || profile?.full_name || user?.user_metadata?.name || "Viajante").trim();
     const finalBirthdate = birthdate || profile?.birth_date || "";
-    const finalBirthtime = birthtime || (profile?.birth_time ? String(profile.birth_time).slice(0, 5) : "");
+    const finalBirthtime = normalizeBirthTime(birthtime || (profile?.birth_time ? String(profile.birth_time).slice(0, 5) : ""));
     const finalBirthPlace = (birthPlace || profile?.birth_city || "").trim();
 
     if (!finalBirthdate || !finalBirthtime || !finalBirthPlace) {
       showAlert("Complete sua data, horário e cidade de nascimento antes de continuar.");
-      return;
-    }
-    if (finalBirthtime === "00:00" || finalBirthtime === "00:00:00") {
-      showAlert("A hora de nascimento '00:00' não é processável. Informe sua hora real de nascimento (ex: 07:30, 14:15).");
       return;
     }
     try {
@@ -103,53 +105,38 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       console.warn("[IntentLookup] sessionStorage write failed:", err);
     }
     setSelectedHouse(houseId);
-    navigate(`/app/trailer?house=${houseId}&mode=${mode || "futuro"}`);
+    navigate(`/app/trailer?house=${houseId}&mode=${encodeURIComponent(mode || "futuro")}&year=${encodeURIComponent(year)}`);
   };
 
   const handleConfirmIntent = async (unlockFullMap: boolean = false) => {
     if (!selectedHouse) return;
-    if (!name || !birthdate || !birthtime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
-    if (birthtime === "00:00" || birthtime === "00:00:00") {
-      showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora real de nascimento (ex: 07:30, 14:15).");
-      return;
-    }
+    const safeTime = normalizeBirthTime(birthtime);
+    if (!name || !birthdate || !safeTime || !birthPlace) { showAlert("Preencha seus dados natais acima antes de continuar."); return; }
     
     const houseData = cityDatabase[selectedHouse];
     if (!houseData) return;
 
-    if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
+    const returnUrl = `/?mode=${encodeURIComponent(mode || "futuro")}&path=intencao`;
+    if (!user) {
+      showAlert("Entre na sua conta para realizar a consulta.");
+      navigate(`/auth?returnTo=${encodeURIComponent(returnUrl)}`);
+      return;
+    }
 
-    const requiredCredits = unlockFullMap ? 7 : 1;
-    if (!isAdmin && (profile?.credits ?? 0) < requiredCredits) {
+    const userCredits = profile?.credits ?? 0;
+    const defaultTier = detectDefaultConsultationTier(userCredits);
+    const tier: ConsultationUnlockTier = unlockFullMap ? "full_map" : defaultTier;
+    const requiredCredits = getTierRequiredCredits(tier);
+    if (!isAdmin && userCredits < requiredCredits) {
       if (unlockFullMap) {
-        showAlert("Ative o Pacote Mapa Completo (7 Créditos) para desbloquear todas as 12 Casas de uma vez!");
-        navigate("/credits?pkg=full");
+        showAlert("Ative o Passe Mapa Completo para desbloquear todas as 12 Casas + Todos os Focos de uma vez!");
+        navigate(`/credits?pkg=full&returnTo=${encodeURIComponent(returnUrl)}`);
       } else {
-        showAlert("Você não possui créditos suficientes. Adquira seu crédito avulso ou o Mapa Completo.");
-        navigate("/credits");
+        showAlert("Você não possui créditos suficientes. Adquira 1 Casa Avulsa, o Pacote Expansão ou o Mapa Completo.");
+        navigate(`/credits?pkg=1&returnTo=${encodeURIComponent(returnUrl)}`);
       }
       return;
     }
-
-    const charge = await chargeConsultation({
-      userId: user.id,
-      currentCredits: profile?.credits ?? 0,
-      isAdmin,
-      description: unlockFullMap
-        ? `Mapa Completo (12 Casas) — Intenção Casa ${selectedHouse} (${houseData.label}) em ${year}`
-        : `Consulta por Intenção — Casa ${selectedHouse} (${houseData.label}) em ${year}`,
-      amount: requiredCredits,
-    });
-    if (!charge.ok) {
-      if (charge.reason === "no_credits") {
-        showAlert("Você não possui créditos suficientes.");
-        navigate(unlockFullMap ? "/credits?pkg=full" : "/credits");
-      } else {
-        showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
-      }
-      return;
-    }
-    await refreshProfile();
 
     setLoadingState(true);
     setResult(null);
@@ -158,19 +145,28 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       const [ano, mes, dia] = birthdate.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
 
-      const response = await fetch(`${API_URL}/find_all_cities`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          place_of_birth: birthPlace.trim(),
-          dob: dataFormatada,
-          time: birthtime,
-          target_year: year,
-          alvoId: selectedHouse,
-          intent: houseData.intent,
-        }),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      let response: Response;
+      try {
+        response = await fetch(`${API_URL}/find_all_cities`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            name: name.trim(),
+            place_of_birth: birthPlace.trim(),
+            dob: dataFormatada,
+            time: safeTime,
+            target_year: year,
+            alvoId: selectedHouse,
+            intent: houseData.intent,
+          }),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
@@ -198,30 +194,79 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
         }
       }
 
-      const allTwelveHouses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-      const consultationId = await saveConsultation({
-        userId: user.id,
-        name: name.trim(),
-        birthdate,
-        birthtime,
-        birth_place: birthPlace.trim(),
-        year,
-        mode,
-        goal: selectedHouse,
-        intent: houseData.intent,
-        houses_unlocked: unlockFullMap ? 12 : 1,
-        unlocked_houses: unlockFullMap ? allTwelveHouses : [selectedHouse],
-        result: {
+      const resultPayload = enrichResultForTier(
+        {
           results: allResults,
           house: selectedHouse,
           return_time_utc: data?.return_time_utc || null,
           return_date: data?.return_date || null,
           sun_sign: data?.sun_sign || null,
           ascendant: data?.ascendant || null,
-          ...(unlockFullMap ? { full_map_unlocked: true, unlocked_houses_list: allTwelveHouses } : {}),
         },
-      }) ?? undefined;
+        tier,
+        selectedHouse
+      );
+
+      let consultationId: string | undefined;
+
+      if (!isAdmin && tier === "single") {
+        consultationId = (await chargeAndSaveConsultationV1({
+          id: crypto.randomUUID(),
+          userId: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime: safeTime,
+          birth_place: birthPlace.trim(),
+          year,
+          mode,
+          goal: selectedHouse,
+          intent: houseData.intent,
+          result: resultPayload,
+        })) ?? undefined;
+
+        if (!consultationId) {
+          throw new Error("Não foi possível debitar o crédito e salvar sua consulta.");
+        }
+        await refreshProfile();
+      } else {
+        const charge = await chargeConsultation({
+          userId: user.id,
+          currentCredits: profile?.credits ?? 0,
+          isAdmin,
+          description:
+            tier === "full_map"
+              ? `Passe Mapa Completo (12 Casas + Todos os Focos) — Intenção Casa ${selectedHouse} (${houseData.label}) em ${year}`
+              : tier === "expansao"
+              ? `Passe Expansão (Casa ${selectedHouse} + Todos os Focos) em ${year}`
+              : `Consulta por Intenção — Casa ${selectedHouse} (${houseData.label}) em ${year}`,
+          amount: requiredCredits,
+        });
+        if (!charge.ok) {
+          if (charge.reason === "no_credits") {
+            showAlert("Você não possui créditos suficientes.");
+            navigate(`/credits?pkg=${tier === "full_map" ? "full" : tier === "expansao" ? "3" : "1"}&returnTo=${encodeURIComponent(returnUrl)}`);
+          } else {
+            showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
+          }
+          return;
+        }
+        await refreshProfile();
+
+        consultationId = (await saveConsultation({
+          userId: user.id,
+          name: name.trim(),
+          birthdate,
+          birthtime: safeTime,
+          birth_place: birthPlace.trim(),
+          year,
+          mode,
+          goal: selectedHouse,
+          intent: houseData.intent,
+          houses_unlocked: tier === "full_map" ? 12 : 1,
+          unlocked_houses: tier === "full_map" ? ALL_TWELVE_HOUSES : [selectedHouse],
+          result: resultPayload,
+        })) ?? undefined;
+      }
 
       // Transição suave para contemplação cósmica
       await new Promise((resolve) => setTimeout(resolve, 900));
@@ -230,7 +275,11 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
       onHouseFound?.(selectedHouse);
     } catch (error) {
       const err = error as Error;
-      showAlert("Falha na consulta: " + err.message);
+      if (err.name === "AbortError") {
+        showAlert("O servidor demorou muito para responder. Nenhum crédito foi descontado — tente novamente.");
+      } else {
+        showAlert("Falha na consulta: " + err.message);
+      }
       setSelectedHouse(null);
     } finally {
       setLoadingState(false);
@@ -338,7 +387,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
                   <Crown className="w-3.5 h-3.5 text-[#E5C158]" />
                   <span>Desbloquear Mapa Completo</span>
                   <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold">
-                    12 Casas • 7 Créd.
+                    12 Casas + Todos os Focos
                   </span>
                 </button>
               </div>

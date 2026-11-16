@@ -1,0 +1,4 @@
+Arraste para esta pasta (`_backup-originais/`) qualquer `.mp4` ou `-poster.jpg` antigo
+antes de substituir pelos novos arquivos colorizados em `assets-v3/`.
+
+Os arquivos colocados aqui dentro NÃO são carregados pelo `onboarding-v3.html`.

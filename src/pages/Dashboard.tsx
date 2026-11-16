@@ -1,15 +1,40 @@
 import React, { useEffect, useState } from "react";
 
-class RootErrorBoundary extends React.Component {
-  constructor(props) {
+class RootErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
-  static getDerivedStateFromError(error) { return { hasError: true, error }; }
-  componentDidCatch(error, info) { console.error("Root error:", error, info); }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error("Root error:", error, info);
+  }
   render() {
     if (this.state.hasError) {
-      return <div style={{background:'red', color:'white', padding:50}}>ROOT CRASH: {this.state.error?.toString()}</div>;
+      return (
+        <div className="min-h-[100dvh] bg-[#050507] text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="max-w-md rounded-2xl border border-[#F5B041]/25 bg-white/[0.03] p-6 backdrop-blur-xl space-y-4">
+            <h2 className="font-ps-display text-xl font-bold text-[#FFF3D1]">
+              Não foi possível exibir esta visualização
+            </h2>
+            <p className="text-xs text-white/60 leading-relaxed">
+              {this.state.error?.message || "Ocorreu um erro inesperado ao renderizar seu mapa."}
+            </p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="px-5 py-2.5 rounded-xl bg-[#C9A227] text-[#050507] font-bold text-xs uppercase tracking-widest"
+            >
+              Recarregar Mapa
+            </button>
+          </div>
+        </div>
+      );
     }
     return this.props.children;
   }
@@ -18,12 +43,10 @@ class RootErrorBoundary extends React.Component {
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Calendar, Clock, MapPin, Compass, Crown, Scroll } from "lucide-react";
+import { toast } from "sonner";
 import StarryBackground from "@/components/StarryBackground";
 
-import HouseCard from "@/components/HouseCard";
-import HouseDetail from "@/components/HouseDetail";
 import DestinyResults from "@/pages/AppleResultPreviewV3";
-import ConfirmCreditAction from "@/components/ConfirmCreditAction";
 import PageLoader from "@/components/PageLoader";
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
@@ -32,6 +55,17 @@ import { usePricing } from "@/hooks/usePricing";
 import { useAlert } from "@/hooks/useAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { cityDatabase, fallbackOraclesFuture, fallbackOraclesPast, houseColors } from "@/data/houses";
+import {
+  TOTAL_HOUSES,
+  FOCUS_AREA_METADATA,
+  getConsultationGoalHouse,
+  isHouseLockedByConsultation,
+  getUnlockedHousesList,
+  getHouseIntendedFocusId,
+  computeAllFocusesCost,
+  computeRemainingFullMapCost,
+  buildFullMapUnlockedFocuses,
+} from "@/lib/consultationUnlocks";
 
 
 interface CityOption {
@@ -53,12 +87,15 @@ interface HouseResult {
 }
 
 interface ApiResult {
-  results: Record<string, HouseResult>;
+  results?: Record<string, HouseResult>;
   oraculo?: string;
   house?: number | string;
   goal_house?: number | string;
   goalHouse?: number | string;
   casa?: number | string;
+  full_map_unlocked?: boolean;
+  unlocked_houses_list?: number[];
+  unlocked_focuses?: Record<string, string[]>;
 }
 
 interface ConsultationRow {
@@ -91,47 +128,12 @@ function inferSearchType(c: { origin: string | null; intent: string | null }): {
   return { label: "Por Casa", Icon: Crown };
 }
 
-const TOTAL_HOUSES = 12;
-
-const parseHouseNumber = (value: unknown): number | null => {
-  if (typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= TOTAL_HOUSES) return value;
-  if (typeof value === "string") {
-    const parsed = parseInt(value, 10);
-    if (Number.isInteger(parsed) && parsed >= 1 && parsed <= TOTAL_HOUSES) return parsed;
-  }
-  return null;
-};
-
-const getConsultationGoalHouse = (consultation: ConsultationRow | null): number | null => {
-  if (!consultation) return null;
-  return (
-    parseHouseNumber(consultation.goal)
-    ?? parseHouseNumber(consultation.result?.house)
-    ?? parseHouseNumber(consultation.result?.goal_house)
-    ?? parseHouseNumber(consultation.result?.goalHouse)
-    ?? parseHouseNumber(consultation.result?.casa)
-  );
-};
-
-const isHouseLockedByConsultation = (consultation: ConsultationRow, houseNum: number) => {
-  if ((consultation.result as any)?.full_map_unlocked === true) return false;
-  if (Array.isArray((consultation.result as any)?.unlocked_houses_list) && (consultation.result as any).unlocked_houses_list.includes(houseNum)) return false;
-  if (consultation.unlocked_houses?.includes(houseNum)) return false;
-
-  const unlockedCount = Math.max(consultation.houses_unlocked, 0);
-  const goalHouse = getConsultationGoalHouse(consultation);
-
-  if (unlockedCount >= TOTAL_HOUSES) return false;
-  if (goalHouse && houseNum === goalHouse) return false;
-  if (goalHouse && unlockedCount <= 1) return houseNum !== goalHouse;
-  return houseNum > unlockedCount;
-};
-
 const Dashboard = () => {
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
-  const { getCost, loading: pricingLoading } = usePricing();
+  const { getCost } = usePricing();
   const costFocus = getCost("cost_focus", 1);
+  const costAllFocuses = getCost("cost_all_focuses", 3);
   const costHouse = getCost("cost_house_1", 1);
   const costFull = getCost("cost_full_map", 7);
   const { showAlert } = useAlert();
@@ -145,7 +147,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [unlocking, setUnlocking] = useState(false);
   const [autoUnlockDone, setAutoUnlockDone] = useState(false);
-  const [pendingUnlock, setPendingUnlock] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -195,16 +196,22 @@ const Dashboard = () => {
     setSelectedHouse(firstUnlocked);
   }, [consultation?.id, consultation?.goal, consultation?.houses_unlocked, consultation?.unlocked_houses, consultation?.result]);
 
-  const handleUnlockFocus = async (focusId: string, houseNum: number) => {
-    if (!user || !profile || !consultation || unlocking) return;
+  const handleUnlockFocus = async (focusId: string, houseNum: number): Promise<boolean> => {
+    if (!user || !profile || !consultation || unlocking) return false;
 
     const existingHouseFocuses = consultation.result?.unlocked_focuses?.[String(houseNum)] || [];
-    const isFirstFreeFocus = !consultation.intent && existingHouseFocuses.length === 0;
+    const currentGoalHouse = getConsultationGoalHouse(consultation);
+    const intendedFocusForHouse = getHouseIntendedFocusId(consultation.intent, houseNum, currentGoalHouse);
+    if (existingHouseFocuses.includes(focusId) || intendedFocusForHouse === focusId) {
+      return true;
+    }
+
+    const isFirstFreeFocus = !intendedFocusForHouse && existingHouseFocuses.length === 0;
 
     if (!isAdmin && !isFirstFreeFocus && credits < costFocus) {
-      showAlert(`Você não tem créditos suficientes. Adquira mais no menu.`);
-      navigate("/credits");
-      throw new Error("Sem créditos");
+      showAlert(`Você precisa de ${costFocus} crédito${costFocus > 1 ? "s" : ""} para desbloquear este Foco.`);
+      navigate(`/credits?pkg=1&returnTo=${encodeURIComponent(`/dashboard?id=${consultation.id}`)}`);
+      return false;
     }
 
     setUnlocking(true);
@@ -218,48 +225,62 @@ const Dashboard = () => {
         if (chargeErr || !chargeSuccess) throw new Error(chargeErr?.message || "Erro ao debitar créditos");
       }
 
-      // Save to database
       const currentResult = consultation.result || {};
-      const currentUnlockedFocuses = currentResult.unlocked_focuses || {};
+      const currentUnlockedFocuses = { ...(currentResult.unlocked_focuses || {}) };
       const houseFocuses = [...(currentUnlockedFocuses[String(houseNum)] || [])];
-      
+
       if (!houseFocuses.includes(focusId)) {
         houseFocuses.push(focusId);
       }
       currentUnlockedFocuses[String(houseNum)] = houseFocuses;
-      
+
       const newResult = { ...currentResult, unlocked_focuses: currentUnlockedFocuses };
-      
+
       const { error: updateErr } = await supabase
         .from("consultations")
-        .update({ result: newResult })
+        .update({ result: newResult as any })
         .eq("id", consultation.id);
-        
+
       if (updateErr) throw new Error("Erro ao salvar foco escolhido.");
-      
-      // Update local state
-      setConsultation(prev => prev ? { ...prev, result: newResult } : null);
+
+      setConsultation((prev) => (prev ? { ...prev, result: newResult } : null));
       if (!isAdmin && !isFirstFreeFocus) {
-         await refreshProfile();
+        await refreshProfile();
       }
-      showAlert(isFirstFreeFocus ? "Foco principal escolhido e ativado!" : "Foco ativado com sucesso!", "success");
+      toast.success(isFirstFreeFocus ? "Foco principal escolhido e ativado!" : "Foco ativado com sucesso!");
+      return true;
     } catch (err: any) {
-      showAlert(err.message || "Erro ao ativar foco.");
-      throw err;
+      showAlert(err?.message || "Erro ao ativar foco.");
+      return false;
     } finally {
       setUnlocking(false);
     }
   };
 
-  const handleUnlockAllFocuses = async (allFocusIds: string[], houseNum: number) => {
-    if (!user || !profile || !consultation || unlocking) return;
+  const handleUnlockAllFocuses = async (allFocusIds: string[], houseNum: number): Promise<boolean> => {
+    if (!user || !profile || !consultation || unlocking) return false;
 
-    const requiredCredits = getCost("cost_all_focuses", 3);
+    const currentGoalHouse = getConsultationGoalHouse(consultation);
+    const intendedFocusForHouse = getHouseIntendedFocusId(consultation.intent, houseNum, currentGoalHouse);
+    const existingHouseFocuses = consultation.result?.unlocked_focuses?.[String(houseNum)] || [];
+    const targetIds = allFocusIds.length > 0 ? allFocusIds : FOCUS_AREA_METADATA.map((f) => f.id);
+    const openFocusSet = new Set([
+      ...existingHouseFocuses,
+      ...(intendedFocusForHouse ? [intendedFocusForHouse] : []),
+    ]);
+    const remainingLockedCount = targetIds.filter((id) => !openFocusSet.has(id)).length;
+
+    if (remainingLockedCount <= 0) return true;
+
+    const effectiveFocusCap = !isHouseLockedByConsultation(consultation, houseNum)
+      ? Math.min(costAllFocuses, 2)
+      : costAllFocuses;
+    const requiredCredits = computeAllFocusesCost(remainingLockedCount, costFocus, effectiveFocusCap);
 
     if (!isAdmin && credits < requiredCredits) {
-      showAlert(`Você precisa de ${requiredCredits} créditos. Adquira mais no menu.`);
-      navigate("/credits");
-      throw new Error("Sem créditos");
+      showAlert("Ative o Pacote Expansão para liberar a Casa escolhida com todos os Focos desbloqueados.");
+      navigate(`/credits?pkg=3&returnTo=${encodeURIComponent(`/dashboard?id=${consultation.id}`)}`);
+      return false;
     }
 
     setUnlocking(true);
@@ -274,24 +295,29 @@ const Dashboard = () => {
       }
 
       const currentResult = consultation.result || {};
-      const currentUnlockedFocuses = currentResult.unlocked_focuses || {};
-      currentUnlockedFocuses[String(houseNum)] = allFocusIds;
-      
+      const currentUnlockedFocuses = { ...(currentResult.unlocked_focuses || {}) };
+      currentUnlockedFocuses[String(houseNum)] = Array.from(
+        new Set([...targetIds, ...(intendedFocusForHouse ? [intendedFocusForHouse] : [])])
+      );
+
       const newResult = { ...currentResult, unlocked_focuses: currentUnlockedFocuses };
-      
+
       const { error: updateErr } = await supabase
         .from("consultations")
-        .update({ result: newResult })
+        .update({ result: newResult as any })
         .eq("id", consultation.id);
-        
+
       if (updateErr) throw new Error("Erro ao salvar desbloqueio.");
-      
-      setConsultation(prev => prev ? { ...prev, result: newResult } : null);
-      await refreshProfile();
-      showAlert("Todos os focos desta Casa foram ativados!", "success");
+
+      setConsultation((prev) => (prev ? { ...prev, result: newResult } : null));
+      if (!isAdmin) {
+        await refreshProfile();
+      }
+      toast.success("Todos os focos desta Casa foram ativados!");
+      return true;
     } catch (err: any) {
-      showAlert(err.message || "Erro ao desbloquear.");
-      throw err;
+      showAlert(err?.message || "Erro ao desbloquear.");
+      return false;
     } finally {
       setUnlocking(false);
     }
@@ -307,70 +333,137 @@ const Dashboard = () => {
     return consultation.result.results[String(houseNum)] || null;
   };
 
-  const handleUnlock = async (targetHouse: number) => {
-    if (!user || !profile || !consultation || unlocking) return;
+  const handleUnlock = async (targetHouse: number): Promise<boolean> => {
+    if (!user || !profile || !consultation || unlocking) return false;
 
     const isUnlockAll = targetHouse === 0;
-    const currentUnlockedCount = Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).filter(
-      (h) => !isHouseLockedByConsultation(consultation, h)
-    ).length;
-    const upgradeToFullCost = Math.max(1, getCost("cost_full_map", 7) - currentUnlockedCount);
-    const requiredCredits = isUnlockAll ? upgradeToFullCost : getCost("cost_house_1", 1);
+    const currentUnlockedCount = getUnlockedHousesList(consultation).length;
+    const upgradeToFullCost = computeRemainingFullMapCost(currentUnlockedCount, costFull, costHouse);
+    const requiredCredits = isUnlockAll ? upgradeToFullCost : costHouse;
+
+    if (!isUnlockAll && !isHouseLockedByConsultation(consultation, targetHouse)) {
+      setSelectedHouse(targetHouse);
+      showAlert("Esta casa já está desbloqueada.");
+      return true;
+    }
 
     if (!isAdmin && credits < requiredCredits) {
       showAlert(`Você precisa de ${requiredCredits} crédito${requiredCredits > 1 ? "s" : ""} para esta liberação.`);
-      navigate(isUnlockAll ? "/credits?pkg=full" : "/credits");
-      return;
-    }
-
-    if (!isUnlockAll && !isHouseLockedByConsultation(consultation, targetHouse)) {
-      showAlert("Esta casa já está desbloqueada.");
-      return;
+      const ret = encodeURIComponent(`/dashboard?id=${consultation.id}`);
+      navigate(isUnlockAll ? `/credits?pkg=full&returnTo=${ret}` : `/credits?pkg=1&returnTo=${ret}`);
+      return false;
     }
 
     setUnlocking(true);
 
     try {
       if (isUnlockAll) {
-        if (!isAdmin) {
-          const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
-            p_amount: requiredCredits,
-            p_description: "Desbloqueio do Mapa Completo (12 Casas)",
-            p_type: "cost_full_map",
-          });
-          if (chargeErr || !chargeSuccess) {
-            throw new Error(chargeErr?.message || "Erro ao debitar créditos do Mapa Completo.");
+        const allTwelve = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        const fullFocusesMap = buildFullMapUnlockedFocuses();
+        const { error: fullRpcError } = await supabase.rpc("unlock_full_map_v1", {
+          p_consultation_id: consultation.id,
+        });
+
+        if (fullRpcError) {
+          const msg = String(fullRpcError.message || "");
+          const code = String((fullRpcError as { code?: string }).code || "");
+          const isMissingRpc =
+            code === "42883" ||
+            code === "PGRST202" ||
+            msg.includes("Could not find the function") ||
+            msg.includes("does not exist");
+
+          if (!isMissingRpc) {
+            throw fullRpcError;
+          }
+
+          // Graceful client fallback while remote DB awaits unlock_full_map_v1 migration
+          if (!isAdmin) {
+            const { data: chargeSuccess, error: chargeErr } = await supabase.rpc("charge_credits", {
+              p_amount: requiredCredits,
+              p_description: "Desbloqueio do Mapa Completo (12 Casas + Todos os Focos)",
+              p_type: "cost_full_map",
+            });
+            if (chargeErr || !chargeSuccess) {
+              throw new Error(chargeErr?.message || "Erro ao debitar créditos do Mapa Completo.");
+            }
+          }
+
+          const currentResult = (consultation.result || {}) as Record<string, any>;
+          const newResult = {
+            ...currentResult,
+            full_map_unlocked: true,
+            all_focuses_unlocked: true,
+            unlocked_houses_list: allTwelve,
+            unlocked_focuses: fullFocusesMap,
+          };
+
+          const { error: updateErr } = await supabase
+            .from("consultations")
+            .update({ result: newResult as any })
+            .eq("id", consultation.id);
+
+          if (updateErr) throw updateErr;
+
+          setConsultation((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  houses_unlocked: 12,
+                  unlocked_houses: allTwelve,
+                  result: newResult as ApiResult,
+                }
+              : null
+          );
+        } else {
+          const { data: refreshedConsultation } = await supabase
+            .from("consultations")
+            .select("*")
+            .eq("id", consultation.id)
+            .single();
+
+          const baseRefreshedResult = ((refreshedConsultation as any)?.result || consultation.result || {}) as Record<string, any>;
+          const mergedResult = {
+            ...baseRefreshedResult,
+            full_map_unlocked: true,
+            all_focuses_unlocked: true,
+            unlocked_houses_list: allTwelve,
+            unlocked_focuses: fullFocusesMap,
+          };
+
+          if (!(baseRefreshedResult as any)?.all_focuses_unlocked) {
+            await supabase
+              .from("consultations")
+              .update({ result: mergedResult as any })
+              .eq("id", consultation.id);
+          }
+
+          if (refreshedConsultation) {
+            setConsultation({
+              ...(refreshedConsultation as unknown as ConsultationRow),
+              houses_unlocked: 12,
+              unlocked_houses: allTwelve,
+              result: mergedResult as ApiResult,
+            });
+          } else {
+            setConsultation((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    houses_unlocked: 12,
+                    unlocked_houses: allTwelve,
+                    result: mergedResult as ApiResult,
+                  }
+                : null
+            );
           }
         }
 
-        const allTwelve = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-        const currentResult = (consultation.result || {}) as Record<string, any>;
-        const newResult = {
-          ...currentResult,
-          full_map_unlocked: true,
-          unlocked_houses_list: allTwelve,
-        };
-
-        const { error: updateErr } = await supabase
-          .from("consultations")
-          .update({ result: newResult })
-          .eq("id", consultation.id);
-
-        if (updateErr) throw updateErr;
-
-        setConsultation((prev) =>
-          prev
-            ? {
-                ...prev,
-                houses_unlocked: 12,
-                unlocked_houses: allTwelve,
-                result: newResult as any,
-              }
-            : null
-        );
-        await refreshProfile();
-        showAlert("Mapa Completo (12 Casas) desbloqueado com sucesso!", "success");
-        document.getElementById("visao-360")?.scrollIntoView({ behavior: "smooth" });
+        if (!isAdmin) {
+          await refreshProfile();
+        }
+        toast.success("Mapa Completo desbloqueado! Todas as 12 Casas + Todos os Focos estão livres.");
+        return true;
       } else {
         const { error: rpcError } = await supabase.rpc("unlock_consultation_houses", {
           p_consultation_id: consultation.id,
@@ -387,14 +480,18 @@ const Dashboard = () => {
 
         if (fetchError) throw fetchError;
 
-        setConsultation(refreshedConsultation as ConsultationRow);
-        await refreshProfile();
-        showAlert(`Casa ${targetHouse} desbloqueada com sucesso.`);
+        setConsultation(refreshedConsultation as unknown as ConsultationRow);
+        if (!isAdmin) {
+          await refreshProfile();
+        }
+        toast.success(`Casa ${targetHouse} desbloqueada com sucesso.`);
         setSelectedHouse(targetHouse);
+        return true;
       }
     } catch (error: any) {
       console.error(error);
-      showAlert(error.message || "Falha ao desbloquear. Tente novamente.");
+      showAlert(error?.message || "Falha ao desbloquear. Tente novamente.");
+      return false;
     } finally {
       setUnlocking(false);
     }
@@ -438,120 +535,133 @@ const Dashboard = () => {
 
   const goalHouse = getConsultationGoalHouse(consultation);
   const currentMode = (consultation.mode || "futuro") as "passado" | "presente" | "futuro";
-  const actualUnlockedCount = Array.from({ length: TOTAL_HOUSES }, (_, i) => i + 1).filter(
-    (h) => !isHouseLockedByConsultation(consultation, h)
-  ).length;
-  const remainingFullMapCost = Math.max(1, getCost("cost_full_map", 7) - actualUnlockedCount);
-  const lockedCount = Math.max(0, TOTAL_HOUSES - actualUnlockedCount);
+  const unlockedHousesList = getUnlockedHousesList(consultation);
+  const actualUnlockedCount = unlockedHousesList.length;
+  const remainingFullMapCost = computeRemainingFullMapCost(actualUnlockedCount, costFull, costHouse);
   const credits = profile?.credits ?? 0;
-
 
   const oracleText = consultation.result?.oraculo
     || (goalHouse
       ? (currentMode === "passado" ? fallbackOraclesPast[goalHouse] : fallbackOraclesFuture[goalHouse])
       : null);
 
-  // Unlock tier options
-  const unlockOptions = [];
-  if (lockedCount > 0) {
-    if (lockedCount >= 1) unlockOptions.push({ amount: 1, label: "+1 Casa", cost: 1 });
-    if (lockedCount >= 3) unlockOptions.push({ amount: 3, label: "+3 Casas", cost: 3 });
-    if (lockedCount > 3) unlockOptions.push({ amount: lockedCount, label: `Todas (${lockedCount})`, cost: remainingFullMapCost });
-    else if (lockedCount === 3) {
-      // already have +3 option, skip "todas"
-    } else if (lockedCount === 2) {
-      unlockOptions.push({ amount: 2, label: "Todas (2)", cost: 2 });
-    }
-  }
-
   // Se existe uma casa selecionada, o componente V3 (DestinyResults) assume 100% da tela.
-  if (selectedHouse) {
+  if (selectedHouse && cityDatabase[selectedHouse]) {
     const house = cityDatabase[selectedHouse];
     const result = getHouseResult(selectedHouse);
-    if (house && result) {
-      const toArr = (v: any): CityOption[] => {
-        if (!v) return [];
-        if (Array.isArray(v)) return v.filter(Boolean);
-        return [v];
-      };
-      const htArr = toArr(result.options?.highticket);
-      const acArr = toArr(result.options?.acessivel);
-      const naArr = toArr(result.options?.nacional);
-      const masterCity = result.city || htArr[0] || acArr[0] || naArr[0] || null;
-      const seen = new Set<string>();
-      const dedup = (arr: CityOption[]): CityOption[] => arr.filter(c => {
-        if (!c) return false;
-        const k = `${c.city}|${c.country}`;
-        if (seen.has(k)) return false;
-        seen.add(k);
-        return true;
-      });
-      // CRITICAL FIX: DO NOT add masterCity to 'seen' beforehand!
-      // If we do, the deduplicator strips the user's searched city from the arrays,
-      // causing the Hero banner to fallback to a random extra destination (e.g., Salvador).
-      const highticket: CityOption[] = dedup(htArr);
-      const acessivel: CityOption[] = dedup(acArr);
-      const nacional: CityOption[] = dedup(naArr);
+    const toArr = (v: any): CityOption[] => {
+      if (!v) return [];
+      if (Array.isArray(v)) return v.filter(Boolean);
+      return [v];
+    };
+    const htArr = toArr(result?.options?.highticket);
+    const acArr = toArr(result?.options?.acessivel);
+    const naArr = toArr(result?.options?.nacional);
+    const seen = new Set<string>();
+    const dedup = (arr: CityOption[]): CityOption[] => arr.filter((c) => {
+      if (!c) return false;
+      const k = `${c.city}|${c.country}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+    const highticket: CityOption[] = dedup(htArr);
+    const acessivel: CityOption[] = dedup(acArr);
+    const nacional: CityOption[] = dedup(naArr);
 
-      return (
-        <>
-          <DestinyResults
-            birthDate={consultation.birthdate}
-            birthTime={(consultation as any).birthtime}
-            userName={consultation.name || profile?.display_name || undefined}
-            originName={consultation.origin || undefined}
-            targetYear={consultation.year}
-            returnTimeUtc={(consultation.result as any)?.return_time_utc || undefined}
-            returnDate={(consultation.result as any)?.return_date || undefined}
-            sunSign={(consultation.result as any)?.sun_sign || undefined}
-            ascendantSign={(consultation.result as any)?.ascendant || undefined}
-            birthPlace={consultation.birth_place}
-            intent={consultation.intent}
-            house={selectedHouse}
-            houseName={house.label}
-            houseData={house}
-            cities={{ highticket, acessivel, nacional }}
-            allResults={consultation.result?.results}
-            unlockedFocuses={consultation.result?.unlocked_focuses}
-            userCredits={credits}
-            isAuthenticated={!!user}
-            consultationId={consultation.id}
-            autoUnlocked={true}
-            onUnlock={(n) => handleUnlock(n)}
-            onUnlockFocus={(fid, hNum) => handleUnlockFocus(fid, hNum)}
-            onUnlockAllFocuses={(allIds, hNum) => handleUnlockAllFocuses(allIds, hNum)}
-            focusCostLabel={`${getCost("cost_focus", 1)} Crédito${getCost("cost_focus", 1) > 1 ? "s" : ""}`}
-            allFocusesCostLabel={`${getCost("cost_all_focuses", 3)} Créditos`}
-            embedded={false}
-            isHouseUnlocked={isHouseLocked ? (h) => !isHouseLocked(h) : undefined}
-            onSelectHouse={(h) => setSelectedHouse(h)}
-            mode={currentMode}
-            unlockedCount={actualUnlockedCount}
-            fullMapCost={remainingFullMapCost}
-            houseCost={getCost("cost_house_1", 1)}
-            focusCost={getCost("cost_focus", 1)}
-            allFocusesCost={getCost("cost_all_focuses", 3)}
-          />
-          <ConfirmCreditAction
-            fullMapCost={remainingFullMapCost}
-            houseCost={getCost("cost_house_1", 1)}
-            open={pendingUnlock !== null}
-            onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}
-            onConfirm={() => {
-              const n = pendingUnlock;
-              setPendingUnlock(null);
-              if (n) handleUnlock(n);
-            }}
-            title={pendingUnlock ? `Desbloquear Casa ${pendingUnlock}` : ""}
-            description={pendingUnlock ? `Você está prestes a desbloquear a Casa ${pendingUnlock} desta consulta.` : undefined}
-            credits={getCost("cost_house_1", 1)}
-            currentBalance={credits}
-            confirmLabel="Desbloquear agora"
-            loading={unlocking}
-          />
-        </>
-      );
-    }
+    const houseFocuses = consultation.result?.unlocked_focuses?.[String(selectedHouse)] || [];
+    const intendedFocusForHouse = getHouseIntendedFocusId(consultation.intent, selectedHouse, goalHouse);
+    const openFocusCount = new Set([
+      ...houseFocuses,
+      ...(intendedFocusForHouse ? [intendedFocusForHouse] : []),
+    ]).size;
+    const lockedFocusCount = Math.max(0, FOCUS_AREA_METADATA.length - openFocusCount);
+    const effectiveFocusCap = !isHouseLocked(selectedHouse) ? Math.min(costAllFocuses, 2) : costAllFocuses;
+    const smartAllFocusesCost = computeAllFocusesCost(lockedFocusCount, costFocus, effectiveFocusCap);
+
+    const canApplyFullMapPass = actualUnlockedCount < 12 && credits >= remainingFullMapCost;
+    const canApplyExpansaoPass = !canApplyFullMapPass && lockedFocusCount > 0 && credits >= smartAllFocusesCost && smartAllFocusesCost >= 2;
+
+    return (
+      <>
+        {(canApplyFullMapPass || canApplyExpansaoPass) && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] w-[calc(100%-2rem)] max-w-xl pointer-events-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-[#071122]/95 border border-[#C9A227]/60 backdrop-blur-xl shadow-[0_16px_45px_rgba(0,0,0,0.75)]">
+              <div className="flex items-center gap-3 text-left">
+                <div className="w-9 h-9 rounded-xl bg-[#C9A227]/20 border border-[#C9A227]/40 flex items-center justify-center shrink-0">
+                  <Crown className="w-4 h-4 text-[#F5DE98]" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#F5DE98]">
+                    {canApplyFullMapPass ? "Passe Mapa Completo Disponível" : "Passe Expansão Disponível"}
+                  </p>
+                  <p className="text-xs text-white/75">
+                    {canApplyFullMapPass
+                      ? "Libere todas as 12 Casas + Todos os Focos nesta consulta com 1 toque."
+                      : `Libere todos os 8 Focos da Casa ${selectedHouse} nesta consulta.`}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={unlocking}
+                onClick={() =>
+                  canApplyFullMapPass
+                    ? handleUnlock(0)
+                    : handleUnlockAllFocuses(FOCUS_AREA_METADATA.map((f) => f.id), selectedHouse)
+                }
+                className="w-full sm:w-auto shrink-0 px-4 py-2.5 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-[11px] uppercase tracking-[0.16em] transition-all active:scale-95"
+              >
+                {unlocking ? "Liberando..." : "Ativar Agora"}
+              </button>
+            </div>
+          </div>
+        )}
+        <DestinyResults
+          birthDate={consultation.birthdate}
+          birthTime={(consultation as any).birthtime}
+          userName={consultation.name || profile?.display_name || undefined}
+          originName={consultation.origin || undefined}
+          targetYear={consultation.year}
+          returnTimeUtc={(consultation.result as any)?.return_time_utc || undefined}
+          returnDate={(consultation.result as any)?.return_date || undefined}
+          sunSign={(consultation.result as any)?.sun_sign || undefined}
+          ascendantSign={(consultation.result as any)?.ascendant || undefined}
+          birthPlace={consultation.birth_place}
+          intent={consultation.intent}
+          goalHouse={goalHouse}
+          house={selectedHouse}
+          houseName={house.label}
+          houseData={house}
+          cities={{ highticket, acessivel, nacional }}
+          allResults={consultation.result?.results}
+          unlockedFocuses={consultation.result?.unlocked_focuses}
+          unlockedHousesList={unlockedHousesList}
+          userCredits={credits}
+          isAdmin={isAdmin}
+          isAuthenticated={!!user}
+          consultationId={consultation.id}
+          autoUnlocked={true}
+          onUnlock={(n) => handleUnlock(n)}
+          onUnlockFocus={(fid, hNum) => handleUnlockFocus(fid, hNum)}
+          onUnlockAllFocuses={(allIds, hNum) => handleUnlockAllFocuses(allIds, hNum)}
+          focusCostLabel={`${costFocus} Crédito${costFocus > 1 ? "s" : ""}`}
+          allFocusesCostLabel={`${smartAllFocusesCost} Crédito${smartAllFocusesCost > 1 ? "s" : ""}`}
+          embedded={false}
+          isHouseUnlocked={(h) => !isHouseLocked(h)}
+          onSelectHouse={(h) => setSelectedHouse(h)}
+          onNavigateCredits={(pkg) =>
+            navigate(`/credits?${pkg ? `pkg=${pkg}&` : ""}returnTo=${encodeURIComponent(`/dashboard?id=${consultation.id}`)}`)
+          }
+          mode={currentMode}
+          unlockedCount={actualUnlockedCount}
+          fullMapCost={remainingFullMapCost}
+          houseCost={costHouse}
+          focusCost={costFocus}
+          allFocusesCost={smartAllFocusesCost}
+        />
+      </>
+    );
   }
 
   return (
@@ -564,7 +674,10 @@ const Dashboard = () => {
           <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary transition-colors">
             ← Nova Consulta
           </button>
-          <button onClick={() => navigate("/credits")} className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors font-semibold">
+          <button
+            onClick={() => navigate(`/credits?returnTo=${encodeURIComponent(`/dashboard?id=${consultation.id}`)}`)}
+            className="text-xs uppercase tracking-widest text-primary hover:text-primary/80 transition-colors font-semibold"
+          >
             {credits} Créditos
           </button>
         </div>
@@ -663,26 +776,6 @@ const Dashboard = () => {
 
 
       </div>
-
-      <ConfirmCreditAction
-        open={pendingUnlock !== null}
-        onOpenChange={(o) => { if (!o) setPendingUnlock(null); }}
-        onConfirm={() => {
-          const n = pendingUnlock;
-          setPendingUnlock(null);
-          if (n) handleUnlock(n);
-        }}
-        title={`Desbloquear Casa ${pendingUnlock}`}
-        description={
-          pendingUnlock
-            ? `Você está prestes a desbloquear a Casa ${pendingUnlock} desta consulta.`
-            : undefined
-        }
-        credits={getCost("cost_house_1", 1)}
-        currentBalance={credits}
-        confirmLabel="Desbloquear agora"
-        loading={unlocking}
-      />
     </>
 
   );

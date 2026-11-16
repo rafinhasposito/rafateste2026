@@ -127,8 +127,8 @@ export default function AppleResultPrototype() {
   
   // DEBUG HELPER
   React.useEffect(() => {
-    const handleErr = (msg, url, line, col, error) => {
-      alert("RUNTIME ERROR: " + msg + " line: " + line);
+    const handleErr = (ev: ErrorEvent) => {
+      alert("RUNTIME ERROR: " + ev.message + " line: " + ev.lineno);
     };
     window.addEventListener("error", handleErr);
     return () => window.removeEventListener("error", handleErr);

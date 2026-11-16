@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BackButton } from '@/components/ui/BackButton';
 import { motion } from "framer-motion";
-import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft, Compass, Sparkles } from "lucide-react";
+import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft, Compass, Sparkles, Ticket } from "lucide-react";
 import StarryBackground from "@/components/StarryBackground";
 import PageLoader from "@/components/PageLoader";
 
 import CityAutocomplete from "@/components/CityAutocomplete";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeBirthTime } from "@/lib/astro";
 import { toast } from "sonner";
 
 interface ConsultRow {
@@ -22,6 +24,7 @@ interface ConsultRow {
 
 const Profile = () => {
   const { user, profile, loading, refreshProfile, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnTo = searchParams.get("returnTo");
@@ -72,7 +75,7 @@ const Profile = () => {
     const { error } = await supabase.from("profiles").update({
       full_name: fullName.trim() || null,
       birth_date: birthDate || null,
-      birth_time: birthTime || null,
+      birth_time: birthTime ? normalizeBirthTime(birthTime) : null,
       birth_city: birthCity.trim() || null,
       birth_country: country,
       birth_lat: birthCoords?.lat ?? null,
@@ -177,6 +180,19 @@ const Profile = () => {
                 </div>
                 <span className="text-[#C9A227] text-xs">→</span>
               </button>
+
+              {isAdmin && (
+                <button
+                  onClick={() => navigate("/admin?tab=coupons")}
+                  className="w-full py-3 px-3.5 bg-[#C9A227]/20 hover:bg-[#C9A227]/30 border border-[#C9A227]/50 rounded-xl text-[#FFF3D1] font-semibold transition-all text-xs font-ps-ui flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Ticket className="w-4 h-4 text-[#F5DE98]" />
+                    <span>Painel Admin • Cupons & Mídia Kit</span>
+                  </div>
+                  <span className="text-[#F5DE98] text-xs">→</span>
+                </button>
+              )}
             </div>
 
             <div className="pt-4 border-t border-white/[0.08]">

@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { MobileOnboarding } from "@/components/mobile/onboarding/MobileOnboarding";
+import MobileOnboarding from "@/components/mobile/onboarding/MobileOnboarding";
 
 /**
  * [SAFE_TO_DEPRECATE]

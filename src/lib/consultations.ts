@@ -1,5 +1,35 @@
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  ALL_TWELVE_HOUSES,
+  buildFullMapUnlockedFocuses,
+  buildHouseAllFocuses,
+  type ConsultationUnlockTier,
+} from "@/lib/consultationUnlocks";
+
+export const enrichResultForTier = (
+  baseResult: Record<string, any>,
+  tier: ConsultationUnlockTier,
+  targetHouse: number
+): Record<string, any> => {
+  if (tier === "full_map") {
+    return {
+      ...baseResult,
+      full_map_unlocked: true,
+      all_focuses_unlocked: true,
+      unlocked_houses_list: ALL_TWELVE_HOUSES,
+      unlocked_focuses: buildFullMapUnlockedFocuses(),
+    };
+  }
+  if (tier === "expansao") {
+    return {
+      ...baseResult,
+      unlocked_houses_list: [targetHouse],
+      unlocked_focuses: buildHouseAllFocuses(baseResult.unlocked_focuses, targetHouse),
+    };
+  }
+  return baseResult;
+};
 
 export interface SaveConsultationArgs {
   id?: string;

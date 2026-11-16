@@ -29,7 +29,7 @@ export default function NorthStarFlow() {
     setCurrentState('ALINHAMENTO');
   };
 
-  const easeInOut = [0.4, 0, 0.2, 1];
+  const easeInOut = [0.4, 0, 0.2, 1] as const;
 
   return (
     <div className="fixed inset-0 w-full h-full bg-[#000000] font-ps-ui overflow-hidden flex flex-col items-center justify-center text-[#F2F8FB] selection:bg-white/20">

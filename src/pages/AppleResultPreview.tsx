@@ -298,13 +298,13 @@ export default function AppleResultPreview() {
   const [areas, setAreas] = useState(LIFE_AREAS);
   const [activeDnaTab, setActiveDnaTab] = useState('essencia');
   const [openTimelinePhase, setOpenTimelinePhase] = useState<number | null>(0);
-  const sortedAreas = [...areas].sort((a,b) => b.score - a.score);
-  const currentActiveData = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
+  const sortedAreas: any[] = [...areas].sort((a,b) => b.score - a.score);
+  const currentActiveData: any = sortedAreas.find(a => a.id === (hoveredArea || sortedAreas[0].id));
   
   // DEBUG HELPER
   React.useEffect(() => {
-    const handleErr = (msg, url, line, col, error) => {
-      alert("RUNTIME ERROR: " + msg + " line: " + line);
+    const handleErr = (ev: ErrorEvent) => {
+      alert("RUNTIME ERROR: " + ev.message + " line: " + ev.lineno);
     };
     window.addEventListener("error", handleErr);
     return () => window.removeEventListener("error", handleErr);

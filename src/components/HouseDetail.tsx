@@ -27,6 +27,7 @@ interface HouseDetailProps {
   isGoal?: boolean;
   originCity?: string | null;
   onClose: () => void;
+  searchPath?: string | null;
 }
 
 import { MapPin, CheckCircle2, AlertTriangle, Lightbulb } from "lucide-react";

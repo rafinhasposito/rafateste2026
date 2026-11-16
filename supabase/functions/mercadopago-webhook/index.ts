@@ -79,11 +79,27 @@ serve(async (req) => {
       return new Response("Missing external reference", { status: 200 });
     }
 
-    // 2. Safely Process Payment (Idempotent via RPC)
+    // 2. Safely Process Payment (Idempotent via RPC) after verifying order amount
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    const { data: orderRow, error: orderFetchError } = await supabaseAdmin
+      .from('credit_orders')
+      .select('id, amount')
+      .eq('id', orderId)
+      .single();
+
+    if (orderFetchError || !orderRow) {
+      console.error(`[mp-webhook] Order ${orderId} not found in credit_orders:`, orderFetchError);
+      return new Response("Order not found", { status: 200 });
+    }
+
+    if (Number(paymentData.transaction_amount || 0) < Number(orderRow.amount) - 0.01) {
+      console.error(`[mp-webhook] Amount mismatch for order ${orderId}: expected ${orderRow.amount}, got ${paymentData.transaction_amount}`);
+      return new Response("Amount mismatch", { status: 400 });
+    }
 
     const { data: processed, error: rpcError } = await supabaseAdmin.rpc('process_mercadopago_payment', {
       p_order_id: orderId,

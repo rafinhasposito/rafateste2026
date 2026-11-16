@@ -300,15 +300,15 @@ const LIFE_AREAS = [
 ];
 
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: any; info: any }> {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null, info: null };
   }
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: any) {
     return { hasError: true, error };
   }
-  componentDidCatch(error, info) {
+  componentDidCatch(error: any, info: any) {
     this.setState({ error, info });
   }
   render() {
@@ -416,8 +416,8 @@ function HouseResult() {
   
   // DEBUG HELPER
   React.useEffect(() => {
-    const handleErr = (msg, url, line, col, error) => {
-      alert("RUNTIME ERROR: " + msg + " line: " + line);
+    const handleErr = (ev: ErrorEvent) => {
+      alert("RUNTIME ERROR: " + ev.message + " line: " + ev.lineno);
     };
     window.addEventListener("error", handleErr);
     return () => window.removeEventListener("error", handleErr);

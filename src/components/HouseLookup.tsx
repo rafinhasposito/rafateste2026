@@ -3,12 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Crown, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cityDatabase } from "@/data/houses";
-import { API_URL } from "@/lib/astro";
+import { API_URL, normalizeBirthTime } from "@/lib/astro";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { chargeConsultation } from "@/lib/credits";
-import { saveConsultation } from "@/lib/consultations";
+import { saveConsultation, chargeAndSaveConsultationV1, enrichResultForTier } from "@/lib/consultations";
+import {
+  ALL_TWELVE_HOUSES,
+  detectDefaultConsultationTier,
+  getTierRequiredCredits,
+  type ConsultationUnlockTier,
+} from "@/lib/consultationUnlocks";
 import GoalCards from "@/components/GoalCards";
 import DestinyResults from "@/components/DestinyResults";
 import { PremiumButton } from "@/components/shell";
@@ -69,7 +75,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
     // Armazena no sessionStorage (com fallback para o perfil salvo) para o Trailer processar a API
     const safeName = name || profile?.full_name || "";
     const safeDate = birthdate || profile?.birth_date || "";
-    const safeTime = birthtime || (profile?.birth_time ? profile.birth_time.slice(0, 5) : "");
+    const safeTime = normalizeBirthTime(birthtime || (profile?.birth_time ? profile.birth_time.slice(0, 5) : ""));
     const safePlace = birthPlace || profile?.birth_city || "";
 
     if (safeName) sessionStorage.setItem('ps_natal_name', safeName);
@@ -79,60 +85,39 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
     if (year) sessionStorage.setItem('ps_natal_year', year.toString());
     if (mode) sessionStorage.setItem('ps_natal_mode', mode);
 
-    navigate(`/app/trailer?house=${houseNum}&mode=${mode}`);
+    navigate(`/app/trailer?house=${houseNum}&mode=${encodeURIComponent(mode)}&year=${encodeURIComponent(year)}`);
   };
 
   const handleLookup = async (unlockFullMap: boolean = false) => {
     const target = overrideTargetHouse !== undefined ? overrideTargetHouse : selectedHouse;
     const safeName = name || profile?.full_name || "";
     const safeDate = birthdate || profile?.birth_date || "";
-    const safeTime = birthtime || (profile?.birth_time ? profile.birth_time.slice(0, 5) : "");
+    const safeTime = normalizeBirthTime(birthtime || (profile?.birth_time ? profile.birth_time.slice(0, 5) : ""));
     const safePlace = birthPlace || profile?.birth_city || "";
+    const returnUrl = `/?mode=${encodeURIComponent(mode)}&path=casa`;
     
-    if (target === undefined) { showAlert("Selecione uma opção."); return; }
+    if (target === undefined || target === null) { showAlert("Selecione uma opção."); return; }
     if (!safeName || !safeDate || !safeTime || !safePlace) { showAlert("Preencha seus dados de nascimento antes de continuar."); return; }
-    if (safeTime === "00:00" || safeTime === "00:00:00") {
-      showAlert("A hora de nascimento '00:00' não é processável. Por favor, informe sua hora aproximada ou real de nascimento (ex: 07:30, 14:15).");
+    if (!user) {
+      showAlert("Entre na sua conta para realizar a consulta.");
+      navigate(`/auth?returnTo=${encodeURIComponent(returnUrl)}`);
       return;
     }
-    if (!user) { showAlert("Entre na sua conta para realizar a consulta."); navigate("/auth"); return; }
 
-    const requiredCredits = unlockFullMap ? 7 : 1;
-    if (!isAdmin && (profile?.credits ?? 0) < requiredCredits) {
+    const userCredits = profile?.credits ?? 0;
+    const defaultTier = detectDefaultConsultationTier(userCredits);
+    const tier: ConsultationUnlockTier = unlockFullMap ? "full_map" : defaultTier;
+    const requiredCredits = getTierRequiredCredits(tier);
+    if (!isAdmin && userCredits < requiredCredits) {
       if (unlockFullMap) {
-        showAlert("Ative o Pacote Mapa Completo (7 Créditos) para desbloquear todas as 12 Casas de uma vez!");
-        navigate("/credits?pkg=full");
+        showAlert("Ative o Passe Mapa Completo para desbloquear todas as 12 Casas + Todos os Focos de uma vez!");
+        navigate(`/credits?pkg=full&returnTo=${encodeURIComponent(returnUrl)}`);
       } else {
-        showAlert("Você não possui créditos suficientes. Adquira seu crédito avulso ou o Mapa Completo.");
-        navigate("/credits");
+        showAlert("Você não possui créditos suficientes. Adquira 1 Casa Avulsa, o Pacote Expansão ou o Mapa Completo.");
+        navigate(`/credits?pkg=1&returnTo=${encodeURIComponent(returnUrl)}`);
       }
       return;
     }
-
-    const houseData0 = target ? cityDatabase[target] : null;
-    const description = unlockFullMap
-      ? `Mapa Completo (12 Casas) — Casa Inicial ${target} (${houseData0?.label ?? ""}) em ${year}`
-      : target 
-        ? `Consulta por Intenção — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`
-        : `Consulta Completa (12 Casas) em ${year}`;
-      
-    const charge = await chargeConsultation({
-      userId: user.id,
-      currentCredits: profile?.credits ?? 0,
-      isAdmin,
-      description,
-      amount: requiredCredits,
-    });
-    if (!charge.ok) {
-      if (charge.reason === "no_credits") {
-        showAlert("Você não possui créditos suficientes.");
-        navigate(unlockFullMap ? "/credits?pkg=full" : "/credits");
-      } else {
-        showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
-      }
-      return;
-    }
-    await refreshProfile();
 
     setLoadingState(true);
     setResult(null);
@@ -141,18 +126,27 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       const [ano, mes, dia] = safeDate.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
 
-      const response = await fetch(`${API_URL}/find_all_cities`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: safeName.trim(),
-          place_of_birth: safePlace.trim(),
-          dob: dataFormatada,
-          time: safeTime,
-          target_year: year,
-          alvoId: target,
-        }),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      let response: Response;
+      try {
+        response = await fetch(`${API_URL}/find_all_cities`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            name: safeName.trim(),
+            place_of_birth: safePlace.trim(),
+            dob: dataFormatada,
+            time: safeTime,
+            target_year: year,
+            alvoId: target,
+          }),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Erro na consulta.");
@@ -165,29 +159,80 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
         }
       }
 
-      const allTwelveHouses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-      const consultationId = await saveConsultation({
-        userId: user.id,
-        name: safeName.trim(),
-        birthdate: safeDate,
-        birthtime: safeTime,
-        birth_place: safePlace.trim(),
-        year,
-        mode,
-        goal: target,
-        houses_unlocked: unlockFullMap ? 12 : 1,
-        unlocked_houses: unlockFullMap ? allTwelveHouses : target ? [target] : [],
-        result: {
+      const resultPayload = enrichResultForTier(
+        {
           results: allResults,
           house: target,
           return_time_utc: data?.return_time_utc || null,
           return_date: data?.return_date || null,
           sun_sign: data?.sun_sign || null,
           ascendant: data?.ascendant || null,
-          ...(unlockFullMap ? { full_map_unlocked: true, unlocked_houses_list: allTwelveHouses } : {}),
         },
-      }) ?? undefined;
+        tier,
+        target
+      );
+
+      let consultationId: string | undefined;
+
+      if (!isAdmin && tier === "single") {
+        consultationId = (await chargeAndSaveConsultationV1({
+          id: crypto.randomUUID(),
+          userId: user.id,
+          name: safeName.trim(),
+          birthdate: safeDate,
+          birthtime: safeTime,
+          birth_place: safePlace.trim(),
+          year,
+          mode,
+          goal: target,
+          result: resultPayload,
+        })) ?? undefined;
+
+        if (!consultationId) {
+          throw new Error("Não foi possível debitar o crédito e salvar sua consulta.");
+        }
+        await refreshProfile();
+      } else {
+        const houseData0 = target ? cityDatabase[target] : null;
+        const description =
+          tier === "full_map"
+            ? `Passe Mapa Completo (12 Casas + Todos os Focos) — Casa Inicial ${target} (${houseData0?.label ?? ""}) em ${year}`
+            : tier === "expansao"
+            ? `Passe Expansão (Casa ${target} + Todos os Focos) em ${year}`
+            : `Consulta por Casa — Casa ${target} (${houseData0?.label ?? ""}) em ${year}`;
+
+        const charge = await chargeConsultation({
+          userId: user.id,
+          currentCredits: profile?.credits ?? 0,
+          isAdmin,
+          description,
+          amount: requiredCredits,
+        });
+        if (!charge.ok) {
+          if (charge.reason === "no_credits") {
+            showAlert("Você não possui créditos suficientes.");
+            navigate(`/credits?pkg=${tier === "full_map" ? "full" : tier === "expansao" ? "3" : "1"}&returnTo=${encodeURIComponent(returnUrl)}`);
+          } else {
+            showAlert("Erro de conexão ao processar seus créditos. Tente novamente.");
+          }
+          return;
+        }
+        await refreshProfile();
+
+        consultationId = (await saveConsultation({
+          userId: user.id,
+          name: safeName.trim(),
+          birthdate: safeDate,
+          birthtime: safeTime,
+          birth_place: safePlace.trim(),
+          year,
+          mode,
+          goal: target,
+          houses_unlocked: tier === "full_map" ? 12 : 1,
+          unlocked_houses: tier === "full_map" ? ALL_TWELVE_HOUSES : [target],
+          result: resultPayload,
+        })) ?? undefined;
+      }
 
       // Transição suave para contemplação cósmica
       await new Promise((resolve) => setTimeout(resolve, 600));
@@ -196,7 +241,11 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
       if (target) onHouseSelected?.(target);
     } catch (error) {
       const err = error as Error;
-      showAlert("Falha na consulta: " + err.message);
+      if (err.name === "AbortError") {
+        showAlert("O servidor demorou muito para responder. Nenhum crédito foi descontado — tente novamente.");
+      } else {
+        showAlert("Falha na consulta: " + err.message);
+      }
     } finally {
       setLoadingState(false);
     }
@@ -267,7 +316,7 @@ const HouseLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHou
                   <Crown className="w-3.5 h-3.5 text-[#E5C158]" />
                   <span>Desbloquear Mapa Completo</span>
                   <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold">
-                    12 Casas • 7 Créd.
+                    12 Casas + Todos os Focos
                   </span>
                 </button>
               </div>

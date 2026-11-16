@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:mobile": "playwright test e2e/mobile-first-simulator.spec.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
