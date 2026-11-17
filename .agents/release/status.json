@@ -1,21 +1,26 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-04T07:42:00-03:00 — Corrigidos: (1) Remoção 100% de Nova Délhi (Nova Delhi / New Delhi) em house_scanner.py, HouseTrailerApp.tsx e AppleResultPreviewV3.tsx (substituída por Malé - Ilhas Maldivas); (2) Correção definitiva de 'Desconhecido' na Casa 11 (e qualquer casa estreita) via expansão de cobertura longitudinal em house_scanner.py + fallback de ponto exato Placidus + interpolação longitudinal legada via resolveHouseCity(num) no Hero e na Grade das 12 Casas em AppleResultPreviewV3.tsx; (3) Correção do erro 'Conexão Interrompida' ao consultar Por Área da Vida (remoção dos 12 vídeos autoPlay simultâneos em GoalCards.tsx, fallback de profile em HouseLookup/IntentLookup/HouseTrailerApp, remoção do ReferenceError de isAllHousesUnlocked e P.onUnlockFocus em AppleResultPreviewV3.tsx); (4) Unificação de simetria, respiro visual e vocabulário humano em Index.tsx, GoalCards.tsx, IntentLookup.tsx, HouseTrailerApp.tsx e AppleResultPreviewV3.tsx (eliminando o Hero duplicado e textos repetidos dos 3 pilares no Resultado).",
+  "last_verification": "2026-11-17T10:35:00-03:00 — Release cycle V1 concluído com SUCESSO: (1) Novos passes implementados e validados (1 Casa R$ 19,90, Expansão R$ 49,90, Mapa Completo R$ 99,90); (2) Sistema de cupons com geração CSPRNG, taxa limite anti-bruteforce (5 tentativas / 15 min), trava atômica de uso único no Supabase; (3) Mídia Kit de embarque para impressão A4 com QR Code vetorial SVG real; (4) QA Build Verde (29/29 testes Vitest, zero erros TypeScript, build de produção OK); (5) QA Funcional Verde (10 fluxos críticos aprovados); (6) QA Responsivo Verde (iPhone SE, iPhone 15/16 Pro, Galaxy S24, iPad e Desktop).",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br) + Render Python API (protocolo-solar-api.onrender.com) + Supabase Edge Functions (gvqdlsflrbctfiorimcl)",
   "deploy_instructions": {
     "step1": "Publicar Backend Python (protocolo-solar-api) em origin/main para atualizar o Render",
-    "step2": "Publicar Frontend React (solar-release-candidate) em github/main para atualizar protocolosolar.com.br via GitHub Actions"
+    "step2": "Publicar Frontend React (solar-release-candidate) em github/release/recovery-83ce832 para atualizar protocolosolar.com.br via GitHub Actions"
   },
   "notes": {
     "videos": "Todos os 46 vídeos de cidades e vídeos do Onboarding comprimidos abaixo de 4.5MB com +faststart, acompanhados de camada <img> pré-carregada em RAM que mantém a foto visível até o frame 1 do vídeo tocar.",
     "continents_engine": "Rotas Alternativas agrupadas dinamicamente por Continente (Américas, Europa, Ásia, África, Oceania) exibindo 100% apenas cidades matematicamente reais da Casa (sem fallback global).",
     "mercadopago": "Checkout Transparente 100% in-site (Pix QR Code + Copia e Cola + Cartão via Brick) ativo na Edge Function create-mercadopago-checkout.",
-    "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages."
+    "domain": "protocolosolar.com.br configurado com DNS no Registro.br e CNAME no GitHub Pages.",
+    "passes_pricing": "1 Casa = R$ 19,90; Expansão = R$ 49,90; Mapa Completo = R$ 99,90."
   },
   "blockers_open": [],
   "blockers_fixed": [
+    "Implementação do modelo de Passes & Desbloqueio (1 Casa R$ 19,90 / Expansão R$ 49,90 / Mapa Completo R$ 99,90) integrado a consulta, dashboard e checkout",
+    "Sistema de cupons para Mídia Kit no Admin com código CSPRNG, trava atômica de uso único e rate-limit anti-bruteforce",
+    "Mídia Kit editorial de presente em formato cartão de embarque A4 com QR Code vetorial SVG",
+    "Rota /resgatar com formulário seguro de resgate e feedback imediato de saldo",
     "Erradicação definitiva do rodapé dividido (split footer) com seta para baixo no canto esquerdo e barra de progresso no canto direito (#cue, .direction, .track, #bottomBar) em todos os arquivos de onboarding e prévias (01-abertura.html, 01-abertura-theo.html, abertura-com-voz.html, theo-e-ana.html, theo-e-ana-mobile.html, guia-pessoal-theo-pergunta.html), consolidando 100% da navegação em cliques discretos centrados e unificados",
     "Remoção 100% de Nova Délhi (Nova Delhi / New Delhi) em house_scanner.py, HouseTrailerApp.tsx e AppleResultPreviewV3.tsx",
     "Fim do 'Desconhecido' na Casa 11 (mesmo quando Nova York é a cidade titular): Adicionadas cidades reais nas faixas longitudinais oceânicas/asiáticas em house_scanner.py + fallback de ponto exato Placidus (get_house_superposition) + helper unificado resolveHouseCity(num) no Hero e na Grade de 12 Casas em AppleResultPreviewV3.tsx",
