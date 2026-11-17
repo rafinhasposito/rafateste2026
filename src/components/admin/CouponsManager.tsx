@@ -27,6 +27,12 @@ import {
   type CouponRewardType,
   type RedeemCouponRow,
 } from "@/lib/coupons";
+import {
+  BOARDING_VISUAL_THEMES,
+  buildMediaKitPrintHtml,
+  type BoardingPassVisual,
+} from "@/lib/mediaKitPrint";
+import { renderQrSvg } from "@/lib/qrSvg";
 
 const REWARD_OPTIONS: {
   type: CouponRewardType;
@@ -60,6 +66,7 @@ const REWARD_OPTIONS: {
 
 const CouponsManager = () => {
   const [coupons, setCoupons] = useState<RedeemCouponRow[]>([]);
+  const [dbReady, setDbReady] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
 
@@ -72,11 +79,30 @@ const CouponsManager = () => {
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [previewCoupon, setPreviewCoupon] = useState<RedeemCouponRow | null>(null);
+  const [hostSignature, setHostSignature] = useState<string>(() => {
+    try {
+      return localStorage.getItem("ps_media_kit_host") || "POR RAFAEL SPOSITO";
+    } catch {
+      return "POR RAFAEL SPOSITO";
+    }
+  });
+  const [blankRecipientLine, setBlankRecipientLine] = useState(false);
+  const [boardingVisual, setBoardingVisual] = useState<BoardingPassVisual>("theo");
+
+  const handleHostSignatureChange = (val: string) => {
+    setHostSignature(val);
+    try {
+      localStorage.setItem("ps_media_kit_host", val);
+    } catch {
+      // ignore storage errors
+    }
+  };
 
   const fetchAll = async () => {
     setLoading(true);
     const res = await listCoupons();
     setCoupons(res.rows);
+    setDbReady(res.dbReady);
     setLoading(false);
   };
 
@@ -92,7 +118,7 @@ const CouponsManager = () => {
     }
     setCreating(true);
     try {
-      const { row } = await createCoupon({
+      const { row, dbReady: savedInDb } = await createCoupon({
         code,
         reward_type: rewardType,
         recipient_name: recipientName,
@@ -100,6 +126,7 @@ const CouponsManager = () => {
         max_uses: maxUses,
         expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
       });
+      setDbReady(savedInDb);
       setCoupons((prev) => [row, ...prev]);
       toast.success(`Cupom ${row.code} criado com sucesso!`);
       setCode(generateCouponCode("SOLAR"));
@@ -146,156 +173,27 @@ const CouponsManager = () => {
     toast.success(`Cupom ${c.code} removido.`);
   };
 
-  const handlePrintCard = (c: RedeemCouponRow) => {
-    const meta = COUPON_REWARD_META[c.reward_type] || COUPON_REWARD_META.full_map;
+  const handlePrintKit = (c: RedeemCouponRow, mode: "full" | "card" = "full") => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://protocolosolar.com.br";
     const redeemUrl = getRedeemUrl(c);
-    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=8&data=${encodeURIComponent(redeemUrl)}`;
 
-    const win = window.open("", "_blank", "width=900,height=700");
+    const win = window.open("", "_blank", "width=1120,height=860");
     if (!win) {
-      toast.error("Permita pop-ups para imprimir o Cartão do Mídia Kit.");
+      toast.error("Permita pop-ups para abrir o Estúdio de Impressão do Mídia Kit.");
       return;
     }
 
-    win.document.write(`<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <title>Mídia Kit • Protocolo Solar (${c.code})</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    body {
-      background: #050507;
-      color: #F8FAFC;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 32px;
-    }
-    .card {
-      width: 680px;
-      background: radial-gradient(circle at 85% 15%, rgba(245, 176, 65, 0.22), transparent 45%),
-                  linear-gradient(145deg, #0D1627 0%, #070B14 60%, #050507 100%);
-      border: 1.5px solid rgba(245, 176, 65, 0.45);
-      border-radius: 28px;
-      padding: 40px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.85);
-    }
-    .badge {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: rgba(245, 176, 65, 0.16);
-      border: 1px solid rgba(245, 176, 65, 0.45);
-      color: #FFF3D1;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-    .recipient {
-      font-size: 13px;
-      color: #F5B041;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 32px;
-      line-height: 1.1;
-      color: #FFFFFF;
-      margin-bottom: 12px;
-    }
-    .desc {
-      font-size: 14px;
-      line-height: 1.6;
-      color: #94A3B8;
-      max-width: 400px;
-      margin-bottom: 28px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 164px;
-      gap: 24px;
-      align-items: center;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 24px;
-    }
-    .code-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: #94A3B8;
-      margin-bottom: 8px;
-    }
-    .code-box {
-      display: inline-block;
-      padding: 14px 22px;
-      border-radius: 16px;
-      background: rgba(0,0,0,0.55);
-      border: 1.5px dashed #F5B041;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      color: #FFF3D1;
-      margin-bottom: 12px;
-    }
-    .steps {
-      font-size: 11px;
-      color: #94A3B8;
-      line-height: 1.5;
-    }
-    .qr-wrap {
-      background: #FFFFFF;
-      padding: 10px;
-      border-radius: 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .qr-wrap img {
-      width: 140px;
-      height: 140px;
-      display: block;
-    }
-    @media print {
-      body { background: #050507; padding: 0; }
-      .no-print { display: none !important; }
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="badge">${meta.badge}</div>
-    ${c.recipient_name ? `<div class="recipient">Convidado(a) Especial: ${c.recipient_name}</div>` : `<div class="recipient">Convite Exclusivo • Protocolo Solar</div>`}
-    <h1>${meta.label}</h1>
-    <p class="desc">${meta.description} Descubra em qual cidade do mundo passar seu próximo aniversário para ativar seu melhor ciclo anual.</p>
-    <div class="grid">
-      <div>
-        <div class="code-label">Seu Código de Resgate</div>
-        <div class="code-box">${c.code}</div>
-        <div class="steps">
-          Aponte a câmera para o QR Code ao lado ou acesse <strong>/resgatar</strong> e insira seu código para liberar seu acesso gratuitamente.
-        </div>
-      </div>
-      <div class="qr-wrap">
-        <img src="${qrSrc}" alt="QR Code Resgate" onload="setTimeout(() => window.print(), 300)" />
-      </div>
-    </div>
-  </div>
-</body>
-</html>`);
+    const html = buildMediaKitPrintHtml({
+      coupon: c,
+      redeemUrl,
+      origin,
+      hostSignature,
+      blankRecipientLine,
+      visual: boardingVisual,
+      mode,
+    });
+
+    win.document.write(html);
     win.document.close();
   };
 
@@ -451,10 +349,21 @@ const CouponsManager = () => {
 
       {/* Lista de Cupons Criados */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-ps-display text-2xl text-white font-bold">
-            Cupons Ativos & Mídia Kit ({coupons.length})
-          </h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="font-ps-display text-2xl text-white font-bold">
+              Cupons Ativos & Mídia Kit ({coupons.length})
+            </h3>
+            <span
+              className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                dbReady
+                  ? "bg-emerald-500/15 border-emerald-500/35 text-emerald-300"
+                  : "bg-amber-500/15 border-amber-500/35 text-amber-300"
+              }`}
+            >
+              {dbReady ? "Supabase Ativo • Uso Único Antifraude" : "Modo Local • Execute o SQL no Supabase"}
+            </span>
+          </div>
           <button
             type="button"
             onClick={fetchAll}
@@ -547,7 +456,16 @@ const CouponsManager = () => {
                         className="px-3 py-2 rounded-xl bg-[#C9A227]/20 hover:bg-[#C9A227]/30 border border-[#C9A227]/45 text-[#F5DE98] text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
                       >
                         <QrCode className="w-3.5 h-3.5" />
-                        <span>Cartão Mídia Kit</span>
+                        <span>Mídia Kit & QR</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePrintKit(c, "full")}
+                        className="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                        title="Abrir Boarding Pass + Cartas das Casas + Black Card + Selo prontos para A4"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>Imprimir A4</span>
                       </button>
                       <button
                         type="button"
@@ -589,15 +507,15 @@ const CouponsManager = () => {
         )}
       </section>
 
-      {/* Modal de Prévia do Cartão de Mídia Kit para Impressão */}
+      {/* Modal de Prévia do Mídia Kit para Impressão */}
       {previewCoupon && (() => {
         const meta = COUPON_REWARD_META[previewCoupon.reward_type] || COUPON_REWARD_META.full_map;
         const redeemUrl = getRedeemUrl(previewCoupon);
-        const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=${encodeURIComponent(redeemUrl)}`;
+        const qrSvg = renderQrSvg(redeemUrl);
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-            <div className="relative w-full max-w-2xl rounded-3xl border border-[#C9A227]/50 bg-gradient-to-br from-[#0E1A30] via-[#070D19] to-[#050507] p-6 sm:p-9 shadow-[0_25px_90px_rgba(0,0,0,0.9)]">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+            <div className="relative w-full max-w-2xl rounded-3xl border border-[#C9A227]/50 bg-gradient-to-br from-[#0E1E36] via-[#070E1B] to-[#04070E] p-6 sm:p-9 shadow-[0_25px_90px_rgba(0,0,0,0.9)] my-auto">
               <button
                 type="button"
                 onClick={() => setPreviewCoupon(null)}
@@ -606,61 +524,114 @@ const CouponsManager = () => {
                 <X className="w-4 h-4" />
               </button>
 
-              <span className="inline-block px-3 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 text-[#F5DE98] font-mono text-[10px] uppercase tracking-[0.2em] mb-4">
-                {meta.badge}
+              <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-200 font-mono text-[10px] uppercase tracking-[0.18em] mb-3">
+                📶 {meta.badge}
               </span>
 
-              <p className="text-xs uppercase tracking-[0.16em] text-[#C9A227] font-bold mb-1">
-                {previewCoupon.recipient_name
+              <p className="text-xs uppercase tracking-[0.16em] text-[#F5B041] font-bold mb-1">
+                {!blankRecipientLine && previewCoupon.recipient_name
                   ? `Convidado(a) Especial: ${previewCoupon.recipient_name}`
-                  : "Convite Exclusivo • Protocolo Solar"}
+                  : "Convite VIP • Exemplo do Wi-Fi no Aniversário"}
               </p>
 
               <h3 className="font-ps-display text-2xl sm:text-3xl font-bold text-white mb-2">
                 {meta.label}
               </h3>
-              <p className="text-white/65 text-xs sm:text-sm leading-relaxed mb-6">
-                {meta.description}
+              <p className="text-white/70 text-xs sm:text-sm leading-relaxed mb-5">
+                “Você não vê o Wi-Fi nem as ondas de energia, mas confia neles todo dia. A cidade no aniversário não faz mágica — sintoniza sua energia.” —{" "}
+                <span className="text-white/90">{meta.description}</span>
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center pt-5 border-t border-white/10">
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center pt-5 border-t border-white/10">
                 <div className="sm:col-span-8 space-y-3">
                   <div>
                     <span className="block text-[10px] uppercase tracking-[0.2em] text-white/45 mb-1.5">
-                      Código de Resgate
+                      Código de Resgate (42×14mm p/ adesivo raspadinha)
                     </span>
-                    <div className="inline-block px-5 py-3 rounded-2xl bg-black/60 border border-dashed border-[#C9A227] font-mono text-2xl font-bold tracking-[0.16em] text-[#FFF3D1]">
+                    <div className="inline-block px-5 py-3 rounded-2xl bg-black/60 border border-dashed border-[#F5B041] font-mono text-2xl font-bold tracking-[0.16em] text-[#FFF3D1]">
                       {previewCoupon.code}
                     </div>
                   </div>
                   <p className="text-white/55 text-xs leading-relaxed">
-                    Escaneie o QR Code ou acesse <strong>/resgatar</strong> e digite o código acima para liberar seu presente gratuitamente.
+                    QR Code offline apontando para <strong>/resgatar?code={previewCoupon.code}</strong>.
                   </p>
                 </div>
 
                 <div className="sm:col-span-4 flex justify-center">
-                  <div className="p-3 bg-white rounded-2xl shadow-lg">
-                    <img src={qrSrc} alt="QR Code do Cupom" className="w-32 h-32 object-contain" />
-                  </div>
+                  <div
+                    className="p-2.5 bg-white rounded-2xl shadow-lg w-32 h-32 [&>svg]:w-full [&>svg]:h-full"
+                    dangerouslySetInnerHTML={{ __html: qrSvg }}
+                  />
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-end gap-3 mt-7 pt-5 border-t border-white/10">
+              {/* Opções rápidas do Estúdio de Impressão */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5 pt-4 border-t border-white/10">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.16em] text-white/50 font-bold mb-1">
+                    Imagem / Estilo do Boarding Pass (Papel Claro)
+                  </label>
+                  <select
+                    value={boardingVisual}
+                    onChange={(e) => setBoardingVisual(e.target.value as BoardingPassVisual)}
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] text-xs font-semibold focus:outline-none focus:border-[#C9A227]"
+                  >
+                    {(Object.entries(BOARDING_VISUAL_THEMES) as [BoardingPassVisual, (typeof BOARDING_VISUAL_THEMES)["theo"]][]).map(
+                      ([key, item]) => (
+                        <option key={key} value={key} className="bg-[#091326] text-white">
+                          {item.label}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.16em] text-white/50 font-bold mb-1">
+                    Assinatura no Cartão
+                  </label>
+                  <input
+                    type="text"
+                    value={hostSignature}
+                    onChange={(e) => handleHostSignatureChange(e.target.value)}
+                    placeholder="POR RAFAEL SPOSITO"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] font-mono text-xs font-bold uppercase focus:outline-none focus:border-[#C9A227]"
+                  />
+                </div>
+                <label className="sm:col-span-2 flex items-center gap-2.5 pt-1 cursor-pointer select-none text-xs text-white/80">
+                  <input
+                    type="checkbox"
+                    checked={blankRecipientLine}
+                    onChange={(e) => setBlankRecipientLine(e.target.checked)}
+                    className="rounded border-white/30 bg-black/50 accent-[#C9A227] w-4 h-4"
+                  />
+                  <span>Deixar linha pontilhada p/ escrever o nome à mão (caneta dourada)</span>
+                </label>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-end gap-2.5 mt-6 pt-5 border-t border-white/10">
                 <button
                   type="button"
                   onClick={() => handleCopyLink(previewCoupon)}
-                  className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2"
                 >
                   <LinkIcon className="w-4 h-4 text-[#F5DE98]" />
-                  <span>Copiar Link com Código</span>
+                  <span>Copiar Link</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePrintCard(previewCoupon)}
-                  className="px-6 py-3 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-[0_10px_25px_rgba(201,162,39,0.3)]"
+                  onClick={() => handlePrintKit(previewCoupon, "card")}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4 text-[#F5DE98]" />
+                  <span>Cartão Único</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePrintKit(previewCoupon, "full")}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#F5B041] to-[#C9A227] hover:brightness-110 text-[#02050A] text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-[0_10px_25px_rgba(201,162,39,0.35)]"
                 >
                   <Printer className="w-4 h-4" />
-                  <span>Imprimir Cartão Mídia Kit</span>
+                  <span>Imprimir Mídia Kit Completo (A4)</span>
                 </button>
               </div>
             </div>

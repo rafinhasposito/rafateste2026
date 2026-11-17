@@ -13,6 +13,7 @@ import {
   buildFullMapUnlockedFocuses,
   buildHouseAllFocuses,
 } from "../lib/consultationUnlocks";
+import { generateCouponCode } from "../lib/coupons";
 
 describe("consultationUnlocks — regras de Casas e Focos", () => {
   it("resolve apenas IDs ou nomes reais de Focos, ignorando taglines descritivas das Casas", () => {
@@ -107,5 +108,16 @@ describe("consultationUnlocks — regras de Casas e Focos", () => {
     expect(Object.keys(fullFocuses)).toHaveLength(12);
     expect(fullFocuses["1"]).toHaveLength(8);
     expect(fullFocuses["12"]).toHaveLength(8);
+  });
+
+  it("gera códigos de cupom criptográficos no formato SOLAR-XXXX-XXXX sem caracteres ambíguos", () => {
+    const pattern = /^SOLAR-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}$/;
+    const generated = new Set<string>();
+    for (let i = 0; i < 50; i++) {
+      const code = generateCouponCode("SOLAR");
+      expect(code).toMatch(pattern);
+      generated.add(code);
+    }
+    expect(generated.size).toBe(50);
   });
 });

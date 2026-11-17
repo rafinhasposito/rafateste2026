@@ -74,17 +74,22 @@ const writeLocalCoupons = (rows: RedeemCouponRow[]) => {
 };
 
 export const generateCouponCode = (prefix = "SOLAR"): string => {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let part = "";
-  for (let i = 0; i < 4; i++) {
-    part += chars[Math.floor(Math.random() * chars.length)];
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // 32 símbolos sem I/O/0/1 (sem viés de módulo em 256)
+  const bytes = new Uint8Array(8);
+  const cryptoObj = globalThis.crypto;
+  if (cryptoObj && typeof cryptoObj.getRandomValues === "function") {
+    cryptoObj.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = Math.floor(Math.random() * 256);
+    }
   }
-  let part2 = "";
-  for (let i = 0; i < 3; i++) {
-    part2 += chars[Math.floor(Math.random() * chars.length)];
+  let code = "";
+  for (let i = 0; i < 8; i++) {
+    code += chars[bytes[i] & 31];
   }
   const cleanPrefix = prefix.trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || "SOLAR";
-  return `${cleanPrefix}-${part}-${part2}`;
+  return `${cleanPrefix}-${code.slice(0, 4)}-${code.slice(4, 8)}`;
 };
 
 export const listCoupons = async (): Promise<{
@@ -214,6 +219,9 @@ export const redeemCouponCode = async (args: {
   });
 
   if (!error && data) {
+    if (data.success === false) {
+      throw new Error(String(data.error || "Não foi possível resgatar este cupom."));
+    }
     return {
       reward_type: (data.reward_type || "1_casa") as CouponRewardType,
       credits_added: Number(data.credits_added || 1),
