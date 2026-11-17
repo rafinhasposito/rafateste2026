@@ -46,7 +46,7 @@ describe("Mídia Kit Print & QR Generator", () => {
     expect(html).toContain("ZRH");
     expect(html).toContain("CARTÃO DE EMBARQUE");
     expect(html).toContain("a4-sheet");
-    expect(html).toContain("theo-midia-kit.png");
+    expect(html).toContain("theo-ad-cutout-opt.png");
   });
 
   it("supports blank handwrite line and escapes HTML in recipient names", () => {

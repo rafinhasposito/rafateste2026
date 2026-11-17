@@ -227,9 +227,9 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
     ? `<span class="bp-cell-value accent">${safeRecipient}</span>`
     : `<span class="bp-cell-value handwrite-line" title="Espaço para assinar à mão com caneta dourada"></span>`;
 
-  // Theo photo: prefers generated bright editorial portrait when present, falls back to theo-studio.jpg
-  const theoPhotoUrl = `${origin}/images/abertura/theo-midia-kit.png`;
-  const theoFallbackUrl = `${origin}/images/abertura/theo-studio.jpg`;
+  // Theo photo: prefers generated bright transparent cutout when present, falls back to composite/studio
+  const theoCutoutUrl = `${origin}/images/abertura/theo-ad-cutout-opt.png`;
+  const theoFallbackUrl = `${origin}/images/abertura/theo-ad-claro.jpg`;
 
   if (mode === "card") {
     return `<!doctype html>
@@ -514,193 +514,216 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
       border-radius: 99mm;
     }
 
-    /* CORPO EDITORIAL DA FOLHA A4: APRESENTAÇÃO + WI-FI (ESQ) & FOTO DO THEO (DIR) */
-    .a4-editorial {
+    /* CORPO ADVERTISING DA FOLHA A4 (CLARO / ANITTA PROMO POSTER STYLE) */
+    .a4-advertising {
       display: grid;
-      grid-template-columns: 1fr 67mm;
-      gap: 7mm;
-      align-items: stretch;
+      grid-template-columns: 1fr 78mm;
+      gap: 5mm;
+      align-items: center;
       flex: 1;
-      padding: 5mm 0 4mm;
+      padding: 4mm 0 2mm;
       position: relative;
       z-index: 2;
     }
 
-    .ed-copy {
+    .a4-ad-rays {
+      position: absolute;
+      top: -20px;
+      right: 0;
+      width: 95mm;
+      height: 95mm;
+      background: radial-gradient(circle, rgba(245, 176, 65, 0.18) 0%, rgba(254, 247, 230, 0.08) 55%, transparent 75%);
+      pointer-events: none;
+      z-index: -1;
+      border-radius: 50%;
+    }
+
+    .ad-copy {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 3mm;
+      gap: 2.8mm;
     }
 
-    .ed-eyebrow {
+    .ad-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.8mm;
       font-family: var(--ps-mono);
-      font-size: 7pt;
-      letter-spacing: 0.16em;
+      font-size: 6.8pt;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--bp-accent);
+      color: #92400E;
+      background: #FEF3C7;
+      border: 0.3mm solid #FCD34D;
+      padding: 1.2mm 2.8mm;
+      border-radius: 99mm;
       font-weight: 700;
+      width: fit-content;
     }
 
-    .ed-headline {
+    .ad-headline {
       font-family: var(--ps-display);
-      font-size: 21pt;
-      line-height: 1.14;
+      font-size: 20pt;
+      line-height: 1.12;
       color: var(--ink-navy);
-      margin: 1.5mm 0 2.5mm;
+      margin: 1.2mm 0 1.8mm;
       font-weight: 400;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.015em;
     }
 
-    .ed-headline em {
+    .ad-headline em {
       font-style: normal;
-      color: var(--gold-rich);
-      text-decoration: underline;
-      text-decoration-color: var(--bp-accent);
-      text-underline-offset: 3px;
-    }
-
-    .ed-lead {
-      margin: 0;
-      font-size: 9.4pt;
-      line-height: 1.52;
-      color: var(--ink-slate);
-    }
-
-    .ed-lead strong {
-      color: var(--ink-navy);
-    }
-
-    /* Caixa Destaque Casa ≠ Cidade */
-    .ed-mechanic-box {
-      background: var(--ivory);
-      border: 0.3mm solid #E5D4AA;
-      border-left: 1.1mm solid var(--bp-accent);
-      border-radius: 2.5mm;
-      padding: 3.2mm 4mm;
-    }
-
-    .ed-mechanic-box h3 {
-      margin: 0 0 1mm;
-      font-family: var(--ps-mono);
-      font-size: 7pt;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--bp-accent);
-    }
-
-    .ed-mechanic-box p {
-      margin: 0;
-      font-size: 8.5pt;
-      line-height: 1.46;
-      color: var(--ink-navy);
-    }
-
-    /* 3 Pílulas Coloridas das Casas */
-    .ed-houses {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2.6mm;
-    }
-
-    .ed-house-pill {
-      background: var(--pill-bg);
-      border: 0.25mm solid var(--pill-border);
-      border-top: 0.85mm solid var(--pill-accent);
-      border-radius: 2.2mm;
-      padding: 2.4mm 2.6mm;
-    }
-
-    .ed-house-pill span {
-      display: block;
-      font-family: var(--ps-mono);
-      font-size: 5.8pt;
+      color: #B45309;
       font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--pill-accent);
-      margin-bottom: 0.8mm;
+      border-bottom: 0.8mm solid #F59E0B;
     }
 
-    .ed-house-pill strong {
-      display: block;
-      font-family: var(--ps-display);
-      font-size: 8.8pt;
-      font-weight: 400;
-      color: var(--ink-navy);
-      margin-bottom: 0.8mm;
-    }
-
-    .ed-house-pill p {
+    .ad-lead {
       margin: 0;
-      font-size: 7pt;
-      line-height: 1.35;
+      font-size: 8.8pt;
+      line-height: 1.48;
       color: var(--ink-slate);
     }
 
-    .ed-host-note {
-      font-size: 8pt;
+    .ad-lead strong {
+      color: var(--ink-navy);
+    }
+
+    /* CARDS FLUTUANTES DE ALTO IMPACTO (ESTILO PAINÉIS RETAIL TELECOM) */
+    .ad-promo-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 2.2mm;
+      margin: 1.5mm 0;
+    }
+
+    .ad-promo-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 3mm;
+      align-items: center;
+      background: #FFFFFF;
+      border: 0.35mm solid #E2E8F0;
+      border-left: 1.2mm solid var(--promo-accent, var(--bp-accent));
+      border-radius: 2.4mm;
+      padding: 2.2mm 3.2mm;
+      box-shadow: 0 2mm 5mm rgba(11, 25, 44, 0.04);
+    }
+
+    .ad-promo-card.highlight {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+      border-left: 1.2mm solid #D97706;
+    }
+
+    .ad-promo-icon {
+      font-size: 13pt;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ad-promo-info strong {
+      display: block;
+      font-family: var(--ps-mono);
+      font-size: 7.2pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-navy);
+      font-weight: 700;
+      margin-bottom: 0.3mm;
+    }
+
+    .ad-promo-info p {
+      margin: 0;
+      font-size: 7.2pt;
+      line-height: 1.32;
+      color: var(--ink-slate);
+    }
+
+    .ad-footer-note {
+      font-size: 7.6pt;
       color: var(--ink-muted);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 4mm;
       border-top: 0.25mm solid #E8DCC0;
-      padding-top: 2.2mm;
+      padding-top: 2mm;
     }
 
-    .ed-host-note strong {
+    .ad-footer-note strong {
       color: var(--ink-navy);
-      white-space: nowrap;
     }
 
-    /* Coluna Direita: Foto Editorial do Theo (3:4 integrada à folha A4) */
-    .ed-theo-frame {
+    /* THEO EM RECORTE DINÂMICO (SEM CAIXA QUADRADA!) */
+    .ad-theo-stage {
       position: relative;
-      border-radius: 3.5mm;
-      overflow: hidden;
-      border: 0.45mm solid #DFC387;
-      background: #FAF6EC;
+      height: 100%;
+      min-height: 78mm;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: flex-end;
+      overflow: visible;
     }
 
-    .ed-theo-frame img {
+    .ad-theo-cutout {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
+      max-height: 82mm;
+      object-fit: contain;
+      object-position: center bottom;
       display: block;
+      filter: drop-shadow(0 6mm 10mm rgba(11, 25, 44, 0.12));
+      transform: scale(1.04);
+      transform-origin: bottom center;
+      position: relative;
+      z-index: 2;
     }
 
-    .ed-theo-caption {
+    .ad-speech-bubble {
       position: absolute;
-      left: 2.8mm;
-      right: 2.8mm;
-      bottom: 2.8mm;
-      background: rgba(255, 255, 255, 0.94);
-      border: 0.25mm solid #DFC387;
-      border-radius: 2.2mm;
-      padding: 2mm 2.8mm;
+      top: 6mm;
+      left: -10mm;
+      background: #FFFFFF;
+      border: 0.35mm solid #F59E0B;
+      border-radius: 3mm;
+      padding: 2mm 3.2mm;
+      box-shadow: 0 4mm 10mm rgba(11, 25, 44, 0.09);
+      max-width: 52mm;
+      z-index: 3;
     }
 
-    .ed-theo-caption strong {
+    .ad-speech-bubble strong {
       display: block;
       font-family: var(--ps-mono);
       font-size: 6.2pt;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--gold-rich);
-      margin-bottom: 0.4mm;
+      color: #B45309;
+      margin-bottom: 0.3mm;
     }
 
-    .ed-theo-caption span {
-      display: block;
-      font-size: 7.4pt;
-      line-height: 1.32;
+    .ad-speech-bubble p {
+      margin: 0;
+      font-size: 7pt;
+      line-height: 1.25;
       color: var(--ink-navy);
-      font-weight: 500;
+      font-weight: 600;
+    }
+
+    .ad-speech-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -2.2mm;
+      left: 12mm;
+      width: 3.5mm;
+      height: 3.5mm;
+      background: #FFFFFF;
+      border-right: 0.35mm solid #F59E0B;
+      border-bottom: 0.35mm solid #F59E0B;
+      transform: rotate(45deg);
     }
 
     /* ======================================================================
@@ -873,8 +896,8 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
 
     .bp-telemetry {
       display: grid;
-      grid-template-columns: 1.5fr 0.7fr 0.9fr 1.1fr;
-      gap: 2mm;
+      grid-template-columns: 1.4fr 0.65fr 0.8fr 0.65fr 1.1fr;
+      gap: 1.6mm;
     }
 
     .bp-cell {
@@ -1078,55 +1101,62 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
         <span class="a4-gift-tag">${giftIconSvg(theme.accent)} <span>Convite Especial · ${safeShort}</span></span>
       </header>
 
-      <!-- 2. CORPO EDITORIAL: APRESENTAÇÃO + WI-FI + FOTO NOVA DO THEO -->
-      <section class="a4-editorial">
-        <div class="ed-copy">
+      <!-- 2. CORPO ADVERTISING DA FOLHA A4 (CLARO / ANITTA PROMO POSTER STYLE) -->
+      <section class="a4-advertising">
+        <div class="a4-ad-rays"></div>
+
+        <div class="ad-copy">
           <div>
-            <span class="ed-eyebrow" style="display:inline-flex;align-items:center;gap:1.8mm;">${wifiIconSvg(theme.accent)} <span>Como funciona a Revolução Solar (sem misticismo)</span></span>
-            <h1 class="ed-headline">Você não vê o Wi-Fi nem as ondas de energia, mas <em>confia neles todo dia.</em></h1>
-            <p class="ed-lead">
-              Com o Sol no seu aniversário é igual: <strong>a cidade não faz mágica</strong> — ela gira a roda das 12 Casas do seu mapa e sintoniza onde sua energia ganha força o ano inteiro.
+            <span class="ad-badge-top">
+              ${wifiIconSvg(theme.accent)}
+              <span>O PODER DA REVOLUÇÃO SOLAR · SEM MISTICISMO</span>
+            </span>
+
+            <h1 class="ad-headline">Você não vê o Wi-Fi nem as ondas de energia, mas <em>confia neles todo dia.</em></h1>
+            <p class="ad-lead">
+              Com o Sol no seu aniversário é igual: <strong>a cidade não faz mágica</strong> — ela sintoniza onde sua energia ganha força máxima o ano inteiro.
             </p>
           </div>
 
-          <div class="ed-mechanic-box">
-            <h3>A Mecânica Real · Casa ≠ Cidade</h3>
-            <p>
-              Você não muda quem você é (seu Mapa Natal é o seu aparelho). Mas o lugar onde você passa as 24h da virada muda qual área da vida fica no volume máximo — e o resultado nasce dessa sintonia somada à sua atitude.
-            </p>
+          <div class="ad-promo-cards">
+            <div class="ad-promo-card highlight" style="--promo-accent:#D97706;">
+              <div class="ad-promo-icon">📶</div>
+              <div class="ad-promo-info">
+                <strong>SINAL 100% · 12 CASAS · 365 DIAS</strong>
+                <p>Precisão astronômica de ±0.01° GPS sintonizando Dinheiro, Carreira e Amor.</p>
+              </div>
+            </div>
+
+            <div class="ad-promo-card" style="--promo-accent:#0284C7;">
+              <div class="ad-promo-icon">🧭</div>
+              <div class="ad-promo-info">
+                <strong>3 MODOS LIVRES DE NAVEGAÇÃO</strong>
+                <p>Simule e descubra onde passar seu aniversário: Por Cidade, Por Casa ou Por Intenção.</p>
+              </div>
+            </div>
+
+            <div class="ad-promo-card" style="--promo-accent:#059669;">
+              <div class="ad-promo-icon">🎁</div>
+              <div class="ad-promo-info">
+                <strong>PRESENTE VIP 100% LIBERADO</strong>
+                <p>Seu acesso completo no app está pago. Destaque o cartão de embarque abaixo e resgate.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="ed-houses">
-            <div class="ed-house-pill" style="--pill-accent:#059669; --pill-bg:#ECFDF5; --pill-border:#A7F3D0;">
-              <span>Casa 2</span>
-              <strong>Dinheiro &amp; Valor</strong>
-              <p>Favorece ganhos e preço justo. Depende da sua atitude.</p>
-            </div>
-            <div class="ed-house-pill" style="--pill-accent:#0284C7; --pill-bg:#F0F9FF; --pill-border:#BAE6FD;">
-              <span>Casa 10</span>
-              <strong>Carreira &amp; Topo</strong>
-              <p>Favorece autoridade e holofote. Assuma o palco.</p>
-            </div>
-            <div class="ed-house-pill" style="--pill-accent:#E11D48; --pill-bg:#FFF1F2; --pill-border:#FECDD3;">
-              <span>Casas 5 &amp; 7</span>
-              <strong>Amor &amp; Parcerias</strong>
-              <p>Favorece encontros e criação. Abra a agenda pro novo.</p>
-            </div>
-          </div>
-
-          <div class="ed-host-note">
-            <span>Este presente libera o seu acesso completo no app <strong>protocolosolar.com.br</strong></span>
+          <div class="ad-footer-note">
+            <span>Acesse direto pelo smartphone em <strong>protocolosolar.com.br</strong></span>
             <strong>${safeHost}</strong>
           </div>
         </div>
 
-        <aside class="ed-theo-frame">
-          <img src="${theoPhotoUrl}" onerror="this.onerror=null;this.src='${theoFallbackUrl}';" alt="Theo · Guia do Protocolo Solar" />
-          <div class="ed-theo-caption">
+        <div class="ad-theo-stage">
+          <div class="ad-speech-bubble">
             <strong>Theo · Seu Guia Solar</strong>
-            <span>“Escolha onde passar seu próximo aniversário e sintonize o ano que você quer viver.”</span>
+            <p>“Escolha onde passar seu aniversário e sintonize seu melhor ano.”</p>
           </div>
-        </aside>
+          <img class="ad-theo-cutout" src="${theoCutoutUrl}" onerror="this.onerror=null;this.src='${theoFallbackUrl}';" alt="Theo · Protocolo Solar" />
+        </div>
       </section>
 
       <!-- 3. LINHA DE CORTE / DESTAQUE -->
@@ -1178,6 +1208,10 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
               <div class="bp-cell">
                 <span class="bp-cell-label">Portão / Gate</span>
                 <span class="bp-cell-value bp-gate-val">${theme.gateLabel}</span>
+              </div>
+              <div class="bp-cell">
+                <span class="bp-cell-label">Assento / Seat</span>
+                <span class="bp-cell-value">12A · VIP</span>
               </div>
               <div class="bp-cell">
                 <span class="bp-cell-label">Presente de</span>

@@ -169,42 +169,218 @@
       border-radius: 99mm;
     }
 
-    .a4-editorial {
+    /* CORPO ADVERTISING DA FOLHA A4 (ESTILO CAMPANHA CLARO / ANITTA) */
+    .a4-advertising {
       display: grid;
-      grid-template-columns: 1fr 67mm;
-      gap: 7mm;
-      align-items: stretch;
+      grid-template-columns: 1fr 78mm;
+      gap: 5mm;
+      align-items: center;
       flex: 1;
-      padding: 5mm 0 4mm;
+      padding: 4mm 0 2mm;
       position: relative;
       z-index: 2;
     }
 
-    .ed-copy { display: flex; flex-direction: column; justify-content: space-between; gap: 3mm; }
-    .ed-eyebrow { font-family: var(--ps-mono); font-size: 7pt; letter-spacing: 0.16em; text-transform: uppercase; color: var(--bp-accent); font-weight: 700; }
-    .ed-headline { font-family: var(--ps-display); font-size: 21pt; line-height: 1.14; color: var(--ink-navy); margin: 1.5mm 0 2.5mm; font-weight: 400; letter-spacing: -0.01em; }
-    .ed-headline em { font-style: normal; color: var(--gold-rich); text-decoration: underline; text-decoration-color: var(--bp-accent); text-underline-offset: 3px; }
-    .ed-lead { margin: 0; font-size: 9.4pt; line-height: 1.52; color: var(--ink-slate); }
-    .ed-lead strong { color: var(--ink-navy); }
+    /* Raios de luz solar sutis de fundo (estilo telecom/anitta sem gastar tinta) */
+    .a4-ad-rays {
+      position: absolute;
+      top: -20px;
+      right: 0;
+      width: 95mm;
+      height: 95mm;
+      background: radial-gradient(circle, rgba(245, 176, 65, 0.18) 0%, rgba(254, 247, 230, 0.08) 55%, transparent 75%);
+      pointer-events: none;
+      z-index: -1;
+      border-radius: 50%;
+    }
 
-    .ed-mechanic-box { background: var(--ivory); border: 0.3mm solid #E5D4AA; border-left: 1.1mm solid var(--bp-accent); border-radius: 2.5mm; padding: 3.2mm 4mm; }
-    .ed-mechanic-box h3 { margin: 0 0 1mm; font-family: var(--ps-mono); font-size: 7pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bp-accent); }
-    .ed-mechanic-box p { margin: 0; font-size: 8.5pt; line-height: 1.46; color: var(--ink-navy); }
+    .ad-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2.8mm;
+    }
 
-    .ed-houses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.6mm; }
-    .ed-house-pill { background: var(--pill-bg); border: 0.25mm solid var(--pill-border); border-top: 0.85mm solid var(--pill-accent); border-radius: 2.2mm; padding: 2.4mm 2.6mm; }
-    .ed-house-pill span { display: block; font-family: var(--ps-mono); font-size: 5.8pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pill-accent); margin-bottom: 0.8mm; }
-    .ed-house-pill strong { display: block; font-family: var(--ps-display); font-size: 8.8pt; font-weight: 400; color: var(--ink-navy); margin-bottom: 0.8mm; }
-    .ed-house-pill p { margin: 0; font-size: 7pt; line-height: 1.35; color: var(--ink-slate); }
+    .ad-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.8mm;
+      font-family: var(--ps-mono);
+      font-size: 6.8pt;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #92400E;
+      background: #FEF3C7;
+      border: 0.3mm solid #FCD34D;
+      padding: 1.2mm 2.8mm;
+      border-radius: 99mm;
+      font-weight: 700;
+      width: fit-content;
+    }
 
-    .ed-host-note { font-size: 8pt; color: var(--ink-muted); display: flex; align-items: center; justify-content: space-between; gap: 4mm; border-top: 0.25mm solid #E8DCC0; padding-top: 2.2mm; }
-    .ed-host-note strong { color: var(--ink-navy); white-space: nowrap; }
+    .ad-headline {
+      font-family: var(--ps-display);
+      font-size: 20pt;
+      line-height: 1.12;
+      color: var(--ink-navy);
+      margin: 1.2mm 0 1.8mm;
+      font-weight: 400;
+      letter-spacing: -0.015em;
+    }
 
-    .ed-theo-frame { position: relative; border-radius: 3.5mm; overflow: hidden; border: 0.45mm solid #DFC387; background: #FAF6EC; display: flex; flex-direction: column; justify-content: flex-end; }
-    .ed-theo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
-    .ed-theo-caption { position: absolute; left: 2.8mm; right: 2.8mm; bottom: 2.8mm; background: rgba(255, 255, 255, 0.94); border: 0.25mm solid #DFC387; border-radius: 2.2mm; padding: 2mm 2.8mm; }
-    .ed-theo-caption strong { display: block; font-family: var(--ps-mono); font-size: 6.2pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-rich); margin-bottom: 0.4mm; }
-    .ed-theo-caption span { display: block; font-size: 7.4pt; line-height: 1.32; color: var(--ink-navy); font-weight: 500; }
+    .ad-headline em {
+      font-style: normal;
+      color: #B45309;
+      font-weight: 700;
+      border-bottom: 0.8mm solid #F59E0B;
+    }
+
+    .ad-lead {
+      margin: 0;
+      font-size: 8.8pt;
+      line-height: 1.48;
+      color: var(--ink-slate);
+    }
+
+    .ad-lead strong {
+      color: var(--ink-navy);
+    }
+
+    /* CARDS FLUTUANTES DE ALTO IMPACTO (ESTILO PAINÉIS RETAIL TELECOM) */
+    .ad-promo-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 2.2mm;
+      margin: 1.5mm 0;
+    }
+
+    .ad-promo-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 3mm;
+      align-items: center;
+      background: #FFFFFF;
+      border: 0.35mm solid #E2E8F0;
+      border-left: 1.2mm solid var(--promo-accent, #B87A14);
+      border-radius: 2.4mm;
+      padding: 2.2mm 3.2mm;
+      box-shadow: 0 2mm 5mm rgba(11, 25, 44, 0.04);
+    }
+
+    .ad-promo-card.highlight {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+      border-left: 1.2mm solid #D97706;
+    }
+
+    .ad-promo-icon {
+      font-size: 13pt;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ad-promo-info strong {
+      display: block;
+      font-family: var(--ps-mono);
+      font-size: 7.2pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-navy);
+      font-weight: 700;
+      margin-bottom: 0.3mm;
+    }
+
+    .ad-promo-info p {
+      margin: 0;
+      font-size: 7.2pt;
+      line-height: 1.32;
+      color: var(--ink-slate);
+    }
+
+    .ad-footer-note {
+      font-size: 7.6pt;
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 0.25mm solid #E8DCC0;
+      padding-top: 2mm;
+    }
+
+    .ad-footer-note strong {
+      color: var(--ink-navy);
+    }
+
+    /* THEO EM RECORTE DINÂMICO (SEM CAIXA QUADRADA!) */
+    .ad-theo-stage {
+      position: relative;
+      height: 100%;
+      min-height: 78mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      overflow: visible;
+    }
+
+    .ad-theo-cutout {
+      width: 100%;
+      max-height: 82mm;
+      object-fit: contain;
+      object-position: center bottom;
+      display: block;
+      filter: drop-shadow(0 6mm 10mm rgba(11, 25, 44, 0.12));
+      transform: scale(1.04);
+      transform-origin: bottom center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .ad-speech-bubble {
+      position: absolute;
+      top: 6mm;
+      left: -10mm;
+      background: #FFFFFF;
+      border: 0.35mm solid #F59E0B;
+      border-radius: 3mm;
+      padding: 2mm 3.2mm;
+      box-shadow: 0 4mm 10mm rgba(11, 25, 44, 0.09);
+      max-width: 52mm;
+      z-index: 3;
+    }
+
+    .ad-speech-bubble strong {
+      display: block;
+      font-family: var(--ps-mono);
+      font-size: 6.2pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #B45309;
+      margin-bottom: 0.3mm;
+    }
+
+    .ad-speech-bubble p {
+      margin: 0;
+      font-size: 7pt;
+      line-height: 1.25;
+      color: var(--ink-navy);
+      font-weight: 600;
+    }
+
+    .ad-speech-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -2.2mm;
+      left: 12mm;
+      width: 3.5mm;
+      height: 3.5mm;
+      background: #FFFFFF;
+      border-right: 0.35mm solid #F59E0B;
+      border-bottom: 0.35mm solid #F59E0B;
+      transform: rotate(45deg);
+    }
 
     .tear-divider { position: relative; z-index: 2; display: flex; align-items: center; gap: 3mm; margin: 1mm 0 2.5mm; color: var(--gold-rich); font-family: var(--ps-mono); font-size: 6pt; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; }
     .tear-divider::before, .tear-divider::after { content: ""; flex: 1; border-top: 0.45mm dashed #B87A14; }
@@ -232,7 +408,7 @@
     .bp-arc-line .plane { font-size: 10pt; color: var(--bp-accent); line-height: 1; }
     .bp-arc-sub { font-family: var(--ps-mono); font-size: 4.8pt; letter-spacing: 0.1em; color: var(--ink-muted); }
 
-    .bp-telemetry { display: grid; grid-template-columns: 1.5fr 0.7fr 0.9fr 1.1fr; gap: 2mm; }
+    .bp-telemetry { display: grid; grid-template-columns: 1.4fr 0.65fr 0.8fr 0.65fr 1.1fr; gap: 1.6mm; }
     .bp-cell { border: 0.22mm solid #E2E8F0; background: var(--ivory); border-radius: 1.6mm; padding: 1mm 2mm; display: flex; flex-direction: column; gap: 0.25mm; }
     .bp-cell-label { font-family: var(--ps-mono); font-size: 4.6pt; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-muted); }
     .bp-cell-value { font-family: var(--ps-mono); font-size: 7pt; font-weight: 700; color: var(--ink-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -326,46 +502,62 @@
         <span class="a4-gift-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><rect x="3" y="8" width="18" height="4" rx="1" stroke="currentColor" stroke-width="2"/><path d="M12 8V21M5 12V20C5 20.6 5.4 21 6 21H18C18.6 21 19 20.6 19 20V12" stroke="currentColor" stroke-width="2"/><path d="M12 8H8.5C7.1 8 6 6.9 6 5.5C6 4.1 7.1 3 8.5 3C10.7 3 12 8 12 8ZM12 8H15.5C16.9 8 18 6.9 18 5.5C18 4.1 16.9 3 15.5 3C13.3 3 12 8 12 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Convite Especial · <span class="sync-short">MAPA COMPLETO</span></span></span>
       </header>
 
-      <section class="a4-editorial">
-        <div class="ed-copy">
+      <!-- 2. CORPO ADVERTISING DA FOLHA A4 (CLARO / ANITTA PROMO POSTER STYLE) -->
+      <section class="a4-advertising">
+        <div class="a4-ad-rays"></div>
+
+        <div class="ad-copy">
           <div>
-            <span class="ed-eyebrow" style="display:inline-flex;align-items:center;gap:1.8mm;"><svg width="12" height="10" viewBox="0 0 24 20" fill="none" style="flex-shrink:0"><path d="M2 7.5C7.6 2.5 16.4 2.5 22 7.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M5.5 11.5C9.2 8.2 14.8 8.2 18.5 11.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M9.2 15.2C10.8 13.7 13.2 13.7 14.8 15.2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18.2" r="1.9" fill="currentColor"/></svg><span>Como funciona a Revolução Solar (sem misticismo)</span></span>
-            <h1 class="ed-headline">Você não vê o Wi-Fi nem as ondas de energia, mas <em>confia neles todo dia.</em></h1>
-            <p class="ed-lead">
-              Com o Sol no seu aniversário é igual: <strong>a cidade não faz mágica</strong> — ela gira a roda das 12 Casas do seu mapa e sintoniza onde sua energia ganha força o ano inteiro.
+            <span class="ad-badge-top">
+              <svg width="12" height="10" viewBox="0 0 24 20" fill="none" style="flex-shrink:0"><path d="M2 7.5C7.6 2.5 16.4 2.5 22 7.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M5.5 11.5C9.2 8.2 14.8 8.2 18.5 11.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M9.2 15.2C10.8 13.7 13.2 13.7 14.8 15.2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18.2" r="1.9" fill="currentColor"/></svg>
+              <span>O PODER DA REVOLUÇÃO SOLAR · SEM MISTICISMO</span>
+            </span>
+
+            <h1 class="ad-headline">Você não vê o Wi-Fi nem as ondas de energia, mas <em>confia neles todo dia.</em></h1>
+            <p class="ad-lead">
+              Com o Sol no seu aniversário é igual: <strong>a cidade não faz mágica</strong> — ela sintoniza onde sua energia ganha força máxima o ano inteiro.
             </p>
           </div>
 
-          <div class="ed-mechanic-box">
-            <h3>A Mecânica Real · Casa ≠ Cidade</h3>
-            <p>Você não muda quem você é (seu Mapa Natal é o seu aparelho). Mas o lugar onde você passa as 24h da virada muda qual área da vida fica no volume máximo — e o resultado nasce dessa sintonia somada à sua atitude.</p>
+          <div class="ad-promo-cards">
+            <div class="ad-promo-card highlight" style="--promo-accent:#D97706;">
+              <div class="ad-promo-icon">📶</div>
+              <div class="ad-promo-info">
+                <strong>SINAL 100% · 12 CASAS · 365 DIAS</strong>
+                <p>Precisão astronômica de ±0.01° GPS sintonizando Dinheiro, Carreira e Amor.</p>
+              </div>
+            </div>
+
+            <div class="ad-promo-card" style="--promo-accent:#0284C7;">
+              <div class="ad-promo-icon">🧭</div>
+              <div class="ad-promo-info">
+                <strong>3 MODOS LIVRES DE NAVEGAÇÃO</strong>
+                <p>Simule e descubra onde passar seu aniversário: Por Cidade, Por Casa ou Por Intenção.</p>
+              </div>
+            </div>
+
+            <div class="ad-promo-card" style="--promo-accent:#059669;">
+              <div class="ad-promo-icon">🎁</div>
+              <div class="ad-promo-info">
+                <strong>PRESENTE VIP 100% LIBERADO</strong>
+                <p>Seu acesso completo no app está pago. Destaque o cartão de embarque abaixo e resgate.</p>
+              </div>
+            </div>
           </div>
 
-          <div class="ed-houses">
-            <div class="ed-house-pill" style="--pill-accent:#059669; --pill-bg:#ECFDF5; --pill-border:#A7F3D0;">
-              <span>Casa 2</span><strong>Dinheiro &amp; Valor</strong><p>Favorece ganhos e preço justo. Depende da sua atitude.</p>
-            </div>
-            <div class="ed-house-pill" style="--pill-accent:#0284C7; --pill-bg:#F0F9FF; --pill-border:#BAE6FD;">
-              <span>Casa 10</span><strong>Carreira &amp; Topo</strong><p>Favorece autoridade e holofote. Assuma o palco.</p>
-            </div>
-            <div class="ed-house-pill" style="--pill-accent:#E11D48; --pill-bg:#FFF1F2; --pill-border:#FECDD3;">
-              <span>Casas 5 &amp; 7</span><strong>Amor &amp; Parcerias</strong><p>Favorece encontros e criação. Abra a agenda pro novo.</p>
-            </div>
-          </div>
-
-          <div class="ed-host-note">
-            <span>Este presente libera o seu acesso completo no app <strong>protocolosolar.com.br</strong></span>
+          <div class="ad-footer-note">
+            <span>Acesse direto pelo smartphone em <strong>protocolosolar.com.br</strong></span>
             <strong class="sync-host">POR RAFAEL SPOSITO</strong>
           </div>
         </div>
 
-        <aside class="ed-theo-frame">
-          <img src="../../public/images/abertura/theo-midia-kit.png" onerror="this.onerror=null;this.src='../../public/images/abertura/theo-studio.jpg';" alt="Theo · Guia do Protocolo Solar">
-          <div class="ed-theo-caption">
+        <div class="ad-theo-stage">
+          <div class="ad-speech-bubble">
             <strong>Theo · Seu Guia Solar</strong>
-            <span>“Escolha onde passar seu próximo aniversário e sintonize o ano que você quer viver.”</span>
+            <p>“Escolha onde passar seu aniversário e sintonize seu melhor ano.”</p>
           </div>
-        </aside>
+          <img class="ad-theo-cutout" src="../../public/images/abertura/theo-ad-cutout-opt.png" onerror="this.onerror=null;this.src='../../public/images/abertura/theo-ad-claro.jpg';" alt="Theo · Protocolo Solar">
+        </div>
       </section>
 
       <div class="tear-divider"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><circle cx="6" cy="6" r="3" stroke="#B87A14" stroke-width="2"/><circle cx="6" cy="18" r="3" stroke="#B87A14" stroke-width="2"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12" stroke="#B87A14" stroke-width="2" stroke-linecap="round"/></svg><span>Destaque abaixo o seu Boarding Pass com o código do presente</span></div>
@@ -397,6 +589,7 @@
               <div class="bp-cell"><span class="bp-cell-label">Passageiro(a) / Passenger</span><span class="bp-cell-value accent sync-guest">CONVIDADO(A) ESPECIAL</span></div>
               <div class="bp-cell"><span class="bp-cell-label">Voo / Flight</span><span class="bp-cell-value bp-flight-val">PS-365</span></div>
               <div class="bp-cell"><span class="bp-cell-label">Portão / Gate</span><span class="bp-cell-value bp-gate-val">CASAS I–XII</span></div>
+              <div class="bp-cell"><span class="bp-cell-label">Assento / Seat</span><span class="bp-cell-value">12A · VIP</span></div>
               <div class="bp-cell"><span class="bp-cell-label">Presente de</span><span class="bp-cell-value sync-host">POR RAFAEL SPOSITO</span></div>
             </div>
           </div>
