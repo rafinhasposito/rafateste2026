@@ -29,6 +29,19 @@ function escapeHtml(raw: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/** Crisp inline SVG icons for print (replaces OS emojis for 100% editorial finish) */
+function wifiIconSvg(color = "#B87A14"): string {
+  return `<svg width="12" height="10" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><path d="M2 7.5C7.6 2.5 16.4 2.5 22 7.5" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><path d="M5.5 11.5C9.2 8.2 14.8 8.2 18.5 11.5" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><path d="M9.2 15.2C10.8 13.7 13.2 13.7 14.8 15.2" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18.2" r="1.9" fill="${color}"/></svg>`;
+}
+
+function giftIconSvg(color = "#B87A14"): string {
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><rect x="3" y="8" width="18" height="4" rx="1" stroke="${color}" stroke-width="2"/><path d="M12 8V21M5 12V20C5 20.6 5.4 21 6 21H18C18.6 21 19 20.6 19 20V12" stroke="${color}" stroke-width="2"/><path d="M12 8H8.5C7.1 8 6 6.9 6 5.5C6 4.1 7.1 3 8.5 3C10.7 3 12 8 12 8ZM12 8H15.5C16.9 8 18 6.9 18 5.5C18 4.1 16.9 3 15.5 3C13.3 3 12 8 12 8Z" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function scissorsIconSvg(color = "#B87A14"): string {
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="flex-shrink:0"><circle cx="6" cy="6" r="3" stroke="${color}" stroke-width="2"/><circle cx="6" cy="18" r="3" stroke="${color}" stroke-width="2"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12" stroke="${color}" stroke-width="2" stroke-linecap="round"/></svg>`;
+}
+
 /** Crisp vector logo designed specifically for light paper (zero dark circle box) */
 function lightPaperLogoSvg(accent = "#B87A14"): string {
   return `<svg width="215" height="36" viewBox="0 0 215 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Protocolo Solar">
@@ -631,12 +644,14 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 4mm;
       border-top: 0.25mm solid #E8DCC0;
-      padding-top: 2mm;
+      padding-top: 2.2mm;
     }
 
     .ed-host-note strong {
       color: var(--ink-navy);
+      white-space: nowrap;
     }
 
     /* Coluna Direita: Foto Editorial do Theo (3:4 integrada à folha A4) */
@@ -714,11 +729,11 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
     }
 
     /* ======================================================================
-       PASSAGEM AÉREA REAL NO RODAPÉ DA FOLHA A4 (186mm × 86mm)
+       PASSAGEM AÉREA REAL NO RODAPÉ DA FOLHA A4 (186mm × 81mm)
        ====================================================================== */
     .boarding-pass {
       width: 100%;
-      height: 85mm;
+      height: 81mm;
       border-radius: 3.2mm;
       overflow: hidden;
       display: grid;
@@ -751,12 +766,12 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
     }
 
     .bp-content {
-      padding: 2.8mm 5mm 2mm;
+      padding: 2.8mm 5mm 2.4mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       flex: 1;
-      gap: 1.8mm;
+      gap: 2.4mm;
     }
 
     .bp-route-stage {
@@ -764,9 +779,29 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
       background: var(--bp-soft);
       border: 0.25mm solid #E5D5AE;
       border-radius: 2.4mm;
-      padding: 2.4mm 4mm 2mm;
+      padding: 3.2mm 4.5mm 2.8mm;
       overflow: hidden;
       isolation: isolate;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .bp-route-subline {
+      margin: 1.5mm 0 0;
+      padding-top: 1.5mm;
+      border-top: 0.22mm solid rgba(11, 25, 44, 0.12);
+      font-size: 7.4pt;
+      color: var(--ink-slate);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3mm;
+    }
+
+    .bp-route-subline strong {
+      color: var(--ink-navy);
     }
 
     .bp-horizon-art {
@@ -1040,14 +1075,14 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
       <!-- 1. TOPO: LOGO DO SITE + BADGE CONVITE -->
       <header class="a4-header">
         <div class="a4-logo-slot">${lightPaperLogoSvg(theme.accent)}</div>
-        <span class="a4-gift-tag">🎁 Convite Especial · ${safeShort}</span>
+        <span class="a4-gift-tag">${giftIconSvg(theme.accent)} <span>Convite Especial · ${safeShort}</span></span>
       </header>
 
       <!-- 2. CORPO EDITORIAL: APRESENTAÇÃO + WI-FI + FOTO NOVA DO THEO -->
       <section class="a4-editorial">
         <div class="ed-copy">
           <div>
-            <span class="ed-eyebrow">📶 Como funciona a Revolução Solar (sem misticismo)</span>
+            <span class="ed-eyebrow" style="display:inline-flex;align-items:center;gap:1.8mm;">${wifiIconSvg(theme.accent)} <span>Como funciona a Revolução Solar (sem misticismo)</span></span>
             <h1 class="ed-headline">Você não vê o Wi-Fi nem as ondas de energia, mas <em>confia neles todo dia.</em></h1>
             <p class="ed-lead">
               Com o Sol no seu aniversário é igual: <strong>a cidade não faz mágica</strong> — ela gira a roda das 12 Casas do seu mapa e sintoniza onde sua energia ganha força o ano inteiro.
@@ -1095,7 +1130,7 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
       </section>
 
       <!-- 3. LINHA DE CORTE / DESTAQUE -->
-      <div class="tear-divider">✂ Destaque abaixo o seu Boarding Pass com o código do presente</div>
+      <div class="tear-divider">${scissorsIconSvg("#B87A14")} <span>Destaque abaixo o seu Boarding Pass com o código do presente</span></div>
 
       <!-- 4. RODAPÉ DA A4: PASSAGEM AÉREA REAL COM CÓDIGO + QR -->
       <section class="boarding-pass" aria-label="Boarding Pass do Presente">
@@ -1124,6 +1159,10 @@ export function buildMediaKitPrintHtml(opts: MediaKitPrintOptions): string {
                   <span class="bp-iata accent">${theme.toCode}</span>
                   <span class="bp-city">${theme.toLabel}</span>
                 </div>
+              </div>
+              <div class="bp-route-subline">
+                <span><strong>Como usar:</strong> acesse <strong>protocolosolar.com.br/resgatar</strong> e simule Por Cidade, Casa ou Intenção.</span>
+                <span style="font-family:var(--ps-mono);font-size:6pt;color:var(--bp-accent);font-weight:700;white-space:nowrap;">12 CASAS · ±0.01° GPS</span>
               </div>
             </div>
 

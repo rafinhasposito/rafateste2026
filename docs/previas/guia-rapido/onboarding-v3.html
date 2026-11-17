@@ -489,12 +489,227 @@ h2{font-size:clamp(32px,4.4vw,64px)}
 .cityConfirmBadge{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:7px 14px;border-radius:999px;background:rgba(235,198,130,.14);border:1px solid rgba(235,198,130,.46);color:#fff4d6;font:600 12.5px/1.3 UI,sans-serif;backdrop-filter:blur(12px);animation:popIn .35s cubic-bezier(.16,1,.3,1)}
 @keyframes popIn{from{opacity:0;transform:scale(.95) translateY(8px)}}
 
-/* Stage 2: Minimal Seamless Transitions Overlay + Light MOTIONS (ZERO clickable reset chips) */
-#stage2{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);align-items:end;justify-content:space-between;gap:24px;padding:96px var(--theo-margin) max(34px,env(safe-area-inset-bottom))}
-#stage2 .copyBox{align-self:end;max-width:520px}
-#stage2 h2{font-size:clamp(32px,4vw,56px)}
-#stage2 .body{margin-top:10px;font-size:clamp(14.5px,1.1vw,17px);max-width:40ch}
-.stage2HudActions{display:flex;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+/* Stage 2: O Segredo das Casas Astrológicas & Os 3 Modos do Método */
+#stage2{
+  display:block;
+  padding:90px var(--theo-margin) max(48px,env(safe-area-inset-bottom));
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.stage2ContentWrapper{
+  max-width:1160px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:26px;
+}
+.stage2HeroHeader{
+  max-width:780px;
+}
+.stage2HeroHeader h2{
+  font-size:clamp(30px,3.8vw,52px);
+  line-height:1.08;
+  letter-spacing:-.03em;
+  margin:10px 0 12px;
+}
+.stage2HeroHeader .body{
+  font-size:clamp(15px,1.15vw,17.5px);
+  line-height:1.55;
+  color:rgba(241,240,234,.86);
+  max-width:62ch;
+}
+.stage2TabsRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+.stage2TabBtn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 18px;
+  border-radius:999px;
+  background:rgba(8,14,24,.62);
+  border:1px solid rgba(235,198,130,.28);
+  color:rgba(255,249,238,.78);
+  font:600 12.5px/1 UI,sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  backdrop-filter:blur(14px);
+  transition:all .22s ease;
+  cursor:pointer;
+}
+.stage2TabBtn:hover{
+  background:rgba(235,198,130,.18);
+  border-color:rgba(235,198,130,.6);
+  color:#fff;
+  transform:translateY(-1px);
+}
+.stage2TabBtn.active{
+  background:linear-gradient(135deg,rgba(235,198,130,.26),rgba(213,159,71,.16));
+  border-color:#ebc682;
+  color:#fff4d6;
+  box-shadow:0 0 20px rgba(235,198,130,.25);
+}
+.stage2ShowcaseCard{
+  display:grid;
+  grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);
+  gap:28px;
+  align-items:center;
+  background:rgba(8,14,24,.72);
+  border:1px solid rgba(235,198,130,.28);
+  border-radius:24px;
+  padding:24px;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+}
+.stage2ShowcaseVisual{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/10;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+}
+.stage2ShowcaseVisual img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .6s ease,opacity .3s ease;
+}
+.stage2ShowcaseVisual .visualPill{
+  position:absolute;
+  bottom:14px;
+  left:14px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(4,8,14,.78);
+  border:1px solid rgba(235,198,130,.4);
+  font:600 10.5px/1 ui-monospace,monospace;
+  letter-spacing:.12em;
+  color:#ffe6b0;
+  backdrop-filter:blur(10px);
+}
+.stage2ShowcaseDetails{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.stage2ShowcaseBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  border-radius:999px;
+  background:rgba(235,198,130,.12);
+  border:1px solid rgba(235,198,130,.42);
+  font:600 11.5px/1 ui-monospace,monospace;
+  letter-spacing:.12em;
+  color:#fff2cf;
+  width:fit-content;
+}
+.stage2ShowcaseHeadline{
+  font-family:Display,Georgia,serif;
+  font-size:clamp(22px,2.2vw,32px);
+  line-height:1.18;
+  color:#fff8ea;
+  letter-spacing:-.02em;
+}
+.stage2ShowcaseText{
+  font-size:clamp(14px,1.05vw,16px);
+  line-height:1.6;
+  color:rgba(241,240,234,.84);
+}
+.stage2EnergyBox{
+  display:flex;
+  gap:16px;
+  padding:20px 24px;
+  border-radius:20px;
+  background:linear-gradient(135deg,rgba(235,198,130,.09),rgba(8,14,24,.5));
+  border:1px solid rgba(235,198,130,.22);
+  backdrop-filter:blur(16px);
+  align-items:flex-start;
+}
+.stage2EnergyIcon{
+  font-size:26px;
+  line-height:1;
+  color:#ebc682;
+  filter:drop-shadow(0 0 10px rgba(235,198,130,.5));
+  flex-shrink:0;
+  margin-top:2px;
+}
+.stage2EnergyText h4{
+  font-family:Display,Georgia,serif;
+  font-size:clamp(17px,1.4vw,20px);
+  margin:0 0 6px;
+  color:#fff3d1;
+}
+.stage2EnergyText p{
+  margin:0;
+  font-size:13.5px;
+  line-height:1.55;
+  color:rgba(241,240,234,.78);
+}
+.stage2ModesBox{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.stage2ModesGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.stage2ModeCard{
+  padding:18px 20px;
+  border-radius:18px;
+  background:rgba(8,14,24,.6);
+  border:1px solid rgba(255,255,255,.09);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  backdrop-filter:blur(12px);
+}
+.stage2ModeTag{
+  font:600 10px/1 ui-monospace,monospace;
+  letter-spacing:.14em;
+  color:#ebc682;
+  text-transform:uppercase;
+}
+.stage2ModeCard h5{
+  font-family:Display,Georgia,serif;
+  font-size:17px;
+  margin:2px 0 4px;
+  color:#fff6e0;
+}
+.stage2ModeCard p{
+  margin:0;
+  font-size:12.5px;
+  line-height:1.5;
+  color:rgba(241,240,234,.68);
+}
+.stage2ActionsRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-top:8px;
+  padding-bottom:12px;
+}
+@media(max-width:980px){
+  #stage2{padding:84px 5% max(34px,env(safe-area-inset-bottom))}
+  .stage2ShowcaseCard{grid-template-columns:1fr;gap:20px;padding:18px}
+  .stage2ModesGrid{grid-template-columns:1fr;gap:12px}
+  .stage2ActionsRow{flex-direction:column;align-items:stretch}
+  .stage2ActionsRow .btnStageNext{width:100%;min-height:52px}
+}
 .btnStageNext{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 24px;border-radius:999px;border:1px solid rgba(235,198,130,.58);background:rgba(235,198,130,.16);color:#fff6e3;font:600 12.5px/1 UI,sans-serif;letter-spacing:.11em;text-transform:uppercase;backdrop-filter:blur(14px);transition:background .22s,border-color .22s,transform .22s}
 .btnStageNext:hover{background:rgba(235,198,130,.28);border-color:#ebc682;transform:translateY(-1px)}
 .btnStageNext:active{transform:scale(0.98)}
@@ -511,6 +726,34 @@ h2{font-size:clamp(32px,4.4vw,64px)}
 .t-text-swap.is-swapping{opacity:0;filter:blur(4px);transform:translateY(4px)}
 .t-text-soft{transition:opacity var(--text-soft-dur) var(--ease-smooth-out),filter var(--text-soft-dur) var(--ease-smooth-out)}
 .t-text-soft.is-swapping{opacity:0;filter:blur(3px)}
+
+.btnVideoSwitch{
+  position:absolute;
+  top:calc(max(14px,env(safe-area-inset-top)) + 58px);
+  left:var(--theo-margin);
+  z-index:10;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  border-radius:999px;
+  background:rgba(8,14,24,.64);
+  border:1px solid rgba(235,198,130,.32);
+  color:#ffe6b0;
+  font:600 11px/1 ui-monospace,monospace;
+  letter-spacing:.08em;
+  backdrop-filter:blur(12px);
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.btnVideoSwitch:hover{
+  background:rgba(235,198,130,.22);
+  border-color:#ebc682;
+  color:#fff;
+}
+@media(max-width:760px){
+  .btnVideoSwitch{top:calc(max(14px,env(safe-area-inset-top)) + 48px);left:16px;font-size:10px;padding:5px 11px}
+}
 
 /* Stages 3 & 4: Boxless Editorial Forms + Live Non-Square Input Styles + 2-Step City -> Starburst -> Giant Luminous Sun */
 .theoGlassCard{width:min(100%,540px);padding:8px 0 12px;border-radius:0;background:transparent;border:0;text-shadow:0 3px 20px rgba(2,5,12,.92);transition:opacity .35s cubic-bezier(.16,1,.3,1),transform .35s cubic-bezier(.16,1,.3,1)}
@@ -998,6 +1241,9 @@ html[data-input-style="pill"] .t-input-wrap.is-error .field{border-color:#ff8a7a
 
   <!-- TELA ZERO (Stage 0): Trailer Limpo do Theo -> Audio Normal Primeiro (Botão circular aparece ao lado do Play/Pause se navegador mutar) -->
   <section id="stage0" class="stagePanel active">
+    <button type="button" class="btnVideoSwitch" id="btnVideoSwitch" title="Alternar vídeo do Theo" aria-label="Alternar versão do vídeo do Theo">
+      <span>✦ Vídeo: Wi-Fi & Sol (14s)</span>
+    </button>
     <div class="theoCaptionsWrap" id="theoCaptionsWrap" aria-label="Introdução">
       <div class="theoKickerRow">
         <div class="theoBadgeSmall">
@@ -1009,16 +1255,16 @@ html[data-input-style="pill"] .t-input-wrap.is-error .field{border-color:#ff8a7a
       <div class="theoHorizonRule" id="theoHorizonRule" aria-hidden="true"></div>
       <div class="theoPhraseBox" id="theoPhraseBox">
         <div class="theoPhase active" data-phase="0">
-          Tem anos <span class="goldHighlight">bons</span> e anos <span class="goldHighlight">difíceis,</span>
+          Você confia no <span class="goldHighlight">Wi-Fi</span> e nas energias invisíveis todo dia...
         </div>
         <div class="theoPhase" data-phase="1">
-          e a gente <span class="goldHighlight">nunca sabe</span> por quê.
+          Por que duvidar da <span class="goldHighlight">energia do Sol</span> no seu aniversário?
         </div>
         <div class="theoPhase" data-phase="2">
-          Todo aniversário o <span class="goldHighlight">Sol</span> reinicia o seu <span class="goldHighlight">mapa,</span>
+          A cada ano, o Sol reinicia o seu ciclo e <span class="goldHighlight">gira as Casas</span> do seu mapa.
         </div>
         <div class="theoPhase" data-phase="3">
-          e a <span class="goldHighlight">cidade</span> onde você está decide o <span class="goldHighlight">rumo do seu ano.</span>
+          A cidade onde você comemora <span class="goldHighlight">sintoniza a frequência</span> dos seus 365 dias.
         </div>
       </div>
     </div>
@@ -1084,47 +1330,115 @@ html[data-input-style="pill"] .t-input-wrap.is-error .field{border-color:#ff8a7a
     </div>
   </section>
 
-  <!-- STAGE 2: Vídeo Contínuo de Transições Entre Cidades + Avanço Automático para Stage 3 -->
+  <!-- STAGE 2: O Segredo das Casas Astrológicas & Os 3 Modos do Método -->
   <section id="stage2" class="stagePanel" inert>
     <div class="stage2CutFlash" id="stage2CutFlash" aria-hidden="true"></div>
-    <div class="copyBox">
-      <p class="kicker t-text-swap" id="theoCityKicker">✦ Mesmo nascimento · Base natal fixa</p>
-      <h2 id="stage2Headline" class="t-text-soft">Mesmo dia.<br>Mesma pessoa.</h2>
-      <p class="body" id="stage2Subline">Só muda a coordenada onde você passa o aniversário.</p>
-      <div class="stage2HudActions">
-        <button id="skipSpeech" class="btnStageNext" type="button">
-          <span>Continuar</span>
-          <span aria-hidden="true">→</span>
-        </button>
-        <button id="audio" class="btnTheoCircle" type="button" aria-label="Silenciar som" title="Silenciar som">
-          <svg class="s2AudioOff" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
-            <path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 6 6m0-6-6 6"/>
-          </svg>
-          <svg class="s2AudioOn" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>
-          </svg>
-        </button>
-      </div>
-      <div class="theoSpeechBar" aria-hidden="true"><div id="theoSpeechFill"></div></div>
-    </div>
-
-    <aside class="stage2MotionHud" id="stage2MotionHud" aria-live="off">
-      <div class="stage2TelemetryLine">
-        <svg class="stage2MiniArc" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-          <circle cx="32" cy="32" r="27" stroke="rgba(255,244,218,0.22)" stroke-width="1"/>
-          <circle cx="32" cy="32" r="19" stroke="rgba(235,198,130,0.36)" stroke-width="0.9" stroke-dasharray="2 3"/>
-          <g id="stage2MiniBeam" style="transform-origin:32px 32px;transition:transform .6s cubic-bezier(0.16,1,0.3,1)">
-            <path d="M32 32 L24 6 A27 27 0 0 1 40 6 Z" fill="rgba(235,198,130,0.35)" stroke="#ffe4a8" stroke-width="1"/>
-          </g>
-          <circle cx="32" cy="32" r="5" fill="#fff5d9"/>
-        </svg>
-        <div class="stage2CityReadout">
-          <span class="stage2CoordsMono t-text-swap" id="stage2CoordsMono">ESTÚDIO · BASE NATAL FIXA</span>
-          <strong class="stage2HouseBig t-text-swap" id="stage2HouseBig">12 Casas em Espera</strong>
-          <span class="stage2FocusLine t-text-swap" id="stage2FocusLine">A hora e o dia nunca mudam</span>
+    <div class="stage2ContentWrapper">
+      <div class="stage2HeroHeader">
+        <p class="kicker" id="theoCityKicker">
+          <span class="stage1KickerDot" aria-hidden="true"></span>
+          <span>✦ A Regra de Ouro da Revolução Solar</span>
+        </p>
+        <h2 id="stage2Headline">A Casa Ativa a Energia.<br><span class="goldHighlight">A Cidade é o Meio.</span></h2>
+        <p class="body" id="stage2Subline">
+          O seu mapa natal é a sua essência fixa. A cada aniversário, a rotação da Terra recalibra o Ascendente local — e é isso que gira as 12 Casas astrológicas para aquele ciclo de 365 dias.
+        </p>
+        <div class="stage2TabsRow" role="tablist" aria-label="Casas e Cidades em Exemplo">
+          <button type="button" class="stage2TabBtn active" id="tabCasa2" role="tab" aria-selected="true" data-house="2">
+            <span>☩ Casa 2 · Prosperidade</span>
+          </button>
+          <button type="button" class="stage2TabBtn" id="tabCasa7" role="tab" aria-selected="false" data-house="7">
+            <span>♀ Casa 7 · Amor</span>
+          </button>
+          <button type="button" class="stage2TabBtn" id="tabCasa10" role="tab" aria-selected="false" data-house="10">
+            <span>♄ Casa 10 · Carreira</span>
+          </button>
         </div>
       </div>
-    </aside>
+
+      <!-- Showcase Card Interativo com Fotos 2K do Theo -->
+      <div class="stage2ShowcaseCard" id="stage2ShowcaseCard">
+        <div class="stage2ShowcaseVisual">
+          <img id="stage2ShowcaseImg" src="assets-v3/theo-casa2-zurique-2k.jpg" alt="Theo em Zurique ativando Casa 2" loading="eager">
+          <div class="visualPill" id="stage2VisualPill">
+            <span>EXEMPLO DO THEO · ZURIQUE · 47.37° N</span>
+          </div>
+        </div>
+        <div class="stage2ShowcaseDetails">
+          <div class="stage2ShowcaseBadge" id="stage2Badge">
+            <span class="stage1KickerDot" aria-hidden="true"></span>
+            <span id="stage2BadgeText">CASA 2 · FLUXO MATERIAL & RECURSOS</span>
+          </div>
+          <h3 class="stage2ShowcaseHeadline" id="stage2CardHeadline">
+            O alinhamento que destrava bens materiais e novos contratos.
+          </h3>
+          <p class="stage2ShowcaseText" id="stage2CardDesc">
+            No mapa deste ano do Theo, passar o aniversário em Zurique projeta o Sol para a Casa 2. Mas atenção: <strong>para você em outro ano, Zurique pode cair na Casa 6 ou 12!</strong> É o cálculo das Casas que revela sua coordenada pessoal de prosperidade.
+          </p>
+          <div class="stage2FocusLine" id="stage2CardNote" style="font-size:12.5px;color:rgba(235,198,130,.85);margin-top:4px">
+            ✦ A Casa comanda a vibração. A cidade é a coordenada astronômica que posiciona o Sol nela.
+          </div>
+        </div>
+      </div>
+
+      <!-- Callout Box: Wi-Fi, Forças Invisíveis & Vontade Humana -->
+      <div class="stage2EnergyBox">
+        <div class="stage2EnergyIcon" aria-hidden="true">⚡</div>
+        <div class="stage2EnergyText">
+          <h4>A Ciência das Ondas Invisíveis & O Poder da Sua Intenção</h4>
+          <p>
+            Você não enxerga as ondas do Wi-Fi nem a corrente elétrica, mas confia nelas todos os dias. A energia solar no seu aniversário opera sob a mesma lei física: ela <strong>não faz mágica passiva nem cria destino cego</strong>. A rotação solar disponibiliza o campo fértil da Casa ativada; a sua crença, vontade e ação prática são o motor que colhe os resultados.
+          </p>
+        </div>
+      </div>
+
+      <!-- Ato 3: Os 3 Modos de Usar o App -->
+      <div class="stage2ModesBox">
+        <div style="grid-column:1/-1">
+          <p class="kicker" style="margin-bottom:8px">✦ 3 Caminhos do Método</p>
+          <h3 style="font-family:Display,Georgia,serif;font-size:clamp(20px,2vw,28px);margin:0;color:#fff4d6">
+            Como você pode usar o Protocolo Solar
+          </h3>
+        </div>
+        <div class="stage2ModesGrid">
+          <div class="stage2ModeCard">
+            <span class="stage2ModeTag">Modo 01</span>
+            <h5>Por Cidade</h5>
+            <p>Já tem uma viagem em mente? Digite o destino e descubra quais Casas astrológicas você irá iluminar lá.</p>
+          </div>
+          <div class="stage2ModeCard">
+            <span class="stage2ModeTag">Modo 02</span>
+            <h5>Por Casa Astrológica</h5>
+            <p>Quer foco em Dinheiro (Casa 2) ou Amor (Casa 7)? O app varre o globo e revela as melhores cidades para você.</p>
+          </div>
+          <div class="stage2ModeCard">
+            <span class="stage2ModeTag">Modo 03</span>
+            <h5>Por Intenção Estratégica</h5>
+            <p>Escolha suas prioridades do ano e o sistema calcula a coordenada ideal de 365 dias para a sua vida.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage2ActionsRow">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <button id="skipSpeech" class="btnStageNext" type="button" style="min-height:52px;padding:0 32px">
+            <span>Desbloquear Meu Mapa Pessoal</span>
+            <span aria-hidden="true">→</span>
+          </button>
+          <button id="audio" class="btnTheoCircle" type="button" aria-label="Silenciar som" title="Silenciar som">
+            <svg class="s2AudioOff" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+              <path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 6 6m0-6-6 6"/>
+            </svg>
+            <svg class="s2AudioOn" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>
+            </svg>
+          </button>
+        </div>
+        <div style="font-size:12px;color:rgba(255,249,238,.5);letter-spacing:.05em">
+          ✦ Coleta rápida · 100% segura
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- STAGE 3 (CENA 2): Theo Pergunta o Nome + Loop Vivo de Espera + Transição para o Céu -->
@@ -1394,9 +1708,14 @@ function save(){
  * ============================================================================ */
 const V3_MEDIA={
   abertura:{
+    src:'assets-v3/theo-ato1-wifi-sol-14s.mp4',
+    poster:'assets-v3/theo-ato1-wifi-sol-poster.jpg',
+    cutAtSeconds:null
+  },
+  aberturaClassica:{
     src:'assets-v3/01-abertura.mp4',
     poster:'assets-v3/01-abertura-poster.jpg',
-    cutAtSeconds:null // Novo corte de 8.04s toca inteiro ate o sorriso final antes de ir para a Terra
+    cutAtSeconds:null
   },
   terraOrbital:{
     src:'assets-v3/02-terra-sunrise.mp4',
@@ -2148,7 +2467,55 @@ function setStarDustActive(on) {
   }
 }
 
+let currentVideoMode = 'wifi';
+const btnVideoSwitch = $('#btnVideoSwitch');
+
+function setVideoMode(mode, restart = true) {
+  currentVideoMode = mode;
+  if (!heroVid) return;
+  const isWifi = mode === 'wifi';
+  if (btnVideoSwitch) {
+    const lbl = btnVideoSwitch.querySelector('span');
+    if (lbl) lbl.textContent = isWifi ? '✦ Vídeo: Wi-Fi & Sol (14s)' : '✦ Vídeo: Abertura Clássica (8s)';
+  }
+  const nextSrc = isWifi ? V3_MEDIA.abertura.src : V3_MEDIA.aberturaClassica.src;
+  const nextPoster = isWifi ? V3_MEDIA.abertura.poster : V3_MEDIA.aberturaClassica.poster;
+
+  if (isWifi) {
+    if (phaseEls[0]) phaseEls[0].innerHTML = 'Você confia no <span class="goldHighlight">Wi-Fi</span> e nas energias invisíveis todo dia...';
+    if (phaseEls[1]) phaseEls[1].innerHTML = 'Por que duvidar da <span class="goldHighlight">energia do Sol</span> no seu aniversário?';
+    if (phaseEls[2]) phaseEls[2].innerHTML = 'A cada ano, o Sol reinicia o seu ciclo e <span class="goldHighlight">gira as Casas</span> do seu mapa.';
+    if (phaseEls[3]) phaseEls[3].innerHTML = 'A cidade onde você comemora <span class="goldHighlight">sintoniza a frequência</span> dos seus 365 dias.';
+  } else {
+    if (phaseEls[0]) phaseEls[0].innerHTML = 'Tem anos <span class="goldHighlight">bons</span> e anos <span class="goldHighlight">difíceis,</span>';
+    if (phaseEls[1]) phaseEls[1].innerHTML = 'e a gente <span class="goldHighlight">nunca sabe</span> por quê.';
+    if (phaseEls[2]) phaseEls[2].innerHTML = 'Todo aniversário o <span class="goldHighlight">Sol</span> reinicia o seu <span class="goldHighlight">mapa,</span>';
+    if (phaseEls[3]) phaseEls[3].innerHTML = 'e a <span class="goldHighlight">cidade</span> onde você está decide o <span class="goldHighlight">rumo do seu ano.</span>';
+  }
+
+  heroVid.poster = nextPoster;
+  heroVid.src = nextSrc;
+  eyeZoomTriggered = false;
+  resetStage0Visuals();
+  if (restart && currentStage === 0) {
+    heroVid.currentTime = 0;
+    heroVid.play().catch(() => {
+      heroVid.muted = true;
+      heroVid.play().catch(() => {});
+    });
+  }
+}
+
+if (btnVideoSwitch) {
+  btnVideoSwitch.onclick = (e) => {
+    e.stopPropagation();
+    setVideoMode(currentVideoMode === 'wifi' ? 'classic' : 'wifi', true);
+  };
+}
+
 function getStage0EffectiveDur() {
+  const isWifi = currentVideoMode === 'wifi' || (heroVid && heroVid.src.includes('wifi'));
+  if (isWifi) return 14.00;
   const cutAt = V3_MEDIA.abertura.cutAtSeconds;
   if (typeof cutAt === 'number' && Number.isFinite(cutAt) && cutAt > 0) return cutAt;
   if (heroVid && Number.isFinite(heroVid.duration) && heroVid.duration > 0) return heroVid.duration;
@@ -2173,6 +2540,7 @@ function resetStage0Visuals() {
 function syncHeroMotionHud() {
   if (!heroVid || currentStage !== 0) return;
   const t = heroVid.currentTime || 0;
+  const isWifi = currentVideoMode === 'wifi' || (heroVid.src && heroVid.src.includes('wifi'));
 
   if (!earthWarmed && t >= 2.5) {
     earthWarmed = true;
@@ -2181,28 +2549,43 @@ function syncHeroMotionHud() {
   }
 
   if (theoLocInline) {
-    const locked = t >= 5.48;
-    theoLocInline.classList.toggle('locked', locked);
-    if (t < 3.38) theoLocInline.textContent = 'SÃO PAULO · 23°33′ S';
-    else if (t < 4.45) theoLocInline.textContent = 'LISBOA · 38°43′ N';
-    else if (t < 5.48) theoLocInline.textContent = 'KYOTO · 35°00′ N';
-    else theoLocInline.textContent = 'ROMA · 41°54′ N';
+    if (isWifi) {
+      const locked = t >= 10.8;
+      theoLocInline.classList.toggle('locked', locked);
+      if (t < 3.50) theoLocInline.textContent = 'SÃO PAULO · 23°33′ S';
+      else if (t < 7.20) theoLocInline.textContent = 'ZURIQUE · 47°22′ N';
+      else if (t < 10.80) theoLocInline.textContent = 'NOVA YORK · 40°42′ N';
+      else theoLocInline.textContent = 'ROMA · 41°54′ N';
+    } else {
+      const locked = t >= 5.48;
+      theoLocInline.classList.toggle('locked', locked);
+      if (t < 3.38) theoLocInline.textContent = 'SÃO PAULO · 23°33′ S';
+      else if (t < 4.45) theoLocInline.textContent = 'LISBOA · 38°43′ N';
+      else if (t < 5.48) theoLocInline.textContent = 'KYOTO · 35°00′ N';
+      else theoLocInline.textContent = 'ROMA · 41°54′ N';
+    }
   }
   if (theoHorizonRule) {
     theoHorizonRule.classList.toggle('expanded', t >= 0.35);
   }
 
-  const cutAt = V3_MEDIA.abertura.cutAtSeconds;
-  const hasCut = typeof cutAt === 'number' && Number.isFinite(cutAt) && cutAt > 0;
   const effDur = getStage0EffectiveDur();
-  const fadeAt = Math.max(7.65, effDur - 0.35);
+  const fadeAt = Math.max(isWifi ? 13.5 : 7.65, effDur - 0.35);
 
   let curPhase = -1;
-  if (t < 1.70) curPhase = 0;
-  else if (t < 3.38) curPhase = 1;
-  else if (t < 5.48) curPhase = 2;
-  else if (t < fadeAt) curPhase = 3;
-  else curPhase = -1;
+  if (isWifi) {
+    if (t < 3.50) curPhase = 0;
+    else if (t < 7.20) curPhase = 1;
+    else if (t < 10.80) curPhase = 2;
+    else if (t < fadeAt) curPhase = 3;
+    else curPhase = -1;
+  } else {
+    if (t < 1.70) curPhase = 0;
+    else if (t < 3.38) curPhase = 1;
+    else if (t < 5.48) curPhase = 2;
+    else if (t < fadeAt) curPhase = 3;
+    else curPhase = -1;
+  }
 
   phaseEls.forEach((el, idx) => {
     el.classList.toggle('active', idx === curPhase);
@@ -2221,7 +2604,7 @@ function syncHeroMotionHud() {
     progressFill.style.width = pct + '%';
   }
 
-  if (hasCut && t >= cutAt && !eyeZoomTriggered) {
+  if (t >= effDur - 0.15 && !eyeZoomTriggered) {
     eyeZoomTriggered = true;
     if (mainHeader) mainHeader.classList.remove('cinemaDim');
     goToStage(1, { fromStage0: true });
@@ -2528,59 +2911,75 @@ const STAGE2_CUES=[
   {idx:3,until:99.0,deg:270,kicker:'✦ Transição 03 · Nova York, EUA',sub:'Em Nova York, o Sol sobe para o topo: carreira, autoridade e projeção.',coords:'NOVA YORK · EUA · 40.71° N',house:'CASA 10 · CARREIRA',focus:'Autoridade, projeção e topo'}
 ];
 
-let lastStage2Idx=-1;
-let stage2AutoAdvanced=false;
-function updateStage2Sync(t){
-  const cue=STAGE2_CUES.find(c=>t<c.until)||STAGE2_CUES[STAGE2_CUES.length-1];
-  const fill=$('#theoSpeechFill');
-  if(cue.idx!==lastStage2Idx){
-    const prevIdx=lastStage2Idx;
-    lastStage2Idx=cue.idx;
-    swapTextAnimated($('#theoCityKicker'),cue.kicker);
-    swapTextAnimated($('#stage2Subline'),cue.sub);
-    swapTextAnimated($('#stage2CoordsMono'),cue.coords);
-    swapTextAnimated($('#stage2HouseBig'),cue.house);
-    swapTextAnimated($('#stage2FocusLine'),cue.focus);
-    const beam=$('#stage2MiniBeam');
-    if(beam)beam.style.transform=`rotate(${cue.deg}deg)`;
-    const flashEl=$('#stage2CutFlash');
-    if(flashEl&&prevIdx>=0&&!reducedMotion){
-      flashEl.classList.add('flash');
-      clearTimeout(flashEl._ft);
-      flashEl._ft=setTimeout(()=>flashEl.classList.remove('flash'),380);
-    }
+const STAGE2_HOUSES = {
+  2: {
+    img: 'assets-v3/theo-casa2-zurique-2k.jpg',
+    pill: 'EXEMPLO DO THEO · ZURIQUE · 47.37° N',
+    badge: 'CASA 2 · FLUXO MATERIAL & RECURSOS',
+    headline: 'O alinhamento que destrava bens materiais e novos contratos.',
+    desc: 'No mapa deste ano do Theo, passar o aniversário em Zurique projeta o Sol para a Casa 2. Mas atenção: <strong>para você em outro ano, Zurique pode cair na Casa 6 ou 12!</strong> É o cálculo das Casas que revela sua coordenada pessoal de prosperidade.',
+    note: '✦ A Casa comanda a vibração. A cidade é a coordenada astronômica que posiciona o Sol nela.'
+  },
+  7: {
+    img: 'assets-v3/theo-casa7-roma-2k.jpg',
+    pill: 'EXEMPLO DO THEO · ROMA · 41.90° N',
+    badge: 'CASA 7 · RELACIONAMENTOS & SOCIEDADES',
+    headline: 'O destino exato para abrir o coração e construir alianças de alto valor.',
+    desc: 'Em Roma, o mapa do Theo alinha a Casa 7: magnetismo e sintonia para relações sólidas. A cidade não cria encontros do nada; ela sintoniza a frequência para que você esteja presente e receptivo às pessoas certas.',
+    note: '✦ A Casa 7 acaba com relações rasas e fortalece parcerias sólidas de vida e negócios.'
+  },
+  10: {
+    img: 'assets-v3/theo-casa10-ny-2k.jpg',
+    pill: 'EXEMPLO DO THEO · NOVA YORK · 40.71° N',
+    badge: 'CASA 10 · CARREIRA & MEIO DO CÉU',
+    headline: 'A projeção solar que posiciona sua autoridade e liderança no topo.',
+    desc: 'Em Nova York, a vibração da Casa 10 coloca o Sol no Meio do Céu: visibilidade pública e expansão de carreira. O alinhamento oferece o vento favorável; a sua determinação constrói o legado.',
+    note: '✦ O Sol no topo do mapa atrai líderes, visibilidade e reconhecimento profissional.'
   }
-  const dur=Number.isFinite(speech.duration)&&speech.duration>0?speech.duration:13.80;
-  if(fill){
-    fill.style.width=Math.min(100,(t/dur)*100).toFixed(1)+'%';
+};
+
+function selectStage2House(houseNum) {
+  const data = STAGE2_HOUSES[houseNum];
+  if (!data) return;
+  $$('.stage2TabBtn').forEach(b => {
+    const isThis = b.dataset.house === String(houseNum);
+    b.classList.toggle('active', isThis);
+    b.setAttribute('aria-selected', isThis ? 'true' : 'false');
+  });
+  const img = $('#stage2ShowcaseImg');
+  if (img) {
+    img.style.opacity = '0';
+    setTimeout(() => {
+      img.src = data.img;
+      img.style.opacity = '1';
+    }, 120);
   }
-  if(!stage2AutoAdvanced&&dur>2&&t>=dur-0.18){
-    stage2AutoAdvanced=true;
-    goToStage(3);
-  }
+  const pill = $('#stage2VisualPill');
+  if (pill) pill.textContent = data.pill;
+  const badgeText = $('#stage2BadgeText');
+  if (badgeText) badgeText.textContent = data.badge;
+  const hl = $('#stage2CardHeadline');
+  if (hl) hl.textContent = data.headline;
+  const desc = $('#stage2CardDesc');
+  if (desc) desc.innerHTML = data.desc;
+  const note = $('#stage2CardNote');
+  if (note) note.textContent = data.note;
 }
+
+const tabCasa2 = $('#tabCasa2');
+if (tabCasa2) tabCasa2.onclick = () => selectStage2House(2);
+const tabCasa7 = $('#tabCasa7');
+if (tabCasa7) tabCasa7.onclick = () => selectStage2House(7);
+const tabCasa10 = $('#tabCasa10');
+if (tabCasa10) tabCasa10.onclick = () => selectStage2House(10);
 
 async function startSpeechVideo(){
   if(currentStage!==2)return;
-  lastStage2Idx=-1;
-  stage2AutoAdvanced=false;
   speech.preload='auto';
-  speech.loop=false;
-  speech.onended=()=>{
-    if(currentStage===2&&!stage2AutoAdvanced){
-      stage2AutoAdvanced=true;
-      goToStage(3);
-    }
-  };
+  speech.loop=true;
   try{speech.currentTime=0;}catch(e){}
   speech.muted=!audioUnlocked||userMutedAudio;
   setActiveTheoVideo(speech);
-  updateStage2Sync(0);
-  speech.ontimeupdate=()=>{
-    if(currentStage===2&&!speech.seeking){
-      updateStage2Sync(speech.currentTime);
-    }
-  };
   try{
     await speech.play();
   }catch{
@@ -3037,6 +3436,55 @@ function renderStage7Closing(){
   if(sumKicker){
     sumKicker.textContent=who?`✦ O Seu Mapa de Virada de Chave · ${who}${where?' ('+where+')':''}`:'✦ O Seu Mapa de Virada de Chave';
   }
+
+  // Personalização instantânea de acordo com a prioridade #1 escolhida
+  const topPrio = (selectedPriorities && selectedPriorities.length > 0) ? selectedPriorities[0] : 'Amor';
+  const bannerImg = document.querySelector('.romaBanner img');
+  const bannerVid = $('#reportBannerVid');
+  const metaH3 = document.querySelector('.romaBannerMeta h3');
+  const metaSmall = document.querySelector('.romaBannerMeta small');
+  const casaBadgeSpan = document.querySelector('.romaCasaBadge span:last-child');
+  const mainHeadline = document.querySelector('.romaHeadline');
+  const area1Title = document.querySelector('.romaAreasGrid .romaAreaBox:nth-child(1) h5');
+  const area1Text = document.querySelector('.romaAreasGrid .romaAreaBox:nth-child(1) p');
+  const area2Title = document.querySelector('.romaAreasGrid .romaAreaBox:nth-child(2) h5');
+  const area2Text = document.querySelector('.romaAreasGrid .romaAreaBox:nth-child(2) p');
+
+  if (topPrio === 'Dinheiro') {
+    if (bannerImg) bannerImg.src = 'assets-v3/theo-casa2-zurique-2k.jpg';
+    if (bannerVid) bannerVid.src = '../../../public/assets/cities/zurich.mp4';
+    if (metaH3) metaH3.textContent = 'Zurique, Suíça';
+    if (metaSmall) metaSmall.textContent = '47.3769° N · 8.5417° E';
+    if (casaBadgeSpan) casaBadgeSpan.textContent = 'Casa 2 em Destaque';
+    if (mainHeadline) mainHeadline.textContent = 'O destino exato para ativar a Casa 2 e alavancar sua prosperidade financeira.';
+    if (area1Title) area1Title.textContent = 'Fluxo de Caixa & Negócios';
+    if (area1Text) area1Text.textContent = 'A vibração da Casa 2 desbloqueia novas fontes de receita, acelera contratos e organiza seus recursos materiais.';
+    if (area2Title) area2Title.textContent = 'Construção Material & Autovalor';
+    if (area2Text) area2Text.textContent = 'Porque a Casa 2 rege o patrimônio e a retenção de riqueza. Suas decisões financeiras ganham clareza e solidez.';
+  } else if (topPrio === 'Carreira' || topPrio === 'Reconhecimento') {
+    if (bannerImg) bannerImg.src = 'assets-v3/theo-casa10-ny-2k.jpg';
+    if (bannerVid) bannerVid.src = '../../../public/assets/cities/new_york.mp4';
+    if (metaH3) metaH3.textContent = 'Nova York, EUA';
+    if (metaSmall) metaSmall.textContent = '40.7128° N · 74.0060° W';
+    if (casaBadgeSpan) casaBadgeSpan.textContent = 'Casa 10 (Meio do Céu) em Destaque';
+    if (mainHeadline) mainHeadline.textContent = 'O destino exato para ativar a Casa 10 e projetar sua liderança e carreira.';
+    if (area1Title) area1Title.textContent = 'Visibilidade & Autoridade';
+    if (area1Text) area1Text.textContent = 'A energia do Meio do Céu coloca seus projetos em evidência direta diante de patrocinadores, líderes e do mercado.';
+    if (area2Title) area2Title.textContent = 'Ascensão & Reputação';
+    if (area2Text) area2Text.textContent = 'Porque a Casa 10 rege o ápice da sua trajetória pública. O Sol nesta posição consolida seu legado profissional.';
+  } else {
+    if (bannerImg) bannerImg.src = 'assets-v3/theo-casa7-roma-2k.jpg';
+    if (bannerVid) bannerVid.src = '../../../public/assets/roma.mp4';
+    if (metaH3) metaH3.textContent = 'Roma, Itália';
+    if (metaSmall) metaSmall.textContent = '41.9028° N · 12.4964° E';
+    if (casaBadgeSpan) casaBadgeSpan.textContent = 'Casa 7 em Destaque';
+    if (mainHeadline) mainHeadline.textContent = 'O destino exato para ativar a Casa 7 e destravar a sua vida amorosa.';
+    if (area1Title) area1Title.textContent = 'Encontro de Almas';
+    if (area1Text) area1Text.textContent = 'A energia da Casa 7 acaba com as relações rasas, atraindo o parceiro de vida ideal e oficializando alianças.';
+    if (area2Title) area2Title.textContent = 'A Força da União';
+    if (area2Text) area2Text.textContent = 'Porque a Casa 7 rege as parcerias de alto valor. Ao ativar esta casa no seu aniversário, você constrói uma vida próspera a dois.';
+  }
+
   const romaAccBtn=$('#romaAccordionBtn'),romaPanel=$('#romaAreasPanel');
   if(romaAccBtn&&romaPanel){
     romaAccBtn.onclick=()=>{

@@ -197,8 +197,8 @@
     .ed-house-pill strong { display: block; font-family: var(--ps-display); font-size: 8.8pt; font-weight: 400; color: var(--ink-navy); margin-bottom: 0.8mm; }
     .ed-house-pill p { margin: 0; font-size: 7pt; line-height: 1.35; color: var(--ink-slate); }
 
-    .ed-host-note { font-size: 8pt; color: var(--ink-muted); display: flex; align-items: center; justify-content: space-between; border-top: 0.25mm solid #E8DCC0; padding-top: 2mm; }
-    .ed-host-note strong { color: var(--ink-navy); }
+    .ed-host-note { font-size: 8pt; color: var(--ink-muted); display: flex; align-items: center; justify-content: space-between; gap: 4mm; border-top: 0.25mm solid #E8DCC0; padding-top: 2.2mm; }
+    .ed-host-note strong { color: var(--ink-navy); white-space: nowrap; }
 
     .ed-theo-frame { position: relative; border-radius: 3.5mm; overflow: hidden; border: 0.45mm solid #DFC387; background: #FAF6EC; display: flex; flex-direction: column; justify-content: flex-end; }
     .ed-theo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
@@ -209,11 +209,13 @@
     .tear-divider { position: relative; z-index: 2; display: flex; align-items: center; gap: 3mm; margin: 1mm 0 2.5mm; color: var(--gold-rich); font-family: var(--ps-mono); font-size: 6pt; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; }
     .tear-divider::before, .tear-divider::after { content: ""; flex: 1; border-top: 0.45mm dashed #B87A14; }
 
-    .boarding-pass { width: 100%; height: 85mm; border-radius: 3.2mm; overflow: hidden; display: grid; grid-template-columns: 1fr 52mm; background: #FFFFFF; border: 0.35mm solid #DEC58B; position: relative; z-index: 2; }
+    .boarding-pass { width: 100%; height: 81mm; border-radius: 3.2mm; overflow: hidden; display: grid; grid-template-columns: 1fr 52mm; background: #FFFFFF; border: 0.35mm solid #DEC58B; position: relative; z-index: 2; }
     .bp-main { display: flex; flex-direction: column; justify-content: space-between; background: #FFFFFF; }
     .bp-airline-strip { background: var(--bp-accent); color: #FFFFFF; padding: 2mm 5mm; display: flex; align-items: center; justify-content: space-between; font-family: var(--ps-mono); font-size: 6pt; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; }
-    .bp-content { padding: 2.8mm 5mm 2mm; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 1.8mm; }
-    .bp-route-stage { position: relative; background: var(--bp-soft); border: 0.25mm solid #E5D5AE; border-radius: 2.4mm; padding: 2.4mm 4mm 2mm; overflow: hidden; isolation: isolate; }
+    .bp-content { padding: 2.8mm 5mm 2.4mm; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 2.4mm; }
+    .bp-route-stage { position: relative; background: var(--bp-soft); border: 0.25mm solid #E5D5AE; border-radius: 2.4mm; padding: 3.2mm 4.5mm 2.8mm; overflow: hidden; isolation: isolate; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .bp-route-subline { margin: 1.5mm 0 0; padding-top: 1.5mm; border-top: 0.22mm solid rgba(11, 25, 44, 0.12); font-size: 7.4pt; color: var(--ink-slate); display: flex; align-items: center; justify-content: space-between; gap: 3mm; }
+    .bp-route-subline strong { color: var(--ink-navy); }
     .bp-horizon-art { position: absolute; inset: 0; pointer-events: none; z-index: -1; }
     .bp-horizon-art svg { width: 100%; height: 100%; display: block; }
     .bp-route-row { display: grid; grid-template-columns: auto 1fr auto; gap: 4mm; align-items: center; }
@@ -321,13 +323,13 @@
     <article class="a4-sheet">
       <header class="a4-header">
         <div class="a4-logo-slot"></div>
-        <span class="a4-gift-tag">🎁 Convite Especial · <span class="sync-short">MAPA COMPLETO</span></span>
+        <span class="a4-gift-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><rect x="3" y="8" width="18" height="4" rx="1" stroke="currentColor" stroke-width="2"/><path d="M12 8V21M5 12V20C5 20.6 5.4 21 6 21H18C18.6 21 19 20.6 19 20V12" stroke="currentColor" stroke-width="2"/><path d="M12 8H8.5C7.1 8 6 6.9 6 5.5C6 4.1 7.1 3 8.5 3C10.7 3 12 8 12 8ZM12 8H15.5C16.9 8 18 6.9 18 5.5C18 4.1 16.9 3 15.5 3C13.3 3 12 8 12 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Convite Especial · <span class="sync-short">MAPA COMPLETO</span></span></span>
       </header>
 
       <section class="a4-editorial">
         <div class="ed-copy">
           <div>
-            <span class="ed-eyebrow">📶 Como funciona a Revolução Solar (sem misticismo)</span>
+            <span class="ed-eyebrow" style="display:inline-flex;align-items:center;gap:1.8mm;"><svg width="12" height="10" viewBox="0 0 24 20" fill="none" style="flex-shrink:0"><path d="M2 7.5C7.6 2.5 16.4 2.5 22 7.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M5.5 11.5C9.2 8.2 14.8 8.2 18.5 11.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M9.2 15.2C10.8 13.7 13.2 13.7 14.8 15.2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18.2" r="1.9" fill="currentColor"/></svg><span>Como funciona a Revolução Solar (sem misticismo)</span></span>
             <h1 class="ed-headline">Você não vê o Wi-Fi nem as ondas de energia, mas <em>confia neles todo dia.</em></h1>
             <p class="ed-lead">
               Com o Sol no seu aniversário é igual: <strong>a cidade não faz mágica</strong> — ela gira a roda das 12 Casas do seu mapa e sintoniza onde sua energia ganha força o ano inteiro.
@@ -366,7 +368,7 @@
         </aside>
       </section>
 
-      <div class="tear-divider">✂ Destaque abaixo o seu Boarding Pass com o código do presente</div>
+      <div class="tear-divider"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><circle cx="6" cy="6" r="3" stroke="#B87A14" stroke-width="2"/><circle cx="6" cy="18" r="3" stroke="#B87A14" stroke-width="2"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12" stroke="#B87A14" stroke-width="2" stroke-linecap="round"/></svg><span>Destaque abaixo o seu Boarding Pass com o código do presente</span></div>
 
       <section class="boarding-pass">
         <div class="bp-main">
@@ -385,6 +387,10 @@
                   <span class="bp-arc-sub">24H NA COORDENADA</span>
                 </div>
                 <div class="bp-airport right"><span class="bp-iata accent">SOL</span><span class="bp-city">Sua Coordenada</span></div>
+              </div>
+              <div class="bp-route-subline">
+                <span><strong>Como usar:</strong> acesse <strong>protocolosolar.com.br/resgatar</strong> e simule Por Cidade, Casa ou Intenção.</span>
+                <span style="font-family:var(--ps-mono);font-size:6pt;color:var(--bp-accent);font-weight:700;white-space:nowrap;">12 CASAS · ±0.01° GPS</span>
               </div>
             </div>
             <div class="bp-telemetry">
