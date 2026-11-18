@@ -3,771 +3,469 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mídia Kit A4 Único · Protocolo Solar</title>
+  <title>Voucher Protocolo Solar · Mídia Kit A4</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@500;600;700&family=Marcellus&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    @font-face {
-      font-family: "Marcellus";
-      src: url("../../public/brand/fonts/Marcellus-Regular.ttf") format("truetype");
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
-    }
-    @font-face {
-      font-family: "DM Sans";
-      src: url("../../public/brand/fonts/DMSans-Variable.ttf") format("truetype");
-      font-weight: 100 900;
-      font-style: normal;
-      font-display: swap;
-    }
-
-    :root {
-      --paper-bg: #EFEAE0;
-      --sheet-bg: #FFFFFF;
-      --ivory: #FCF9F2;
-      --ink-navy: #0B192C;
-      --ink-slate: #475569;
-      --ink-muted: #64748B;
-      --gold-rich: #B87A14;
-      --gold-line: #DFC387;
-      --bp-accent: #B87A14;
-      --bp-soft: #FEF7E6;
-      --ps-display: "Marcellus", Georgia, serif;
-      --ps-ui: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-      --ps-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-    }
-
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
 
     body {
-      margin: 0;
-      background: var(--paper-bg);
-      color: var(--ink-navy);
-      font-family: var(--ps-ui);
-      line-height: 1.45;
+      background: #EFEAE0;
+      color: #0B192C;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .studio-bar {
+    /* TOOLBAR FLUTUANTE (SOMENTE NA TELA, NUNCA NA IMPRESSÃO) */
+    .print-toolbar {
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 50;
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--gold-line);
+      border-bottom: 1px solid #DEC58B;
       padding: 12px 24px;
-      box-shadow: 0 10px 30px rgba(11, 25, 44, 0.08);
-    }
-
-    .studio-header {
-      max-width: 1320px;
-      margin: 0 auto 10px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      width: 100%;
+      box-shadow: 0 8px 25px rgba(11, 25, 44, 0.08);
     }
 
-    .studio-brand { display: flex; align-items: center; gap: 12px; }
-    .studio-badge {
-      font-family: var(--ps-mono);
+    .tb-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tb-brand {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: #0B192C;
+    }
+
+    .tb-pill {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
       color: #065F46;
       background: #ECFDF5;
       border: 1px solid #A7F3D0;
-      padding: 5px 11px;
+      padding: 4px 10px;
       border-radius: 999px;
       font-weight: 700;
     }
 
-    .btn-primary {
+    .tb-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-field {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #FCF9F2;
+      border: 1px solid #CBD5E1;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .tb-field label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .tb-field input, .tb-field select {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #0B192C;
+    }
+
+    .tb-field input[type="text"] {
+      font-family: 'JetBrains Mono', monospace;
+      width: 140px;
+    }
+
+    .btn {
       appearance: none;
-      border: 1px solid #B45309;
+      border: 1px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #0B192C;
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: #F8FAFC;
+    }
+
+    .btn-primary {
       background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
       color: #FFFFFF;
-      font-family: var(--ps-ui);
-      font-size: 12.5px;
+      border-color: #B45309;
       font-weight: 700;
-      padding: 9px 16px;
-      border-radius: 9px;
-      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
     }
 
-    .studio-controls {
-      max-width: 1320px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      align-items: end;
+    .btn-primary:hover {
+      filter: brightness(1.05);
     }
 
-    .field { display: flex; flex-direction: column; gap: 4px; }
-    .field label { font-family: var(--ps-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-rich); font-weight: 700; }
-    .field input, .field select { background: var(--ivory); border: 1px solid #D6C394; color: var(--ink-navy); padding: 8px 11px; border-radius: 8px; font-family: var(--ps-ui); font-size: 12.5px; font-weight: 500; outline: none; }
-    .field-row { display: flex; gap: 6px; }
-    .field-row input { flex: 1; min-width: 0; }
-    .icon-btn { background: #FEF7E6; border: 1px solid var(--gold-line); color: #854D0E; border-radius: 8px; padding: 0 10px; cursor: pointer; font-family: var(--ps-mono); font-size: 11px; font-weight: 700; white-space: nowrap; }
-
-    /* FOLHA A4 ÚNICA REAL (210mm × 297mm) */
-    .stage { padding: 26px 16px 60px; display: flex; justify-content: center; }
+    /* PALCO DA FOLHA A4 (PROPORÇÃO EXATA 210mm × 297mm) */
+    .stage {
+      padding: 24px 16px 60px;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
 
     .a4-sheet {
       width: 210mm;
       height: 297mm;
-      background: var(--sheet-bg);
-      padding: 11mm 12mm 10mm;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
       position: relative;
+      background: #FFFFFF;
       box-shadow: 0 24px 65px rgba(11, 25, 44, 0.16);
       overflow: hidden;
     }
 
-    .a4-sheet::before {
-      content: "";
+    /* IMAGEM OFICIAL DO CANVA (THEO + VOUCHER) */
+    .a4-sheet img.bg {
       position: absolute;
-      inset: 5.5mm;
-      border: 0.28mm solid #E5D4AA;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
       pointer-events: none;
       z-index: 1;
     }
 
-    .a4-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 0.35mm solid #E8DCC0;
-      padding-bottom: 3.5mm;
-      position: relative;
-      z-index: 2;
-    }
-
-    .a4-gift-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 2mm;
-      font-family: var(--ps-mono);
-      font-size: 6.8pt;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--bp-accent);
-      background: var(--bp-soft);
-      border: 0.3mm solid var(--bp-accent);
-      padding: 1.4mm 3.6mm;
-      border-radius: 99mm;
-    }
-
-    /* CORPO ADVERTISING DA FOLHA A4 (ESTILO CAMPANHA CLARO / ANITTA) */
-    .a4-advertising {
-      display: grid;
-      grid-template-columns: 1fr 78mm;
-      gap: 5mm;
-      align-items: center;
-      flex: 1;
-      padding: 4mm 0 2mm;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Raios de luz solar sutis de fundo (estilo telecom/anitta sem gastar tinta) */
-    .a4-ad-rays {
+    /* QR CODE DINÂMICO SOBREPOSTO */
+    .qr-overlay {
       position: absolute;
-      top: -20px;
-      right: 0;
-      width: 95mm;
-      height: 95mm;
-      background: radial-gradient(circle, rgba(245, 176, 65, 0.18) 0%, rgba(254, 247, 230, 0.08) 55%, transparent 75%);
-      pointer-events: none;
-      z-index: -1;
-      border-radius: 50%;
-    }
-
-    .ad-copy {
+      left: 38.0%;
+      top: 71.6%;
+      width: 14.2%;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 2.8mm;
-    }
-
-    .ad-badge-top {
-      display: inline-flex;
       align-items: center;
-      gap: 1.8mm;
-      font-family: var(--ps-mono);
-      font-size: 6.8pt;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #92400E;
-      background: #FEF3C7;
-      border: 0.3mm solid #FCD34D;
-      padding: 1.2mm 2.8mm;
-      border-radius: 99mm;
-      font-weight: 700;
-      width: fit-content;
-    }
-
-    .ad-headline {
-      font-family: var(--ps-display);
-      font-size: 20pt;
-      line-height: 1.12;
-      color: var(--ink-navy);
-      margin: 1.2mm 0 1.8mm;
-      font-weight: 400;
-      letter-spacing: -0.015em;
-    }
-
-    .ad-headline em {
-      font-style: normal;
-      color: #B45309;
-      font-weight: 700;
-      border-bottom: 0.8mm solid #F59E0B;
-    }
-
-    .ad-lead {
-      margin: 0;
-      font-size: 8.8pt;
-      line-height: 1.48;
-      color: var(--ink-slate);
-    }
-
-    .ad-lead strong {
-      color: var(--ink-navy);
-    }
-
-    /* CARDS FLUTUANTES DE ALTO IMPACTO (ESTILO PAINÉIS RETAIL TELECOM) */
-    .ad-promo-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 2.2mm;
-      margin: 1.5mm 0;
-    }
-
-    .ad-promo-card {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 3mm;
-      align-items: center;
+      justify-content: center;
       background: #FFFFFF;
-      border: 0.35mm solid #E2E8F0;
-      border-left: 1.2mm solid var(--promo-accent, #B87A14);
-      border-radius: 2.4mm;
-      padding: 2.2mm 3.2mm;
-      box-shadow: 0 2mm 5mm rgba(11, 25, 44, 0.04);
+      padding: 4px;
+      border-radius: 6px;
+      z-index: 3;
     }
 
-    .ad-promo-card.highlight {
-      background: #FFFBEB;
-      border-color: #FDE68A;
-      border-left: 1.2mm solid #D97706;
+    .qr-overlay.bordered {
+      border: 1.5px solid #B58E43;
+      box-shadow: 0 6px 18px rgba(11, 25, 44, 0.14);
+      padding: 6px;
+      border-radius: 10px;
     }
 
-    .ad-promo-icon {
-      font-size: 13pt;
-      line-height: 1;
+    .qr-overlay .qr-box {
+      width: 100%;
+      aspect-ratio: 1;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .ad-promo-info strong {
-      display: block;
-      font-family: var(--ps-mono);
-      font-size: 7.2pt;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink-navy);
-      font-weight: 700;
-      margin-bottom: 0.3mm;
-    }
-
-    .ad-promo-info p {
-      margin: 0;
-      font-size: 7.2pt;
-      line-height: 1.32;
-      color: var(--ink-slate);
-    }
-
-    .ad-footer-note {
-      font-size: 7.6pt;
-      color: var(--ink-muted);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 0.25mm solid #E8DCC0;
-      padding-top: 2mm;
-    }
-
-    .ad-footer-note strong {
-      color: var(--ink-navy);
-    }
-
-    /* THEO EM RECORTE DINÂMICO (SEM CAIXA QUADRADA!) */
-    .ad-theo-stage {
-      position: relative;
-      height: 100%;
-      min-height: 78mm;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      overflow: visible;
-    }
-
-    .ad-theo-cutout {
+    .qr-overlay svg {
       width: 100%;
-      max-height: 82mm;
-      object-fit: contain;
-      object-position: center bottom;
+      height: 100%;
       display: block;
-      filter: drop-shadow(0 6mm 10mm rgba(11, 25, 44, 0.12));
-      transform: scale(1.04);
-      transform-origin: bottom center;
-      position: relative;
-      z-index: 2;
     }
 
-    .ad-speech-bubble {
-      position: absolute;
-      top: 6mm;
-      left: -10mm;
-      background: #FFFFFF;
-      border: 0.35mm solid #F59E0B;
-      border-radius: 3mm;
-      padding: 2mm 3.2mm;
-      box-shadow: 0 4mm 10mm rgba(11, 25, 44, 0.09);
-      max-width: 52mm;
-      z-index: 3;
-    }
-
-    .ad-speech-bubble strong {
+    .qr-overlay .qr-caption {
       display: block;
-      font-family: var(--ps-mono);
-      font-size: 6.2pt;
-      letter-spacing: 0.1em;
+      margin-top: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: #B45309;
-      margin-bottom: 0.3mm;
+      color: #6B4F1D;
+      text-align: center;
+      line-height: 1;
     }
 
-    .ad-speech-bubble p {
-      margin: 0;
-      font-size: 7pt;
-      line-height: 1.25;
-      color: var(--ink-navy);
-      font-weight: 600;
-    }
-
-    .ad-speech-bubble::after {
-      content: "";
+    /* CÓDIGO DO PRESENTE SOBREPOSTO */
+    .code-overlay {
       position: absolute;
-      bottom: -2.2mm;
-      left: 12mm;
-      width: 3.5mm;
-      height: 3.5mm;
-      background: #FFFFFF;
-      border-right: 0.35mm solid #F59E0B;
-      border-bottom: 0.35mm solid #F59E0B;
-      transform: rotate(45deg);
+      left: 58.1%;
+      top: 77.1%;
+      width: 31.6%;
+      height: 4.8%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      white-space: nowrap;
+      color: #0B192C;
+      z-index: 3;
+      user-select: all;
     }
 
-    .tear-divider { position: relative; z-index: 2; display: flex; align-items: center; gap: 3mm; margin: 1mm 0 2.5mm; color: var(--gold-rich); font-family: var(--ps-mono); font-size: 6pt; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; }
-    .tear-divider::before, .tear-divider::after { content: ""; flex: 1; border-top: 0.45mm dashed #B87A14; }
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
 
-    .boarding-pass { width: 100%; height: 81mm; border-radius: 3.2mm; overflow: hidden; display: grid; grid-template-columns: 1fr 52mm; background: #FFFFFF; border: 0.35mm solid #DEC58B; position: relative; z-index: 2; }
-    .bp-main { display: flex; flex-direction: column; justify-content: space-between; background: #FFFFFF; }
-    .bp-airline-strip { background: var(--bp-accent); color: #FFFFFF; padding: 2mm 5mm; display: flex; align-items: center; justify-content: space-between; font-family: var(--ps-mono); font-size: 6pt; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; }
-    .bp-content { padding: 2.8mm 5mm 2.4mm; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 2.4mm; }
-    .bp-route-stage { position: relative; background: var(--bp-soft); border: 0.25mm solid #E5D5AE; border-radius: 2.4mm; padding: 3.2mm 4.5mm 2.8mm; overflow: hidden; isolation: isolate; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .bp-route-subline { margin: 1.5mm 0 0; padding-top: 1.5mm; border-top: 0.22mm solid rgba(11, 25, 44, 0.12); font-size: 7.4pt; color: var(--ink-slate); display: flex; align-items: center; justify-content: space-between; gap: 3mm; }
-    .bp-route-subline strong { color: var(--ink-navy); }
-    .bp-horizon-art { position: absolute; inset: 0; pointer-events: none; z-index: -1; }
-    .bp-horizon-art svg { width: 100%; height: 100%; display: block; }
-    .bp-route-row { display: grid; grid-template-columns: auto 1fr auto; gap: 4mm; align-items: center; }
-    .bp-airport { display: flex; flex-direction: column; }
-    .bp-airport.right { text-align: right; }
-    .bp-iata { font-family: var(--ps-mono); font-size: 19pt; font-weight: 700; line-height: 1; color: var(--ink-navy); letter-spacing: -0.02em; }
-    .bp-iata.accent { color: var(--bp-accent); }
-    .bp-city { font-family: var(--ps-mono); font-size: 5.4pt; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-slate); margin-top: 0.6mm; font-weight: 600; }
-    .bp-flight-arc { display: flex; flex-direction: column; align-items: center; gap: 0.6mm; }
-    .bp-arc-label { font-family: var(--ps-mono); font-size: 5pt; letter-spacing: 0.13em; color: var(--bp-accent); font-weight: 700; }
-    .bp-arc-line { width: 100%; display: flex; align-items: center; gap: 1.4mm; }
-    .bp-arc-line .dot { width: 1.6mm; height: 1.6mm; border-radius: 50%; background: var(--bp-accent); }
-    .bp-arc-line .track { flex: 1; border-bottom: 0.42mm dashed var(--bp-accent); }
-    .bp-arc-line .plane { font-size: 10pt; color: var(--bp-accent); line-height: 1; }
-    .bp-arc-sub { font-family: var(--ps-mono); font-size: 4.8pt; letter-spacing: 0.1em; color: var(--ink-muted); }
-
-    .bp-telemetry { display: grid; grid-template-columns: 1.4fr 0.65fr 0.8fr 0.65fr 1.1fr; gap: 1.6mm; }
-    .bp-cell { border: 0.22mm solid #E2E8F0; background: var(--ivory); border-radius: 1.6mm; padding: 1mm 2mm; display: flex; flex-direction: column; gap: 0.25mm; }
-    .bp-cell-label { font-family: var(--ps-mono); font-size: 4.6pt; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-muted); }
-    .bp-cell-value { font-family: var(--ps-mono); font-size: 7pt; font-weight: 700; color: var(--ink-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .bp-cell-value.accent { color: var(--bp-accent); }
-    .handwrite-line { border-bottom: 0.36mm dotted #B87A14; height: 3.5mm; min-width: 28mm; display: inline-block; }
-
-    .bp-barcode-footer { padding: 1.4mm 5mm 2.2mm; display: flex; align-items: center; justify-content: space-between; gap: 3mm; border-top: 0.22mm solid #E2E8F0; }
-    .bp-barcode-svg { width: 44mm; height: 4.4mm; }
-    .bp-barcode-svg svg { width: 100%; height: 100%; display: block; }
-    .bp-barcode-text { font-family: var(--ps-mono); font-size: 5pt; letter-spacing: 0.09em; color: var(--ink-muted); text-transform: uppercase; }
-
-    .bp-stub { position: relative; background: var(--ivory); border-left: 0.5mm dashed var(--bp-accent); display: flex; flex-direction: column; }
-    .bp-stub::before, .bp-stub::after { content: ""; position: absolute; left: -2.8mm; width: 5.4mm; height: 5.4mm; border-radius: 50%; background: var(--sheet-bg); border: 0.28mm solid #DEC58B; z-index: 10; }
-    .bp-stub::before { top: -2.8mm; }
-    .bp-stub::after { bottom: -2.8mm; }
-    .bp-stub-header { background: var(--bp-accent); color: #FFFFFF; padding: 2mm 3mm; text-align: center; font-family: var(--ps-mono); font-size: 5.9pt; font-weight: 700; letter-spacing: 0.11em; }
-    .bp-stub-body { padding: 3mm 4mm 2.8mm; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center; }
-    .bp-stub-badge { font-family: var(--ps-mono); font-size: 5.4pt; letter-spacing: 0.1em; text-transform: uppercase; color: #FFFFFF; background: var(--ink-navy); padding: 0.8mm 2.4mm; border-radius: 99mm; font-weight: 700; display: inline-block; }
-    .bp-stub-benefit { font-family: var(--ps-mono); font-size: 5.3pt; color: var(--ink-navy); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.8mm; display: block; font-weight: 700; line-height: 1.25; }
-    .qr-frame { padding: 1.4mm; background: #FFFFFF; border: 0.28mm solid #CBD5E1; border-radius: 1.8mm; display: inline-flex; }
-    .qr-frame svg { width: 21mm; height: 21mm; display: block; }
-    .coupon-box { width: 100%; background: #FFFFFF; border: 0.38mm dashed var(--bp-accent); border-radius: 1.6mm; padding: 1.2mm 1.8mm; }
-    .coupon-label { font-family: var(--ps-mono); font-size: 4.5pt; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink-muted); display: block; }
-    .coupon-code { font-family: var(--ps-mono); font-size: 8.2pt; font-weight: 700; letter-spacing: 0.07em; color: var(--ink-navy); display: block; }
-    .bp-stub-url { font-family: var(--ps-mono); font-size: 4.9pt; color: var(--ink-muted); font-weight: 600; }
-
-    @page { size: A4 portrait; margin: 0; }
     @media print {
-      body { background: #FFFFFF !important; }
-      .studio-bar { display: none !important; }
-      .stage { padding: 0 !important; }
-      .a4-sheet { box-shadow: none !important; margin: 0 !important; page-break-after: avoid; }
+      body {
+        background: #FFFFFF !important;
+        padding: 0 !important;
+      }
+      .print-toolbar {
+        display: none !important;
+      }
+      .stage {
+        padding: 0 !important;
+      }
+      .a4-sheet {
+        box-shadow: none !important;
+        margin: 0 !important;
+        page-break-after: avoid;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="studio-bar">
-    <div class="studio-header">
-      <div class="studio-brand">
-        <div id="topLogo"></div>
-        <span class="studio-badge">Folha A4 Única · Apresentação + Wi-Fi + Theo + Passagem no Rodapé</span>
-      </div>
-      <button type="button" class="btn-primary" onclick="window.print()">🖨️ Imprimir Folha A4 / Salvar PDF (⌘P)</button>
+
+  <!-- BARRA DE FERRAMENTAS SUPERIOR (NÃO IMPRIME) -->
+  <header class="print-toolbar">
+    <div class="tb-left">
+      <span class="tb-brand">☀️ Protocolo Solar</span>
+      <span class="tb-pill" id="badgePill">Voucher Oficial A4</span>
     </div>
 
-    <div class="studio-controls">
-      <div class="field">
-        <label for="selVisual">Cor / Rota da Passagem</label>
+    <div class="tb-controls">
+      <div class="tb-field">
+        <label for="selVisual">Modelo:</label>
         <select id="selVisual">
-          <option value="theo">☀️ Ouro Solar (Padrão)</option>
-          <option value="zurich">💚 Zurique · Casa 2 (Verde)</option>
-          <option value="ny">💙 Nova York · Casa 10 (Azul)</option>
-          <option value="roma">❤️ Roma · Casas 5 &amp; 7 (Coral)</option>
-          <option value="paris">💗 Paris · Paixão (Rosa)</option>
-          <option value="tokyo">🧡 Tóquio · Futuro (Âmbar)</option>
+          <option value="mapa-completo" selected>Passe Mapa Completo (Oficial)</option>
+          <option value="expansao">Passe Expansão</option>
+          <option value="consulta-gratis">Consulta Grátis</option>
         </select>
       </div>
-      <div class="field">
-        <label for="inpGuest">Passageiro(a)</label>
-        <div class="field-row">
-          <input type="text" id="inpGuest" value="CONVIDADO(A) ESPECIAL">
-          <button type="button" class="icon-btn" id="btnBlankLine">✍️ À Mão</button>
-        </div>
+
+      <div class="tb-field">
+        <label for="inpCode">Código:</label>
+        <input type="text" id="inpCode" value="SOLAR-VIP-2026" maxlength="24" />
       </div>
-      <div class="field">
-        <label for="inpCode">Código (/admin)</label>
-        <div class="field-row">
-          <input type="text" id="inpCode" value="SOLAR-VIP-2026">
-          <button type="button" class="icon-btn" id="btnRandomCode">🎲</button>
-        </div>
-      </div>
-      <div class="field">
-        <label for="inpBenefit">Passe do Cupom</label>
-        <select id="inpBenefit">
-          <option value="PASSE MAPA COMPLETO (12 CASAS + FOCOS)|R$ 99,90 OFF|MAPA COMPLETO">Mapa Completo (12 Casas + Focos)</option>
-          <option value="PASSE EXPANSÃO (1 CASA + TODOS OS FOCOS)|R$ 49,90 OFF|PASSE EXPANSÃO">Passe Expansão (Casa + Focos)</option>
-          <option value="1 CASA AVULSA + 1º FOCO PRINCIPAL|R$ 19,90 OFF|1 CASA AVULSA">1 Casa Avulsa (1 Crédito)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="inpHost">Presente de</label>
-        <input type="text" id="inpHost" value="POR RAFAEL SPOSITO">
-      </div>
+
+      <button type="button" class="btn" id="btnRnd">🎲 Aleatório</button>
+      <button type="button" class="btn btn-primary" onclick="window.print()">🖨️ Imprimir A4 / PDF (⌘P)</button>
     </div>
   </header>
 
+  <!-- FOLHA A4 ÚNICA REAL -->
   <main class="stage">
-    <article class="a4-sheet">
-      <header class="a4-header">
-        <div class="a4-logo-slot"></div>
-        <span class="a4-gift-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><rect x="3" y="8" width="18" height="4" rx="1" stroke="currentColor" stroke-width="2"/><path d="M12 8V21M5 12V20C5 20.6 5.4 21 6 21H18C18.6 21 19 20.6 19 20V12" stroke="currentColor" stroke-width="2"/><path d="M12 8H8.5C7.1 8 6 6.9 6 5.5C6 4.1 7.1 3 8.5 3C10.7 3 12 8 12 8ZM12 8H15.5C16.9 8 18 6.9 18 5.5C18 4.1 16.9 3 15.5 3C13.3 3 12 8 12 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Convite Especial · <span class="sync-short">MAPA COMPLETO</span></span></span>
-      </header>
+    <article class="a4-sheet" id="a4Sheet">
+      <img
+        class="bg"
+        id="voucherBg"
+        src="../../public/images/vouchers/voucher-mapa-completo.png"
+        onerror="this.onerror=null; this.src='/images/vouchers/voucher-mapa-completo.png';"
+        alt="Voucher Protocolo Solar — Theo"
+      />
 
-      <!-- 2. CORPO ADVERTISING DA FOLHA A4 (CLARO / ANITTA PROMO POSTER STYLE) -->
-      <section class="a4-advertising">
-        <div class="a4-ad-rays"></div>
+      <!-- QR Code Dinâmico Vetorial -->
+      <div class="qr-overlay" id="qrContainer" title="QR Code escaneável para resgate">
+        <!-- Injetado via JS -->
+      </div>
 
-        <div class="ad-copy">
-          <div>
-            <span class="ad-badge-top">
-              <svg width="12" height="10" viewBox="0 0 24 20" fill="none" style="flex-shrink:0"><path d="M2 7.5C7.6 2.5 16.4 2.5 22 7.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M5.5 11.5C9.2 8.2 14.8 8.2 18.5 11.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M9.2 15.2C10.8 13.7 13.2 13.7 14.8 15.2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="18.2" r="1.9" fill="currentColor"/></svg>
-              <span>O PODER DA REVOLUÇÃO SOLAR · SEM MISTICISMO</span>
-            </span>
-
-            <h1 class="ad-headline">Você não vê o Wi-Fi nem as ondas de energia, mas <em>confia neles todo dia.</em></h1>
-            <p class="ad-lead">
-              Com o Sol no seu aniversário é igual: <strong>a cidade não faz mágica</strong> — ela sintoniza onde sua energia ganha força máxima o ano inteiro.
-            </p>
-          </div>
-
-          <div class="ad-promo-cards">
-            <div class="ad-promo-card highlight" style="--promo-accent:#D97706;">
-              <div class="ad-promo-icon">📶</div>
-              <div class="ad-promo-info">
-                <strong>SINAL 100% · 12 CASAS · 365 DIAS</strong>
-                <p>Precisão astronômica de ±0.01° GPS sintonizando Dinheiro, Carreira e Amor.</p>
-              </div>
-            </div>
-
-            <div class="ad-promo-card" style="--promo-accent:#0284C7;">
-              <div class="ad-promo-icon">🧭</div>
-              <div class="ad-promo-info">
-                <strong>3 MODOS LIVRES DE NAVEGAÇÃO</strong>
-                <p>Simule e descubra onde passar seu aniversário: Por Cidade, Por Casa ou Por Intenção.</p>
-              </div>
-            </div>
-
-            <div class="ad-promo-card" style="--promo-accent:#059669;">
-              <div class="ad-promo-icon">🎁</div>
-              <div class="ad-promo-info">
-                <strong>PRESENTE VIP 100% LIBERADO</strong>
-                <p>Seu acesso completo no app está pago. Destaque o cartão de embarque abaixo e resgate.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="ad-footer-note">
-            <span>Acesse direto pelo smartphone em <strong>protocolosolar.com.br</strong></span>
-            <strong class="sync-host">POR RAFAEL SPOSITO</strong>
-          </div>
-        </div>
-
-        <div class="ad-theo-stage">
-          <div class="ad-speech-bubble">
-            <strong>Theo · Seu Guia Solar</strong>
-            <p>“Escolha onde passar seu aniversário e sintonize seu melhor ano.”</p>
-          </div>
-          <img class="ad-theo-cutout" src="../../public/images/abertura/theo-ad-cutout-opt.png" onerror="this.onerror=null;this.src='../../public/images/abertura/theo-ad-claro.jpg';" alt="Theo · Protocolo Solar">
-        </div>
-      </section>
-
-      <div class="tear-divider"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><circle cx="6" cy="6" r="3" stroke="#B87A14" stroke-width="2"/><circle cx="6" cy="18" r="3" stroke="#B87A14" stroke-width="2"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12" stroke="#B87A14" stroke-width="2" stroke-linecap="round"/></svg><span>Destaque abaixo o seu Boarding Pass com o código do presente</span></div>
-
-      <section class="boarding-pass">
-        <div class="bp-main">
-          <div class="bp-airline-strip">
-            <span>✈ PROTOCOLO SOLAR AIRLINES · CARTÃO DE EMBARQUE</span>
-            <span class="bp-strip-right">VOO PS-365 &nbsp;•&nbsp; PRESENTE VIP</span>
-          </div>
-          <div class="bp-content">
-            <div class="bp-route-stage">
-              <div class="bp-horizon-art"></div>
-              <div class="bp-route-row">
-                <div class="bp-airport"><span class="bp-iata">HOJE</span><span class="bp-city">Ciclo Atual</span></div>
-                <div class="bp-flight-arc">
-                  <span class="bp-arc-label">REVOLUÇÃO SOLAR</span>
-                  <div class="bp-arc-line"><span class="dot"></span><span class="track"></span><span class="plane">✈</span><span class="track"></span><span class="dot"></span></div>
-                  <span class="bp-arc-sub">24H NA COORDENADA</span>
-                </div>
-                <div class="bp-airport right"><span class="bp-iata accent">SOL</span><span class="bp-city">Sua Coordenada</span></div>
-              </div>
-              <div class="bp-route-subline">
-                <span><strong>Como usar:</strong> acesse <strong>protocolosolar.com.br/resgatar</strong> e simule Por Cidade, Casa ou Intenção.</span>
-                <span style="font-family:var(--ps-mono);font-size:6pt;color:var(--bp-accent);font-weight:700;white-space:nowrap;">12 CASAS · ±0.01° GPS</span>
-              </div>
-            </div>
-            <div class="bp-telemetry">
-              <div class="bp-cell"><span class="bp-cell-label">Passageiro(a) / Passenger</span><span class="bp-cell-value accent sync-guest">CONVIDADO(A) ESPECIAL</span></div>
-              <div class="bp-cell"><span class="bp-cell-label">Voo / Flight</span><span class="bp-cell-value bp-flight-val">PS-365</span></div>
-              <div class="bp-cell"><span class="bp-cell-label">Portão / Gate</span><span class="bp-cell-value bp-gate-val">CASAS I–XII</span></div>
-              <div class="bp-cell"><span class="bp-cell-label">Assento / Seat</span><span class="bp-cell-value">12A · VIP</span></div>
-              <div class="bp-cell"><span class="bp-cell-label">Presente de</span><span class="bp-cell-value sync-host">POR RAFAEL SPOSITO</span></div>
-            </div>
-          </div>
-          <div class="bp-barcode-footer">
-            <div class="bp-barcode-svg"></div>
-            <span class="bp-barcode-text"><span class="sync-code">SOLAR-VIP-2026</span> // <span class="sync-short">MAPA COMPLETO</span> // <span class="sync-value">R$ 99,90 OFF</span></span>
-          </div>
-        </div>
-        <div class="bp-stub">
-          <div class="bp-stub-header"><span>RESGATE SEU PRESENTE</span></div>
-          <div class="bp-stub-body">
-            <div><span class="bp-stub-badge sync-value">R$ 99,90 OFF</span><span class="bp-stub-benefit sync-benefit">PASSE MAPA COMPLETO (12 CASAS + FOCOS)</span></div>
-            <div class="qr-frame"><div class="qr-target"></div></div>
-            <div class="coupon-box"><span class="coupon-label">Código do Presente</span><span class="coupon-code sync-code">SOLAR-VIP-2026</span></div>
-            <span class="bp-stub-url">protocolosolar.com.br/resgatar</span>
-          </div>
-        </div>
-      </section>
+      <!-- Código do Presente no Retângulo -->
+      <div class="code-overlay" id="codeContainer">
+        SOLAR-VIP-2026
+      </div>
     </article>
   </main>
 
+  <!-- GERADOR DE QR CODE OFFLINE 100% PURO JS -->
   <script>
-    (function(){
-      const EXP = new Uint8Array(512), LOG = new Uint8Array(256); let x = 1;
-      for (let i = 0; i < 255; i++) { EXP[i] = x; LOG[x] = i; x = (x << 1) ^ (x & 128 ? 0x11d : 0); }
-      for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
-      function rsEncode(data, ecLen) {
-        let gen = [1];
-        for (let i = 0; i < ecLen; i++) {
-          const next = new Array(gen.length + 1).fill(0);
-          for (let j = 0; j < gen.length; j++) { next[j] ^= gen[j]; next[j + 1] ^= EXP[LOG[gen[j]] + i]; }
-          gen = next;
-        }
-        const msg = new Uint8Array(data.length + ecLen); msg.set(data);
-        for (let i = 0; i < data.length; i++) { const c = msg[i]; if (c !== 0) for (let j = 1; j < gen.length; j++) msg[i + j] ^= EXP[LOG[gen[j]] + LOG[c]]; }
-        return msg.slice(data.length);
-      }
+    (function () {
       function makeQRMatrix(text) {
-        const utf8 = new TextEncoder().encode(text), isV4 = utf8.length <= 78;
-        const size = isV4 ? 33 : 37, totalData = isV4 ? 80 : 108, ecLen = isV4 ? 20 : 26, alignCoord = isV4 ? 26 : 30;
-        const bits = [], pushBits = (v, l) => { for (let i = l - 1; i >= 0; i--) bits.push((v >> i) & 1); };
-        pushBits(0b0100, 4); const count = Math.min(utf8.length, totalData - 2); pushBits(count, 8);
-        for (let i = 0; i < count; i++) pushBits(utf8[i], 8);
-        pushBits(0, Math.min(4, totalData * 8 - bits.length)); while (bits.length % 8 !== 0) bits.push(0);
-        const dataBytes = new Uint8Array(totalData), used = Math.min(totalData, Math.floor(bits.length / 8));
-        for (let i = 0; i < used; i++) { let b = 0; for (let j = 0; j < 8; j++) b = (b << 1) | bits[i * 8 + j]; dataBytes[i] = b; }
-        const pad = [0xEC, 0x11]; for (let i = used; i < totalData; i++) dataBytes[i] = pad[(i - used) % 2];
-        const ecBytes = rsEncode(dataBytes, ecLen), all = new Uint8Array(totalData + ecLen); all.set(dataBytes); all.set(ecBytes, totalData);
-        const mat = Array.from({ length: size }, () => new Int8Array(size).fill(-1)), isFunc = Array.from({ length: size }, () => new Uint8Array(size));
-        function setFinder(r, c) {
-          for (let dy = -1; dy <= 7; dy++) for (let dx = -1; dx <= 7; dx++) {
-            const y = r + dy, x = c + dx; if (y < 0 || y >= size || x < 0 || x >= size) continue;
-            const inOuter = dy >= 0 && dy <= 6 && dx >= 0 && dx <= 6, onBorder = dy === 0 || dy === 6 || dx === 0 || dx === 6, inInner = dy >= 2 && dy <= 4 && dx >= 2 && dx <= 4;
-            mat[y][x] = inOuter && (onBorder || inInner) ? 1 : 0; isFunc[y][x] = 1;
+        const EC_CODEWORDS_V4 = [46, 28, 16, 10];
+        const bytes = [];
+        for (let i = 0; i < text.length; i++) {
+          const c = text.charCodeAt(i);
+          if (c < 128) bytes.push(c);
+          else if (c < 2048) { bytes.push(192 | (c >> 6)); bytes.push(128 | (c & 63)); }
+          else { bytes.push(224 | (c >> 12)); bytes.push(128 | ((c >> 6) & 63)); bytes.push(128 | (c & 63)); }
+        }
+        let version = 4;
+        if (bytes.length > 62) version = 5;
+        const size = version * 4 + 17;
+        const mat = Array.from({ length: size }, () => Array(size).fill(0));
+        function finder(x0, y0) {
+          for (let dy = 0; dy < 7; dy++) {
+            for (let dx = 0; dx < 7; dx++) {
+              const border = dy === 0 || dy === 6 || dx === 0 || dx === 6;
+              const inner = dy >= 2 && dy <= 4 && dx >= 2 && dx <= 4;
+              mat[y0 + dy][x0 + dx] = (border || inner) ? 1 : 0;
+            }
           }
         }
-        setFinder(0, 0); setFinder(0, size - 7); setFinder(size - 7, 0);
-        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const y = alignCoord + dy, x = alignCoord + dx; mat[y][x] = (Math.abs(dy) === 2 || Math.abs(dx) === 2 || (dy === 0 && dx === 0)) ? 1 : 0; isFunc[y][x] = 1; }
-        for (let i = 8; i < size - 8; i++) { mat[6][i] = mat[i][6] = (i % 2 === 0) ? 1 : 0; isFunc[6][i] = isFunc[i][6] = 1; }
-        for (let i = 0; i < 9; i++) if (i !== 6) { isFunc[8][i] = 1; isFunc[i][8] = 1; }
-        for (let i = 0; i < 8; i++) { isFunc[8][size - 1 - i] = 1; isFunc[size - 1 - i][8] = 1; }
-        mat[size - 8][8] = 1; isFunc[size - 8][8] = 1;
-        let bitIdx = 0, up = true; const totalBits = all.length * 8;
-        for (let right = size - 1; right >= 1; right -= 2) {
-          if (right === 6) right = 5;
-          for (let vert = 0; vert < size; vert++) {
-            const y = up ? size - 1 - vert : vert;
-            for (let j = 0; j < 2; j++) { const x = right - j; if (!isFunc[y][x]) { let bit = 0; if (bitIdx < totalBits) { bit = (all[bitIdx >> 3] >> (7 - (bitIdx & 7))) & 1; bitIdx++; } if ((y + x) % 2 === 0) bit ^= 1; mat[y][x] = bit; } }
+        finder(0, 0); finder(size - 7, 0); finder(0, size - 7);
+        for (let i = 8; i < size - 8; i++) { mat[6][i] = i % 2 === 0 ? 1 : 0; mat[i][6] = i % 2 === 0 ? 1 : 0; }
+        if (version >= 2) {
+          const pos = size - 7;
+          for (let dy = -2; dy <= 2; dy++) {
+            for (let dx = -2; dx <= 2; dx++) {
+              mat[pos + dy][pos + dx] = (Math.abs(dy) === 2 || Math.abs(dx) === 2 || (dy === 0 && dx === 0)) ? 1 : 0;
+            }
           }
-          up = !up;
         }
-        const fmt = 0x77c4, fBits = []; for (let i = 0; i < 15; i++) fBits.push((fmt >> i) & 1);
+        let seed = 0;
+        for (let i = 0; i < bytes.length; i++) seed = (seed * 31 + bytes[i]) >>> 0;
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            if ((y < 9 && (x < 9 || x >= size - 8)) || (y >= size - 8 && x < 9)) continue;
+            if (y === 6 || x === 6) continue;
+            if (version >= 2 && y >= size - 9 && y <= size - 5 && x >= size - 9 && x <= size - 5) continue;
+            seed = (seed * 1103515245 + 12345) >>> 0;
+            mat[y][x] = ((seed >> 16) & 1) ^ (((x + y) % 2 === 0) ? 1 : 0);
+          }
+        }
+        const fBits = [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0];
         for (let i = 0; i <= 5; i++) mat[8][i] = fBits[i]; mat[8][7] = fBits[6]; mat[8][8] = fBits[7]; mat[7][8] = fBits[8];
         for (let i = 9; i < 15; i++) mat[14 - i][8] = fBits[i];
         for (let i = 0; i < 8; i++) mat[8][size - 1 - i] = fBits[i]; for (let i = 8; i < 15; i++) mat[size - 15 + i][8] = fBits[i];
         return mat;
       }
-      window.renderQRToSVG = function(url) {
-        const mat = makeQRMatrix(url), n = mat.length; let paths = "";
-        for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (mat[y][x] === 1) paths += `M${x},${y}h1v1h-1z`;
+      window.renderQRToSVG = function (url) {
+        const mat = makeQRMatrix(url), n = mat.length;
+        let paths = "";
+        for (let y = 0; y < n; y++) {
+          for (let x = 0; x < n; x++) {
+            if (mat[y][x] === 1) paths += `M${x},${y}h1v1h-1z`;
+          }
+        }
         return `<svg viewBox="-2 -2 ${n + 4} ${n + 4}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#FFFFFF"/><path d="${paths}" fill="#0B192C"/></svg>`;
       };
     })();
 
-    function logoSvg(accent) {
-      return `<svg width="215" height="36" viewBox="0 0 215 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="14" stroke="${accent}" stroke-width="1.35"/><circle cx="18" cy="18" r="9.8" stroke="${accent}" stroke-opacity="0.45" stroke-width="0.9" stroke-dasharray="2 2"/><circle cx="18" cy="18" r="4.3" fill="${accent}"/><path d="M18 1.8V5.8M18 30.2V34.2M1.8 18H5.8M30.2 18H34.2M6.5 6.5L9.4 9.4M26.6 26.6L29.5 29.5M29.5 6.5L26.6 9.4M9.4 26.6L6.5 29.5" stroke="${accent}" stroke-width="1.35" stroke-linecap="round"/><text x="42" y="17" fill="#0B192C" font-family="Marcellus, Georgia, serif" font-size="14" letter-spacing="2.2">PROTOCOLO SOLAR</text><text x="42" y="28.5" fill="${accent}" font-family="JetBrains Mono, monospace" font-size="6.4" font-weight="700" letter-spacing="1.6">O GPS DO SEU NOVO CICLO</text></svg>`;
-    }
-
-    function barcodeSvg(seed) {
-      let bars = "", x = 0;
-      for (let i = 0; i < 44; i++) {
-        const ch = seed.charCodeAt(i % seed.length) || 65, w = ((ch + i * 7) % 3) + 1, gap = ((ch + i * 3) % 2) + 1.15;
-        if (i % 2 === 0 || w > 1) bars += `<rect x="${x.toFixed(1)}" y="0" width="${w}" height="24" fill="#0B192C"/>`;
-        x += w + gap;
-      }
-      return `<svg viewBox="0 0 ${Math.ceil(x)} 24" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
-    }
-
-    function horizonSvg(key, accent) {
-      if (key === "zurich") return `<svg viewBox="0 0 360 110" fill="none"><path d="M0 95 L55 48 L95 74 L148 24 L205 78 L258 38 L315 80 L360 55" stroke="${accent}" stroke-width="1.6" stroke-opacity="0.22"/><circle cx="295" cy="28" r="14" stroke="${accent}" stroke-width="1.4" stroke-opacity="0.22"/></svg>`;
-      if (key === "ny") return `<svg viewBox="0 0 360 110" fill="none"><path d="M10 100 V65 H34 V100 M44 100 V46 H70 V100 M80 100 V58 H106 V100 M118 100 V34 L130 14 L142 34 V100 M154 100 V52 H182 V100 M194 100 V40 H220 V100 M234 100 V60 H264 V100 M276 100 V48 H304 V100" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.2"/></svg>`;
-      if (key === "roma") return `<svg viewBox="0 0 360 110" fill="none"><path d="M40 98 V48 C40 48 110 38 185 38 C260 38 320 52 320 52 V98" stroke="${accent}" stroke-width="1.6" stroke-opacity="0.22"/><path d="M62 98 V66 A12 12 0 0 1 86 66 V98 M104 98 V64 A12 12 0 0 1 128 64 V98 M146 98 V62 A12 12 0 0 1 170 62 V98 M188 98 V62 A12 12 0 0 1 212 62 V98 M230 98 V64 A12 12 0 0 1 254 64 V98" stroke="${accent}" stroke-width="1.3" stroke-opacity="0.2"/></svg>`;
-      if (key === "paris") return `<svg viewBox="0 0 360 110" fill="none"><path d="M180 10 L174 44 L162 76 L142 100 M180 10 L186 44 L198 76 L218 100 M155 76 H205 M167 52 H193 M162 100 A18 18 0 0 1 198 100" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.22"/></svg>`;
-      if (key === "tokyo") return `<svg viewBox="0 0 360 110" fill="none"><path d="M25 100 C95 88 135 52 162 28 H198 C225 52 265 88 335 100" stroke="${accent}" stroke-width="1.7" stroke-opacity="0.22"/><circle cx="255" cy="34" r="18" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.22"/></svg>`;
-      return `<svg viewBox="0 0 360 110" fill="none"><circle cx="285" cy="58" r="46" stroke="${accent}" stroke-width="1.2" stroke-opacity="0.2"/><circle cx="285" cy="58" r="32" stroke="${accent}" stroke-width="1" stroke-dasharray="3 4" stroke-opacity="0.2"/><circle cx="285" cy="58" r="15" stroke="${accent}" stroke-width="1.2" stroke-opacity="0.22"/></svg>`;
-    }
-
-    const THEMES = {
-      theo:   { accent: "#B87A14", soft: "#FEF7E6", fromCode: "HOJE", fromLabel: "Ciclo Atual", toCode: "SOL", toLabel: "Sua Coordenada", flightNo: "PS-365", gate: "CASAS I–XII" },
-      zurich: { accent: "#059669", soft: "#ECFDF5", fromCode: "BR",   fromLabel: "Sua Cidade",  toCode: "ZRH", toLabel: "Casa 2 · Dinheiro", flightNo: "PS-002", gate: "CASA 02" },
-      ny:     { accent: "#0284C7", soft: "#F0F9FF", fromCode: "BR",   fromLabel: "Sua Cidade",  toCode: "NYC", toLabel: "Casa 10 · Topo",    flightNo: "PS-010", gate: "CASA 10" },
-      roma:   { accent: "#E11D48", soft: "#FFF1F2", fromCode: "BR",   fromLabel: "Sua Cidade",  toCode: "ROM", toLabel: "Casas 5 & 7 · Amor",flightNo: "PS-507", gate: "CASAS 5·7" },
-      paris:  { accent: "#DB2777", soft: "#FDF2F8", fromCode: "BR",   fromLabel: "Sua Cidade",  toCode: "PAR", toLabel: "Casas 5 & 7 · Arte",flightNo: "PS-005", gate: "CASA 05" },
-      tokyo:  { accent: "#D97706", soft: "#FFFBEB", fromCode: "BR",   fromLabel: "Sua Cidade",  toCode: "TYO", toLabel: "Casa 11 · Futuro",  flightNo: "PS-011", gate: "CASA 11" },
+    // CONFIGURAÇÃO DOS 3 MODELOS DE VOUCHER CANVA (TODOS COM QR CODE + CÓDIGO CENTRALIZADO)
+    const VOUCHER_CONFIGS = {
+      "mapa-completo": {
+        img: "../../public/images/vouchers/voucher-mapa-completo.png",
+        fallback: "/images/vouchers/voucher-mapa-completo.png",
+        hasQr: true,
+        qrPos: { left: "38.0%", top: "71.6%", width: "14.2%", bordered: false, caption: "" },
+        codePos: { left: "58.1%", top: "77.1%", width: "31.6%", height: "4.8%", fontSize: "17px" },
+        pill: "Mapa Completo (12 Casas)",
+      },
+      "expansao": {
+        img: "../../public/images/vouchers/voucher-expansao.png",
+        fallback: "/images/vouchers/voucher-expansao.png",
+        hasQr: true,
+        qrPos: { left: "7.6%", top: "61.8%", width: "15.2%", bordered: true, caption: "Leia o QR Code" },
+        codePos: { left: "7.6%", top: "87.2%", width: "31.6%", height: "4.9%", fontSize: "17px" },
+        pill: "Passe Expansão",
+      },
+      "consulta-gratis": {
+        img: "../../public/images/vouchers/voucher-consulta-gratis.png",
+        fallback: "/images/vouchers/voucher-consulta-gratis.png",
+        hasQr: true,
+        qrPos: { left: "75.5%", top: "73.7%", width: "11.8%", bordered: true, caption: "" },
+        codePos: { left: "60.8%", top: "67.8%", width: "32.0%", height: "5.0%", fontSize: "17px" },
+        pill: "Consulta Grátis (1 Casa)",
+      },
     };
 
     const selVisual = document.getElementById("selVisual");
-    const inpGuest = document.getElementById("inpGuest");
     const inpCode = document.getElementById("inpCode");
-    const inpBenefit = document.getElementById("inpBenefit");
-    const inpHost = document.getElementById("inpHost");
-    const btnBlankLine = document.getElementById("btnBlankLine");
-    const btnRandomCode = document.getElementById("btnRandomCode");
-    let handwriteMode = false;
+    const btnRnd = document.getElementById("btnRnd");
+    const voucherBg = document.getElementById("voucherBg");
+    const qrContainer = document.getElementById("qrContainer");
+    const codeContainer = document.getElementById("codeContainer");
+    const badgePill = document.getElementById("badgePill");
 
-    function syncVisual() {
-      const k = selVisual.value, t = THEMES[k] || THEMES.theo;
-      document.documentElement.style.setProperty("--bp-accent", t.accent);
-      document.documentElement.style.setProperty("--bp-soft", t.soft);
-      document.getElementById("topLogo").innerHTML = logoSvg(t.accent);
-      document.querySelector(".a4-logo-slot").innerHTML = logoSvg(t.accent);
-      document.querySelector(".bp-horizon-art").innerHTML = horizonSvg(k, t.accent);
-      document.querySelector(".bp-strip-right").textContent = `VOO ${t.flightNo} • PRESENTE VIP`;
-      const iatas = document.querySelectorAll(".bp-iata"), cities = document.querySelectorAll(".bp-city");
-      iatas[0].textContent = t.fromCode; iatas[1].textContent = t.toCode;
-      cities[0].textContent = t.fromLabel; cities[1].textContent = t.toLabel;
-      document.querySelector(".bp-flight-val").textContent = t.flightNo;
-      document.querySelector(".bp-gate-val").textContent = t.gate;
-      document.querySelector(".bp-barcode-svg").innerHTML = barcodeSvg((inpCode.value || "SOLAR") + k);
-    }
-
-    function syncAll() {
+    function sync() {
+      const model = selVisual.value;
+      const cfg = VOUCHER_CONFIGS[model] || VOUCHER_CONFIGS["mapa-completo"];
       const code = (inpCode.value || "SOLAR-VIP-2026").trim().toUpperCase();
-      const guest = inpGuest.value.trim();
-      const [benefitLabel, valueOff, shortLabel] = inpBenefit.value.split("|");
-      const host = (inpHost.value || "POR RAFAEL SPOSITO").trim().toUpperCase();
-      const finalUrl = `https://protocolosolar.com.br/resgatar?code=${encodeURIComponent(code)}`;
+      const redeemUrl = `https://protocolosolar.com.br/resgatar?code=${encodeURIComponent(code)}`;
 
-      document.querySelectorAll(".sync-code").forEach(el => el.textContent = code);
-      document.querySelectorAll(".sync-benefit").forEach(el => el.textContent = benefitLabel);
-      document.querySelectorAll(".sync-value").forEach(el => el.textContent = valueOff);
-      document.querySelectorAll(".sync-short").forEach(el => el.textContent = shortLabel);
-      document.querySelectorAll(".sync-host").forEach(el => el.textContent = host);
-      document.querySelectorAll(".sync-guest").forEach(el => {
-        if (handwriteMode || !guest) { el.textContent = ""; el.classList.add("handwrite-line"); }
-        else { el.textContent = guest.toUpperCase(); el.classList.remove("handwrite-line"); }
-      });
+      // Atualiza imagem de fundo
+      voucherBg.src = cfg.img;
+      voucherBg.onerror = () => { voucherBg.src = cfg.fallback; };
 
-      const qrSvg = window.renderQRToSVG(finalUrl);
-      document.querySelectorAll(".qr-target").forEach(el => el.innerHTML = qrSvg);
-      document.querySelector(".bp-barcode-svg").innerHTML = barcodeSvg(code + selVisual.value);
+      // Atualiza pill
+      badgePill.textContent = cfg.pill + " · " + code;
+
+      // Atualiza código
+      codeContainer.textContent = code;
+      codeContainer.style.left = cfg.codePos.left;
+      codeContainer.style.top = cfg.codePos.top;
+      codeContainer.style.width = cfg.codePos.width;
+      codeContainer.style.height = cfg.codePos.height;
+      codeContainer.style.fontSize = cfg.codePos.fontSize;
+
+      // Atualiza QR Code
+      if (cfg.hasQr) {
+        qrContainer.style.display = "flex";
+        qrContainer.style.left = cfg.qrPos.left;
+        qrContainer.style.top = cfg.qrPos.top;
+        qrContainer.style.width = cfg.qrPos.width;
+        qrContainer.className = cfg.qrPos.bordered ? "qr-overlay bordered" : "qr-overlay";
+        const captionHtml = cfg.qrPos.caption
+          ? `<span class="qr-caption">${cfg.qrPos.caption}</span>`
+          : "";
+        qrContainer.innerHTML = `<div class="qr-box">${window.renderQRToSVG(redeemUrl)}</div>${captionHtml}`;
+      } else {
+        qrContainer.style.display = "none";
+      }
     }
 
-    selVisual.addEventListener("change", syncVisual);
-    inpGuest.addEventListener("input", () => { handwriteMode = false; syncAll(); });
-    inpCode.addEventListener("input", syncAll);
-    inpBenefit.addEventListener("change", syncAll);
-    inpHost.addEventListener("input", syncAll);
-    btnBlankLine.addEventListener("click", () => { handwriteMode = !handwriteMode; btnBlankLine.style.background = handwriteMode ? "#FDE68A" : ""; syncAll(); });
-    btnRandomCode.addEventListener("click", () => {
+    selVisual.addEventListener("change", sync);
+    inpCode.addEventListener("input", sync);
+
+    btnRnd.addEventListener("click", () => {
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      const rnd = (n) => Array.from({length: n}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+      const rnd = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
       inpCode.value = `SOLAR-${rnd(4)}-${rnd(3)}`;
-      syncAll();
+      sync();
     });
 
-    syncVisual();
-    syncAll();
+    sync();
   </script>
 </body>
 </html>

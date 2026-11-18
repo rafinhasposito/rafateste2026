@@ -27,12 +27,7 @@ import {
   type CouponRewardType,
   type RedeemCouponRow,
 } from "@/lib/coupons";
-import {
-  BOARDING_VISUAL_THEMES,
-  buildMediaKitPrintHtml,
-  buildCanvaVoucherHtml,
-  type BoardingPassVisual,
-} from "@/lib/mediaKitPrint";
+import { buildCanvaVoucherHtml } from "@/lib/mediaKitPrint";
 import { renderQrSvg } from "@/lib/qrSvg";
 
 const REWARD_OPTIONS: {
@@ -80,24 +75,6 @@ const CouponsManager = () => {
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [previewCoupon, setPreviewCoupon] = useState<RedeemCouponRow | null>(null);
-  const [hostSignature, setHostSignature] = useState<string>(() => {
-    try {
-      return localStorage.getItem("ps_media_kit_host") || "POR RAFAEL SPOSITO";
-    } catch {
-      return "POR RAFAEL SPOSITO";
-    }
-  });
-  const [blankRecipientLine, setBlankRecipientLine] = useState(false);
-  const [boardingVisual, setBoardingVisual] = useState<BoardingPassVisual>("theo");
-
-  const handleHostSignatureChange = (val: string) => {
-    setHostSignature(val);
-    try {
-      localStorage.setItem("ps_media_kit_host", val);
-    } catch {
-      // ignore storage errors
-    }
-  };
 
   const fetchAll = async () => {
     setLoading(true);
@@ -172,30 +149,6 @@ const CouponsManager = () => {
     await deleteCoupon(c.id);
     setCoupons((prev) => prev.filter((item) => item.id !== c.id));
     toast.success(`Cupom ${c.code} removido.`);
-  };
-
-  const handlePrintKit = (c: RedeemCouponRow, mode: "full" | "card" = "full") => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://protocolosolar.com.br";
-    const redeemUrl = getRedeemUrl(c);
-
-    const win = window.open("", "_blank", "width=1120,height=860");
-    if (!win) {
-      toast.error("Permita pop-ups para abrir o Estúdio de Impressão do Mídia Kit.");
-      return;
-    }
-
-    const html = buildMediaKitPrintHtml({
-      coupon: c,
-      redeemUrl,
-      origin,
-      hostSignature,
-      blankRecipientLine,
-      visual: boardingVisual,
-      mode,
-    });
-
-    win.document.write(html);
-    win.document.close();
   };
 
   const handlePrintCanvaVoucher = (c: RedeemCouponRow) => {
@@ -476,21 +429,12 @@ const CouponsManager = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handlePrintKit(c, "full")}
+                        onClick={() => handlePrintCanvaVoucher(c)}
                         className="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
-                        title="Abrir Boarding Pass + Cartas das Casas + Black Card + Selo prontos para A4"
+                        title="Abrir Voucher Oficial A4 pronto para impressão (QR + Código)"
                       >
                         <Printer className="w-3.5 h-3.5" />
                         <span>Imprimir A4</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handlePrintCanvaVoucher(c)}
-                        className="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
-                        title="Voucher com design do Canva (Theo + QR + código)"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                        <span>Voucher Canva</span>
                       </button>
                       <button
                         type="button"
@@ -554,7 +498,7 @@ const CouponsManager = () => {
               </span>
 
               <p className="text-xs uppercase tracking-[0.16em] text-[#F5B041] font-bold mb-1">
-                {!blankRecipientLine && previewCoupon.recipient_name
+                {previewCoupon.recipient_name
                   ? `Convidado(a) Especial: ${previewCoupon.recipient_name}`
                   : "Convite VIP • Exemplo do Wi-Fi no Aniversário"}
               </p>
@@ -590,49 +534,6 @@ const CouponsManager = () => {
                 </div>
               </div>
 
-              {/* Opções rápidas do Estúdio de Impressão */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5 pt-4 border-t border-white/10">
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.16em] text-white/50 font-bold mb-1">
-                    Imagem / Estilo do Boarding Pass (Papel Claro)
-                  </label>
-                  <select
-                    value={boardingVisual}
-                    onChange={(e) => setBoardingVisual(e.target.value as BoardingPassVisual)}
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] text-xs font-semibold focus:outline-none focus:border-[#C9A227]"
-                  >
-                    {(Object.entries(BOARDING_VISUAL_THEMES) as [BoardingPassVisual, (typeof BOARDING_VISUAL_THEMES)["theo"]][]).map(
-                      ([key, item]) => (
-                        <option key={key} value={key} className="bg-[#091326] text-white">
-                          {item.label}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.16em] text-white/50 font-bold mb-1">
-                    Assinatura no Cartão
-                  </label>
-                  <input
-                    type="text"
-                    value={hostSignature}
-                    onChange={(e) => handleHostSignatureChange(e.target.value)}
-                    placeholder="POR RAFAEL SPOSITO"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] font-mono text-xs font-bold uppercase focus:outline-none focus:border-[#C9A227]"
-                  />
-                </div>
-                <label className="sm:col-span-2 flex items-center gap-2.5 pt-1 cursor-pointer select-none text-xs text-white/80">
-                  <input
-                    type="checkbox"
-                    checked={blankRecipientLine}
-                    onChange={(e) => setBlankRecipientLine(e.target.checked)}
-                    className="rounded border-white/30 bg-black/50 accent-[#C9A227] w-4 h-4"
-                  />
-                  <span>Deixar linha pontilhada p/ escrever o nome à mão (caneta dourada)</span>
-                </label>
-              </div>
-
               <div className="flex flex-wrap items-center justify-end gap-2.5 mt-6 pt-5 border-t border-white/10">
                 <button
                   type="button"
@@ -644,19 +545,11 @@ const CouponsManager = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePrintKit(previewCoupon, "card")}
-                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2"
-                >
-                  <Printer className="w-4 h-4 text-[#F5DE98]" />
-                  <span>Cartão Único</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePrintKit(previewCoupon, "full")}
+                  onClick={() => handlePrintCanvaVoucher(previewCoupon)}
                   className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#F5B041] to-[#C9A227] hover:brightness-110 text-[#02050A] text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-[0_10px_25px_rgba(201,162,39,0.35)]"
                 >
                   <Printer className="w-4 h-4" />
-                  <span>Imprimir Mídia Kit Completo (A4)</span>
+                  <span>Imprimir Voucher Oficial A4</span>
                 </button>
               </div>
             </div>
