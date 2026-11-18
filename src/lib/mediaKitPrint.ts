@@ -1,5 +1,266 @@
-import { COUPON_REWARD_META, type RedeemCouponRow } from "./coupons";
+import { COUPON_REWARD_META, type CouponRewardType, type RedeemCouponRow } from "./coupons";
 import { renderQrSvg } from "./qrSvg";
+
+/* ======================================================================
+   CANVA VOUCHER SYSTEM — Hybrid: Canva PNG background + dynamic QR/code
+   ====================================================================== */
+
+const VOUCHER_IMAGES: Record<CouponRewardType, string> = {
+  full_map: "/images/vouchers/voucher-mapa-completo.png",
+  expansao: "/images/vouchers/voucher-expansao.png",
+  "1_casa": "/images/vouchers/voucher-consulta-gratis.png",
+};
+
+/** Position config for QR code and coupon code overlay on each Canva design */
+const VOUCHER_OVERLAY_POS: Record<CouponRewardType, {
+  qr: { bottom: string; left: string; size: string } | null;
+  code: { bottom: string; left: string; width: string; fontSize: string };
+}> = {
+  full_map: {
+    qr: { bottom: "19.8%", left: "14.5%", size: "9.5%" },
+    code: { bottom: "17.6%", left: "57%", width: "30%", fontSize: "1.4vw" },
+  },
+  expansao: {
+    qr: null, // Design 2 doesn't have a QR placeholder
+    code: { bottom: "10.8%", left: "7.5%", width: "28%", fontSize: "1.3vw" },
+  },
+  "1_casa": {
+    qr: null,
+    code: { bottom: "16.5%", left: "52%", width: "30%", fontSize: "1.3vw" },
+  },
+};
+
+export interface CanvaVoucherOptions {
+  coupon: RedeemCouponRow;
+  redeemUrl: string;
+  origin: string;
+}
+
+export function buildCanvaVoucherHtml(opts: CanvaVoucherOptions): string {
+  const { coupon, redeemUrl, origin } = opts;
+  const rewardType = coupon.reward_type as CouponRewardType;
+  const bgImage = `${origin}${VOUCHER_IMAGES[rewardType] || VOUCHER_IMAGES.full_map}`;
+  const overlay = VOUCHER_OVERLAY_POS[rewardType] || VOUCHER_OVERLAY_POS.full_map;
+  const qrSvg = renderQrSvg(redeemUrl, "#0B192C");
+  const safeCode = coupon.code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const meta = COUPON_REWARD_META[rewardType] || COUPON_REWARD_META.full_map;
+
+  const qrHtml = overlay.qr ? `
+    <div class="qr-overlay" style="
+      position: absolute;
+      bottom: ${overlay.qr.bottom};
+      left: ${overlay.qr.left};
+      width: ${overlay.qr.size};
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">${qrSvg}</div>
+  ` : "";
+
+  const allVouchers = Object.entries(VOUCHER_IMAGES).map(([type, path]) => {
+    const typeMeta = COUPON_REWARD_META[type as CouponRewardType];
+    return `<option value="${type}" ${type === rewardType ? "selected" : ""}>${typeMeta?.shortLabel || type}</option>`;
+  }).join("\n");
+
+  return `<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Voucher ${safeCode} · ${meta.shortLabel} · Protocolo Solar</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body {
+      background: #EFEAE0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid #DFC387;
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      box-shadow: 0 8px 25px rgba(11,25,44,0.08);
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #065F46;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .toolbar select, .toolbar button {
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 600;
+      border: 1px solid #CBD5E1;
+      background: #FFF;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      color: #FFF;
+      border-color: #B45309;
+      font-weight: 700;
+    }
+
+    .stage {
+      padding: 26px 16px 60px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .a4-sheet {
+      width: 210mm;
+      height: 297mm;
+      position: relative;
+      box-shadow: 0 24px 65px rgba(11,25,44,0.16);
+      overflow: hidden;
+      background: #FFF;
+    }
+
+    .a4-sheet img.bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .qr-overlay svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .code-overlay {
+      position: absolute;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #0B192C;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    @media print {
+      body { background: #FFF !important; }
+      .toolbar { display: none !important; }
+      .stage { padding: 0 !important; }
+      .a4-sheet { box-shadow: none !important; }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="toolbar">
+    <div class="toolbar-left">
+      <span style="font-weight:700;font-size:14px;">☀️ Protocolo Solar</span>
+      <span class="pill">Voucher · ${safeCode}</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select id="selType">${allVouchers}</select>
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir A4 / PDF (⌘P)</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <article class="a4-sheet" id="a4Sheet">
+      <img class="bg" id="bgImg" src="${bgImage}" alt="Voucher Protocolo Solar" />
+      ${qrHtml}
+      <div class="code-overlay" style="
+        bottom: ${overlay.code.bottom};
+        left: ${overlay.code.left};
+        width: ${overlay.code.width};
+        font-size: ${overlay.code.fontSize};
+      ">${safeCode}</div>
+    </article>
+  </main>
+
+  <script>
+    const VOUCHER_IMGS = ${JSON.stringify(Object.fromEntries(
+      Object.entries(VOUCHER_IMAGES).map(([k, v]) => [k, origin + v])
+    ))};
+    const OVERLAY_POS = ${JSON.stringify(VOUCHER_OVERLAY_POS)};
+    const CODE = ${JSON.stringify(coupon.code)};
+    const QR_SVG = ${JSON.stringify(qrSvg)};
+
+    const sel = document.getElementById("selType");
+    if (sel) {
+      sel.addEventListener("change", () => {
+        const type = sel.value;
+        document.getElementById("bgImg").src = VOUCHER_IMGS[type] || VOUCHER_IMGS.full_map;
+        const pos = OVERLAY_POS[type] || OVERLAY_POS.full_map;
+
+        // Update code overlay
+        const codeEl = document.querySelector(".code-overlay");
+        if (codeEl) {
+          codeEl.style.bottom = pos.code.bottom;
+          codeEl.style.left = pos.code.left;
+          codeEl.style.width = pos.code.width;
+          codeEl.style.fontSize = pos.code.fontSize;
+        }
+
+        // Update QR overlay
+        const existingQr = document.querySelector(".qr-overlay");
+        if (pos.qr) {
+          if (existingQr) {
+            existingQr.style.bottom = pos.qr.bottom;
+            existingQr.style.left = pos.qr.left;
+            existingQr.style.width = pos.qr.size;
+          } else {
+            const qrDiv = document.createElement("div");
+            qrDiv.className = "qr-overlay";
+            qrDiv.style.cssText = "position:absolute;bottom:" + pos.qr.bottom + ";left:" + pos.qr.left + ";width:" + pos.qr.size + ";aspect-ratio:1;display:flex;align-items:center;justify-content:center;";
+            qrDiv.innerHTML = QR_SVG;
+            document.getElementById("a4Sheet").appendChild(qrDiv);
+          }
+        } else if (existingQr) {
+          existingQr.remove();
+        }
+      });
+    }
+  </script>
+</body>
+</html>`;
+}
 
 export type BoardingPassVisual =
   | "emblem"

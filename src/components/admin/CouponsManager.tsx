@@ -30,6 +30,7 @@ import {
 import {
   BOARDING_VISUAL_THEMES,
   buildMediaKitPrintHtml,
+  buildCanvaVoucherHtml,
   type BoardingPassVisual,
 } from "@/lib/mediaKitPrint";
 import { renderQrSvg } from "@/lib/qrSvg";
@@ -193,6 +194,21 @@ const CouponsManager = () => {
       mode,
     });
 
+    win.document.write(html);
+    win.document.close();
+  };
+
+  const handlePrintCanvaVoucher = (c: RedeemCouponRow) => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://protocolosolar.com.br";
+    const redeemUrl = getRedeemUrl(c);
+
+    const win = window.open("", "_blank", "width=1120,height=860");
+    if (!win) {
+      toast.error("Permita pop-ups para abrir o Voucher.");
+      return;
+    }
+
+    const html = buildCanvaVoucherHtml({ coupon: c, redeemUrl, origin });
     win.document.write(html);
     win.document.close();
   };
@@ -466,6 +482,15 @@ const CouponsManager = () => {
                       >
                         <Printer className="w-3.5 h-3.5" />
                         <span>Imprimir A4</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePrintCanvaVoucher(c)}
+                        className="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                        title="Voucher com design do Canva (Theo + QR + código)"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>Voucher Canva</span>
                       </button>
                       <button
                         type="button"
