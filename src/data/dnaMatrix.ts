@@ -207,12 +207,12 @@ export const DNA_MATRIX: Record<number, Record<string, { essencia: string; metod
     "rotina": {
       "essencia": "Sua vitalidade se alimenta do prazer de viver, mostrando que cuidar do corpo precisa ser algo estimulante e divertido.",
       "metodo": "Sua rotina ganha leveza através de esportes, dança ou atividades físicas que tragam alegria ao mesmo tempo que queimam energia.",
-      "fase": "Seu ciclo atual corta obrigações extremamente pesadas sem momento de pausa, garantindo espaço na agenda pra curtir a vida."
+      "fase": "Seu ciclo atual estimula cortar obrigações pesadas sem pausa, abrindo espaço na agenda pra curtir a vida."
     },
     "saude": {
       "essencia": "Sua vitalidade se alimenta do prazer de viver, mostrando que cuidar do corpo precisa ser algo estimulante e divertido.",
       "metodo": "Sua rotina ganha leveza através de esportes, dança ou atividades físicas que tragam alegria ao mesmo tempo que queimam energia.",
-      "fase": "Seu ciclo atual corta obrigações extremamente pesadas sem momento de pausa, garantindo espaço na agenda pra curtir a vida."
+      "fase": "Seu ciclo atual estimula cortar obrigações pesadas sem pausa, abrindo espaço na agenda pra curtir a vida."
     },
     "networking": {
       "essencia": "Seu magnetismo pessoal atrai gente vibrante, criativa e alinhada com seu estilo, multiplicando contatos no meio social e artístico.",
@@ -395,12 +395,12 @@ export const DNA_MATRIX: Record<number, Record<string, { essencia: string; metod
     "rotina": {
       "essencia": "Sua vitalidade se renova através do contato com a natureza, viagens e atividades que expandam sua mente e tirem da rotina pesada.",
       "metodo": "Sua atitude busca incorporar práticas de bem-estar de outras culturas, facilitando alinhar mente, filosofia de vida e movimento físico.",
-      "fase": "Seu ciclo atual recusa viver enclausurado em rotinas cinzentas, garantindo momentos de liberdade, ar livre e exploração."
+      "fase": "Seu ciclo atual pede sair de rotinas engessadas, favorecendo momentos de liberdade, ar livre e exploração."
     },
     "saude": {
       "essencia": "Sua vitalidade se renova através do contato com a natureza, viagens e atividades que expandam sua mente e tirem da rotina pesada.",
       "metodo": "Sua atitude busca incorporar práticas de bem-estar de outras culturas, facilitando alinhar mente, filosofia de vida e movimento físico.",
-      "fase": "Seu ciclo atual recusa viver enclausurado em rotinas cinzentas, garantindo momentos de liberdade, ar livre e exploração."
+      "fase": "Seu ciclo atual pede sair de rotinas engessadas, favorecendo momentos de liberdade, ar livre e exploração."
     },
     "networking": {
       "essencia": "Seu magnetismo atrai contatos internacionais, acadêmicos e mentores de alto nível, conectando você com mentes brilhantes.",
@@ -525,23 +525,23 @@ export const DNA_MATRIX: Record<number, Record<string, { essencia: string; metod
     },
     "trabalho": {
       "essencia": "Sua produtividade atinge a maestria no modo 'deep work' e incubação, sendo o momento perfeito pra planejar projetos sigilosos pra lançar depois.",
-      "metodo": "Sua forma de trabalhar ganha um foco inabalável longe dos holofotes, ajudando a criar protótipos, estruturar sistemas e trabalhar sem interrupção.",
+      "metodo": "Sua forma de trabalhar favorece um foco mais profundo longe dos holofotes, ajudando a criar protótipos, estruturar sistemas e trabalhar com menos interrupções.",
       "fase": "Seu momento de vida encerra o desgaste de palcos desnecessários, preferindo produzir no silêncio até que o projeto esteja 100% pronto."
     },
     "identidade": {
       "essencia": "Sua alma pede um momento de recolhimento e autoconhecimento, limpando ruídos externos pra você se reconectar com a sua essência mais pura.",
       "metodo": "Sua postura transmite mistério, serenidade e sabedoria silenciosa, fazendo as pessoas sentirem que você possui uma força interior enorme.",
-      "fase": "Sua maturidade encerra a necessidade de ter que provar algo pros outros, conquistando paz de espírito e estabilidade interna inabalável."
+      "fase": "Sua maturidade reduz a necessidade de provar algo aos outros, favorecendo paz de espírito e estabilidade interna mais firme."
     },
     "rotina": {
       "essencia": "Sua saúde mental e imunidade viram a prioridade máxima do ano, necessitando de um ritmo suave, noites de sono reparadoras e momentos de solitude.",
       "metodo": "Sua atitude facilita criar rituais de meditação, terapias, rotinas de descanso e cuidados de saúde pra prevenir o esgotamento.",
-      "fase": "Seu ciclo atual corta a correria maluca que gerava ansiedade, garantindo pausas sagradas pra recarregar sua bateria física e mental."
+      "fase": "Seu ciclo atual favorece reduzir a correria que gerava ansiedade, abrindo espaço para pausas necessárias de recarga física e mental."
     },
     "saude": {
       "essencia": "Sua saúde mental e imunidade viram a prioridade máxima do ano, necessitando de um ritmo suave, noites de sono reparadoras e momentos de solitude.",
       "metodo": "Sua atitude facilita criar rituais de meditação, terapias, rotinas de descanso e cuidados de saúde pra prevenir o esgotamento.",
-      "fase": "Seu ciclo atual corta a correria maluca que gerava ansiedade, garantindo pausas sagradas pra recarregar sua bateria física e mental."
+      "fase": "Seu ciclo atual favorece reduzir a correria que gerava ansiedade, abrindo espaço para pausas necessárias de recarga física e mental."
     },
     "networking": {
       "essencia": "Sua vida social busca o filtro da privacidade, preferindo ter pouquíssimas pessoas de extrema confiança no seu convívio reservado.",

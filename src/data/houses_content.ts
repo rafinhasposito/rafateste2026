@@ -21,7 +21,7 @@ export const REAL_HOUSES_DATA = [
   },
   {
     "num": 3,
-    "tema": "Este é um ano de movimento e aprendizado prático, onde sua fala, sua escrita e sua capacidade de dialogar vão abrir portas importantes de negócios e vendas.",
+    "tema": "Este é um ciclo que joga a favor do movimento e do aprendizado prático, onde sua fala, sua escrita e sua capacidade de dialogar tendem a abrir portas importantes em negócios e vendas.",
     "segredo": "🗣️ Vendas diretas de serviços, reuniões comerciais e poder de convencimento 🤝 Fazer contatos rápidos e ter uma rede de indicações ativa 📚 Cursos rápidos de atualização, leituras úteis e novos idiomas ✈️ Viagens curtas e constantes para negócios ou reuniões presenciais 📱 Atividade digital dinâmica e uso focado de canais de mensagens ",
     "mantra": "A minha voz abre todas as portas e as minhas ideias têm um valor incalculável no mercado.",
     "ritual": "Escreva um pequeno e-mail, mensagem ou postagem divulgando uma nova ideia ou produto que você quer colocar no mercado. Faça uma viagem rápida para uma cidade vizinha ou ligue para 3 contatos de negócios antigos para restabelecer a comunicação.",
@@ -57,7 +57,7 @@ export const REAL_HOUSES_DATA = [
     "ritual": "No dia do seu aniversário, estabeleça uma meta simples e executável de bem-estar: beba água de forma correta, organize sua mesa de trabalho e faça uma refeição limpa e saudável. Monte a sua agenda da semana de forma estruturada, com horários dedicados para o treino e para o descanso.",
     "fase1": "Organização física e exames de saúde. Fase ideal para realizar check-ups preventivos, iniciar dietas com acompanhamento profissional e arrumar a mesa de trabalho.",
     "fase2": "Consolidação da nova rotina de treinos e consistência. Excelente período para automatizar processos de trabalho repetitivos e focar em prazos corporativos.",
-    "fase3": "Eficiência total. Você sentirá as tarefas do dia fluírem de forma natural e sem esforço, aproveitando a sua energia física no ápice de rendimento."
+    "fase3": "Eficiência consolidada. Tendência a sentir as tarefas do dia fluírem com mais naturalidade, aproveitando melhor sua disposição e ritmo."
   },
   {
     "num": 7,
@@ -112,7 +112,7 @@ export const REAL_HOUSES_DATA = [
   {
     "num": 12,
     "tema": "Este é o ano da incubação silenciosa. O foco está em proteger seus projetos de ruídos externos, trabalhar nos bastidores e recuperar a sua saúde física e mental.",
-    "segredo": "🤫 Trabalhar em projetos sigilosos longe dos olhos de concorrentes e da inveja alheia 🧘‍♀️ Realizar exames de saúde detalhados, rotinas de desintoxicação física e descanso real 🔮 Fortalecer a sua intuição profunda para tomar melhores decisões de negócios 🧹 Encerrar de vez ciclos emocionais desgastantes e pendências do passado com sabedoria 🛡️ Desfrutar de um escudo invisível de privacidade contra fofocas ou intromissões externas ",
+    "segredo": "🤫 Trabalhar em projetos reservados longe de ruídos externos 🧘‍♀️ Priorizar exames de saúde preventivos, descanso e recuperação mental 🔮 Cultivar escuta intuitiva para tomar melhores decisões 🧹 Encerrar ciclos emocionais desgastantes e pendências do passado com maturidade 🛡️ Preservar mais privacidade e tranquilidade contra desgastes externos ",
     "mantra": "O meu silêncio é estratégico; a minha intuição e os bastidores preparam meu novo ciclo.",
     "ritual": "Tire o dia do seu aniversário para descansar em privacidade. Desligue as notificações das redes sociais e passe um tempo em silêncio de portas fechadas. Faça uma rotina de autocuidado, como um banho morno com sais de banho ou uma caminhada silenciosa na natureza, sintonizando sua mente com o repouso.",
     "fase1": "Desintoxicação e descanso. Excelente fase para marcar exames clínicos preventivos, readequar a sua rotina de sono e reduzir a exposição nas redes sociais de forma intencional.",

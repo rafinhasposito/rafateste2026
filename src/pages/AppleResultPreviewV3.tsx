@@ -128,7 +128,7 @@ const LIFE_AREAS = [
     cityDesc: "O epicentro financeiro do mundo. A energia inesgotável desta ilha não aceita mediocridade, forçando você a assumir a autoridade da sua própria carreira e colocar suas ideias nos maiores palcos disponíveis.",
     image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=2000&q=80",
     dna: {
-      essencia: "O seu brilho pessoal exige protagonismo. No Trabalho, a vibração desta cidade garante que o seu magnetismo abra portas que diplomas sozinhos não abririam.",
+      essencia: "O seu brilho pessoal pede protagonismo. No Trabalho, o clima desta cidade joga a favor de destacar seu magnetismo e abrir novas conversas que diplomas sozinhos não trazem.",
       metodo: "A sua necessidade de excelência encontra o terreno fértil. O destino recompensa a sua capacidade de estruturar equipes, otimizar rotinas e liderar pelo exemplo prático.",
       fase: "O foco agora é consolidação. Não se trata mais de provar o seu valor para o mercado, mas de assumir a autoridade que você já construiu e colher os frutos financeiros disso."
     },
@@ -159,14 +159,14 @@ const LIFE_AREAS = [
     ritual: "Tire um momento exclusivo para você. Faça algo que melhore a sua autoestima e compre uma roupa nova que marque esse ciclo. Caminhe pelas ruas habitando essa pele, sem justificar seu brilho para ninguém.",
     mantra: "Eu assumo o comando das minhas escolhas. A minha presença fala por si e eu não me diminuo para caber em expectativas alheias.",
     pillars: [
-      { icon: ArrowUpRight, title: "Autoconfiança Magnética", text: "A sensação ao pisar neste destino é de clareza absoluta de quem você é. A energia afasta a dúvida e garante que você entre em qualquer sala sabendo o seu valor." },
+      { icon: ArrowUpRight, title: "Autoconfiança Magnética", text: "O clima deste destino favorece mais clareza sobre quem você é — ajudando a reduzir dúvidas e entrar em qualquer sala reconhecendo o seu valor." },
       { icon: Crown, title: "Posicionamento Premium", text: "O universo alinha a sua imagem ao alto valor. O magnetismo é tão forte que as pessoas costumam ler o seu sucesso antes mesmo de você abrir a boca." },
       { icon: Shield, ShieldAlert, title: "Fim da Autossabotagem", text: "A força do mapa destrava o medo da exposição. A energia pede que você pare de se encolher para caber em lugares pequenos e ocupe o seu espaço real." }
     ],
     timeline: [
       { phase: "Fase 1: Desconstrução e Limpeza", period: "Meses 1 a 4", text: "O universo pede uma limpa na sua imagem. É o momento perfeito para jogar fora identidades antigas, repensar seu estilo e abandonar rótulos que já não cabem mais." },
       { phase: "Fase 2: Magnestismo em Alta", period: "Meses 5 a 8", text: "A sua nova persona ganha força. A energia atrai olhares e parcerias, fazendo com que o mundo perceba o upgrade interno que você realizou nos meses anteriores." },
-      { phase: "Fase 3: Segurança Inabalável", period: "Meses 9 a 12", text: "A sua identidade torna-se seu maior escudo protetor. A vibração da cidade garante que nenhuma crítica externa tenha força para balançar a sua confiança real." }
+      { phase: "Fase 3: Segurança Consolidada", period: "Meses 9 a 12", text: "Sua identidade tende a se firmar como um apoio sólido. O ciclo joga a favor de manter sua confiança estável mesmo diante de críticas externas." }
     ]
   },
   { 
@@ -207,7 +207,7 @@ const LIFE_AREAS = [
     ritual: "Mande mensagem para 3 pessoas que te inspiram ou com quem você quer criar laços de alto nível. Depois, sente-se no lobby de um hotel elegante da cidade apenas para observar e pertencer àquele ambiente.",
     mantra: "Eu atraio pessoas que elevam o meu nível. Eu sento em mesas onde a colaboração de elite substitui a competição rasa.",
     pillars: [
-      { icon: ArrowUpRight, title: "Acesso a Mesas Fechadas", text: "A vibração atrai encontros mágicos. Convites para ambientes exclusivos costumam surgir, colocando você a um aperto de mãos dos maiores contratos." },
+      { icon: ArrowUpRight, title: "Acesso a Mesas Estratégicas", text: "O clima favorece encontros relevantes. Convites para ambientes qualificados podem surgir, aproximando você de conversas e contratos mais estratégicos." },
       { icon: Crown, title: "Parcerias de Elite", text: "O destino eleva a sua frequência social. A energia atrai apenas associações com quem puxa o seu nível para cima, afastando relações que sugam o seu tempo." },
       { icon: Shield, ShieldAlert, title: "Proteção por Contatos", text: "O universo cria uma verdadeira rede de segurança ao seu redor através das suas conexões. O poder do 'quem indica' ganha força máxima a seu favor." }
     ],
@@ -232,7 +232,7 @@ const LIFE_AREAS = [
     mantra: "Eu aceito receber amor na exata medida da minha dedicação. Eu me torno magnético quando honro o meu próprio valor.",
     pillars: [
       { icon: ArrowUpRight, title: "Magnetismo Real", text: "O destino foca na atração de parcerias maduras. A energia é ideal para encontrar quem queira construir junto, cortando o desgaste com relações rasas." },
-      { icon: Crown, title: "Valorização Pessoal", text: "A sensação de amor próprio se torna o seu maior escudo. O universo pede o fim das concessões excessivas, garantindo que você dite as regras do seu valor." },
+      { icon: Crown, title: "Valorização Pessoal", text: "O senso de amor-próprio ganha espaço como referência. O ciclo convida a reduzir concessões excessivas e definir com mais clareza os seus limites." },
       { icon: Shield, ShieldAlert, title: "Construção de Futuro", text: "A vibração transforma a atração física em raízes profundas. O cenário é perfeito para que o romance se torne uma base para realizações conjuntas." }
     ],
     timeline: [
@@ -281,12 +281,12 @@ const LIFE_AREAS = [
     pillars: [
       { icon: ArrowUpRight, title: "Energia Inesgotável", text: "O magnetismo local impulsiona o seu vigor. A sensação de cansaço crônico cede espaço para uma energia limpa, acompanhando o ritmo da sua ambição mental." },
       { icon: Crown, title: "Longevidade e Vigor", text: "A vibração faz com que o seu corpo responda instantaneamente aos bons tratos. O universo recompensa seus novos hábitos com uma aparência de saúde radiante." },
-      { icon: Shield, ShieldAlert, title: "Corpo Blindado", text: "A energia foca na sua imunidade. O destino transforma o seu sistema de defesa em uma verdadeira fortaleza, garantindo que a saúde acompanhe a sua escalada." }
+      { icon: Shield, ShieldAlert, title: "Vitalidade Protegida", text: "O foco se volta para sua saúde e prevenção. O ciclo favorece cuidar melhor da imunidade para que sua disposição acompanhe o ritmo das suas metas." }
     ],
     timeline: [
       { phase: "Fase 1: Diagnóstico e Ajuste", period: "Meses 1 a 4", text: "A vibração pede checagens precisas. A energia favorece identificar pequenas inflamações e ajustar a sua rotina de sono e alimentação para formar um platô firme de biologia." },
       { phase: "Fase 2: Biohacking e Vigor", period: "Meses 5 a 8", text: "Os novos hábitos começam a rodar no automático. O universo impulsiona uma vitalidade incomum, acabando com a névoa mental e fornecendo combustível limpo para suas conquistas." },
-      { phase: "Fase 3: Fortaleza Imunológica", period: "Meses 9 a 12", text: "A sensação é de corpo blindado. O metabolismo entra no seu auge de performance e estabilidade, garantindo que a sua saúde consiga bancar integralmente a altura das suas ambições." }
+      { phase: "Fase 3: Vitalidade Sustentada", period: "Meses 9 a 12", text: "Com os novos hábitos consolidados, a tendência é de mais estabilidade física e fôlego consistente para sustentar o ritmo das suas ambições." }
     ]
   }
 ];
@@ -1948,9 +1948,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                     )}
                   </div>
 
-                  {/* SEÇÃO DE FOCOS: EXCLUSIVA PARA O MODO FUTURO */}
-                  {isFutureMode ? (
-                  <>
+                  {/* SEÇÃO DE FOCOS & DOSSIÊ COMPLETO (PASSADO, PRESENTE E FUTURO) */}
                   {/* Banner de Escolha do 1º Foco (Consultas Por Cidade / Por Casa) */}
                   {hasFreeFirstFocus && (
                     <div className="w-full max-w-4xl mx-auto mb-6 p-5 sm:p-6 rounded-2xl border border-[#C9A227]/40 bg-[#C9A227]/10 backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-left shadow-[0_0_30px_rgba(201,162,39,0.12)]">
@@ -1963,7 +1961,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             1º Foco Incluso na Sua Consulta
                           </span>
                           <p className="text-white/90 text-sm sm:text-base font-light leading-relaxed">
-                            Escolha uma das 8 áreas abaixo e toque em <strong className="text-white font-semibold">"Escolher e Ativar Este Foco"</strong> para abrir o seu dossiê completo desta cidade.
+                            {isPastMode ? (
+                              <>Escolha uma das 8 áreas abaixo e toque em <strong className="text-white font-semibold">"Escolher e Ativar Este Foco"</strong> para abrir o dossiê completo de como {shortCityName} atuou nessa área em {P_DYNAMIC.year}.</>
+                            ) : isPresentMode ? (
+                              <>Escolha uma das 8 áreas abaixo e toque em <strong className="text-white font-semibold">"Escolher e Ativar Este Foco"</strong> para abrir o dossiê completo de como {shortCityName} está atuando nessa área no seu ano atual.</>
+                            ) : (
+                              <>Escolha uma das 8 áreas abaixo e toque em <strong className="text-white font-semibold">"Escolher e Ativar Este Foco"</strong> para abrir o seu dossiê completo desta cidade.</>
+                            )}
                           </p>
                         </div>
                       </div>
@@ -2382,7 +2386,13 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                           <Target className="w-5 h-5 shrink-0" style={{ color: currentActiveData.color }} />
                         </div>
                         <h2 className="font-ps-display text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight">
-                          Os 3 Pilares da Ativação da <span className="whitespace-nowrap">Casa {P_DYNAMIC.house}</span>
+                          {isPastMode ? (
+                            <>Os 3 Pilares que Regeram a <span className="whitespace-nowrap">Casa {P_DYNAMIC.house}</span> em {P_DYNAMIC.year}</>
+                          ) : isPresentMode ? (
+                            <>Os 3 Pilares Ativos na <span className="whitespace-nowrap">Casa {P_DYNAMIC.house}</span> Neste Ano</>
+                          ) : (
+                            <>Os 3 Pilares da Ativação da <span className="whitespace-nowrap">Casa {P_DYNAMIC.house}</span></>
+                          )}
                         </h2>
                       </div>
                       
@@ -2469,7 +2479,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             className="flex flex-col items-start md:items-center text-left md:text-center max-w-4xl self-center relative z-10 mt-2 md:mt-10"
                           >
                             <span className="font-sans uppercase tracking-[0.3em] text-xs md:text-sm mb-3 md:mb-6" style={{ color: currentActiveData.color }}>
-                              03. Fase Atual
+                              03. {isPastMode ? `Fase Vivida em ${P_DYNAMIC.year}` : "Fase Atual"}
                             </span>
                             <h3 className="font-ps-display text-4xl sm:text-5xl md:text-8xl font-bold text-white mb-4 md:mb-8 tracking-tighter leading-none">
                               {P_DYNAMIC.phaseLabel}.
@@ -2508,7 +2518,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               content: (
                                 <div className="flex flex-col gap-6 md:gap-8 w-full min-w-0">
                                   <div>
-                                    <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-2.5 text-white/40">Foco do Novo Ciclo</span>
+                                    <span className="font-sans text-[10px] tracking-[0.2em] uppercase block mb-2.5 text-white/40">
+                                      {isPastMode ? `Foco do Ciclo de ${P_DYNAMIC.year}` : isPresentMode ? "Foco do Seu Ciclo Atual" : "Foco do Novo Ciclo"}
+                                    </span>
                                     <p className="font-ps-display text-white text-2xl sm:text-3xl md:text-4xl leading-tight">
                                       <AppleHighlightText text={currentActiveData.themeData || "Consolidação e Crescimento"} activeColor={activeColor} />
                                     </p>
@@ -2524,12 +2536,14 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             },
                             {
                               id: 1,
-                              title: "O Ritual",
-                              subtitle: "Ativação em 24h",
+                              title: isPastMode ? "A Prática" : "O Ritual",
+                              subtitle: isPastMode ? "Como Este Ciclo Funcionou" : isPresentMode ? "Ativação no Ano Atual" : "Ativação em 24h",
                               icon: <Compass className="w-6 h-6 lg:w-8 lg:h-8" />,
                               content: (
                                 <div className="flex flex-col w-full min-w-0 justify-center h-full">
-                                  <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-5 md:mb-8" style={{ color: activeColor }}>Guia de Ativação na Viagem</span>
+                                  <span className="font-sans text-[10px] md:text-[11px] uppercase font-bold tracking-[0.3em] block mb-5 md:mb-8" style={{ color: activeColor }}>
+                                    {isPastMode ? "3 Movimentos Práticos Daquele Ciclo" : isPresentMode ? "Guia de Ativação Prática Neste Ciclo" : "Guia de Ativação na Viagem"}
+                                  </span>
                                   <div className="flex flex-col gap-5 md:gap-7">
                                     {[
                                       currentActiveData.ritualData?.step1 || 'Sintonize a intenção.',
@@ -2563,10 +2577,16 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-100px" }}>
                               <motion.div variants={itemVariants} className="w-full flex flex-col items-center text-center mb-10 md:mb-14">
                                 <span className="font-sans text-[11px] md:text-xs tracking-[0.35em] uppercase font-bold mb-3" style={{ color: activeColor }}>
-                                  Ativação Prática · {shortCityName}
+                                  {isPastMode
+                                    ? `Dinâmica Prática · ${shortCityName} (${P_DYNAMIC.year})`
+                                    : isPresentMode
+                                    ? `Ativação do Ano Atual · ${shortCityName}`
+                                    : `Ativação Prática · ${shortCityName}`}
                                 </span>
                                 <h3 className="font-ps-display text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight">
-                                  O Segredo e o Ritual da Casa {P_DYNAMIC.house}
+                                  {isPastMode
+                                    ? `A Chave e a Prática da Casa ${P_DYNAMIC.house}`
+                                    : `O Segredo e o Ritual da Casa ${P_DYNAMIC.house}`}
                                 </h3>
                               </motion.div>
 
@@ -2606,7 +2626,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         <div className="relative z-10 flex flex-col items-center">
                           <div className="flex items-center gap-3 mb-6 md:mb-10 px-5 py-2.5 bg-white/5 rounded-full border border-white/10 backdrop-blur-md shadow-lg">
                              <Sparkles className="w-4 h-4" style={{ color: currentActiveData?.color || '#10b981' }} />
-                             <span className="font-sans text-xs tracking-[0.2em] uppercase font-bold" style={{ color: currentActiveData?.color || '#10b981' }}>O Mantra de Ativação</span>
+                             <span className="font-sans text-xs tracking-[0.2em] uppercase font-bold" style={{ color: currentActiveData?.color || '#10b981' }}>
+                               {isPastMode ? `O Mantra Daquele Ciclo (${P_DYNAMIC.year})` : isPresentMode ? "O Mantra do Seu Ano Atual" : "O Mantra de Ativação"}
+                             </span>
                           </div>
                           
                           <p className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-ps-display font-bold tracking-tighter leading-[1.2] md:leading-[1.15] bg-clip-text text-transparent pb-2 max-w-5xl"
@@ -2619,9 +2641,21 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       {/* BLOCO 5: A LINHA DO TEMPO (ACCORDION) */}
                       <div className="w-full mt-20 md:mt-40 max-w-4xl mx-auto mb-20 md:mb-32">
                         <div className="text-center mb-12 md:mb-24">
-                          <h2 className="font-ps-display text-3xl sm:text-4xl md:text-6xl font-bold tracking-tighter mb-4 md:mb-6">A Evolução da Casa {P_DYNAMIC.house}</h2>
+                          <h2 className="font-ps-display text-3xl sm:text-4xl md:text-6xl font-bold tracking-tighter mb-4 md:mb-6">
+                            {isPastMode
+                              ? `A Anatomia dos 12 Meses em ${P_DYNAMIC.year}`
+                              : isPresentMode
+                              ? `As 3 Fases do Seu Ano Atual (Casa ${P_DYNAMIC.house})`
+                              : `A Evolução da Casa ${P_DYNAMIC.house}`}
+                          </h2>
                           <p className="text-white/60 text-base sm:text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                            Como a energia da cidade trabalha o seu foco em <strong className="text-white font-medium">{currentActiveData.label}</strong> ao longo do novo ciclo.
+                            {isPastMode ? (
+                              <>Como a energia de {shortCityName} trabalhou <strong className="text-white font-medium">{currentActiveData.label}</strong> ao longo dos 3 quadrimestres de {P_DYNAMIC.year}.</>
+                            ) : isPresentMode ? (
+                              <>Identifique em qual fase do seu ano atual você está (Meses 1–4, 5–8 ou 9–12) e como {shortCityName} movimenta <strong className="text-white font-medium">{currentActiveData.label}</strong>.</>
+                            ) : (
+                              <>Como a energia da cidade trabalha o seu foco em <strong className="text-white font-medium">{currentActiveData.label}</strong> ao longo do novo ciclo.</>
+                            )}
                           </p>
                         </div>
 
@@ -2694,7 +2728,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             
                             <div className="flex items-center gap-2 sm:gap-3 mb-5 md:mb-8 px-4 py-1.5 bg-red-500/10 rounded-full border border-red-500/20">
                                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                               <span className="font-sans text-[10px] tracking-widest uppercase text-red-400 font-bold">O Ponto Cego</span>
+                               <span className="font-sans text-[10px] tracking-widest uppercase text-red-400 font-bold">
+                                 {isPastMode ? `O Ponto Cego em ${P_DYNAMIC.year}` : isPresentMode ? "O Ponto Cego do Ano Atual" : "O Ponto Cego"}
+                               </span>
                             </div>
                             
                             <h3 className="font-ps-display text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-5 md:mb-8 tracking-tighter">
@@ -2710,7 +2746,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             <div className="text-left w-full max-w-2xl bg-black/60 p-5 sm:p-7 rounded-2xl border border-red-900/30 shadow-lg">
                                <div className="flex items-center gap-2.5 mb-3 sm:mb-4 border-b border-red-900/30 pb-3">
                                  <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 shrink-0" />
-                                 <span className="font-sans text-[11px] sm:text-xs tracking-[0.2em] uppercase text-red-500 font-bold">Protocolo de Defesa</span>
+                                 <span className="font-sans text-[11px] sm:text-xs tracking-[0.2em] uppercase text-red-500 font-bold">
+                                   {isPastMode ? "O Antídoto Daquele Ciclo" : "Protocolo de Defesa"}
+                                 </span>
                                </div>
                                <p className="text-white/95 text-base sm:text-lg md:text-xl font-serif italic leading-relaxed">
                                  "{currentActiveData.defenseProtocolData || 'Congele 30% de todo lucro novo no momento em que ele tocar a sua conta, antes de tomar qualquer decisão de gasto.'}"
@@ -2724,9 +2762,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 
                     </div>
                   )}
-                  </>
-                  ) : (
-                    /* FECHAMENTO DO DIAGNÓSTICO (PASSADO E PRESENTE — SEM COMPRA DE FOCOS OU ROTAS EXTRAS) */
+
+                  {/* FECHAMENTO CONTEXTUAL DO DIAGNÓSTICO (PASSADO E PRESENTE) */}
+                  {!isFutureMode && (
                     <div className="w-full max-w-4xl mx-auto mt-4 mb-8 flex flex-col items-center text-center">
                       <div className="w-full rounded-[28px] border border-white/10 bg-black/40 p-6 sm:p-10 text-left mb-10">
                         <span

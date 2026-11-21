@@ -17,7 +17,7 @@ export const BASE_HOUSE_PROFILES = {
   "4": {
     "vibe": "Aconchego de casa, paz interior e aquele refúgio gostoso pra você desacelerar e fortalecer suas bases.",
     "understand": "A energia dessa cidade funciona como um abraço acolhedor pra sua vida emocional e familiar. O lugar te convida a voltar a atenção pra dentro, cuidar do seu canto, curtir a privacidade e criar um ambiente seguro pro seu coração. É a escolha perfeita pra quando você precisa de sossego, quer arrumar sua casa ou resolver coisas de família com calma.",
-    "realDynamics": "No cotidiano, o ritmo é mais tranquilo, focado no bem-estar, no descanso e na boa convivência com quem você ama. A vibe do lugar te ajuda a desacelerar a correria do mundo lá fora e recarregar as energias no seu próprio porto seguro, garantindo a paz mental que você precisa pra encarar qualquer parada."
+    "realDynamics": "No cotidiano, o ritmo tende a ser mais tranquilo, focado no bem-estar, no descanso e na boa convivência com quem você ama. A vibe do lugar ajuda você a desacelerar a correria lá de fora e recarregar as energias no seu próprio porto seguro, favorecendo a paz mental para encarar suas prioridades."
   },
   "5": {
     "vibe": "Paixão, brilho nos olhos, vontade de curtir a vida e colocar seus talentos autorais no centro do palco.",
@@ -27,7 +27,7 @@ export const BASE_HOUSE_PROFILES = {
   "6": {
     "vibe": "Disciplina de relógio suíço, vida fit em dia e uma rotina organizada que faz seu trabalho render sem estresse.",
     "understand": "Essa cidade é o paraíso pra quem precisa arrumar a casa, organizar a agenda e colocar a saúde no topo das prioridades. A energia do lugar te dá a constância que faltava pra treinar certinho, comer bem e otimizar as tarefas do seu dia a dia. É o destino perfeito pra transformar o caos em eficiência e fazer sua rotina funcionar que nem um motor bem azeitado.",
-    "realDynamics": "No cotidiano, o clima é de trabalho prático, hábitos saudáveis e foco em resolver pendências. A vibe do lugar te ajuda a criar métodos, eliminar a enrolação e prestar serviços de altíssima qualidade. O resultado é um corpo forte, uma mente calma e um trabalho que vira receita recorrente e organizada."
+    "realDynamics": "No cotidiano, o clima joga a favor do trabalho prático, de hábitos saudáveis e do foco em resolver pendências. A vibe do lugar ajuda você a criar métodos, reduzir a enrolação e entregar serviços com mais qualidade — abrindo caminho para mais disposição física, mente calma e receita mais organizada."
   },
   "7": {
     "vibe": "Olho no olho, parcerias de peso e o ambiente perfeito pra fechar compromissos sérios no amor e nos negócios.",
@@ -47,16 +47,16 @@ export const BASE_HOUSE_PROFILES = {
   "10": {
     "vibe": "Topo da montanha, modo CEO ligado, holofotes na sua autoridade e o mercado reconhecendo o seu sucesso.",
     "understand": "Essa cidade é a vitrine definitiva pro seu crescimento profissional e reputação pública. A energia do lugar tira você dos bastidores, colocando sua competência em evidência pra quem toma decisões no seu mercado. É a escolha imbatível pra quando o objetivo do seu ano é conquistar prestígio, assumir cargos de liderança e colher o sucesso do seu esforço.",
-    "realDynamics": "No cotidiano, a vibe é de alta ambição, profissionalismo e presença marcante. O ambiente te cobra postura de líder, mas joga junto pra destacar seu trabalho e atrair o respeito dos clientes e do seu setor. Aqui, a dedicação se transforma em autoridade indiscutível e portas abertas no topo."
+    "realDynamics": "No cotidiano, a vibe joga a favor da ambição estratégica, do profissionalismo e da presença marcante. O ambiente estimula postura de liderança e favorece destacar seu trabalho para conquistar mais respeito no seu setor — um terreno fértil para consolidar autoridade e abrir novas portas."
   },
   "11": {
     "vibe": "Egrégora forte, amigos que abrem portas, projetos na internet e a certeza de que o seu network é seu maior patrimônio.",
     "understand": "A energia dessa cidade é voltada pras conexões certas, comunidades e metas de longo prazo. O ambiente te ajuda a entender que ninguém cresce sozinho e atrai parceiros, clientes e influenciadores dispostos a apoiar suas ideias. É o destino ideal pra quem trabalha com mídias digitais, eventos, projetos coletivos ou quer expandir sua rede de contatos.",
-    "realDynamics": "O dia a dia aqui é cheio de trocas enriquecedoras, convites pra eventos e conversas que viram parcerias de sucesso. A vibe da cidade facilita a vida em grupo, amplia seu público e faz seu trabalho circular mais longe através das indicações de quem admira o que você faz."
+    "realDynamics": "O dia a dia aqui favorece trocas enriquecedoras, convites para eventos e conversas que podem evoluir para boas parcerias. A vibe da cidade joga a favor da vida em grupo, ampliando o alcance do seu trabalho e estimulando indicações de quem admira o que você faz."
   },
   "12": {
     "vibe": "Santuário de paz, intuição afiada e o clima perfeito pra gestar grandes projetos em segredo e recarregar a alma.",
     "understand": "Essa cidade funciona como um refúgio estratégico de desintoxicação e incubação. A energia do lugar desacelera o barulho do mundo lá fora pra você ouvir sua intuição, encerrar pendências do passado e preparar seus próximos passos no absoluto silêncio. É o destino perfeito pra quem precisa de descanso reparador, espiritualidade e foco em trabalho profundo de bastidores.",
-    "realDynamics": "No cotidiano, o ritmo é suave, reservado e super intuitivo. A vibe do lugar te protege de desgastes externos e estresse, ajudando você a criar no silêncio antes de lançar algo pro mundo. É a pausa estratégica que limpa o caminho e garante a imunidade física e mental pra você começar um novo ciclo com tudo renovado."
+    "realDynamics": "No cotidiano, o ritmo tende a ser suave, reservado e mais intuitivo. A vibe do lugar ajuda a reduzir desgastes externos e estresse, favorecendo criar no silêncio antes de lançar algo ao mundo — uma pausa estratégica para cuidar da saúde física e mental antes do próximo ciclo."
   }
 };

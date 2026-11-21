@@ -160,11 +160,11 @@ export const houseThemes: Record<number, HouseTheme> = {
       },
       {
         "title": "Paz Familiar e Raízes",
-        "text": "Um ciclo de pertencimento e acolhimento, perfeito para resolver pendências familiares com maturidade e cultivar um porto seguro inabalável."
+        "text": "Um ciclo de pertencimento e acolhimento, propício para resolver pendências familiares com maturidade e cultivar um porto seguro mais firme."
       },
       {
         "title": "Estabilidade Emocional",
-        "text": "O foco se volta para a reestruturação da sua intimidade, fortalecendo os laços com quem realmente importa e garantindo equilíbrio interno."
+        "text": "O foco se volta para a reestruturação da sua intimidade, fortalecendo os laços com quem realmente importa e favorecendo mais equilíbrio interno."
       }
     ]
   },
@@ -316,7 +316,7 @@ export const houseThemes: Record<number, HouseTheme> = {
       },
       {
         "title": "Intimidade e Poder Pessoal",
-        "text": "Uma fase de regeneração profunda, onde o desapego do passado e a cura de bloqueios antigos ativam um magnetismo inabalável."
+        "text": "Uma fase propícia à regeneração profunda, em que o desapego do passado e a superação de bloqueios antigos favorecem uma presença mais firme e magnética."
       }
     ]
   },

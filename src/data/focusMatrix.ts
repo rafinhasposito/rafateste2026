@@ -3,7 +3,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 75,
       "theme": "Independência, Marca Pessoal e Grana no Bolso",
-      "headline": "Passar seu aniversário {em_cidade} dá a coragem que faltava pra você tomar as rédeas das suas finanças e fazer seu próprio nome virar dinheiro no bolso.",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor de assumir o comando das suas finanças, agir com mais coragem e transformar iniciativa pessoal em novas oportunidades de renda.",
       "secret": "Na Casa 1, você entra no centro do palco do seu novo ciclo. Em {cidade}, o faturamento deixa de depender da sorte ou de terceiros e passa a responder direto à sua iniciativa — é o ano ideal para lançar algo autoral, reajustar preços sem pedir desculpas e assumir postura de dono.",
       "mantra": "Eu assumo a liderança das minhas decisões financeiras e transformo minha autenticidade em renda real.",
       "blindSpot": "Agir por impulso em compras ou apostas financeiras para provar independência rápida, sem revisar a margem real antes.",
@@ -45,7 +45,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 88,
       "theme": "Protagonismo, Liderança e Voz Ativa",
-      "headline": "Celebrar {em_cidade} acende os holofotes sobre a sua presença e te coloca na linha de frente das decisões da sua carreira.",
+      "headline": "Celebrar {em_cidade} cria um clima propício para ganhar protagonismo, se posicionar com mais firmeza e liderar as decisões da sua carreira.",
       "secret": "Com o Sol na Casa 1, ficar nos bastidores fica pequeno demais para você. O ciclo {em_cidade} pede que você lidere conversas, apresente suas próprias ideias e ocupe o espaço que antes deixava para outras pessoas.",
       "mantra": "Minha presença inspira confiança e eu lidero minha carreira com clareza, coragem e direção própria.",
       "blindSpot": "Querer centralizar todas as entregas sozinho(a) e criar atrito desnecessário por impaciência com o ritmo da equipe.",
@@ -87,7 +87,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 98,
       "theme": "Renascimento Pessoal, Estilo e Presença Magnética",
-      "headline": "Seu aniversário {em_cidade} funciona como um botão de reinicialização: você renova sua imagem, sua postura e o jeito como o mundo te enxerga.",
+      "headline": "Passar seu aniversário {em_cidade} favorece um recomeço pessoal: é um cenário propício para renovar sua imagem, sua postura e o jeito como você se apresenta ao mundo.",
       "secret": "Esta é a área de potência máxima da Casa 1. Passar a virada solar {em_cidade} desperta uma versão mais autêntica, direta e magnetizante de você — chega de se moldar para caber em expectativas antigas.",
       "mantra": "Eu me autorizo a renascer por inteiro e ocupo o mundo com a minha verdade e o meu brilho natural.",
       "blindSpot": "Confundir autenticidade com dureza excessiva ou se isolar achando que ninguém acompanha a sua nova fase.",
@@ -129,7 +129,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 82,
       "theme": "Vitalidade Física, Tônus e Disciplina Matinal",
-      "headline": "Ativar a Casa 1 {em_cidade} injeta gás novo no seu corpo e devolve a disciplina física para sustentar um ano de alta entrega.",
+      "headline": "Celebrar a Casa 1 {em_cidade} joga a favor de retomar o fôlego físico, resgatar a disciplina diária e sustentar um ano com mais disposição.",
       "secret": "Na Casa 1, o corpo é a casa da sua coragem. O ciclo {em_cidade} favorece recomeçar treinos, ajustar o sono e criar rituais matinais que colocam sua disposição no pico logo cedo.",
       "mantra": "Meu corpo é forte, minha energia se renova todos os dias e minha disciplina trabalha a favor dos meus sonhos.",
       "blindSpot": "Começar no ritmo 100% nas primeiras semanas e exagerar na carga física até gerar cansaço ou lesão.",
@@ -171,7 +171,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 70,
       "theme": "Carisma Direto, Atração de Aliados e Anfitrião",
-      "headline": "A energia da Casa 1 {em_cidade} faz você atrair pessoas certas simplesmente por ser quem é — sem precisar fazer média.",
+      "headline": "O ciclo da Casa 1 {em_cidade} favorece conexões mais genuínas, abrindo espaço para aproximar pessoas certas a partir da sua autenticidade.",
       "secret": "Em vez de correr atrás de contatos frios, o ciclo {em_cidade} funciona melhor quando você toma a frente, convida pessoas interessantes para sua mesa e compartilha suas visões com autenticidade.",
       "mantra": "Eu atraio aliados verdadeiros que respeitam minha força e multiplicam a minha visão.",
       "blindSpot": "Falar demais sobre os próprios planos em encontros sociais e esquecer de escutar o que o outro busca.",
@@ -213,7 +213,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 68,
       "theme": "Amor Próprio, Atração Segura e Liberdade Afetiva",
-      "headline": "Viver a Casa 1 {em_cidade} fortalece tanto o seu valor próprio que você só abre espaço para um amor inteiro, maduro e sem jogos.",
+      "headline": "Viver a Casa 1 {em_cidade} convida você a fortalecer seu valor próprio e priorizar vínculos mais inteiros, maduros e sem jogos.",
       "secret": "Na Casa 1, o coração se alinha quando você deixa de se diminuir para ser aceito(a). Se está só, sua postura confiante vira um ímã; se está em um relacionamento, o ano pede renovação do desejo mantendo a individualidade viva.",
       "mantra": "Eu me amo por inteiro e atraio relações onde há admiração, desejo e liberdade para ser quem sou.",
       "blindSpot": "Construir uma armadura de autossuficiência tão rígida que impede o outro de se aproximar com carinho.",
@@ -255,7 +255,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 58,
       "theme": "Verdade Interior, Coragem de Alma e Direção",
-      "headline": "Passar a virada {em_cidade} silencia o barulho das opiniões externas e devolve a certeza íntima sobre o caminho que faz sentido para sua alma.",
+      "headline": "Passar a virada {em_cidade} favorece silenciar o excesso de opiniões externas e cultivar mais clareza íntima sobre o caminho que faz sentido para você.",
       "secret": "A espiritualidade da Casa 1 é ativa e corajosa: não é fugir do mundo, mas alinhar suas escolhas diárias à sua consciência. Em {cidade}, você ganha clareza para escolher com honestidade radical.",
       "mantra": "Eu confio na minha bússola interior e tenho coragem para caminhar na direção da minha verdade.",
       "blindSpot": "Querer controlar todos os resultados pela força do ego e esquecer de observar os sinais do tempo.",
@@ -299,7 +299,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 98,
       "theme": "Caixa Forte, Patrimônio e Dinheiro Inteligente",
-      "headline": "Celebrar seu aniversário {em_cidade} ativa o eixo máximo da prosperidade prática: é o ciclo perfeito para fortalecer seu caixa e fazer o dinheiro render.",
+      "headline": "Celebrar seu aniversário {em_cidade} joga a favor da prosperidade prática: cria um ciclo propício para organizar seu caixa, valorizar seu trabalho e fazer o dinheiro render melhor.",
       "secret": "Na Casa 2, a Revolução Solar joga luz direta sobre o seu bolso e o seu valor de mercado. Em {cidade}, você enxerga com clareza onde o dinheiro escapava, ajusta sua tabela de preços e constrói uma reserva que traz paz de verdade.",
       "mantra": "Eu respeito o meu dinheiro, valorizo o meu trabalho e faço meu patrimônio crescer com inteligência e calma.",
       "blindSpot": "Gastar por impulso para compensar dias estressantes ou travar em medo excessivo de investir no que gera retorno.",
@@ -341,7 +341,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 88,
       "theme": "Rentabilidade, Valorização da Hora e Estabilidade",
-      "headline": "Passar a virada {em_cidade} transforma o jeito como o mercado paga pelo seu trabalho, trocando esforço excessivo por entregas mais bem remuneradas.",
+      "headline": "Passar a virada {em_cidade} favorece reposicionar o valor das suas entregas, abrindo espaço para trocar esforço excessivo por projetos mais bem remunerados.",
       "secret": "A Casa 2 pede pragmatismo profissional: em {cidade}, o foco não é fazer mil coisas para parecer ocupado(a), mas concentrar energia nos serviços e cargos que trazem retorno financeiro proporcional à sua experiência.",
       "mantra": "Meu tempo é valioso, minha entrega tem padrão elevado e o mercado remunera meu trabalho com justiça.",
       "blindSpot": "Ficar preso(a) na zona de conforto de um projeto mediano apenas por medo de renegociar condições.",
@@ -383,7 +383,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 80,
       "theme": "Elegância Sólida, Presença Calma e Valor Próprio",
-      "headline": "O clima de {cidade} refina sua autoestima com elegância silenciosa: você passa a transmitir segurança sem precisar provar nada a ninguém.",
+      "headline": "O clima de {cidade} favorece uma autoestima mais serena e consistente, ajudando você a transmitir segurança sem precisar provar nada a ninguém.",
       "secret": "Na Casa 2, imagem pessoal é sinônimo de qualidade e substância. Em {cidade}, menos é mais: materiais nobres, fala pausada e confiança tranquila comunicam alto valor em qualquer mesa.",
       "mantra": "Eu reconheço o meu próprio valor e expresso minha presença com calma, elegância e firmeza.",
       "blindSpot": "Associar sua autoestima apenas ao saldo bancário ou acumular compras de luxo para validar status.",
@@ -413,7 +413,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         },
         {
           "title": "Elegância Natural",
-          "description": "O fechamento do ano consolida uma imagem madura, coerente e magnética sem esforço."
+          "description": "O fechamento do ano consolida uma imagem madura, coerente e magnética com mais naturalidade."
         }
       ],
       "ritual": {
@@ -425,7 +425,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 72,
       "theme": "Prazer Saudável, Constância e Ritmo Sustentável",
-      "headline": "Passar a virada {em_cidade} tira você da correria ansiosa e constrói uma rotina gostosa de manter, com boa comida, sono firme e ritmo constante.",
+      "headline": "Passar a virada {em_cidade} joga a favor de desacelerar a correria ansiosa e construir uma rotina mais sustentável, com boa alimentação, sono regulado e constância.",
       "secret": "A Casa 2 rege os cinco sentidos e a sustentabilidade física. Em {cidade}, o segredo da produtividade não é sofrer — é criar prazer nos hábitos saudáveis, respeitar o descanso e cuidar do corpo como seu ativo número um.",
       "mantra": "Eu cuido do meu corpo com prazer e constância, construindo saúde sólida um dia de cada vez.",
       "blindSpot": "Comodismo excessivo, sedentarismo disfarçado de 'merecimento' ou exageros na comida por conforto emocional.",
@@ -467,7 +467,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 65,
       "theme": "Contatos de Valor, Clientes Premium e Troca Justa",
-      "headline": "A ativação da Casa 2 {em_cidade} filtra seu círculo para conexões sérias, onde palavra dada vale ouro e as conversas viram negócios concretos.",
+      "headline": "O ciclo da Casa 2 {em_cidade} favorece filtrar seu círculo para conexões mais sérias, onde confiança e boas conversas podem evoluir para negócios concretos.",
       "secret": "Em {cidade}, quantidade de contatos perde espaço para qualidade. Você se aproxima de empreendedores, investidores e profissionais pé no chão que buscam relações comerciais transparentes e duradouras.",
       "mantra": "Eu construo pontes com pessoas íntegras, prósperas e comprometidas com trocas justas.",
       "blindSpot": "Desconfiar de toda aproximação nova ou manter contatos apenas por interesse financeiro frio.",
@@ -509,7 +509,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 62,
       "theme": "Afeto Estável, Lealdade e Prazer Sensorial",
-      "headline": "Viver seu aniversário {em_cidade} traz pé no chão, presença física e lealdade para a sua vida amorosa — menos drama, mais segurança e carinho real.",
+      "headline": "Viver seu aniversário {em_cidade} favorece mais pé no chão, presença e lealdade na vida amorosa — abrindo espaço para menos drama e mais cuidado real.",
       "secret": "Na Casa 2, amor se prova na constância e no cuidado concreto. Em {cidade}, você perde o interesse por montanhas-russas emocionais e valoriza quem soma, planeja junto e sabe aproveitar os prazeres simples da vida a dois.",
       "mantra": "Eu mereço um amor estável, leal e afetuoso, construído na presença real e no respeito mútuo.",
       "blindSpot": "Cair em possessividade, teimosia nas discussões ou transformar a relação em rotina morna sem surpresas.",
@@ -551,8 +551,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 55,
       "theme": "Sagrado na Matéria, Gratidão e Abundância Ética",
-      "headline": "Celebrar {em_cidade} reconcilia espiritualidade e dinheiro, mostrando que prosperar com integridade é uma forma concreta de honrar a vida.",
-      "secret": "A lição espiritual da Casa 2 é profunda: não existe conflito entre ter paz de espírito e construir abundância. Em {cidade}, praticar gratidão pelo que já existe destrava a recepção do novo sem culpa.",
+      "headline": "Celebrar {em_cidade} convida a reconciliar espiritualidade e vida material, fortalecendo a visão de que prosperar com integridade também honra sua jornada.",
+      "secret": "A lição espiritual da Casa 2 é profunda: não existe conflito entre ter paz de espírito e construir abundância. Em {cidade}, praticar gratidão pelo que já existe ajuda a abrir espaço para o novo com menos culpa.",
       "mantra": "Eu honro a abundância da vida, agradeço o que já conquistei e prospero com ética e coração tranquilo.",
       "blindSpot": "Cair na crença de escassez ou achar que acumular bens sozinho preencherá vazios internos.",
       "defenseProtocol": "Pratique generosidade consciente — doe tempo ou recursos a uma causa que você respeita todos os meses.",
@@ -595,7 +595,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 82,
       "theme": "Vendas Ágeis, Infoprodutos e Negociações Inteligentes",
-      "headline": "Ativar a Casa 3 {em_cidade} destrava sua lábia comercial e transforma ideias, conteúdo e boas conversas em novas entradas de dinheiro.",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor da comunicação comercial, criando terreno fértil para transformar ideias, conteúdo e boas conversas em novas entradas de renda.",
       "secret": "Na Casa 3, a riqueza circula em velocidade alta. Em {cidade}, o dinheiro vem de multiplicar canais: vendas digitais, consultorias rápidas, cursos, comissões, intermediações e negociações destravadas onde uma boa conversa fecha o contrato.",
       "mantra": "Minhas ideias têm alto valor comercial e cada conversa estratégica abre portas para novos ganhos.",
       "blindSpot": "Espalhar energia em cinco ideias pequenas ao mesmo tempo e não escalar o canal que já está dando lucro.",
@@ -637,7 +637,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 88,
       "theme": "Comunicação, Conteúdo, Vendas e Movimento Constante",
-      "headline": "Passar seu aniversário {em_cidade} transforma sua voz, sua escrita e sua agilidade mental nas maiores armas da sua carreira este ano.",
+      "headline": "Celebrar seu aniversário {em_cidade} favorece usar sua voz, sua escrita e sua agilidade mental como grandes diferenciais na sua carreira este ano.",
       "secret": "A Casa 3 é o motor das trocas e do marketing pessoal. Em {cidade}, o crescimento profissional vem de aparecer mais, ensinar o que domina, fazer viagens curtas a trabalho e circular nos lugares certos.",
       "mantra": "Eu comunico meu trabalho com clareza magnética e transformo movimento em oportunidades reais.",
       "blindSpot": "Falar muito sobre planos antes da hora ou se sobrecarregar de reuniões rápidas sem tempo para entregar o profundo.",
@@ -679,7 +679,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 78,
       "theme": "Leveza, Curiosidade Viva e Charme Intelectual",
-      "headline": "Celebrar {em_cidade} rejuvenesce seu jeito de se expressar, deixando sua presença mais leve, espirituosa e impossível de ignorar em uma conversa.",
+      "headline": "Celebrar {em_cidade} estimula um jeito mais leve e expressivo de se comunicar, favorecendo uma presença espirituosa e mais marcante nas conversas.",
       "secret": "Na Casa 3, seu maior charme está na inteligência ágil e na curiosidade. Em {cidade}, você se solta da rigidez, aprende coisas novas com entusiasmo e conquista pessoas pela conversa envolvente.",
       "mantra": "Minha mente é leve, curiosa e articulada; eu me expresso com charme, verdade e inteligência.",
       "blindSpot": "Ficar ansioso(a) por excesso de estímulos, celular o tempo todo ou pular de assunto sem escutar de verdade.",
@@ -721,7 +721,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 75,
       "theme": "Agilidade, Organização Mental e Micro-Hábitos",
-      "headline": "O ritmo de {cidade} acelera o seu cotidiano e pede organização inteligente para você dar conta de tudo sem fritar o cérebro.",
+      "headline": "O ritmo da Casa 3 {em_cidade} tende a movimentar seu cotidiano e convida a uma organização inteligente para dar conta das demandas sem sobrecarga mental.",
       "secret": "Com a Casa 3 ativa, o celular toca mais, ideias surgem a toda hora e a agenda fica movimentada. O segredo {em_cidade} é usar sistemas simples (listas curtas, blocos de 25 minutos e pausas para respirar) para transformar movimento em resultado.",
       "mantra": "Minha mente é clara e organizada; eu conduzo minha agenda com leveza, foco e presença.",
       "blindSpot": "Cansaço mental por notificações constantes, sono picado por excesso de pensamentos e tarefas começadas pela metade.",
@@ -763,8 +763,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 95,
       "theme": "Pontes Estratégicas, Cafés Lucrativos e Circulação",
-      "headline": "Esta é a potência máxima da Casa 3 {em_cidade}: uma conversa despretensiosa em um café facilmente vira parceria, convite ou negócio fechado.",
-      "secret": "Passar seu aniversário {em_cidade} multiplica seu trânsito social e profissional. Irmãos, vizinhos, colegas de curso e novos conhecidos locais trazem informações valiosas no momento exato — esteja disponível para trocar.",
+      "headline": "Este é um dos cenários mais favoráveis para trocas na Casa 3 {em_cidade}: o clima joga a favor de conversas espontâneas que podem abrir parcerias, convites ou negócios.",
+      "secret": "Passar seu aniversário {em_cidade} tende a ampliar seu trânsito social e profissional. Irmãos, vizinhos, colegas de curso e novos conhecidos locais trazem informações valiosas no momento exato — esteja disponível para trocar.",
       "mantra": "Eu construo pontes com facilidade e cada encontro traz uma ideia, parceria ou porta aberta.",
       "blindSpot": "Acumular contatos superficiais sem fazer follow-up depois da conversa inicial.",
       "defenseProtocol": "Sempre envie uma mensagem de continuidade em até 24 horas após conhecer alguém interessante.",
@@ -805,7 +805,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 70,
       "theme": "Química Mental, Diálogo Franco e Cumplicidade Leve",
-      "headline": "Ativar a Casa 3 {em_cidade} traz conversa boa, risada fácil e passeios espontâneos para o centro da sua vida amorosa.",
+      "headline": "Celebrar a Casa 3 {em_cidade} favorece mais diálogo leve, risada fácil e passeios espontâneos no centro da sua vida amorosa.",
       "secret": "Neste ciclo, a atração começa pela mente. Em {cidade}, você se apaixona por quem rende papo madrugada adentro, topa aventuras curtas de fim de semana e resolve qualquer ruído com diálogo franco e sem joguinhos.",
       "mantra": "Meu amor flui com leveza, humor inteligente e conversas que aproximam de verdade.",
       "blindSpot": "Racionalizar demais os sentimentos, fugir de conversas profundas com piadas ou ficar no flerte sem avançar.",
@@ -847,7 +847,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 55,
       "theme": "Escrita Terapêutica, Sinais Cotidianos e Sabedoria Prática",
-      "headline": "Passar a virada {em_cidade} aguça sua percepção para ler sincronicidades no cotidiano — um livro, uma frase ou um encontro entrega a resposta certa.",
+      "headline": "Passar a virada {em_cidade} estimula um olhar mais atento aos sinais do cotidiano — favorecendo aprendizados valiosos em livros, estudos e boas conversas.",
       "secret": "A espiritualidade da Casa 3 acontece no meio da rua, na escrita e nos estudos. Em {cidade}, colocar seus pensamentos no papel organiza sua alma e revela padrões que você antes não percebia.",
       "mantra": "Minha mente silenciosa percebe os sinais da vida e traduz sabedoria em escolhas leves.",
       "blindSpot": "Consumir teoria espiritual em excesso sem praticar no tratamento diário com as pessoas próximas.",
@@ -891,7 +891,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 65,
       "theme": "Patrimônio Imobiliário, Alicerce e Segurança Familiar",
-      "headline": "Celebrar seu aniversário {em_cidade} direciona seus recursos para bens duráveis, imóveis e a tranquilidade financeira do seu lar.",
+      "headline": "Celebrar seu aniversário {em_cidade} joga a favor de estruturar seus recursos, focar em bens duráveis e priorizar a tranquilidade financeira do seu lar.",
       "secret": "Na Casa 4, dinheiro significa raiz e proteção. Em {cidade}, o ciclo favorece comprar, reformar, quitar ou rentabilizar imóveis, estruturar negócios feitos a partir de casa e criar um colchão de segurança que protege quem você ama.",
       "mantra": "Eu construo bases financeiras sólidas que trazem proteção, conforto e paz para o meu lar.",
       "blindSpot": "Misturar contas pessoais com despesas de parentes por culpa ou reformar sem orçamento fechado.",
@@ -899,7 +899,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
       "pillars": [
         {
           "title": "Ativos de Raiz",
-          "description": "Imóveis, terrenos, reformas estratégicas ou renda patrimonial ganham proteção especial este ano."
+          "description": "Imóveis, terrenos, reformas estratégicas ou renda patrimonial ganham terreno favorável para avançar este ano."
         },
         {
           "title": "Economia Doméstica",
@@ -907,7 +907,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         },
         {
           "title": "Fundo Porto Seguro",
-          "description": "Montar ou reforçar a reserva de emergência garante noites de sono impecáveis."
+          "description": "Montar ou reforçar a reserva de emergência ajuda a sustentar mais tranquilidade financeira no dia a dia."
         }
       ],
       "phases": [
@@ -921,7 +921,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         },
         {
           "title": "Segurança Consolidada",
-          "description": "Você fecha o ciclo com a estrutura doméstica em ordem e patrimônio mais protegido."
+          "description": "É uma fase propícia para encerrar o ciclo com a estrutura doméstica mais organizada e o patrimônio mais bem cuidado."
         }
       ],
       "ritual": {
@@ -933,7 +933,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 60,
       "theme": "Estrutura Interna, Home Office e Base da Empresa",
-      "headline": "Passar a virada {em_cidade} fortalece os alicerces invisíveis da sua carreira — menos correria externa, mais solidez de bastidor.",
+      "headline": "Passar a virada {em_cidade} favorece fortalecer os alicerces de bastidor da sua carreira — priorizando solidez interna em vez de correria externa.",
       "secret": "A Casa 4 é o fundo do céu: onde o prédio ganha fundação para crescer dez andares depois. Em {cidade}, o trabalho rende melhor em ambientes tranquilos, home office bem estruturado, empresas familiares ou reestruturação interna da sua base.",
       "mantra": "Eu fortaleço os alicerces do meu trabalho hoje para sustentar grandes conquistas amanhã.",
       "blindSpot": "Sentir que está 'andando devagar' ao se comparar com quem só faz barulho nas redes sociais.",
@@ -975,7 +975,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 80,
       "theme": "Raízes Fortes, Maturidade Emocional e Acolhimento",
-      "headline": "Viver a Casa 4 {em_cidade} traz um alívio profundo: você baixa a guarda, honra sua história e conquista uma paz interna inabalável.",
+      "headline": "Viver a Casa 4 {em_cidade} favorece um ritmo de acolhimento: cria espaço para baixar a guarda, honrar sua história e cultivar mais paz interior.",
       "secret": "Em {cidade}, sua força pessoal deixa de vir da pressa e passa a vir do centramento. Você se sente finalmente confortável na própria pele, acolhendo suas emoções sem precisar fingir invulnerabilidade.",
       "mantra": "Eu sou o meu próprio porto seguro; minhas raízes são firmes e meu coração habita em paz.",
       "blindSpot": "Fechar-se demais na concha doméstica ou reviver saudades do passado que impedem novas escolhas.",
@@ -1017,15 +1017,15 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 78,
       "theme": "Descanso Reparador, Casa em Ordem e Comida de Verdade",
-      "headline": "Celebrar {em_cidade} transforma sua casa no maior centro de recarga da sua saúde física e emocional ao longo dos próximos 12 meses.",
-      "secret": "Na Casa 4, o estado da sua casa espelha o estado da sua mente. Em {cidade}, cozinhar melhor, dormir de verdade, cuidar das plantas e proteger seus fins de semana restauram sua vitalidade como nenhum suplemento faria.",
+      "headline": "Celebrar {em_cidade} joga a favor de fazer da sua casa um verdadeiro ponto de recarga para a sua saúde física e emocional ao longo dos próximos 12 meses.",
+      "secret": "Na Casa 4, o estado da sua casa espelha o estado da sua mente. Em {cidade}, cozinhar melhor, dormir de verdade, cuidar das plantas e proteger seus fins de semana tendem a restaurar sua vitalidade de forma muito mais consistente.",
       "mantra": "Meu lar é um santuário de descanso, nutrição e renovação diária para o meu corpo e mente.",
       "blindSpot": "Usar o conforto de casa para adiar cuidados médicos ou trocar movimento físico por maratonas de sofá.",
       "defenseProtocol": "Crie rituais gostosos de movimento leve (alongamento, yoga ou caminhada perto de casa) todos os dias.",
       "pillars": [
         {
           "title": "Sono Sagrado",
-          "description": "Investir em colchão, silêncio e escuridão transforma seu humor em poucos dias."
+          "description": "Investir em colchão, silêncio e escuridão tende a melhorar significativamente seu humor e sua disposição."
         },
         {
           "title": "Cozinha Afetiva",
@@ -1059,7 +1059,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 52,
       "theme": "Círculo Íntimo, Confiança Profunda e Mesas Privadas",
-      "headline": "A Casa 4 {em_cidade} troca festas lotadas por encontros pequenos na sala de estar, onde nascem as alianças mais leais da sua vida.",
+      "headline": "A Casa 4 {em_cidade} favorece trocar eventos barulhentos por encontros menores e mais íntimos, onde costumam nascer alianças mais leais.",
       "secret": "Este não é um ciclo de colecionar cartões de visita — é o ano de cuidar de quem realmente fecha com você. Em {cidade}, um jantar íntimo para quatro pessoas vale mais do que dez coquetéis barulhentos.",
       "mantra": "Eu escolho a profundidade nas minhas relações e cultivo um círculo de lealdade verdadeira.",
       "blindSpot": "Sumir completamente do radar profissional e deixar de nutrir pontes importantes por preguiça de sair.",
@@ -1101,8 +1101,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 88,
       "theme": "Acolhimento, Intimidade de Lar e Planos de Família",
-      "headline": "Passar o aniversário {em_cidade} abre seu coração para um amor com cheiro de casa — profundo, acolhedor e com vontade de construir vida junto.",
-      "secret": "Na Casa 4, o amor amadurece e busca ninho. Em {cidade}, casais sentem vontade de morar junto, reformar o lar ou expandir a família; quem está solteiro(a) atrai conexões carinhosas que transmitem paz desde o primeiro abraço.",
+      "headline": "Passar o aniversário {em_cidade} cria um clima propício para cultivar um amor com senso de lar — mais acolhedor, profundo e voltado para construir juntos.",
+      "secret": "Na Casa 4, o amor amadurece e busca ninho. Em {cidade}, casais sentem vontade de morar junto, reformar o lar ou expandir a família; quem está solteiro(a) tende a valorizar conexões carinhosas que transmitem mais tranquilidade e sintonia.",
       "mantra": "Meu coração é um lar seguro, pronto para acolher e construir um amor verdadeiro e duradouro.",
       "blindSpot": "Reproduzir mágoas da família de origem dentro do relacionamento atual ou esperar que o parceiro adivinhe suas carências.",
       "defenseProtocol": "Peça carinho e apoio com palavras simples e diretas, sem testar o outro com silêncios fechados.",
@@ -1143,8 +1143,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 90,
       "theme": "Cura Ancestral, Proteção da Alma e Silêncio Sagrado",
-      "headline": "Celebrar {em_cidade} ativa uma das casas mais profundas do mapa: um ano abençoado de cura ancestral, proteção íntima e paz na alma.",
-      "secret": "A Casa 4 é o altar interno. Em {cidade}, você sente forte proteção espiritual, recebe respostas através de sonhos e memórias e dissolve pesos antigos da sua árvore familiar com delicadeza e lucidez.",
+      "headline": "Celebrar {em_cidade} favorece um ciclo de recolhimento e reconexão com suas raízes, abrindo espaço para cura emocional, serenidade e paz interior.",
+      "secret": "A Casa 4 é o altar interno. Em {cidade}, o ciclo favorece sensação de recolhimento e proteção, mais atenção a sonhos e memórias e espaço para elaborar pesos antigos da sua árvore familiar com delicadeza e lucidez.",
       "mantra": "Eu honro quem veio antes de mim, libero o que não me pertence e caminho abençoado(a) em paz.",
       "blindSpot": "Carregar dores emocionais dos parentes nas costas achando que sofrer junto é prova de amor.",
       "defenseProtocol": "Ame e ajude com limites saudáveis, entregando o destino de cada familiar à própria jornada dele.",
@@ -1187,7 +1187,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 72,
       "theme": "Lucro Autoral, Criatividade Rentável e Ousadia Calculada",
-      "headline": "Celebrar seu aniversário {em_cidade} acende seu lado criador e mostra como monetizar seus talentos autorais e o que você faz com brilho nos olhos.",
+      "headline": "Celebrar seu aniversário {em_cidade} joga a favor do seu lado criador, favorecendo caminhos para monetizar talentos autorais e projetos que você realiza com entusiasmo.",
       "secret": "Na Casa 5, dinheiro nasce do entusiasmo genuíno e da assinatura exclusiva. Em {cidade}, produtos ou projetos com a sua cara vendem muito mais do que cópias genéricas do mercado — é o ano de apostar na sua originalidade com risco calculado.",
       "mantra": "Minha criatividade tem valor raro; eu transformo talento autoral e prazer em prosperidade real.",
       "blindSpot": "Torrar lucros em comemorações, luxos impulsivos ou apostas arriscadas antes de consolidar o resultado.",
@@ -1229,7 +1229,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 78,
       "theme": "Carisma em Cena, Projetos de Paixão e Destaque Autoral",
-      "headline": "Passar a virada {em_cidade} tira seu trabalho do modo cinza e devolve o tesão criativo de assinar projetos dos quais você realmente se orgulha.",
+      "headline": "Passar a virada {em_cidade} favorece resgatar o prazer criativo no trabalho, criando espaço para assinar projetos com a sua identidade e mais orgulho.",
       "secret": "A Casa 5 é a casa do palco e da criação. Em {cidade}, sua carreira cresce quando você sai da burocracia repetitiva e coloca sua marca pessoal em evidência, liderando pelo carisma e inspirando quem trabalha com você.",
       "mantra": "Eu coloco alma, talento e brilho em cada entrega, e o mercado reconhece a minha assinatura.",
       "blindSpot": "Deixar a vaidade falar mais alto do que o prazo ou abandonar tarefas operacionais por tédio.",
@@ -1271,7 +1271,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 90,
       "theme": "Brilho Solar, Magnetismo Pessoal e Alegria de Viver",
-      "headline": "A energia da Casa 5 {em_cidade} acende um magnetismo luminoso em você — é um ano para brilhar sem pedir desculpas e se apaixonar pela própria vida.",
+      "headline": "O ciclo da Casa 5 {em_cidade} favorece mais expressão pessoal e magnetismo — um convite para aparecer com leveza, confiança e prazer pela própria vida.",
       "secret": "Em {cidade}, o Sol ilumina sua expressividade e seu calor humano. Você recupera a leveza, o senso de humor e a confiança estética para aparecer, celebrar e ocupar o espaço com generosidade e charme.",
       "mantra": "Eu irradio alegria, confiança e magnetismo; meu brilho natural inspira e abre caminhos.",
       "blindSpot": "Buscar aplauso constante para se sentir bem ou dramatizar pequenas contrariedades por orgulho ferido.",
@@ -1313,7 +1313,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 70,
       "theme": "Lazer Sagrado, Esportes Prazerosos e Vitalidade Lúdica",
-      "headline": "Passar a virada {em_cidade} mostra que sua saúde e produtividade disparam quando você coloca diversão, arte e movimento prazeroso na agenda.",
+      "headline": "Passar a virada {em_cidade} joga a favor de equilibrar produtividade e bem-estar, mostrando como diversão, arte e movimento prazeroso ajudam sua energia a render mais.",
       "secret": "Na Casa 5, rotinas cinzentas e cheias de obrigação drenam sua vitalidade. Em {cidade}, o antídoto para o estresse é agendar hobbies, dança, esportes coletivos, sol e tempo de qualidade com quem você ama (incluindo filhos, se tiver).",
       "mantra": "Minha rotina tem espaço para o prazer, o movimento e a alegria que renovam minha saúde.",
       "blindSpot": "Desregular completamente o sono em festas sucessivas ou adiar tarefas sérias sempre em nome da diversão.",
@@ -1355,7 +1355,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 82,
       "theme": "Eventos de Gala, Círculos Criativos e Convites VIP",
-      "headline": "A energia da Casa 5 {em_cidade} abre portas em festas, lançamentos, jantares e ambientes culturais onde seu carisma gera conexões instantâneas.",
+      "headline": "A Casa 5 {em_cidade} favorece conexões em encontros culturais, eventos e jantares, onde sua espontaneidade ajuda a abrir novas portas.",
       "secret": "Em {cidade}, o networking deixa de ser formal e fica envolvente. Pessoas ligadas a arte, moda, gastronomia, entretenimento e empreendedorismo criativo se aproximam de você pela leveza e entusiasmo.",
       "mantra": "Eu atraio conexões vibrantes em ambientes inspiradores onde alegria e oportunidades se encontram.",
       "blindSpot": "Confundir amigos de festa com parceiros confiáveis para negócios sérios sem checar histórico.",
@@ -1371,7 +1371,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         },
         {
           "title": "Generosidade Social",
-          "description": "Elogiar o talento alheio com sinceridade transforma conhecidos em fãs leais."
+          "description": "Elogiar o talento alheio com sinceridade ajuda a aproximar conhecidos e fortalecer vínculos de admiração."
         }
       ],
       "phases": [
@@ -1397,7 +1397,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 98,
       "theme": "Romance de Cinema, Paixão Intensa e Sedução Natural",
-      "headline": "Este é o pico máximo do romance no mapa: celebrar a Casa 5 {em_cidade} acende a paixão, a conquista e histórias de amor inesquecíveis.",
+      "headline": "Este é um dos ciclos mais favoráveis ao romance no mapa: celebrar a Casa 5 {em_cidade} joga a favor de reacender a paixão, a leveza e momentos marcantes a dois.",
       "secret": "Com o Sol na Casa 5 {em_cidade}, o coração volta a bater forte. Se você está solteiro(a), seu magnetismo entra no auge para atrair encontros arrebatadores; se está em um relacionamento, o ano pede reacender o namoro, o desejo e as surpresas a dois.",
       "mantra": "Eu abro meu coração para viver uma paixão luminosa, leve, intensa e recíproca.",
       "blindSpot": "Se apaixonar pela emoção da conquista e perder interesse quando o vínculo pede constância, ou cair em ciúme orgulhoso.",
@@ -1405,7 +1405,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
       "pillars": [
         {
           "title": "Magnetismo Irresistível",
-          "description": "Seu charme natural e sua alegria fazem olhares se voltarem para você sem esforço."
+          "description": "Seu charme natural e sua alegria fazem olhares se voltarem para você com mais naturalidade."
         },
         {
           "title": "Eterno Namoro",
@@ -1439,8 +1439,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 60,
       "theme": "Alegria Como Oração, Criança Interior e Luz Própria",
-      "headline": "Passar o aniversário {em_cidade} ensina que a espiritualidade mais elevada deste ano passa pela gratidão alegre e pela reconexão com sua criança interior.",
-      "secret": "Na Casa 5, o sagrado não é sisudo nem pesado: ele mora no riso genuíno, na beleza da arte e na coragem de viver com coração aberto. Em {cidade}, brincar, criar e celebrar curam feridas que anos de seriedade não curaram.",
+      "headline": "Passar o aniversário {em_cidade} convida a viver uma espiritualidade mais leve, cultivando gratidão, alegria cotidiana e reconexão com sua espontaneidade.",
+      "secret": "Na Casa 5, o sagrado não é sisudo nem pesado: ele mora no riso genuíno, na beleza da arte e na coragem de viver com coração aberto. Em {cidade}, brincar, criar e celebrar ajudam a aliviar tensões que anos de excesso de cobrança acumularam.",
       "mantra": "Minha alegria é sagrada; quando celebro a vida com coração aberto, me conecto diretamente ao divino.",
       "blindSpot": "Achar que só evolui através do sofrimento ou sentir culpa quando as coisas dão certo com leveza.",
       "defenseProtocol": "Agradeça cada momento bonito em voz alta — permitir-se ser feliz é um ato espiritual legítimo.",
@@ -1483,7 +1483,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 82,
       "theme": "Receita Recorrente, Margem Limpa e Controle Cirúrgico",
-      "headline": "Passar a virada {em_cidade} transforma o caos financeiro em método: você corta desperdícios, otimiza sua operação e cria receita recorrente.",
+      "headline": "Passar a virada {em_cidade} joga a favor de transformar desorganização financeira em método: favorece cortar desperdícios, otimizar sua operação e buscar receita mais previsível.",
       "secret": "Na Casa 6, prosperidade é consequência de eficiência diária. Em {cidade}, o dinheiro cresce quando você elimina retrabalho, melhora sua margem de lucro por hora trabalhada e estrutura contratos mensais previsíveis.",
       "mantra": "Minha organização financeira gera tranquilidade, margem limpa e prosperidade contínua todos os meses.",
       "blindSpot": "Perder horas economizando centavos enquanto adia melhorar o processo que multiplicaria seu faturamento.",
@@ -1525,7 +1525,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 90,
       "theme": "Excelência Técnica, Processos de Elite e Entregas Impecáveis",
-      "headline": "Celebrar {em_cidade} eleva o padrão técnico do seu trabalho ao nível de relógio suíço — sua competência prática vira seu maior cartão de visitas.",
+      "headline": "Celebrar {em_cidade} favorece elevar o padrão técnico e a consistência do seu trabalho — deixando sua competência prática falar mais alto no dia a dia.",
       "secret": "Na Casa 6, o reconhecimento vem da execução impecável. Em {cidade}, você organiza sistemas, treina melhor sua equipe (ou domina ferramentas novas) e resolve problemas complexos com calma enquanto outros travam.",
       "mantra": "Eu entrego com maestria, método e leveza; minha competência prática abre portas consistentes.",
       "blindSpot": "Cair em perfeccionismo paralisante, microgerenciar colegas ou aceitar trabalho demais até chegar à exaustão.",
@@ -1567,7 +1567,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 75,
       "theme": "Estética Limpa, Postura Cirúrgica e Integridade",
-      "headline": "A ativação da Casa 6 {em_cidade} traz uma elegância minimalista e funcional para sua imagem — você transmite organização, clareza e preparo.",
+      "headline": "O ciclo da Casa 6 {em_cidade} favorece uma imagem mais limpa, organizada e funcional — ajudando você a transmitir clareza, preparo e credibilidade.",
       "secret": "Em {cidade}, menos ruído significa mais impacto. Seu corte, suas roupas, sua pontualidade e o cuidado visível com a saúde comunicam imediatamente que você tem domínio sobre a própria vida.",
       "mantra": "Minha presença reflete clareza, cuidado e integridade em cada detalhe do meu dia.",
       "blindSpot": "Ser o crítico mais cruel de si mesmo(a), apontando cada defeito mínimo e esquecendo de celebrar avanços.",
@@ -1609,8 +1609,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 98,
       "theme": "Saúde Blindada, Hábitos de Elite e Corpo Forte",
-      "headline": "Esta é a potência máxima da Casa 6 {em_cidade}: o ano definitivo para transformar saúde, treino, sono e disciplina em um motor leve e invencível.",
-      "secret": "Com o Sol na Casa 6 {em_cidade}, seu corpo responde duas vezes mais rápido a qualquer ajuste inteligente. Alimentação limpa, musculação, exames em dia e blocos claros de trabalho transformam radicalmente seu vigor físico e mental.",
+      "headline": "Este é um dos ciclos mais propícios da Casa 6 {em_cidade}: o clima joga a favor de consolidar saúde, treino, sono e disciplina com mais constância e leveza.",
+      "secret": "Com o Sol na Casa 6 {em_cidade}, seu corpo tende a responder melhor a ajustes consistentes. Alimentação limpa, treino, exames em dia e blocos claros de trabalho favorecem um ganho real de vigor físico e mental.",
       "mantra": "Minha rotina me fortalece; eu escolho hábitos que blindam minha saúde e multiplicam minha disposição.",
       "blindSpot": "Obsessão por protocolos rígidos de saúde ou síndrome de culpa no dia em que sai da dieta ou pula um treino.",
       "defenseProtocol": "Mire 85% de consistência real o ano inteiro em vez de 100% neurótico por apenas três semanas.",
@@ -1651,7 +1651,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 68,
       "theme": "Colegas de Confiança, Fornecedores Top e Mentores Práticos",
-      "headline": "A energia de {cidade} aproxima pessoas competentes, pontuais e mão na massa que facilitam seu dia a dia e elevam o nível das suas entregas.",
+      "headline": "O ambiente de {cidade} favorece aproximar pessoas competentes, pontuais e práticas, criando espaço para trocas que elevam o nível das suas entregas.",
       "secret": "Na Casa 6, as melhores conexões nascem no trabalho conjunto, em academias, cursos práticos ou grupos de eficiência. Em {cidade}, você atrai profissionais de saúde, técnicos excelentes e prestadores que resolvem sem enrolação.",
       "mantra": "Eu me cerco de profissionais íntegros, competentes e dispostos a construir soluções reais comigo.",
       "blindSpot": "Ficar preso(a) a fofocas de corredor ou julgar colegas com exigência excessiva por detalhes menores.",
@@ -1693,7 +1693,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 58,
       "theme": "Amor em Atos de Serviço, Respeito Diário e Cuidado Real",
-      "headline": "Passar a virada {em_cidade} traz maturidade para o afeto: o amor ganha força nos pequenos gestos diários, na parceria de rotina e no cuidado mútuo.",
+      "headline": "Passar a virada {em_cidade} favorece mais maturidade no afeto, abrindo espaço para fortalecer o vínculo nos gestos diários, na parceria de rotina e no cuidado mútuo.",
       "secret": "A Casa 6 não promete contos de fadas ilusórios — ela constrói relacionamentos que funcionam na terça-feira à noite. Em {cidade}, você valoriza quem divide responsabilidades, cuida da sua saúde junto e honra combinados.",
       "mantra": "Eu cultivo um amor real, respeitoso e presente nos pequenos cuidados de todos os dias.",
       "blindSpot": "Virar fiscal da rotina do parceiro, cobrar perfeição doméstica ou deixar o trabalho engolir o tempo do casal.",
@@ -1735,7 +1735,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 55,
       "theme": "Espiritualidade Prática, Serviço Útil e Ritmo Sagrado",
-      "headline": "Viver a Casa 6 {em_cidade} revela que o sagrado está no serviço bem feito, na presença ao lavar uma xícara e no respeito ao templo do seu corpo.",
+      "headline": "Viver a Casa 6 {em_cidade} convida a encontrar sentido no cotidiano — cuidando do corpo, do trabalho bem feito e da presença nas pequenas tarefas.",
       "secret": "Em {cidade}, sua espiritualidade ganha pé no chão: menos misticismo vago e mais coerência entre o que você acredita e como trata seu corpo, seu trabalho, os animais e as pessoas que cruzam seu caminho.",
       "mantra": "Cada tarefa feita com atenção, ética e amor transforma meu cotidiano em um ritual sagrado.",
       "blindSpot": "Se sacrificar até o esgotamento tentando consertar a vida de todo mundo em nome de 'servir'.",
@@ -1779,8 +1779,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 72,
       "theme": "Contratos Ganha-Ganha, Sociedades e Receita Compartilhada",
-      "headline": "Ativar a Casa 7 {em_cidade} mostra que seu maior salto financeiro este ano não vem sozinho — ele nasce de parcerias, sociedades e acordos certos.",
-      "secret": "Na Casa 7, o dinheiro entra pela porta das relações bilaterais. Em {cidade}, contratos com grandes clientes, co-produções, alianças comerciais e divisão inteligente de esforços multiplicam seus ganhos muito além do esforço solo.",
+      "headline": "Celebrar a Casa 7 {em_cidade} joga a favor do crescimento em conjunto: abre terreno fértil para buscar parcerias, sociedades e acordos comerciais bem estruturados.",
+      "secret": "Na Casa 7, o dinheiro entra pela porta das relações bilaterais. Em {cidade}, contratos com grandes clientes, co-produções, alianças comerciais e divisão inteligente de esforços podem ampliar seus resultados além do que seria possível apenas no esforço solo.",
       "mantra": "Eu fecho acordos claros, prósperos e justos onde todas as partes crescem e lucram juntas.",
       "blindSpot": "Assinar sociedade na emoção sem definir metas, papéis, pró-labore e regra de saída por escrito.",
       "defenseProtocol": "Nenhum acordo financeiro importante fica só no 'boca a boca' — revise cláusulas com cabeça fria.",
@@ -1821,7 +1821,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 80,
       "theme": "Diplomacia Executiva, Grandes Clientes e Alianças B2B",
-      "headline": "Passar o aniversário {em_cidade} transforma sua habilidade de negociar e criar alianças no grande diferencial da sua carreira este ano.",
+      "headline": "Passar o aniversário {em_cidade} favorece usar sua habilidade de negociar e construir alianças como um dos grandes diferenciais da sua carreira este ano.",
       "secret": "A Casa 7 é a casa do outro e dos contratos públicos. Em {cidade}, sua carreira avança rápido através de atendimento consultivo, representação comercial, consultorias estratégicas e alianças com empresas complementares.",
       "mantra": "Eu construo parcerias profissionais de alto nível baseadas em respeito, clareza e resultado mútuo.",
       "blindSpot": "Ceder demais para agradar clientes ou sócios e assumir condições desfavoráveis para evitar conflito.",
@@ -1863,7 +1863,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 68,
       "theme": "Elegância Relacional, Simetria e Escuta Magnética",
-      "headline": "Celebrar {em_cidade} lapida sua presença com diplomacia, charme refinado e uma capacidade rara de fazer as pessoas se sentirem vistas.",
+      "headline": "Celebrar {em_cidade} favorece lapidar sua presença com mais diplomacia, escuta e elegância — qualidades que ajudam as pessoas ao redor a se sentirem ouvidas.",
       "secret": "Na Casa 7, o outro funciona como espelho da sua evolução. Em {cidade}, sua imagem ganha sofisticação harmônica: você suaviza arestas sem perder firmeza e conquista respeito imediato pela postura justa e equilibrada.",
       "mantra": "Eu expresso elegância, justiça e equilíbrio, atraindo relações que refletem a minha melhor versão.",
       "blindSpot": "Ficar indeciso(a) tentando agradar opiniões opostas ou perder a própria voz dentro das expectativas alheias.",
@@ -1905,7 +1905,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 60,
       "theme": "Equilíbrio Vida-Trabalho, Companhia de Treino e Acordos",
-      "headline": "O ciclo da Casa 7 {em_cidade} mostra que você mantém hábitos muito melhor quando tem companhia — um parceiro de treino, nutricionista ou agenda alinhada a dois.",
+      "headline": "O ciclo da Casa 7 {em_cidade} joga a favor de manter hábitos em boa companhia — seja com um parceiro de treino, acompanhamento profissional ou agenda alinhada a dois.",
       "secret": "Em {cidade}, a disciplina solitária perde para o compromisso compartilhado. Combinar exercícios com alguém, equilibrar horas de trabalho com vida pessoal e respeitar a agenda de quem divide a casa com você traz leveza imediata.",
       "mantra": "Minha rotina equilibra trabalho, cuidado pessoal e tempo de qualidade com quem importa.",
       "blindSpot": "Anular seus horários de descanso e saúde para caber na agenda desorganizada de outras pessoas.",
@@ -1947,8 +1947,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 85,
       "theme": "Alianças Estratégicas, Conexões Complementares e Pontes",
-      "headline": "Passar seu aniversário {em_cidade} coloca na sua frente pessoas-chave com habilidades complementares prontas para somar forças com você.",
-      "secret": "A Casa 7 é um ímã de parcerias certas. Em {cidade}, em vez de tentar fazer tudo sozinho(a), você encontra aquele mentor, agente, representante ou sócio que abre portas que você levaria anos para abrir só.",
+      "headline": "Passar seu aniversário {em_cidade} favorece abrir espaço para pessoas-chave com habilidades complementares e interesse real em somar forças com você.",
+      "secret": "A Casa 7 é um ímã de parcerias certas. Em {cidade}, em vez de tentar fazer tudo sozinho(a), aumenta a chance de se conectar com mentores, representantes ou sócios capazes de somar forças ao seu caminho.",
       "mantra": "Eu encontro aliados complementares com quem multiplico alcance, impacto e realizações.",
       "blindSpot": "Esperar que o outro faça milagres por você sem deixar claro o que você entrega em contrapartida.",
       "defenseProtocol": "Apresente-se sempre com clareza sobre o que você traz para a mesa e o que busca construir junto.",
@@ -1989,7 +1989,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 92,
       "theme": "Compromisso Sério, Casamento e Parceria de Vida",
-      "headline": "Ativar a Casa 7 {em_cidade} coloca o amor no nível mais maduro do mapa: é o ciclo clássico de oficializar uniões, casar ou encontrar um parceiro de vida.",
+      "headline": "Celebrar a Casa 7 {em_cidade} cria um clima propício para relacionamentos mais maduros — favorecendo compromissos sérios, diálogo claro e construção a dois.",
       "secret": "Na Casa 7, não há espaço para relacionamentos pela metade. Em {cidade}, quem está em um namoro sólido sente o chamado para dar o próximo passo; quem está só atrai pessoas maduras, disponíveis e prontas para caminhar de mãos dadas de verdade.",
       "mantra": "Eu escolho e atraio uma parceria de vida baseada em amor maduro, lealdade e compromisso real.",
       "blindSpot": "Entrar em relacionamento só para não ficar só ou manter um vínculo desgastado por medo de recomeçar.",
@@ -2031,8 +2031,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 58,
       "theme": "Espelho Evolutivo, Perdão Generoso e Paz nas Relações",
-      "headline": "Passar a virada {em_cidade} ensina a grande lição da Casa 7: cada pessoa que cruza sua vida traz um espelho sagrado para expandir sua compaixão.",
-      "secret": "Em {cidade}, sua evolução espiritual acontece através do encontro, do perdão e da reconciliação. Soltar a necessidade de ter razão o tempo todo devolve uma paz rara e desbloqueia bênçãos nas suas relações.",
+      "headline": "Passar a virada {em_cidade} convida a praticar a lição da Casa 7: enxergar nas relações um espelho valioso para desenvolver empatia, equilíbrio e diálogo.",
+      "secret": "Em {cidade}, sua evolução espiritual acontece através do encontro, do perdão e da reconciliação. Soltar a necessidade de ter razão o tempo todo devolve uma paz rara e abre espaço para relações mais leves e harmoniosas.",
       "mantra": "Eu enxergo o sagrado no encontro, escolho a paz acima do orgulho e pratico a compaixão com lucidez.",
       "blindSpot": "Projetar nos outros a culpa pelas próprias dores ou perdoar sem estabelecer limites saudáveis.",
       "defenseProtocol": "Perdoe para libertar o seu próprio coração, mantendo discernimento sobre quem merece acesso à sua intimidade.",
@@ -2057,7 +2057,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         },
         {
           "title": "Harmonia nas Trocas",
-          "description": "A prática da escuta gentil transforma climas tensos em cooperação no meio do ano."
+          "description": "A prática da escuta gentil ajuda a conduzir climas tensos para mais cooperação no meio do ano."
         },
         {
           "title": "Coração em Paz",
@@ -2075,7 +2075,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 88,
       "theme": "Alavancagem, Investimentos de Peso e Virada Financeira",
-      "headline": "Celebrar seu aniversário {em_cidade} ativa a casa das grandes cifras: é o ciclo de alavancar capital, atrair investidores e virar a chave financeira.",
+      "headline": "Celebrar seu aniversário {em_cidade} joga a favor da estratégia financeira avançada: cria um ciclo propício para estruturar capital, renegociar recursos e buscar novas alavancas.",
       "secret": "A Casa 8 rege dinheiro multiplicado — recursos de terceiros, equity, comissões grandes, financiamentos estratégicos, heranças, venda de ativos e reestruturação de dívidas. Em {cidade}, você ganha sangue frio para negociar valores maiores.",
       "mantra": "Eu domino grandes números com coragem, estratégia e lucidez; minha riqueza se regenera e multiplica.",
       "blindSpot": "Assumir alavancagem arriscada sem garantia ou esconder problemas financeiros por vergonha até virarem bola de neve.",
@@ -2117,7 +2117,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 78,
       "theme": "Virada de Mesa, Gestão de Crise e Poder de Bastidor",
-      "headline": "Passar a virada {em_cidade} dá a você a coragem cirúrgica para encerrar modelos ultrapassados e liderar uma reinvenção profissional poderosa.",
+      "headline": "Passar a virada {em_cidade} favorece ter clareza e coragem para encerrar modelos desgastados e conduzir uma reinvenção profissional mais estratégica.",
       "secret": "Na Casa 8, nada morno sobrevive — e isso é uma bênção. Em {cidade}, você enxerga o que precisa morrer na sua carreira para que algo muito mais forte, rentável e estratégico nasça no lugar.",
       "mantra": "Eu transformo desafios complexos em vantagem estratégica e renasço mais forte em cada virada.",
       "blindSpot": "Entrar em disputas de poder ocultas no trabalho ou guardar segredos que geram desconfiança na equipe.",
@@ -2159,7 +2159,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 70,
       "theme": "Poder Silencioso, Olhar Penetrante e Força de Fênix",
-      "headline": "Viver a Casa 8 {em_cidade} desperta uma versão mais intensa, magnética e inabalável de você — quem atravessa esse ciclo nunca mais se diminui.",
+      "headline": "Viver a Casa 8 {em_cidade} favorece um ciclo de amadurecimento e profundidade — estimulando uma postura mais firme, consciente e menos dependente de aprovação.",
       "secret": "Em {cidade}, você troca a superficialidade pela substância. Seu olhar fica mais firme, sua fala mais concisa e sua presença carrega a autoridade silenciosa de quem venceu tempestades e não se abala por pouco.",
       "mantra": "Eu acolho minhas transformações com coragem; minha força nasce da minha profundidade e verdade.",
       "blindSpot": "Ficar desconfiado(a) demais, guardar mágoas em silêncio ou se fechar em isolamento defensivo.",
@@ -2201,7 +2201,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 65,
       "theme": "Detox Profundo, Terapia e Regeneração Celular",
-      "headline": "Ativar a Casa 8 {em_cidade} pede um detox completo — cortar vícios, limpar a mente com terapia e regenerar sua energia pela raiz.",
+      "headline": "O ciclo da Casa 8 {em_cidade} convida a uma renovação pela raiz: joga a favor de revisar hábitos desgastantes, cuidar da saúde emocional e recuperar energia.",
       "secret": "Na Casa 8, meia medida não funciona na saúde. Em {cidade}, você ganha determinação rara para abandonar de vez açúcar excessivo, cigarro, noites mal dormidas ou ciclos de estresse crônico e investir em regeneração real.",
       "mantra": "Eu libero tudo que intoxica meu corpo e minha mente, escolhendo regeneração e vigor profundo.",
       "blindSpot": "Extremismos radicais na rotina ou somatizar emoções reprimidas em tensão física constante.",
@@ -2243,7 +2243,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 60,
       "theme": "Bastidores do Poder, Investidores e Confiança Sigilosa",
-      "headline": "Celebrar {em_cidade} abre portas discretas nos bastidores: poucas conversas confidenciais com gente de peso que realmente decide o jogo.",
+      "headline": "Celebrar {em_cidade} favorece trocas mais reservadas e estratégicas — abrindo espaço para conversas confidenciais com pessoas de decisão e confiança.",
       "secret": "A Casa 8 não é sobre popularidade superficial — é sobre acesso e confiança absoluta. Em {cidade}, você se conecta com investidores, advogados, conselheiros e empresários que valorizam discrição e profundidade.",
       "mantra": "Eu atraio conexões confidenciais, íntegras e de alto nível que ampliam minha visão estratégica.",
       "blindSpot": "Entrar em círculos movidos por segredos tóxicos ou criar alianças sem transparência ética.",
@@ -2285,8 +2285,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 72,
       "theme": "Paixão Visceral, Entrega Profunda e Verdade Sem Máscaras",
-      "headline": "Passar a virada {em_cidade} derruba relações mornas e ativa uma química profunda, intensa e transformadora na vida a dois.",
-      "secret": "Na Casa 8, o coração exige verdade nua e crua. Em {cidade}, a sexualidade e a cumplicidade emocional atingem um nível visceral — casais que encaram conversas sinceras renascem mais unidos; solteiros atraem conexões magnéticas impossíveis de esquecer.",
+      "headline": "Passar a virada {em_cidade} convida a deixar relações mornas de lado e favorece conexões mais verdadeiras, intensas e profundas na vida a dois.",
+      "secret": "Na Casa 8, o coração exige verdade nua e crua. Em {cidade}, a sexualidade e a cumplicidade emocional atingem um nível visceral — casais que encaram conversas sinceras renascem mais unidos; para quem está só, o clima favorece conexões mais intensas e marcantes.",
       "mantra": "Eu vivo o amor com profundidade, coragem emocional, desejo vivo e entrega consciente.",
       "blindSpot": "Jogos de controle, ciúme investigativo ou apego a vínculos tóxicos só pela intensidade da química.",
       "defenseProtocol": "Intensidade saudável soma paz e desejo — se machuca ou controla, não é amor, é apego.",
@@ -2327,7 +2327,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 92,
       "theme": "Alquimia Interior, Intuição Profunda e Renascimento da Fênix",
-      "headline": "Esta é uma das casas espirituais mais poderosas do mapa: celebrar {em_cidade} ativa sua intuição profunda e um renascimento completo da alma.",
+      "headline": "Este é um dos ciclos mais introspectivos do mapa: celebrar {em_cidade} favorece aprofundar sua percepção interior, encerrar pendências e renovar seu olhar sobre a vida.",
       "secret": "Na Casa 8, você enxerga além das aparências. Em {cidade}, sua sensibilidade espiritual fica cirúrgica para ler ambientes e intenções, encerrar ciclos cármicos pesados e transformar antigas dores na sua maior fonte de sabedoria.",
       "mantra": "Eu atravesso cada mudança sob proteção divina; tudo que se transforma na minha vida me eleva.",
       "blindSpot": "Se fascinar por medos, previsões sombrias ou obsessões mentais tentando controlar o invisível.",
@@ -2371,8 +2371,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 75,
       "theme": "Renda Global, Moedas Fortes e Conhecimento Que Escala",
-      "headline": "Celebrar seu aniversário {em_cidade} abre suas fronteiras financeiras: é o ciclo de faturar fora da bolha local, em moedas fortes ou vendendo seu conhecimento.",
-      "secret": "Na Casa 9, dinheiro cresce quando você pensa grande e cruza fronteiras. Em {cidade}, mentorias, cursos, publicações, comércio exterior, clientes internacionais ou negócios digitais sem teto geográfico destravam uma nova faixa de receita.",
+      "headline": "Celebrar seu aniversário {em_cidade} joga a favor de ampliar fronteiras financeiras: cria terreno propício para explorar novos mercados, receitas digitais ou monetizar seu conhecimento.",
+      "secret": "Na Casa 9, dinheiro cresce quando você pensa grande e cruza fronteiras. Em {cidade}, mentorias, cursos, publicações, comércio exterior, clientes internacionais ou negócios digitais sem teto geográfico podem abrir espaço para uma nova faixa de receita.",
       "mantra": "Minha visão atravessa fronteiras; meu conhecimento tem valor global e atrai prosperidade abundante.",
       "blindSpot": "Gastar com viagens e cursos caros no entusiasmo sem transformar o aprendizado em produto ou caixa real.",
       "defenseProtocol": "Para cada investimento em viagem ou formação neste ano, defina antes como esse repertório voltará em receita.",
@@ -2413,7 +2413,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 90,
       "theme": "Autoridade Intelectual, Ensino, Publicação e Escala Global",
-      "headline": "Passar a virada {em_cidade} tira sua carreira da rotina miúda e projeta seu nome para palcos maiores, estudos avançados e mercados internacionais.",
+      "headline": "Passar a virada {em_cidade} favorece tirar sua carreira da rotina restrita, estimulando estudos avançados, projetos de maior alcance e visão internacional.",
       "secret": "A Casa 9 é a casa dos mestres, autores e exploradores. Em {cidade}, você cresce profissionalmente ao dar um passo atrás da operação pequena, especializar-se em nível superior, publicar suas ideias e liderar projetos de alcance amplo.",
       "mantra": "Minha carreira se expande além das fronteiras comuns; eu ensino, aprendo e lidero com visão ampla.",
       "blindSpot": "Ficar só no mundo das teorias brilhantes e negligenciar os prazos e detalhes operacionais da execução.",
@@ -2455,7 +2455,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 85,
       "theme": "Alma Cosmopolita, Otimismo Magnético e Sabedoria Viva",
-      "headline": "Viver a Casa 9 {em_cidade} alarga o seu olhar sobre a vida — você ganha leveza, entusiasmo renovado e a postura magnética de quem conhece o mundo.",
+      "headline": "Viver a Casa 9 {em_cidade} convida a ampliar seu olhar sobre a vida — favorecendo mais leveza, entusiasmo e uma postura aberta para novas experiências.",
       "secret": "Em {cidade}, velhos limites mentais caem por terra. Sua presença transmite liberdade, bom humor sábio e uma fé contagiante no futuro que atrai pessoas inspiradoras onde quer que você pise.",
       "mantra": "Minha mente é livre, meu olhar é amplo e eu vivo cada capítulo com entusiasmo, cultura e verdade.",
       "blindSpot": "Falar com tom de 'dono da verdade' por entusiasmo excessivo ou prometer mais do que consegue cumprir.",
@@ -2497,7 +2497,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 68,
       "theme": "Ar Livre, Movimento em Viagem e Estudo Diário",
-      "headline": "A ativação da Casa 9 {em_cidade} pede espaço aberto: sua energia sobe em parques, trilhas, viagens e rotinas com flexibilidade inteligente.",
+      "headline": "O ciclo da Casa 9 {em_cidade} favorece movimento e espaço aberto: sua disposição tende a responder melhor a atividades ao ar livre, viagens e rotinas mais flexíveis.",
       "secret": "Ficar trancado(a) 12 horas em uma sala sem janela derruba seu vigor neste ciclo. Em {cidade}, você funciona no pico quando mistura exercícios ao ar livre, 20 minutos diários de leitura ou idioma e pausas em cenários novos.",
       "mantra": "Meu corpo respira liberdade; movimento ao ar livre e aprendizado diário mantêm minha energia no alto.",
       "blindSpot": "Exageros na mesa e na bebida durante viagens ou abandonar completamente o treino quando muda de fuso.",
@@ -2513,7 +2513,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         },
         {
           "title": "Mobilidade Inteligente",
-          "description": "Cuidar dos quadris, pernas e fígado garante fôlego de sobra para viagens longas."
+          "description": "Cuidar dos quadris, pernas e fígado ajuda a manter mais fôlego e disposição para viagens longas."
         }
       ],
       "phases": [
@@ -2539,7 +2539,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 82,
       "theme": "Rede Global, Mestres Inspiradores e Amigos Pelo Mundo",
-      "headline": "Passar o aniversário {em_cidade} conecta você a mentes cosmopolitas, professores, estrangeiros e pessoas que ampliam instantaneamente sua régua.",
+      "headline": "Passar o aniversário {em_cidade} favorece se conectar com mentes curiosas, professores, viajantes e ambientes que ajudam a expandir sua régua.",
       "secret": "Na Casa 9, a melhor companhia é quem pensa maior do que a média ao seu redor. Em {cidade}, congressos, viagens, cursos avançados e comunidades internacionais trazem amigos e mentores que mudam sua perspectiva de vida.",
       "mantra": "Eu me conecto com mentes amplas, sábias e globais que expandem meus horizontes e oportunidades.",
       "blindSpot": "Desprezar pessoas simples do dia a dia ou idealizar mentores distantes sem checar a prática deles.",
@@ -2581,7 +2581,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 72,
       "theme": "Amor Sem Fronteiras, Viagens a Dois e Sintonia de Valores",
-      "headline": "Celebrar {em_cidade} traz ar fresco para o coração: paixões em viagem, encontros com gente de outro lugar ou grandes aventuras que renovam o casal.",
+      "headline": "Celebrar {em_cidade} joga a favor de mais leveza e descoberta no coração — favorecendo romances ligados a viagens, novas culturas ou planos de aventura a dois.",
       "secret": "Na Casa 9, o amor precisa de espaço, risada, descoberta e visão de futuro compartilhada. Em {cidade}, viajar junto vira o maior remédio para qualquer rotina; para quem está solteiro(a), conexões marcantes surgem longe de casa, em cursos ou com pessoas de outra cultura.",
       "mantra": "Eu vivo um amor livre, inspirador e aventureiro, onde crescemos e descobrimos o mundo juntos.",
       "blindSpot": "Fugir quando o relacionamento pede comprometimento real ou discutir sem fim por diferenças ideológicas.",
@@ -2623,7 +2623,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 95,
       "theme": "Fé Expandida, Filosofia de Vida e Peregrinação da Alma",
-      "headline": "Esta é a potência máxima da Casa 9 {em_cidade}: um ano de fé renovada, respostas filosóficas profundas e forte sensação de propósito maior.",
+      "headline": "Este é um dos ciclos mais expansivos da Casa 9 {em_cidade}: favorece cultivar fé lúcida, estudos filosóficos e maior senso de propósito nos próximos meses.",
       "secret": "A Casa 9 é o templo do sentido da vida. Em {cidade}, você enxerga o desenho maior por trás de tudo o que viveu nos últimos anos, encontra paz nas leis da vida e sente a fé trabalhar a seu favor como vento nas velas.",
       "mantra": "Eu confio na sabedoria maior da vida; meu propósito se ilumina e minha fé abre caminhos grandiosos.",
       "blindSpot": "Fanatismo, rigidez moral ou achar que a sua visão espiritual é a única válida no universo.",
@@ -2667,7 +2667,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 88,
       "theme": "Ticket de Elite, Contratos de Prestígio e Faturamento de Topo",
-      "headline": "Passar seu aniversário {em_cidade} coloca sua remuneração no patamar de autoridade: é o ciclo de conquistar contratos maiores e cobrar pelo seu prestígio.",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor de posicionar sua remuneração em um patamar de maior autoridade, abrindo espaço para contratos maiores e valorização profissional.",
       "secret": "Na Casa 10, o dinheiro segue o tamanho da sua reputação. Em {cidade}, clientes corporativos, cargos de direção e projetos vitrine pagam um prêmio alto porque querem o seu nome, a sua liderança e a segurança do seu resultado.",
       "mantra": "Minha reputação é o meu maior ativo; eu cobro com postura de topo e gero prosperidade à altura da minha entrega.",
       "blindSpot": "Aceitar trabalhos baratos que sujam seu posicionamento ou sacrificar toda a vida pessoal só para bater metas.",
@@ -2709,8 +2709,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 98,
       "theme": "Meio do Céu, Consagração, Cargo de Topo e Legado",
-      "headline": "Esta é a potência máxima da Casa 10 {em_cidade}: o grande ano de coroação profissional, promoção, reconhecimento público e salto de carreira.",
-      "secret": "Com o Sol brilhando no ponto mais alto do mapa {em_cidade}, todo esforço silencioso dos anos anteriores fica visível. É a janela clássica de assumir diretoria, lançar sua própria marca no topo, ganhar prêmios ou virar referência incontestável no setor.",
+      "headline": "Este é um dos cenários mais favoráveis da Casa 10 {em_cidade}: cria clima propício para buscar reconhecimento público, assumir liderança e dar um salto na carreira.",
+      "secret": "Com o Sol brilhando no ponto mais alto do mapa {em_cidade}, todo esforço silencioso dos anos anteriores fica visível. É a janela clássica de assumir diretoria, lançar sua própria marca no topo, ganhar prêmios ou consolidar ainda mais sua referência no setor.",
       "mantra": "Eu assumo o meu lugar no topo com competência, ética e visão; minha carreira floresce em reconhecimento.",
       "blindSpot": "Excesso de rigidez, medo de errar sob os holofotes ou deixar o ego subir quando os elogios chegarem.",
       "defenseProtocol": "Quanto maior o cargo e a visibilidade, mais calma, humildade estratégica e preparo precisam guiar suas falas.",
@@ -2751,7 +2751,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 85,
       "theme": "Postura Executiva, Respeito Imediato e Presença de Líder",
-      "headline": "Celebrar {em_cidade} reveste sua imagem de sobriedade elegante e autoridade natural — você entra na sala e todos percebem que chegou quem resolve.",
+      "headline": "Celebrar {em_cidade} favorece uma imagem mais sóbria, elegante e segura — ajudando você a transmitir maturidade e autoridade natural nos ambientes em que circula.",
       "secret": "Na Casa 10, sua imagem pública fala antes de você abrir a boca. Em {cidade}, alfaiataria impecável, postura firme, comunicação objetiva e coerência absoluta constroem um magnetismo de respeito raro.",
       "mantra": "Eu ocupo minha estatura com dignidade, serenidade e força; minha imagem inspira confiança imediata.",
       "blindSpot": "Vestir uma armadura fria de 'executivo sério' o tempo todo e esquecer da leveza humana fora do expediente.",
@@ -2793,7 +2793,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 65,
       "theme": "Agenda de CEO, Foco no Essencial e Delegação Inteligente",
-      "headline": "O ritmo da Casa 10 {em_cidade} exige agenda de alto escalão: proteger sua energia para decisões estratégicas e parar de se afogar em tarefas miúdas.",
+      "headline": "O ciclo da Casa 10 {em_cidade} convida a uma agenda mais estratégica: proteger sua energia para decisões importantes e reduzir o tempo perdido em tarefas secundárias.",
       "secret": "Quando a ambição cresce, o corpo precisa acompanhar sem queimar. Em {cidade}, o segredo é delegar o operacional, manter horários de sono respeitados e cuidar dos ossos, joelhos, coluna e dentes — áreas regidas pela Casa 10.",
       "mantra": "Eu governo meu tempo com estratégia; minha saúde e meu descanso sustentam grandes responsabilidades.",
       "blindSpot": "Workaholism glorificado: trabalhar sem parar até o corpo travar e cobrar a conta de uma vez.",
@@ -2835,7 +2835,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 82,
       "theme": "Cúpulas de Mercado, Autoridades e Conselhos de Liderança",
-      "headline": "Passar a virada {em_cidade} eleva o nível das mesas em que você senta, aproximando diretores, líderes do setor e formadores de opinião.",
+      "headline": "Passar a virada {em_cidade} favorece circular em mesas mais estratégicas, criando espaço para aproximar líderes, decisores e referências do seu setor.",
       "secret": "Na Casa 10, conexões acontecem pelo mérito e pela ambição sadia. Em {cidade}, você passa a conversar de igual para igual com pessoas que antes pareciam inalcançáveis — chegue preparado(a) e entregue clareza.",
       "mantra": "Eu sento nas mesas certas com postura de igualdade, agregando visão e respeito a cada líder que encontro.",
       "blindSpot": "Bajular pessoas poderosas perdendo autenticidade ou ignorar quem está abaixo na hierarquia.",
@@ -2877,7 +2877,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 60,
       "theme": "Casal de Poder, Admiração Mútua e Respeito às Ambições",
-      "headline": "Viver a Casa 10 {em_cidade} traz admiração profunda para o amor: você quer ao lado alguém com propósito, postura madura e orgulho das suas conquistas.",
+      "headline": "Viver a Casa 10 {em_cidade} favorece relações baseadas em admiração mútua — estimulando parcerias com propósito, postura madura e apoio às conquistas um do outro.",
       "secret": "Neste ciclo, atração e admiração andam juntas. Em {cidade}, o relacionamento prospera quando o casal celebra junto as vitórias profissionais, protege o tempo a dois na agenda cheia e age como uma dupla que cresce junta.",
       "mantra": "Eu construo um amor baseado em admiração mútua, respeito profundo e orgulho de caminhar lado a lado.",
       "blindSpot": "Deixar o romance em último plano por causa do trabalho ou levar rigidez de chefe para dentro de casa.",
@@ -2919,15 +2919,15 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 55,
       "theme": "Vocação Maior, Ética no Poder e Legado Com Alma",
-      "headline": "Celebrar {em_cidade} conecta ambição e consciência: você entende que chegar ao topo faz sentido quando sua influência deixa o mundo melhor.",
-      "secret": "A espiritualidade da Casa 10 é a integridade sob os holofotes. Em {cidade}, você alinha vocação e serviço social, descobrindo que sucesso material com propósito ético gera uma paz e uma proteção extraordinárias.",
+      "headline": "Celebrar {em_cidade} convida a unir ambição e consciência, fortalecendo a busca por conquistas profissionais alinhadas a valores éticos e impacto positivo.",
+      "secret": "A espiritualidade da Casa 10 é a integridade sob os holofotes. Em {cidade}, você alinha vocação e serviço social, descobrindo que alinhar sucesso material e propósito ético tende a gerar mais coerência e paz de espírito.",
       "mantra": "Minha vocação serve a um bem maior; eu lidero com integridade, justiça e gratidão em cada passo.",
       "blindSpot": "Medir seu valor como ser humano apenas por títulos, seguidores ou aplausos públicos.",
       "defenseProtocol": "Lembre toda manhã quem você é quando ninguém está olhando — sua essência vale mais do que qualquer cargo.",
       "pillars": [
         {
           "title": "Sucesso Com Ética",
-          "description": "Atalhos desonestos cobram caro; o caminho reto constrói um nome inabalável."
+          "description": "Atalhos desonestos cobram caro; o caminho reto ajuda a construir uma reputação muito mais sólida."
         },
         {
           "title": "Vocação Verdadeira",
@@ -2963,8 +2963,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 82,
       "theme": "Economia em Rede, Comunidades Rentáveis e Escalabilidade",
-      "headline": "Passar seu aniversário {em_cidade} multiplica seus ganhos através da força dos grupos: comunidades, plataformas digitais, coletivos e modelos escaláveis.",
-      "secret": "Na Casa 11, o dinheiro deixa de ser linear (1 para 1) e vira exponencial (1 para muitos). Em {cidade}, assinaturas em grupo, lançamentos digitais, tecnologia, indicações em massa e parcerias com investidores de visão aceleram seu faturamento.",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor de escalar ganhos por meio de grupos: cria terreno propício para comunidades, projetos digitais, parcerias e modelos coletivos.",
+      "secret": "Na Casa 11, o dinheiro deixa de ser linear (1 para 1) e vira exponencial (1 para muitos). Em {cidade}, assinaturas em grupo, lançamentos digitais, tecnologia, indicações em massa e parcerias com investidores de visão podem acelerar o crescimento do seu faturamento.",
       "mantra": "Minha visão conecta pessoas, cria valor coletivo e gera prosperidade escalável para mim e minha rede.",
       "blindSpot": "Apostar em modinhas tecnológicas sem modelo de negócio claro ou emprestar dinheiro a amigos sem critério.",
       "defenseProtocol": "Valide demanda real com sua audiência antes de investir pesado e separe amizade de empréstimos financeiros.",
@@ -3005,8 +3005,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 88,
       "theme": "Inovação, Projetos de Futuro e Liderança Colaborativa",
-      "headline": "Celebrar {em_cidade} coloca você dois passos à frente do mercado: é o ciclo perfeito para inovar, liderar times modernos e lançar projetos visionários.",
-      "secret": "A Casa 11 olha para os próximos 5 anos enquanto a concorrência ainda olha para ontem. Em {cidade}, você brilha em startups, tecnologia, comunidades, causas relevantes e projetos colaborativos onde a inteligência coletiva multiplica o resultado.",
+      "headline": "Celebrar {em_cidade} favorece olhar à frente das tendências: é um ciclo propício para inovar, colaborar com times modernos e tirar projetos visionários do papel.",
+      "secret": "A Casa 11 olha para os próximos 5 anos enquanto a concorrência ainda olha para ontem. Em {cidade}, você brilha em startups, tecnologia, comunidades, causas relevantes e projetos colaborativos onde a inteligência coletiva tende a potencializar os resultados.",
       "mantra": "Eu antecipo tendências com lucidez e construo projetos inovadores que inspiram o futuro.",
       "blindSpot": "Viver tão à frente do tempo que esquece de explicar a ideia de forma simples para o cliente comprar hoje.",
       "defenseProtocol": "Traduza sua visão futurista em benefícios imediatos e fáceis de entender no presente.",
@@ -3047,7 +3047,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 72,
       "theme": "Originalidade Livre, Mente Aberta e Autenticidade Sem Rótulos",
-      "headline": "Ativar a Casa 11 {em_cidade} liberta você da obrigação de seguir o rebanho — sua maior beleza este ano está exatamente no que torna você diferente.",
+      "headline": "O ciclo da Casa 11 {em_cidade} convida você a se soltar de padrões rígidos — favorecendo assumir o que torna sua visão e seu estilo verdadeiramente originais.",
       "secret": "Em {cidade}, cai o medo de parecer excêntrico(a) ou fora do padrão. Você assume suas ideias originais, renova referências visuais e descobre o alívio de pertencer a tribos que celebram sua autenticidade.",
       "mantra": "Eu celebro minha originalidade, penso com liberdade e inspiro outros a serem verdadeiros também.",
       "blindSpot": "Ser do contra apenas por rebeldia ou se distanciar emocionalmente das pessoas íntimas por frieza racional.",
@@ -3089,7 +3089,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 62,
       "theme": "Esportes em Grupo, Biohacking Inteligente e Flexibilidade",
-      "headline": "Passar a virada {em_cidade} tira o tédio da sua rotina com grupos de treino, aplicativos inteligentes e hábitos flexíveis que respeitam sua liberdade.",
+      "headline": "Passar a virada {em_cidade} joga a favor de renovar a rotina com treinos em grupo, ferramentas inteligentes e hábitos mais flexíveis que respeitam sua liberdade.",
       "secret": "Na Casa 11, rotinas militares rígidas geram rebeldia e abandono. Em {cidade}, você decola quando treina em comunidade (assessoria de corrida, crossfit, beach tennis, ciclismo) e usa tecnologia a favor do sono e da saúde circulatória.",
       "mantra": "Minha rotina é leve, inteligente e conectada, renovando meu corpo sem sufocar minha liberdade.",
       "blindSpot": "Ficar conectado(a) a telas até tarde da noite sobrecarregando o sistema nervoso e perdendo o sono profundo.",
@@ -3097,11 +3097,11 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
       "pillars": [
         {
           "title": "Treino em Tribo",
-          "description": "Exercitar-se com um grupo animado transforma disciplina em encontro social gostoso."
+          "description": "Exercitar-se com um grupo animado ajuda a tornar a disciplina mais leve e prazerosa."
         },
         {
           "title": "Saúde Conectada",
-          "description": "Medir passos, sono e hidratação com leveza transforma saúde em jogo divertido."
+          "description": "Medir passos, sono e hidratação com leveza torna o cuidado com a saúde mais leve e fácil de manter."
         },
         {
           "title": "Sistema Nervoso Calmo",
@@ -3131,8 +3131,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 98,
       "theme": "Tribo de Elite, Masterminds, Amigos e Oportunidades em Massa",
-      "headline": "Esta é a potência máxima da Casa 11 {em_cidade}: o melhor ano do mapa para multiplicar amigos incríveis, entrar em masterminds e crescer em comunidade.",
-      "secret": "Com o Sol brilhando na Casa 11 {em_cidade}, suas maiores sortes chegam através de amigos, grupos e comunidades certas. Estar na sala certa — seja um clube, mastermind, associação ou comunidade online — muda completamente o seu jogo.",
+      "headline": "Este é um dos cenários mais propícios da Casa 11 {em_cidade}: o clima favorece ampliar amizades alinhadas, participar de grupos estratégicos e crescer em comunidade.",
+      "secret": "Com o Sol brilhando na Casa 11 {em_cidade}, muitas oportunidades tendem a surgir por meio de amigos, grupos e comunidades alinhadas. Frequentar ambientes estratégicos — clubes, grupos de estudo ou comunidades — joga muito a favor do seu ciclo.",
       "mantra": "Eu atraio minha verdadeira tribo; cercado(a) das pessoas certas, meus grandes sonhos se realizam.",
       "blindSpot": "Dizer sim a todos os grupos e diluir sua energia em causas dispersas sem aprofundar os laços reais.",
       "defenseProtocol": "Escolha 2 comunidades realmente alinhadas aos seus valores e contribua ativamente dentro delas.",
@@ -3173,7 +3173,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 75,
       "theme": "Amor Amigo, Liberdade Saudável e Sonhos Compartilhados",
-      "headline": "Viver a Casa 11 {em_cidade} traz um ar leve e moderno para o amor: cumplicidade de melhores amigos, zero sufoco e planos empolgantes de futuro.",
+      "headline": "Viver a Casa 11 {em_cidade} favorece um clima mais leve e moderno no amor — estimulando cumplicidade de amigos, respeito à liberdade e planos empolgantes de futuro.",
       "secret": "Na Casa 11, o coração foge de ciúme controlador e se apaixona pela amizade verdadeira. Em {cidade}, solteiros podem ver uma amizade virar romance ou conhecer alguém especial através de amigos e grupos; casais renovam o vínculo sonhando novos projetos juntos.",
       "mantra": "Eu vivo um amor leve, livre e cúmplice, onde somos os melhores amigos e torcemos pelos sonhos um do outro.",
       "blindSpot": "Confundir liberdade com distanciamento frio ou manter alguém na 'amizade colorida' por medo de se entregar.",
@@ -3215,7 +3215,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 70,
       "theme": "Esperança Ativa, Consciência Coletiva e Futuro Luminoso",
-      "headline": "Celebrar {em_cidade} desperta sua fé no futuro e mostra que seu propósito individual brilha mais forte quando contribui para o bem coletivo.",
+      "headline": "Celebrar {em_cidade} estimula sua confiança no futuro e convida a conectar seus talentos individuais a projetos que geram impacto coletivo.",
       "secret": "A Casa 11 é a casa dos grandes desejos do coração e da fraternidade. Em {cidade}, você recebe flashes súbitos de intuição sobre o que vem pela frente e descobre alegria profunda ao participar de causas que melhoram a vida de muita gente.",
       "mantra": "Eu confio no futuro luminoso que construo; minha luz individual serve e soma ao todo.",
       "blindSpot": "Ansiedade tentando controlar problemas globais gigantes enquanto esquece de cuidar da paz dentro do próprio peito.",
@@ -3259,7 +3259,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "dinheiro": {
       "match": 62,
       "theme": "Renda nos Bastidores, Intuição Financeira e Proteção Discreta",
-      "headline": "Passar seu aniversário {em_cidade} ensina a arte da prosperidade silenciosa: ganhar bem nos bastidores, proteger seu patrimônio e evitar vazamentos ocultos.",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor de uma gestão financeira mais discreta e estratégica: favorece proteger seu patrimônio, trabalhar bem nos bastidores e revisar vazamentos.",
       "secret": "Na Casa 12, dinheiro gosta de sigilo e inteligência intuitiva. Em {cidade}, ganhos ligados a direitos autorais, bastidores estratégicos, projetos remotos, consultorias discretas ou instituições ganham força — e falar menos dos seus lucros protege seu caixa.",
       "mantra": "Eu protejo minha prosperidade com discrição, lucidez e intuição; meus recursos fluem em paz.",
       "blindSpot": "Perdas por desatenção, confiar dinheiro a pessoas erradas sem checar dados ou fazer compras emocionais para aliviar cansaço.",
@@ -3301,7 +3301,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "trabalho": {
       "match": 60,
       "theme": "Criação em Silêncio, Bastidores Estratégicos e Encerramento de Ciclos",
-      "headline": "Celebrar {em_cidade} convida você a criar longe do barulho: é o ciclo perfeito para encerrar fases desgastadas e gestar em sigilo o próximo grande salto.",
+      "headline": "Celebrar {em_cidade} convida você a criar longe do ruído excessivo: é um ciclo propício para encerrar etapas desgastadas e estruturar em calma o próximo passo profissional.",
       "secret": "A Casa 12 é a gestação antes do renascimento da Casa 1. Em {cidade}, trabalhos que exigem imaginação, terapia, pesquisa profunda, estratégia de bastidor, arte ou operação remota rendem extraordinariamente bem longe da política barulhenta de escritório.",
       "mantra": "No silêncio estratégico eu gesto minhas melhores criações e preparo meu próximo grande ciclo.",
       "blindSpot": "Se cobrar por estar em ritmo mais reservado ou insistir em um emprego que já acabou emocionalmente.",
@@ -3343,7 +3343,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "identidade": {
       "match": 82,
       "theme": "Sensibilidade Refinada, Presença Serena e Libertação do Ego",
-      "headline": "Viver a Casa 12 {em_cidade} traz uma suavidade magnética e libertadora: você larga pesos antigos, baixa o volume do ego e descobre uma paz rara de ser quem é.",
+      "headline": "Viver a Casa 12 {em_cidade} favorece mais suavidade e leveza interna — criando espaço para soltar cobranças antigas, reduzir excessos e se sentir em paz consigo.",
       "secret": "Em {cidade}, sua beleza e sua força passam a vir da tranquilidade interior. Você para de brigar para provar valor ao mundo, perdoa as próprias falhas passadas e emana uma presença calma que acalma qualquer ambiente.",
       "mantra": "Eu solto o peso das expectativas antigas, acolho minha sensibilidade e habito minha paz interior.",
       "blindSpot": "Absorver a tristeza de todo mundo como esponja ou se perder em escapismos quando a realidade aperta.",
@@ -3385,8 +3385,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "rotina": {
       "match": 90,
       "theme": "Sono Profundo, Retiros Restauradores e Saúde Mental Blindada",
-      "headline": "Ativar a Casa 12 {em_cidade} coloca sua saúde mental e seu descanso no centro: dormir bem, meditar e respeitar seus silêncios curam seu corpo inteiro.",
-      "secret": "Neste ciclo, seu sistema nervoso é a prioridade número um. Em {cidade}, terapias integrativas, natação, yoga, massagens, contato com o mar ou montanhas e noites de 8 horas de sono devolvem uma vitalidade que remédio nenhum substitui.",
+      "headline": "O ciclo da Casa 12 {em_cidade} joga a favor de colocar sua saúde mental e seu descanso no centro: priorizar sono, pausas e silêncio tende a renovar sua disposição.",
+      "secret": "Neste ciclo, seu sistema nervoso é a prioridade número um. Em {cidade}, terapias integrativas, natação, yoga, massagens, contato com o mar ou montanhas e noites de 8 horas de sono tendem a devolver clareza mental e vitalidade de forma sustentável.",
       "mantra": "Meu descanso é sagrado; eu cuido da minha mente, do meu sono e da minha paz todos os dias.",
       "blindSpot": "Ignorar sinais sutis de cansaço emocional, insônia ou fugir do estresse com excesso de álcool, telas ou açúcar.",
       "defenseProtocol": "Ao primeiro sinal de fadiga mental, reduza compromissos imediatamente e priorize água, silêncio e sono.",
@@ -3427,7 +3427,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "networking": {
       "match": 50,
       "theme": "Anjos da Guarda, Mentores Discretos e Conexões de Alma",
-      "headline": "A energia da Casa 12 {em_cidade} filtra todo o ruído social e traz poucas conexões de alma — aliados que ajudam em silêncio e na hora exata.",
+      "headline": "A Casa 12 {em_cidade} favorece diminuir o ruído social e valorizar poucas conexões de confiança — relações mais reservadas que oferecem apoio genuíno.",
       "secret": "Este não é um ano de multidões barulhentas, mas de encontros raros e providenciais. Em {cidade}, pessoas que você nem esperava — um terapeuta, um mentor reservado ou um amigo discreto — oferecem apoio decisivo sem pedir palco.",
       "mantra": "Eu atraio conexões verdadeiras de alma e reconheço com gratidão os aliados que caminham comigo em paz.",
       "blindSpot": "Manter por perto pessoas que drenam sua energia emocional ou ignorar sinais de falta de lealdade por pena.",
@@ -3469,7 +3469,7 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "amor": {
       "match": 70,
       "theme": "Conexão de Alma, Perdão Curador e Romance Privado",
-      "headline": "Passar a virada {em_cidade} abre um capítulo delicado e profundo no coração: cura de feridas passadas, empatia telepática e amor vivido longe de holofotes.",
+      "headline": "Passar a virada {em_cidade} cria um clima propício para cuidar do coração com mais delicadeza — favorecendo encerrar mágoas antigas e cultivar intimidade longe de holofotes.",
       "secret": "Na Casa 12, o amor se vive com privacidade e ternura. Em {cidade}, casais curam mágoas antigas através do perdão genuíno e ganham intimidade espiritual; solteiros fecham de vez ciclos passados e abrem espaço para conexões sutis e profundas.",
       "mantra": "Meu coração está curado do passado, protegido em paz e aberto para um amor verdadeiro e compassivo.",
       "blindSpot": "Idealizar pessoas indisponíveis, tentar 'salvar' parceiros feridos ou viver histórias secretas que machucam sua paz.",
@@ -3511,8 +3511,8 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
     "espiritual": {
       "match": 98,
       "theme": "Conexão Direta Com o Divino, Sonhos Lúcidos e Paz Absoluta",
-      "headline": "Esta é a potência máxima da Casa 12 {em_cidade}: um ano raro de despertar espiritual, sonhos reveladores, proteção invisível e paz profunda.",
-      "secret": "Com o Sol na Casa 12 {em_cidade}, o véu entre o visível e o invisível fica fininho. Sua intuição alcança o auge, respostas chegam em sonhos e meditações, e você sente a certeza tranquila de estar amparado(a) por algo maior em cada passo.",
+      "headline": "Este é um dos ciclos mais contemplativos da Casa 12 {em_cidade}: favorece aprofundar sua intuição, cultivar silêncio reparador e fortalecer sua serenidade interior.",
+      "secret": "Com o Sol na Casa 12 {em_cidade}, o véu entre o visível e o invisível fica fininho. Sua intuição alcança o auge, respostas chegam em sonhos e meditações, favorecendo uma sensação mais serena de confiança e amparo a cada passo.",
       "mantra": "Eu descanso na sabedoria divina; minha intuição é clara, meu caminho é protegido e minha alma habita em paz.",
       "blindSpot": "Fugir das responsabilidades concretas do dia a dia usando espiritualidade como desculpa para não agir.",
       "defenseProtocol": "Mantenha os pés na terra enquanto ouve o céu — paz interior verdadeira gera escolhas práticas mais lúcidas.",
