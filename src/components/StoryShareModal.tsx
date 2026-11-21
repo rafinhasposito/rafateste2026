@@ -711,11 +711,11 @@ export const StoryShareModal: React.FC<StoryShareProps> = ({
               </button>
             </div>
             {!isAffiliate && (
-              <p className="text-[11px] text-emerald-300/80 flex items-center justify-between gap-2">
+              <p className="text-[11px] text-[#E8D59B]/85 flex items-center justify-between gap-2">
                 <span>Quer ganhar 20% no Pix por cada amigo que clicar no seu Story?</span>
                 <a
                   href="/afiliado"
-                  className="font-semibold text-emerald-200 underline underline-offset-2 shrink-0"
+                  className="font-semibold text-[#F5DE98] underline underline-offset-2 shrink-0"
                 >
                   Ativar link →
                 </a>

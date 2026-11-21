@@ -71,14 +71,10 @@ const AffiliatesManager = () => {
     fetchOverview();
   }, [fetchOverview]);
 
-  const handleNameChange = (value: string) => {
-    setName(value);
-  };
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim().length < 2) {
-      toast.error("Informe o nome do afiliado.");
+      toast.error("Informe o nome do parceiro.");
       return;
     }
     const cleanCode = normalizeAffiliateCode(code) || generatePartnerNumber();
@@ -107,7 +103,7 @@ const AffiliatesManager = () => {
       setNotes("");
       await fetchOverview();
     } catch (err: any) {
-      toast.error(err?.message || "Não foi possível cadastrar o afiliado.");
+      toast.error(err?.message || "Não foi possível cadastrar o parceiro.");
     } finally {
       setCreating(false);
     }
@@ -124,7 +120,11 @@ const AffiliatesManager = () => {
     setBusyId(aff.id);
     try {
       await adminUpdateAffiliate({ affiliate_id: aff.id, active: !aff.active });
-      toast.success(aff.active ? `Afiliado ${aff.code} pausado.` : `Afiliado ${aff.code} ativado.`);
+      toast.success(
+        aff.active
+          ? `Parceiro ${formatPartnerIdLabel(aff.code)} pausado.`
+          : `Parceiro ${formatPartnerIdLabel(aff.code)} ativado.`
+      );
       await fetchOverview();
     } catch (err: any) {
       toast.error(err?.message || "Erro ao atualizar status.");
@@ -155,13 +155,16 @@ const AffiliatesManager = () => {
   const handlePayoutAll = async (aff: AdminAffiliateRow) => {
     if (aff.pending_brl <= 0) return;
     const confirmed = window.confirm(
-      `Confirmar repasse Pix de ${formatBrl(aff.pending_brl)} para ${aff.name} (${aff.code})?\n\nTodas as comissões pendentes deste afiliado serão marcadas como PAGAS.`
+      `Confirmar repasse Pix de ${formatBrl(aff.pending_brl)} para ${aff.name} (${formatPartnerIdLabel(aff.code)})?\n\nTodas as comissões pendentes deste parceiro serão marcadas como PAGAS.`
     );
     if (!confirmed) return;
 
     setBusyId(aff.id);
     try {
-      const res = await adminMarkAffiliatePayout(aff.id, `Pix enviado para ${aff.pix_key || aff.name}`);
+      const res = await adminMarkAffiliatePayout(
+        aff.id,
+        `Pix enviado para ${aff.pix_key || aff.name}`
+      );
       toast.success(
         `Repasse registrado! ${res.paid_count} comissão(ões) totalizando ${formatBrl(res.paid_total_brl)}.`
       );
@@ -200,77 +203,80 @@ const AffiliatesManager = () => {
   const previewRate = Number(commissionRate) > 0 ? Number(commissionRate) : DEFAULT_COMMISSION_RATE;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-9">
       {!dbReady && (
-        <div className="p-5 rounded-2xl border border-amber-400/40 bg-amber-500/10 text-amber-100 flex items-start gap-3">
+        <div className="p-5 rounded-2xl border border-amber-400/35 bg-amber-500/10 text-amber-100 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm space-y-1">
-            <p className="font-bold">Migration SQL de Afiliados pendente no Supabase</p>
-            <p className="text-amber-100/80">
-              Rode o arquivo{" "}
+          <div className="font-ps-ui text-sm space-y-1">
+            <p className="font-semibold">Migration SQL de Afiliados pendente no Supabase</p>
+            <p className="text-amber-100/80 text-xs">
+              Execute{" "}
               <code className="px-1.5 py-0.5 rounded bg-black/40 font-mono text-[11px]">
                 supabase/migrations/20261121183000_affiliate_system.sql
               </code>{" "}
-              no SQL Editor do Supabase para ativar as tabelas, links e comissões automáticas.
+              no SQL Editor do Supabase para ativar as tabelas e comissões automáticas.
             </p>
           </div>
         </div>
       )}
 
-      {/* Resumo Geral */}
+      {/* Resumo Geral (Ordem: A Pagar primeiro para operação rápida) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-3xl bg-black/45 border border-white/10 backdrop-blur-xl">
-          <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/45 block mb-2">
-            Afiliados Ativos
-          </span>
-          <p className="font-ps-display text-3xl font-bold text-white">{totalActive}</p>
-          <p className="text-xs text-white/45 mt-1">{affiliates.length} cadastrados</p>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-black/45 border border-white/10 backdrop-blur-xl">
-          <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/45 block mb-2">
-            Vendas via Afiliados
-          </span>
-          <p className="font-ps-display text-3xl font-bold text-white">{totalSales}</p>
-          <p className="text-xs text-white/45 mt-1">Comissão padrão {DEFAULT_COMMISSION_RATE}%</p>
-        </div>
-
-        <div className="p-5 rounded-3xl bg-[#C9A227]/12 border border-[#C9A227]/35 backdrop-blur-xl">
-          <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-[#F5DE98] block mb-2">
+        <div className="p-5 rounded-2xl bg-gradient-to-b from-[#C9A227]/14 to-[#07101A]/95 border border-[#C9A227]/40 backdrop-blur-xl">
+          <span className="font-ps-ui text-[11px] uppercase tracking-[0.16em] text-[#F5DE98] font-semibold block mb-2">
             Comissões a Pagar
           </span>
-          <p className="font-ps-display text-3xl font-bold text-[#FFF3D1]">
+          <p className="font-ps-display font-normal text-3xl text-white tabular-nums">
             {formatBrl(totalPendingBrl)}
           </p>
-          <p className="text-xs text-[#F5DE98]/70 mt-1">Pendente de repasse Pix</p>
+          <p className="font-ps-ui text-xs text-[#E8D59B]/80 mt-1.5">Pendente de repasse Pix</p>
         </div>
 
-        <div className="p-5 rounded-3xl bg-emerald-950/30 border border-emerald-400/25 backdrop-blur-xl">
-          <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-emerald-300/80 block mb-2">
+        <div className="p-5 rounded-2xl bg-[#07101A]/90 border border-white/10 backdrop-blur-xl">
+          <span className="font-ps-ui text-[11px] uppercase tracking-[0.16em] text-[#AAB6C4] font-semibold block mb-2">
             Total Repassado
           </span>
-          <p className="font-ps-display text-3xl font-bold text-emerald-200">
+          <p className="font-ps-display font-normal text-3xl text-white tabular-nums">
             {formatBrl(totalPaidBrl)}
           </p>
-          <p className="text-xs text-emerald-200/60 mt-1">Comissões já liquidadas</p>
+          <p className="font-ps-ui text-xs text-[#94A3B8] mt-1.5">Comissões já liquidadas</p>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#07101A]/90 border border-white/10 backdrop-blur-xl">
+          <span className="font-ps-ui text-[11px] uppercase tracking-[0.16em] text-[#AAB6C4] font-semibold block mb-2">
+            Vendas via Parceiros
+          </span>
+          <p className="font-ps-display font-normal text-3xl text-white tabular-nums">{totalSales}</p>
+          <p className="font-ps-ui text-xs text-[#94A3B8] mt-1.5">
+            Taxa padrão {DEFAULT_COMMISSION_RATE}%
+          </p>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-[#07101A]/90 border border-white/10 backdrop-blur-xl">
+          <span className="font-ps-ui text-[11px] uppercase tracking-[0.16em] text-[#AAB6C4] font-semibold block mb-2">
+            Parceiros Ativos
+          </span>
+          <p className="font-ps-display font-normal text-3xl text-white tabular-nums">{totalActive}</p>
+          <p className="font-ps-ui text-xs text-[#94A3B8] mt-1.5">{affiliates.length} cadastrados</p>
         </div>
       </div>
 
-      {/* Formulário: Cadastrar Novo Afiliado */}
-      <section className="p-6 sm:p-8 rounded-[32px] border border-[#C9A227]/35 bg-gradient-to-b from-[#0E1A32]/90 via-[#081020]/95 to-[#050811]/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.65)]">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-5 border-b border-white/10">
+      {/* Formulário: Cadastrar Novo Parceiro */}
+      <section className="p-6 sm:p-8 rounded-[24px] border border-[#C9A227]/30 bg-gradient-to-b from-[#0E1A30]/92 via-[#07101C]/96 to-[#040912]/98 backdrop-blur-2xl shadow-[0_20px_55px_rgba(0,0,0,0.55)]">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-5 border-b border-white/[0.08]">
           <div>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/35 text-[#F5DE98] text-[10px] font-bold uppercase tracking-[0.2em] mb-2">
-              <Sparkles className="w-3 h-3" /> Programa de Afiliados • Preço Inalterado
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C9A227]/12 border border-[#C9A227]/35 text-[#F5DE98] text-[11px] font-ps-ui font-semibold uppercase tracking-[0.18em] mb-2">
+              <Sparkles className="w-3 h-3 text-[#E5C158]" /> Programa de Parceiros • Preço Inalterado
             </span>
-            <h3 className="font-ps-display text-2xl sm:text-3xl text-white font-bold tracking-tight">
-              Cadastrar Novo Afiliado
+            <h3 className="font-ps-display font-normal text-2xl sm:text-3xl text-white">
+              Cadastrar Novo Parceiro
             </h3>
-            <p className="text-white/55 text-xs sm:text-sm font-ps-ui mt-1">
-              O parceiro recebe nº de cadastro + link curto (<span className="font-mono text-[#F5DE98]">/i/482917</span>) e acompanha as vendas em{" "}
-              <span className="font-mono text-[#F5DE98]">/afiliado</span>.
+            <p className="font-ps-ui text-[#AAB6C4] text-sm mt-1">
+              O parceiro recebe nº de cadastro + link curto (<span className="font-mono text-xs text-[#E8D59B]">/i/482917</span>) e acompanha as vendas em{" "}
+              <span className="font-mono text-xs text-[#E8D59B]">/afiliado</span>.
             </p>
           </div>
+
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -278,25 +284,26 @@ const AffiliatesManager = () => {
                 handleCopy(
                   "recruit-landing",
                   `${typeof window !== "undefined" ? window.location.origin : "https://protocolosolar.com.br"}/parceiros`,
-                  "Link da página de recrutamento (/parceiros)"
+                  "Link da página de parceiros (/parceiros)"
                 )
               }
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#C9A227]/15 hover:bg-[#C9A227]/25 border border-[#C9A227]/40 text-xs text-[#FFF3D1] font-semibold font-ps-ui transition-all"
+              className="min-h-[42px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#C9A227]/15 hover:bg-[#C9A227]/25 border border-[#C9A227]/40 text-xs text-[#F5DE98] font-semibold font-ps-ui transition-all"
             >
               {copiedId === "recruit-landing" ? (
-                <Check className="w-3.5 h-3.5 text-emerald-300" />
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
               ) : (
                 <Copy className="w-3.5 h-3.5" />
               )}
-              Copiar Landing /parceiros
+              <span>Copiar /parceiros</span>
             </button>
             <a
               href="/parceiros"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs text-white/80 font-ps-ui transition-all"
+              className="min-h-[42px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/15 text-xs text-[#CBD5E1] font-ps-ui transition-all"
             >
-              Ver /parceiros <ExternalLink className="w-3.5 h-3.5" />
+              <span>Abrir /parceiros</span>
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
@@ -304,34 +311,34 @@ const AffiliatesManager = () => {
         <form onSubmit={handleCreate} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
-                1. Nome do Afiliado *
+              <label className="block font-ps-ui text-xs uppercase tracking-[0.14em] font-semibold text-[#CBD5E1]">
+                1. Nome do Parceiro *
               </label>
               <input
                 type="text"
                 value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Camila Rocha"
                 required
-                className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
+                className="w-full min-h-[46px] px-3.5 py-2.5 rounded-xl bg-[#040912]/90 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
-                2. E-mail da Conta no App (acesso /afiliado)
+              <label className="block font-ps-ui text-xs uppercase tracking-[0.14em] font-semibold text-[#CBD5E1]">
+                2. E-mail da Conta (acesso /afiliado)
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="camila@email.com"
-                className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
+                className="w-full min-h-[46px] px-3.5 py-2.5 rounded-xl bg-[#040912]/90 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
+              <label className="block font-ps-ui text-xs uppercase tracking-[0.14em] font-semibold text-[#E8D59B]">
                 3. Nº de Cadastro / Código (/i/) *
               </label>
               <div className="flex gap-2">
@@ -341,12 +348,12 @@ const AffiliatesManager = () => {
                   onChange={(e) => setCode(normalizeAffiliateCode(e.target.value))}
                   placeholder="Ex: 482917 ou CAMILA"
                   required
-                  className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] font-mono text-sm font-bold tracking-wider focus:outline-none focus:border-[#C9A227]"
+                  className="w-full min-h-[46px] px-3.5 py-2.5 rounded-xl bg-[#040912]/90 border border-white/15 text-[#F5DE98] font-mono text-sm font-semibold tracking-wider focus:outline-none focus:border-[#C9A227]"
                 />
                 <button
                   type="button"
                   onClick={() => setCode(generatePartnerNumber())}
-                  className="px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/70 hover:text-white"
+                  className="min-w-[44px] px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.1] border border-white/15 text-[#CBD5E1] hover:text-white flex items-center justify-center"
                   title="Gerar novo número de cadastro"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -355,7 +362,7 @@ const AffiliatesManager = () => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
+              <label className="block font-ps-ui text-xs uppercase tracking-[0.14em] font-semibold text-[#CBD5E1]">
                 4. Comissão (%) — Padrão 20%
               </label>
               <input
@@ -365,12 +372,12 @@ const AffiliatesManager = () => {
                 step={0.5}
                 value={commissionRate}
                 onChange={(e) => setCommissionRate(Number(e.target.value))}
-                className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-[#C9A227]"
+                className="w-full min-h-[46px] px-3.5 py-2.5 rounded-xl bg-[#040912]/90 border border-white/15 text-white text-sm tabular-nums focus:outline-none focus:border-[#C9A227]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
+              <label className="block font-ps-ui text-xs uppercase tracking-[0.14em] font-semibold text-[#CBD5E1]">
                 5. Chave Pix (Opcional)
               </label>
               <input
@@ -378,12 +385,12 @@ const AffiliatesManager = () => {
                 value={pixKey}
                 onChange={(e) => setPixKey(e.target.value)}
                 placeholder="CPF, E-mail ou Celular"
-                className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
+                className="w-full min-h-[46px] px-3.5 py-2.5 rounded-xl bg-[#040912]/90 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
+              <label className="block font-ps-ui text-xs uppercase tracking-[0.14em] font-semibold text-[#CBD5E1]">
                 6. Observação Interna (Opcional)
               </label>
               <input
@@ -391,24 +398,22 @@ const AffiliatesManager = () => {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Ex: Instagram @camila · 80k"
-                className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
+                className="w-full min-h-[46px] px-3.5 py-2.5 rounded-xl bg-[#040912]/90 border border-white/15 text-white text-sm focus:outline-none focus:border-[#C9A227]"
               />
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-white/10">
-            <div className="text-xs text-white/60 space-y-0.5">
-              <p>
-                Simulação com <strong className="text-[#F5DE98]">{previewRate}%</strong>:{" "}
-                <span className="font-mono text-white/85">
-                  1 Casa: {formatBrl(calculateCommissionBrl(19.9, previewRate))} · Expansão:{" "}
-                  {formatBrl(calculateCommissionBrl(49.9, previewRate))} · Mapa Completo:{" "}
-                  {formatBrl(calculateCommissionBrl(99.9, previewRate))}
-                </span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/[0.08]">
+            <div className="font-ps-ui text-xs text-[#AAB6C4] space-y-1">
+              <p className="tabular-nums">
+                Com <strong className="text-[#F5DE98]">{previewRate}%</strong>: 1 Casa{" "}
+                <span className="text-white">{formatBrl(calculateCommissionBrl(19.9, previewRate))}</span> · Expansão{" "}
+                <span className="text-white">{formatBrl(calculateCommissionBrl(49.9, previewRate))}</span> · Mapa Completo{" "}
+                <span className="text-white">{formatBrl(calculateCommissionBrl(99.9, previewRate))}</span>
               </p>
               {code && (
-                <p className="font-mono text-[11px] text-[#F5DE98]/80">
-                  Link: {buildAffiliateLink(code)}
+                <p className="font-mono text-xs text-[#E8D59B] break-all">
+                  {buildAffiliateLink(code)}
                 </p>
               )}
             </div>
@@ -416,37 +421,38 @@ const AffiliatesManager = () => {
             <button
               type="submit"
               disabled={creating || !dbReady}
-              className="min-h-[48px] px-7 py-3 rounded-2xl bg-gradient-to-r from-[#C9A227] via-[#E5C158] to-[#C9A227] text-black font-ps-ui text-xs font-bold uppercase tracking-[0.18em] flex items-center justify-center gap-2 hover:brightness-110 transition-all disabled:opacity-50"
+              className="min-h-[48px] px-7 py-3 rounded-xl bg-[#C9A227] hover:bg-[#D9B643] text-[#02050A] font-ps-ui text-xs font-bold uppercase tracking-[0.16em] inline-flex items-center justify-center gap-2 transition-all disabled:opacity-50 shrink-0"
             >
               <Plus className="w-4 h-4" />
-              {creating ? "Cadastrando..." : "Criar Afiliado"}
+              <span>{creating ? "Cadastrando..." : "Criar Parceiro"}</span>
             </button>
           </div>
         </form>
       </section>
 
-      {/* Lista de Afiliados */}
+      {/* Lista de Parceiros */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-ps-display text-2xl font-bold text-white flex items-center gap-2.5">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-ps-display font-normal text-2xl text-white flex items-center gap-2.5">
             <Users className="w-5 h-5 text-[#C9A227]" />
-            Afiliados Cadastrados ({affiliates.length})
+            <span>Parceiros Cadastrados ({affiliates.length})</span>
           </h3>
           <button
+            type="button"
             onClick={fetchOverview}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white/75"
+            className="min-h-[40px] inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/12 text-xs text-[#CBD5E1] font-ps-ui"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-            Atualizar
+            <span>Atualizar</span>
           </button>
         </div>
 
         {loading ? (
-          <div className="p-10 text-center text-white/50 text-sm">Carregando afiliados...</div>
+          <div className="p-10 text-center text-[#94A3B8] text-sm font-ps-ui">Carregando parceiros...</div>
         ) : affiliates.length === 0 ? (
-          <div className="p-10 rounded-3xl border border-white/10 bg-black/40 text-center text-white/55 text-sm">
-            Nenhum afiliado cadastrado ainda. Crie o primeiro parceiro no formulário acima.
+          <div className="p-10 rounded-2xl border border-white/10 bg-[#07101A]/75 text-center text-[#94A3B8] text-sm font-ps-ui">
+            Nenhum parceiro cadastrado ainda. Crie o primeiro acima ou compartilhe <span className="font-mono text-[#E8D59B]">/parceiros</span>.
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
@@ -456,66 +462,65 @@ const AffiliatesManager = () => {
               return (
                 <div
                   key={aff.id}
-                  className={`p-5 sm:p-6 rounded-3xl border backdrop-blur-xl transition-all ${
+                  className={`p-5 sm:p-6 rounded-2xl border backdrop-blur-xl transition-all ${
                     aff.active
-                      ? "bg-[#08111F]/90 border-white/12"
-                      : "bg-black/45 border-white/5 opacity-70"
+                      ? "bg-[#07101A]/90 border-white/12"
+                      : "bg-[#040912]/70 border-white/[0.06] opacity-70"
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="space-y-1.5 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h4 className="font-ps-display text-xl font-bold text-white">
+                        <h4 className="font-ps-display font-normal text-xl text-white">
                           {aff.name}
                         </h4>
-                        <span className="px-2.5 py-0.5 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 text-[#F5DE98] font-mono text-xs font-bold">
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#F5DE98] font-mono text-xs">
                           {formatPartnerIdLabel(aff.code)} · /i/{aff.code.toLowerCase()}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-ps-ui font-medium border ${
                             aff.active
-                              ? "bg-emerald-500/15 text-emerald-300 border border-emerald-400/30"
-                              : "bg-white/10 text-white/50 border border-white/15"
+                              ? "bg-emerald-500/10 text-emerald-300 border-emerald-400/30"
+                              : "bg-white/5 text-[#94A3B8] border-white/15"
                           }`}
                         >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              aff.active ? "bg-emerald-400" : "bg-white/40"
+                            }`}
+                          />
                           {aff.active ? "Ativo" : "Pausado"}
                         </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
-                            aff.user_id
-                              ? "bg-sky-500/15 text-sky-200 border border-sky-400/30"
-                              : "bg-white/5 text-white/45 border border-white/10"
-                          }`}
-                        >
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-ps-ui bg-white/[0.04] text-[#AAB6C4] border border-white/10">
                           {aff.user_id ? "Conta vinculada" : "Vincula ao logar"}
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/55">
-                        {aff.email && <span>E-mail: {aff.email}</span>}
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-ps-ui text-xs text-[#94A3B8]">
+                        {aff.email && <span>{aff.email}</span>}
                         {aff.pix_key && (
                           <button
                             type="button"
                             onClick={() => handleCopy(`pix-${aff.id}`, aff.pix_key || "", "Chave Pix")}
-                            className="inline-flex items-center gap-1 text-[#F5DE98]/85 hover:text-[#F5DE98]"
+                            className="inline-flex items-center gap-1.5 text-[#E8D59B] hover:text-[#F5DE98]"
                           >
                             <Wallet className="w-3.5 h-3.5" />
-                            Pix: {aff.pix_key}
+                            <span>Pix: {aff.pix_key}</span>
                             {copiedId === `pix-${aff.id}` ? (
-                              <Check className="w-3 h-3 text-emerald-300" />
+                              <Check className="w-3 h-3 text-emerald-400" />
                             ) : (
                               <Copy className="w-3 h-3 opacity-60" />
                             )}
                           </button>
                         )}
-                        {aff.notes && <span className="text-white/40">• {aff.notes}</span>}
+                        {aff.notes && <span className="text-[#94A3B8]">• {aff.notes}</span>}
                       </div>
                     </div>
 
                     {/* Ações rápidas */}
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
                       {isEditingRate ? (
-                        <div className="flex items-center gap-1.5 bg-black/60 border border-[#C9A227]/45 rounded-xl px-2.5 py-1.5">
+                        <div className="flex items-center gap-1.5 bg-[#040912] border border-[#C9A227]/45 rounded-xl px-2.5 py-1.5">
                           <input
                             type="number"
                             min={1}
@@ -523,21 +528,22 @@ const AffiliatesManager = () => {
                             step={0.5}
                             value={editingRateVal}
                             onChange={(e) => setEditingRateVal(e.target.value)}
-                            className="w-14 bg-transparent text-[#F5DE98] font-mono text-xs font-bold focus:outline-none"
+                            className="w-14 bg-transparent text-[#F5DE98] font-ps-ui text-xs font-semibold tabular-nums focus:outline-none"
                           />
-                          <span className="text-xs text-white/50">%</span>
+                          <span className="text-xs text-[#94A3B8]">%</span>
                           <button
                             type="button"
                             disabled={busyId === aff.id}
                             onClick={() => handleSaveRate(aff.id)}
-                            className="px-2 py-1 rounded-lg bg-[#C9A227] text-black text-[10px] font-bold uppercase"
+                            className="px-2.5 py-1 rounded-lg bg-[#C9A227] text-[#02050A] text-[11px] font-bold"
                           >
-                            OK
+                            Salvar
                           </button>
                           <button
                             type="button"
                             onClick={() => setEditingRateId(null)}
-                            className="px-1.5 py-1 text-white/50 text-[10px]"
+                            className="px-1.5 py-1 text-[#94A3B8] hover:text-white text-xs"
+                            aria-label="Cancelar edição de comissão"
                           >
                             ✕
                           </button>
@@ -549,36 +555,35 @@ const AffiliatesManager = () => {
                             setEditingRateId(aff.id);
                             setEditingRateVal(String(aff.commission_rate));
                           }}
-                          className="min-h-[40px] px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/12 text-xs font-mono text-[#F5DE98] inline-flex items-center gap-1.5"
-                          title="Editar taxa de comissão"
+                          className="min-h-[40px] px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/12 text-xs font-ps-ui font-semibold text-[#F5DE98] inline-flex items-center gap-1.5 tabular-nums"
+                          title="Alterar taxa de comissão"
                         >
                           <Percent className="w-3.5 h-3.5" />
-                          {aff.commission_rate}%
+                          <span>{aff.commission_rate}%</span>
                         </button>
                       )}
 
                       <button
                         type="button"
-                        onClick={() => handleCopy(`link-${aff.id}`, link, "Link de afiliado")}
-                        className="min-h-[40px] px-3.5 py-2 rounded-xl bg-[#C9A227]/15 hover:bg-[#C9A227]/25 border border-[#C9A227]/40 text-[#FFF3D1] text-xs font-semibold inline-flex items-center gap-1.5"
+                        onClick={() => handleCopy(`link-${aff.id}`, link, "Link do parceiro")}
+                        className="min-h-[40px] px-3.5 py-2 rounded-xl bg-[#C9A227]/15 hover:bg-[#C9A227]/25 border border-[#C9A227]/40 text-[#F5DE98] font-ps-ui text-xs font-semibold inline-flex items-center gap-1.5"
                       >
                         {copiedId === `link-${aff.id}` ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-300" />
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
                         )}
-                        Copiar Link
+                        <span>Copiar Link</span>
                       </button>
 
                       <button
                         type="button"
                         disabled={busyId === aff.id}
                         onClick={() => handleToggleActive(aff)}
-                        className="min-h-[40px] px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/12 text-white/75 text-xs inline-flex items-center gap-1.5"
-                        title={aff.active ? "Pausar afiliado" : "Reativar afiliado"}
+                        className="min-h-[40px] px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/12 text-[#CBD5E1] font-ps-ui text-xs inline-flex items-center gap-1.5"
                       >
                         <Power className="w-3.5 h-3.5" />
-                        {aff.active ? "Pausar" : "Ativar"}
+                        <span>{aff.active ? "Pausar" : "Ativar"}</span>
                       </button>
 
                       {aff.pending_brl > 0 && (
@@ -586,43 +591,45 @@ const AffiliatesManager = () => {
                           type="button"
                           disabled={busyId === aff.id}
                           onClick={() => handlePayoutAll(aff)}
-                          className="min-h-[40px] px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/45 text-emerald-200 text-xs font-bold inline-flex items-center gap-1.5"
+                          className="min-h-[40px] px-4 py-2 rounded-xl bg-[#C9A227] hover:bg-[#D9B643] text-[#02050A] font-ps-ui text-xs font-bold inline-flex items-center gap-1.5 tabular-nums"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          Pagar {formatBrl(aff.pending_brl)}
+                          <span>Pagar {formatBrl(aff.pending_brl)}</span>
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {/* Mini métricas por afiliado */}
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-4 pt-4 border-t border-white/[0.08] text-xs">
+                  {/* Métricas por parceiro */}
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-4 pt-4 border-t border-white/[0.07] font-ps-ui text-xs tabular-nums">
                     <div>
-                      <span className="text-white/40 block text-[10px] uppercase font-mono">Cliques</span>
-                      <span className="text-white font-mono font-bold text-sm">{aff.clicks_count}</span>
+                      <span className="text-[#94A3B8] block text-[11px]">Cliques</span>
+                      <span className="text-white font-semibold text-sm">{aff.clicks_count}</span>
                     </div>
                     <div>
-                      <span className="text-white/40 block text-[10px] uppercase font-mono">Cadastros</span>
-                      <span className="text-white font-mono font-bold text-sm">{aff.referred_users_count}</span>
+                      <span className="text-[#94A3B8] block text-[11px]">Cadastros</span>
+                      <span className="text-white font-semibold text-sm">
+                        {aff.referred_users_count}
+                      </span>
                     </div>
                     <div>
-                      <span className="text-white/40 block text-[10px] uppercase font-mono">Vendas</span>
-                      <span className="text-white font-mono font-bold text-sm">
+                      <span className="text-[#94A3B8] block text-[11px]">Vendas</span>
+                      <span className="text-white font-semibold text-sm">
                         {aff.sales_count}{" "}
-                        <span className="text-white/40 font-normal text-[11px]">
+                        <span className="text-[#94A3B8] font-normal">
                           ({formatBrl(aff.volume_brl)})
                         </span>
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#F5DE98]/70 block text-[10px] uppercase font-mono">Pendente</span>
-                      <span className="text-[#F5DE98] font-mono font-bold text-sm">
+                      <span className="text-[#E8D59B] block text-[11px]">A Pagar</span>
+                      <span className="text-[#F5DE98] font-semibold text-sm">
                         {formatBrl(aff.pending_brl)}
                       </span>
                     </div>
                     <div>
-                      <span className="text-emerald-300/70 block text-[10px] uppercase font-mono">Pago</span>
-                      <span className="text-emerald-300 font-mono font-bold text-sm">
+                      <span className="text-[#94A3B8] block text-[11px]">Já Pago</span>
+                      <span className="text-emerald-300 font-semibold text-sm">
                         {formatBrl(aff.paid_brl)}
                       </span>
                     </div>
@@ -634,19 +641,19 @@ const AffiliatesManager = () => {
         )}
       </section>
 
-      {/* Tabela de Comissões Recentes */}
-      <section className="p-6 rounded-3xl bg-[#08111F]/90 border border-white/10 backdrop-blur-xl space-y-5">
+      {/* Comissões por Venda */}
+      <section className="p-5 sm:p-7 rounded-[24px] bg-[#07101A]/90 border border-white/10 backdrop-blur-xl space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="font-ps-display text-xl sm:text-2xl font-bold text-white">
+            <h3 className="font-ps-display font-normal text-2xl text-white">
               Comissões por Venda
             </h3>
-            <p className="text-xs text-white/50">
-              Cada venda paga via link de afiliado gera 1 registro idempotente nesta tabela.
+            <p className="font-ps-ui text-xs text-[#94A3B8] mt-0.5">
+              Cada venda confirmada gera 1 registro idempotente vinculado ao pedido.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 p-1 rounded-xl bg-black/45 border border-white/10">
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#040912]/80 border border-white/10">
             {(
               [
                 { id: "all", label: "Todas" },
@@ -658,10 +665,10 @@ const AffiliatesManager = () => {
                 key={f.id}
                 type="button"
                 onClick={() => setStatusFilter(f.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
+                className={`min-h-[36px] px-3.5 py-1.5 rounded-lg font-ps-ui text-xs font-semibold transition-all ${
                   statusFilter === f.id
-                    ? "bg-white text-black"
-                    : "text-white/50 hover:text-white"
+                    ? "bg-[#C9A227] text-[#02050A]"
+                    : "text-[#AAB6C4] hover:text-white"
                 }`}
               >
                 {f.label}
@@ -671,78 +678,129 @@ const AffiliatesManager = () => {
         </div>
 
         {filteredCommissions.length === 0 ? (
-          <div className="py-10 text-center text-white/45 text-sm">
+          <div className="py-10 text-center text-[#94A3B8] text-sm font-ps-ui">
             Nenhuma comissão neste filtro ainda.
           </div>
         ) : (
-          <div className="overflow-x-auto -mx-2 px-2">
-            <table className="w-full text-left border-collapse min-w-[740px]">
-              <thead>
-                <tr className="border-b border-white/10 text-[10px] font-mono uppercase tracking-[0.16em] text-white/45">
-                  <th className="py-3 pr-4">Data</th>
-                  <th className="py-3 pr-4">Afiliado</th>
-                  <th className="py-3 pr-4">Comprador</th>
-                  <th className="py-3 pr-4">Pacote</th>
-                  <th className="py-3 pr-4 text-right">Venda</th>
-                  <th className="py-3 pr-4 text-right">Comissão</th>
-                  <th className="py-3 text-right">Ação / Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.06] text-xs">
-                {filteredCommissions.map((c) => (
-                  <tr key={c.id} className="hover:bg-white/[0.02]">
-                    <td className="py-3.5 pr-4 font-mono text-white/60 whitespace-nowrap">
-                      {new Date(c.created_at).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </td>
-                    <td className="py-3.5 pr-4">
-                      <span className="font-semibold text-white block">{c.affiliate_name}</span>
-                      <span className="font-mono text-[10px] text-[#F5DE98]/80">{c.affiliate_code}</span>
-                    </td>
-                    <td className="py-3.5 pr-4">
-                      <span className="text-white/85 block">{c.buyer_name}</span>
-                      {c.buyer_email && (
-                        <span className="text-[11px] text-white/45">{c.buyer_email}</span>
-                      )}
-                    </td>
-                    <td className="py-3.5 pr-4 text-white/80">{c.package_label}</td>
-                    <td className="py-3.5 pr-4 text-right font-mono text-white/75 whitespace-nowrap">
-                      {formatBrl(c.sale_amount_brl)}
-                    </td>
-                    <td className="py-3.5 pr-4 text-right font-mono font-bold text-[#F5DE98] whitespace-nowrap">
-                      {formatBrl(c.commission_amount_brl)}
-                      <span className="ml-1 text-[10px] font-normal text-white/45">
-                        ({c.commission_rate}%)
-                      </span>
-                    </td>
-                    <td className="py-3.5 text-right whitespace-nowrap">
-                      {c.status === "pending" ? (
-                        <button
-                          type="button"
-                          disabled={busyId === c.id}
-                          onClick={() => handleMarkSinglePaid(c)}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 text-[11px] font-bold inline-flex items-center gap-1"
-                        >
-                          <Clock className="w-3 h-3" /> Marcar Pago
-                        </button>
-                      ) : c.status === "paid" ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-[10px] font-mono font-bold uppercase">
-                          <CheckCircle2 className="w-3 h-3" /> Pago
+          <>
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-3">
+              {filteredCommissions.map((c) => (
+                <div
+                  key={c.id}
+                  className="p-4 rounded-2xl bg-[#040912]/75 border border-white/[0.08] space-y-2.5 font-ps-ui"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-white">
+                        {c.affiliate_name}{" "}
+                        <span className="font-mono text-xs font-normal text-[#E8D59B]">
+                          {formatPartnerIdLabel(c.affiliate_code)}
                         </span>
-                      ) : (
-                        <span className="text-red-300 font-mono text-[10px] uppercase">Cancelado</span>
-                      )}
-                    </td>
+                      </p>
+                      <p className="text-xs text-[#94A3B8] mt-0.5">
+                        {c.package_label} · {c.buyer_name}
+                      </p>
+                    </div>
+                    <span className="text-sm font-bold text-[#F5DE98] tabular-nums">
+                      {formatBrl(c.commission_amount_brl)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+                    <span className="text-xs text-[#94A3B8] tabular-nums">
+                      {new Date(c.created_at).toLocaleDateString("pt-BR")} · Venda{" "}
+                      {formatBrl(c.sale_amount_brl)}
+                    </span>
+                    {c.status === "pending" ? (
+                      <button
+                        type="button"
+                        disabled={busyId === c.id}
+                        onClick={() => handleMarkSinglePaid(c)}
+                        className="min-h-[36px] px-3 py-1.5 rounded-lg bg-[#C9A227] text-[#02050A] text-xs font-bold"
+                      >
+                        Marcar Pago
+                      </button>
+                    ) : (
+                      <span className="text-emerald-300 text-xs font-semibold">Pago</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/10 text-[11px] font-ps-ui uppercase tracking-[0.14em] text-[#94A3B8]">
+                    <th className="py-3 pr-4 font-semibold">Data</th>
+                    <th className="py-3 pr-4 font-semibold">Parceiro</th>
+                    <th className="py-3 pr-4 font-semibold">Comprador</th>
+                    <th className="py-3 pr-4 font-semibold">Pacote</th>
+                    <th className="py-3 pr-4 text-right font-semibold">Venda</th>
+                    <th className="py-3 pr-4 text-right font-semibold">Comissão</th>
+                    <th className="py-3 text-right font-semibold">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-white/[0.06] text-xs font-ps-ui">
+                  {filteredCommissions.map((c) => (
+                    <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3.5 pr-4 text-[#AAB6C4] whitespace-nowrap tabular-nums">
+                        {new Date(c.created_at).toLocaleDateString("pt-BR", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="py-3.5 pr-4">
+                        <span className="font-semibold text-white block">{c.affiliate_name}</span>
+                        <span className="font-mono text-[11px] text-[#E8D59B]">
+                          {formatPartnerIdLabel(c.affiliate_code)}
+                        </span>
+                      </td>
+                      <td className="py-3.5 pr-4">
+                        <span className="text-[#E2E8F0] block">{c.buyer_name}</span>
+                        {c.buyer_email && (
+                          <span className="text-[11px] text-[#94A3B8]">{c.buyer_email}</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 pr-4 text-[#CBD5E1]">{c.package_label}</td>
+                      <td className="py-3.5 pr-4 text-right text-[#CBD5E1] whitespace-nowrap tabular-nums">
+                        {formatBrl(c.sale_amount_brl)}
+                      </td>
+                      <td className="py-3.5 pr-4 text-right font-semibold text-[#F5DE98] whitespace-nowrap tabular-nums">
+                        {formatBrl(c.commission_amount_brl)}
+                        <span className="ml-1 font-normal text-[#94A3B8]">
+                          ({c.commission_rate}%)
+                        </span>
+                      </td>
+                      <td className="py-3.5 text-right whitespace-nowrap">
+                        {c.status === "pending" ? (
+                          <button
+                            type="button"
+                            disabled={busyId === c.id}
+                            onClick={() => handleMarkSinglePaid(c)}
+                            className="min-h-[36px] px-3.5 py-1.5 rounded-lg bg-[#C9A227]/18 hover:bg-[#C9A227]/30 border border-[#C9A227]/45 text-[#F5DE98] text-xs font-semibold inline-flex items-center gap-1.5"
+                          >
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>Marcar Pago</span>
+                          </button>
+                        ) : c.status === "paid" ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/12 border border-emerald-400/30 text-emerald-300 text-xs font-medium">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Pago
+                          </span>
+                        ) : (
+                          <span className="text-red-300 text-xs font-medium">Cancelado</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>

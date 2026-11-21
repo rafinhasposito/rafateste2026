@@ -69,6 +69,16 @@ export function DesktopWebChrome() {
             >
               Como Funciona
             </Link>
+            <Link 
+              to={isAffiliate ? "/afiliado" : "/parceiros"} 
+              className={`text-sm font-ps-ui font-medium transition-colors ${
+                location.pathname === "/parceiros" || location.pathname === "/afiliado"
+                  ? "text-[#F5DE98]"
+                  : "text-white/65 hover:text-white"
+              }`}
+            >
+              Parceiros
+            </Link>
             {session && (
               <Link 
                 to="/history" 
@@ -134,9 +144,9 @@ export function DesktopWebChrome() {
                     <Settings className="w-4 h-4 mr-2 text-[#C9A227]" />
                     Minha Conta
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/afiliado")} className="text-emerald-300 hover:bg-white/5 focus:bg-white/5 focus:text-emerald-200 cursor-pointer">
-                    <Handshake className="w-4 h-4 mr-2 text-emerald-300" />
-                    {isAffiliate ? "Painel de Afiliado" : "Indique e Ganhe 20%"}
+                  <DropdownMenuItem onClick={() => navigate("/afiliado")} className="text-[#F5DE98] hover:bg-white/5 focus:bg-white/5 focus:text-[#F5DE98] cursor-pointer">
+                    <Handshake className="w-4 h-4 mr-2 text-[#C9A227]" />
+                    {isAffiliate ? "Painel de Parceiro" : "Indique e Ganhe 20%"}
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")} className="text-[#F5DE98] font-bold hover:bg-white/5 focus:bg-white/5 cursor-pointer">

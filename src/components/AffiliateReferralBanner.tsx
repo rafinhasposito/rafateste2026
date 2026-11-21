@@ -35,40 +35,42 @@ export const AffiliateReferralBanner = ({
 
   if (variant === "post-purchase") {
     return (
-      <div className="mt-7 w-full max-w-lg mx-auto p-5 rounded-2xl border border-[#C9A227]/35 bg-gradient-to-r from-[#C9A227]/12 via-[#0A1324]/90 to-[#08111F]/90 text-left space-y-3">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#C9A227]/20 border border-[#C9A227]/45 flex items-center justify-center text-[#F5DE98] shrink-0">
+      <div className="mt-7 w-full max-w-lg mx-auto p-5 rounded-2xl border border-[#C9A227]/30 bg-[#07101A]/90 text-left space-y-3.5">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-[#C9A227]/15 border border-[#C9A227]/35 flex items-center justify-center text-[#F5DE98] shrink-0">
             <Gift className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-[#F5DE98] font-bold">
+            <p className="font-ps-ui text-[11px] uppercase tracking-[0.18em] text-[#E8D59B] font-semibold">
               Indique & Ganhe 20% no Pix
             </p>
-            <p className="text-xs sm:text-sm text-white/85 font-ps-ui leading-snug">
-              Indique 5 amigos para o Mapa Completo e receba <strong className="text-[#FFF3D1]">R$ 99,90 de volta no Pix</strong> — 20% em cada compra feita pelo seu link.
+            <p className="font-ps-ui text-sm text-[#CBD5E1] leading-relaxed">
+              Indique 5 amigos para o Mapa Completo e receba{" "}
+              <strong className="text-[#F5DE98] font-semibold">R$ 99,90 de volta no Pix</strong> — 20% em cada compra pelo seu link.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 pt-1">
+        <div className="flex flex-wrap items-center gap-2.5 pt-1">
           {isAffiliate && shareLink ? (
             <>
               <button
                 type="button"
                 onClick={handleCopy}
-                className="min-h-[44px] px-4 py-2 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#050507] text-[11px] font-bold uppercase tracking-[0.14em] inline-flex items-center gap-1.5"
+                className="min-h-[44px] px-4 py-2 rounded-xl bg-[#C9A227] hover:bg-[#D9B643] text-[#02050A] font-ps-ui text-xs font-bold uppercase tracking-[0.14em] inline-flex items-center gap-1.5 transition-colors"
               >
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? "Link Copiado!" : "Copiar Meu Link"}
+                <span>{copied ? "Link Copiado!" : "Copiar Meu Link"}</span>
               </button>
               {whatsappUrl && (
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[44px] px-4 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/35 text-emerald-200 text-[11px] font-bold uppercase tracking-[0.14em] inline-flex items-center gap-1.5"
+                  className="min-h-[44px] px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/15 text-[#F2F4F7] font-ps-ui text-xs font-semibold uppercase tracking-[0.14em] inline-flex items-center gap-1.5 transition-colors"
                 >
-                  <Share2 className="w-3.5 h-3.5" /> WhatsApp
+                  <Share2 className="w-3.5 h-3.5 text-[#E5C158]" />
+                  <span>WhatsApp</span>
                 </a>
               )}
             </>
@@ -76,9 +78,9 @@ export const AffiliateReferralBanner = ({
             <button
               type="button"
               onClick={() => navigate("/afiliado")}
-              className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#C9A227]/20 hover:bg-[#C9A227]/30 border border-[#C9A227]/50 text-[#FFF3D1] text-[11px] font-bold uppercase tracking-[0.14em] inline-flex items-center gap-1.5 transition-all"
+              className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#C9A227]/16 hover:bg-[#C9A227]/26 border border-[#C9A227]/45 text-[#F5DE98] font-ps-ui text-xs font-semibold uppercase tracking-[0.14em] inline-flex items-center gap-1.5 transition-all"
             >
-              <span>Ativar Meu Link Grátis</span>
+              <span>Ativar Meu Cadastro Grátis</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
@@ -87,24 +89,25 @@ export const AffiliateReferralBanner = ({
     );
   }
 
-  // Variant "result": convite elegante no fim da página de resultado
+  // Variant "result": convite harmônico no fim da página de resultado
   return (
     <section className="w-full px-5 sm:px-6 pb-12 relative z-20">
-      <div className="max-w-4xl mx-auto p-6 sm:p-8 rounded-[28px] border border-[#C9A227]/35 bg-gradient-to-br from-[#0E1A32]/90 via-[#081020]/95 to-[#050811]/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
+      <div className="max-w-4xl mx-auto p-6 sm:p-8 rounded-[24px] border border-[#C9A227]/30 bg-gradient-to-b from-[#0E1A30]/92 via-[#07101C]/96 to-[#040912]/98 backdrop-blur-2xl shadow-[0_20px_55px_rgba(0,0,0,0.55)]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#F5DE98] text-[10px] font-mono font-bold uppercase tracking-[0.18em]">
-              <Sparkles className="w-3 h-3" /> Indique Amigos & Ganhe 20% no Pix
+          <div className="space-y-2.5 max-w-xl">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A227]/12 border border-[#C9A227]/35 text-[#F5DE98] text-[11px] font-ps-ui font-semibold uppercase tracking-[0.18em]">
+              <Sparkles className="w-3 h-3 text-[#E5C158]" />
+              Programa de Parceiros • 20% no Pix
             </span>
-            <h3 className="font-ps-display text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug">
+            <h3 className="font-ps-display font-normal text-2xl sm:text-3xl text-white leading-snug">
               {cityName
                 ? `Curtiu descobrir ${cityName}? Ganhe indicando para seus amigos.`
                 : "Curtiu seu Mapa Solar? Ganhe indicando para seus amigos."}
             </h3>
-            <p className="text-xs sm:text-sm text-white/65 font-ps-ui leading-relaxed">
+            <p className="font-ps-ui text-sm text-[#AAB6C4] leading-relaxed">
               {isAffiliate && affiliateCode
-                ? `Seu cadastro de parceiro (${formatPartnerIdLabel(affiliateCode)}) já está ativo. Cada amigo que comprar pelo seu link gera 20% direto para o seu saldo.`
-                : "Ative seu cadastro de parceiro em 10 segundos. O preço para seus amigos continua o mesmo e você ganha 20% em Pix por cada compra."}
+                ? `Seu cadastro (${formatPartnerIdLabel(affiliateCode)}) já está ativo. Cada amigo que comprar pelo seu link gera 20% direto para o seu saldo.`
+                : "Ative seu cadastro de parceiro em 10 segundos. O preço para seus amigos continua o mesmo e você recebe 20% no Pix por cada compra."}
             </p>
           </div>
 
@@ -114,10 +117,10 @@ export const AffiliateReferralBanner = ({
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-[#C9A227] via-[#F5B041] to-[#C9A227] text-[#050507] font-ps-ui text-xs font-extrabold uppercase tracking-[0.14em] inline-flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all"
+                  className="min-h-[48px] px-6 py-3 rounded-xl bg-[#C9A227] hover:bg-[#D9B643] text-[#02050A] font-ps-ui text-xs font-bold uppercase tracking-[0.14em] inline-flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {copied ? "Link Copiado!" : "Copiar Meu Link"}
+                  <span>{copied ? "Link Copiado!" : "Copiar Meu Link"}</span>
                 </button>
                 <div className="flex gap-2">
                   {whatsappUrl && (
@@ -125,15 +128,16 @@ export const AffiliateReferralBanner = ({
                       href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 min-h-[44px] px-4 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/35 text-emerald-200 text-[11px] font-bold uppercase tracking-[0.12em] inline-flex items-center justify-center gap-1.5"
+                      className="flex-1 min-h-[44px] px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/15 text-[#F2F4F7] font-ps-ui text-xs font-semibold uppercase tracking-[0.12em] inline-flex items-center justify-center gap-1.5"
                     >
-                      <Share2 className="w-3.5 h-3.5" /> WhatsApp
+                      <Share2 className="w-3.5 h-3.5 text-[#E5C158]" />
+                      <span>WhatsApp</span>
                     </a>
                   )}
                   <button
                     type="button"
                     onClick={() => navigate("/afiliado")}
-                    className="flex-1 min-h-[44px] px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/85 text-[11px] font-bold uppercase tracking-[0.12em]"
+                    className="flex-1 min-h-[44px] px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/15 text-[#E8D59B] font-ps-ui text-xs font-semibold uppercase tracking-[0.12em]"
                   >
                     Painel
                   </button>
@@ -144,17 +148,17 @@ export const AffiliateReferralBanner = ({
                 <button
                   type="button"
                   onClick={() => navigate("/afiliado")}
-                  className="min-h-[48px] px-6 py-3 rounded-xl bg-gradient-to-r from-[#C9A227] via-[#F5B041] to-[#C9A227] text-[#050507] font-ps-ui text-xs font-extrabold uppercase tracking-[0.14em] inline-flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all"
+                  className="min-h-[48px] px-6 py-3 rounded-xl bg-[#C9A227] hover:bg-[#D9B643] text-[#02050A] font-ps-ui text-xs font-bold uppercase tracking-[0.14em] inline-flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                 >
-                  <span>Ativar Meu Link Grátis</span>
+                  <span>Ativar Meu Cadastro</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate("/parceiros")}
-                  className="min-h-[44px] px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/75 hover:text-white text-[11px] font-semibold uppercase tracking-[0.12em] transition-all"
+                  className="min-h-[44px] px-5 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/15 text-[#CBD5E1] hover:text-white font-ps-ui text-xs font-medium uppercase tracking-[0.12em] transition-all"
                 >
-                  Simular Quanto Posso Ganhar
+                  Simular Ganhos
                 </button>
               </>
             )}

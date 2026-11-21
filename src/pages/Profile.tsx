@@ -192,13 +192,13 @@ const Profile = () => {
 
               <button
                 onClick={() => navigate("/afiliado")}
-                className="w-full py-3 px-3.5 bg-emerald-500/12 hover:bg-emerald-500/20 border border-emerald-400/35 rounded-xl text-emerald-200 font-semibold transition-all text-xs font-ps-ui flex items-center justify-between"
+                className="w-full min-h-[46px] py-3 px-3.5 bg-[#C9A227]/10 hover:bg-[#C9A227]/18 border border-[#C9A227]/30 rounded-xl text-[#F5DE98] font-medium transition-all text-xs font-ps-ui flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
-                  <Handshake className="w-4 h-4 text-emerald-300" />
-                  <span>{isAffiliate ? "Painel de Afiliado" : "Indique e Ganhe 20% (Afiliado)"}</span>
+                  <Handshake className="w-4 h-4 text-[#E5C158]" />
+                  <span>{isAffiliate ? "Painel de Parceiro (Afiliado)" : "Indique & Ganhe 20% no Pix"}</span>
                 </div>
-                <span className="text-emerald-300 text-xs">→</span>
+                <span className="text-[#C9A227] text-xs">→</span>
               </button>
 
               {isAdmin && (
