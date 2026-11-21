@@ -1,17 +1,17 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-18T12:53:00-03:00 — V1 finalizada: 3 vouchers Canva (Mapa Completo, Expansão, Consulta Grátis) alinhados pixel a pixel com QR Code real + código centralizado na caixa, modelo único travado por cupom no Admin e impressão A4 limpa. TSC PASS, 29/29 testes PASS, Build PASS.",
+  "last_verification": "2026-11-21T18:23:00-03:00 — Auditoria completa de páginas/conexões (Frankenstein cleanup) + Sistema de Afiliados (20% padrão, /afiliado, /admin?tab=affiliates, ?ref= 30 dias, cálculo atômico em process_mercadopago_payment). TSC PASS, 40/40 testes PASS, Build PASS, QA Build/Functional/Responsive PASS (0 blockers). Pendente apenas rodar migration SQL 20261121183000_affiliate_system.sql no Supabase SQL Editor.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br) + Render Python API + Supabase Edge Functions",
   "blockers_open": [],
   "blockers_fixed": [
-    "Integração dos 3 vouchers Canva (Mapa Completo, Expansão, Consulta Grátis) com overlay dinâmico de QR Code + código do cupom",
-    "Alinhamento exato de QR Code e código centralizado nos 3 modelos (todos com QR Code real escaneável)",
-    "Seleção única de modelo por cupom no Admin e na impressão A4 (removido seletor múltiplo e botões duplicados)"
+    "Limpeza completa de inconsistências (Frankenstein): cabeçalhos/fundos duplicados, cobrança indevida de 3/7 créditos em cliques de 1 crédito, ano solar vigente (getCurrentSolarYear), preposições de cidade (cityCopy), redirects de auth/returnTo, cálculos de receita no Admin, e banners mobile colidindo com bottom-nav",
+    "Sistema de Afiliados V1: comissão padrão 20% sem alterar preços (R$ 19,90 / R$ 49,90 / R$ 99,90), rastreamento ?ref= por 30 dias, painel /afiliado (LGPD-safe + Pix + WhatsApp) e gestão completa no /admin?tab=affiliates",
+    "Integração atômica e idempotente de comissão no RPC process_mercadopago_payment (ON CONFLICT order_id, proteção anti-autoindicação e trigger anti-tampering em profiles)"
   ],
   "v1_1_backlog": [
-    "Code splitting: reduzir bundle de 3MB (chunk size warning)",
+    "Code splitting: reduzir bundle de 3.1MB (chunk size warning)",
     "Browserslist: atualizar caniuse-lite",
     "Otimizar imagens de voucher (11MB → compressão)"
   ]

@@ -42,7 +42,7 @@ const MetricsDashboard = () => {
         supabase.from("profiles").select("user_id, email, display_name, full_name, created_at"),
         supabase.from("consultations").select("user_id, origin, intent, goal, created_at"),
         supabase.from("credit_transactions").select("user_id, amount, type"),
-        supabase.from("pricing_config").select("key, credits, price_brl"),
+        supabase.from("pricing_config").select("key, category, credits, price_brl"),
       ]);
 
       const profiles = profilesRes.data ?? [];
@@ -57,9 +57,11 @@ const MetricsDashboard = () => {
       const activeIds = new Set(consults.map(c => c.user_id));
       const buyerIds = new Set(txs.filter(t => t.type === "purchase").map(t => t.user_id));
 
-      // Revenue: sum each purchase amount × matching pricing price/credits
+      // Revenue: map ONLY purchase packages (category === "package") so cost_* rows with price_brl=null never overwrite package prices with 0
       const priceByCredits = new Map<number, number>();
-      pricing.forEach(p => priceByCredits.set(Number(p.credits), Number(p.price_brl)));
+      pricing
+        .filter((p: any) => p.category === "package" && p.price_brl != null)
+        .forEach((p: any) => priceByCredits.set(Number(p.credits), Number(p.price_brl)));
       let revenueBrl = 0;
       let creditsSold = 0;
       let creditsSpent = 0;

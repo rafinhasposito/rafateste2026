@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Coins, LogOut, Settings, BookOpen } from "lucide-react";
+import { Coins, LogOut, Settings, BookOpen, Handshake } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsAffiliate } from "@/hooks/useIsAffiliate";
 
 
 export function DesktopWebChrome() {
   const { session, profile } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { isAffiliate } = useIsAffiliate();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -132,6 +134,12 @@ export function DesktopWebChrome() {
                     <Settings className="w-4 h-4 mr-2 text-[#C9A227]" />
                     Minha Conta
                   </DropdownMenuItem>
+                  {(isAffiliate || isAdmin) && (
+                    <DropdownMenuItem onClick={() => navigate("/afiliado")} className="text-emerald-300 hover:bg-white/5 focus:bg-white/5 focus:text-emerald-200 cursor-pointer">
+                      <Handshake className="w-4 h-4 mr-2 text-emerald-300" />
+                      Painel de Afiliado
+                    </DropdownMenuItem>
+                  )}
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")} className="text-[#F5DE98] font-bold hover:bg-white/5 focus:bg-white/5 cursor-pointer">
                       Painel Admin

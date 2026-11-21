@@ -1,10 +1,11 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
+import { captureAffiliateRefFromUrl } from "@/lib/affiliates";
 
 // Shells
 import { ConsumerShell } from "./layouts/ConsumerShell";
@@ -24,6 +25,7 @@ import Credits from "./pages/Credits";
 import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Admin from "./pages/Admin";
+import AffiliateDashboard from "./pages/AffiliateDashboard";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import SolarGameV2 from "./pages/SolarGameV2";
@@ -58,6 +60,14 @@ const AdminShowcase = () => (
 
 const queryClient = new QueryClient();
 
+const AffiliateRefTracker = () => {
+  const location = useLocation();
+  useEffect(() => {
+    captureAffiliateRefFromUrl();
+  }, [location.search]);
+  return null;
+};
+
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const App = () => (
@@ -73,6 +83,7 @@ const App = () => (
             v7_relativeSplatPath: true,
           }}
         >
+          <AffiliateRefTracker />
           <Routes>
             <Route path="/concepts" element={<ConceptsShowcase />} />
             
@@ -82,6 +93,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/history" element={<History />} />
               <Route path="/perfil" element={<Profile />} />
+              <Route path="/afiliado" element={<AffiliateDashboard />} />
               <Route path="/tecnologia" element={<Technology />} />
               <Route path="/app/trailer" element={<HouseTrailerApp />} />
             </Route>

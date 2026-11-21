@@ -10,8 +10,9 @@ import UsersTable from "@/components/admin/UsersTable";
 import TransactionsTable from "@/components/admin/TransactionsTable";
 import MetricsDashboard from "@/components/admin/MetricsDashboard";
 import CouponsManager from "@/components/admin/CouponsManager";
+import AffiliatesManager from "@/components/admin/AffiliatesManager";
 
-type Tab = "metrics" | "pricing" | "coupons" | "users" | "transactions";
+type Tab = "metrics" | "pricing" | "coupons" | "affiliates" | "users" | "transactions";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Admin = () => {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const initialTab = (searchParams.get("tab") as Tab) || "coupons";
   const [tab, setTab] = useState<Tab>(
-    ["metrics", "pricing", "coupons", "users", "transactions"].includes(initialTab)
+    ["metrics", "pricing", "coupons", "affiliates", "users", "transactions"].includes(initialTab)
       ? initialTab
       : "coupons"
   );
@@ -57,6 +58,7 @@ const Admin = () => {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "coupons", label: "Cupons & Mídia Kit" },
+    { id: "affiliates", label: "Afiliados" },
     { id: "pricing", label: "Preços & Custos" },
     { id: "metrics", label: "Métricas" },
     { id: "users", label: "Usuários" },
@@ -70,7 +72,7 @@ const Admin = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <BackButton label="Voltar" to="/" className="mb-6" />
           <h1 className="font-ps-display text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-md">Painel Admin</h1>
-          <p className="text-white/40 text-lg font-light font-ps-ui mb-10 leading-relaxed max-w-2xl">Gerencie preços, cupons de Mídia Kit, usuários e transações da plataforma.</p>
+          <p className="text-white/40 text-lg font-light font-ps-ui mb-10 leading-relaxed max-w-2xl">Gerencie preços, cupons de Mídia Kit, afiliados, usuários e transações da plataforma.</p>
 
           <div className="flex flex-wrap gap-3 mb-12 p-2 bg-black/40 border border-white/10 rounded-3xl w-fit backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.8)]">
             {tabs.map(t => (
@@ -90,6 +92,7 @@ const Admin = () => {
           {tab === "metrics" && <MetricsDashboard />}
           {tab === "pricing" && <PricingEditor />}
           {tab === "coupons" && <CouponsManager />}
+          {tab === "affiliates" && <AffiliatesManager />}
           {tab === "users" && <UsersTable />}
           {tab === "transactions" && <TransactionsTable />}
         </motion.div>

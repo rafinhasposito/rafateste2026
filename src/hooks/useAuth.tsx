@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { syncAffiliateRefForUser } from "@/lib/affiliates";
 import type { User, Session } from "@supabase/supabase-js";
 
 interface Profile {
@@ -75,6 +76,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .eq("user_id", userId)
       .single();
     if (data) setProfile(data);
+
+    // Vincula código de afiliado capturado via ?ref= (first-touch, não bloqueante)
+    void syncAffiliateRefForUser();
   };
 
   const refreshProfile = async () => {

@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Clock, Calendar, ArrowUpRight, CheckCircle2, Loader2, Fingerprint, MapPin, Search, Compass, Scroll, Crown, ChevronRight } from "lucide-react";
-import StarryBackground from "@/components/StarryBackground";
 import { cityDatabase } from "@/data/houses";
 import { BackButton } from "@/components/ui/BackButton";
 import { countUnlockedHouses, type ConsultationUnlockRecord } from "@/lib/consultationUnlocks";
@@ -34,7 +33,7 @@ const intentMap: Record<string, string> = {
 };
 
 export default function History() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [consultations, setConsultations] = useState<ConsultationRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,8 +43,9 @@ export default function History() {
   }, []);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
-      navigate("/auth");
+      navigate("/auth?returnTo=%2Fhistory", { replace: true });
       return;
     }
 
@@ -68,7 +68,7 @@ export default function History() {
     };
 
     fetchHistory();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR", {

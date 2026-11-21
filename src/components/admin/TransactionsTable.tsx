@@ -53,7 +53,7 @@ const TransactionsTable = () => {
         {[
           { id: "all", label: "Todas" },
           { id: "pago", label: "Pagos (R$)" },
-          { id: "gratis", label: "Grátis / Admin" },
+          { id: "gratis", label: "Cupons / Admin" },
           { id: "gastos", label: "Desbloqueios" }
         ].map(t => (
           <button 

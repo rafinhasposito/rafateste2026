@@ -244,11 +244,15 @@ const Auth = () => {
     setBusy(true);
     try {
       if (mode === "signup") {
+        const returnToParam = searchParams.get("returnTo");
+        if (returnToParam && returnToParam.startsWith("/")) {
+          sessionStorage.setItem("ps_auth_return_to", returnToParam);
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth`,
+            emailRedirectTo: `${window.location.origin}/auth${returnToParam ? `?returnTo=${encodeURIComponent(returnToParam)}` : ""}`,
             data: { full_name: name.trim() || email.split("@")[0] },
           },
         });
@@ -408,9 +412,15 @@ const Auth = () => {
                 onClick={() => {
                   setAcceptedTerms(true);
                   localStorage.setItem("pending_terms_acceptance", "true");
+                  const returnToParam = searchParams.get("returnTo") || sessionStorage.getItem("ps_auth_return_to");
+                  if (returnToParam && returnToParam.startsWith("/")) {
+                    sessionStorage.setItem("ps_auth_return_to", returnToParam);
+                  }
                   supabase.auth.signInWithOAuth({
                     provider: "google",
-                    options: { redirectTo: `${window.location.origin}/auth` },
+                    options: {
+                      redirectTo: `${window.location.origin}/auth${returnToParam ? `?returnTo=${encodeURIComponent(returnToParam)}` : ""}`,
+                    },
                   });
                 }}
                 className="w-full py-3.5 px-4 bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] rounded-xl font-ps-ui text-xs font-bold uppercase tracking-[0.14em] flex items-center justify-center gap-2.5 shadow-[0_10px_28px_rgba(201,162,39,0.28)] transition-all"

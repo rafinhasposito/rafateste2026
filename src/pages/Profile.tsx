@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BackButton } from '@/components/ui/BackButton';
 import { motion } from "framer-motion";
-import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft, Compass, Sparkles, Ticket } from "lucide-react";
-import StarryBackground from "@/components/StarryBackground";
+import { User, Calendar, Clock, MapPin, Save, CreditCard, History as HistoryIcon, ArrowLeft, Compass, Sparkles, Ticket, Handshake } from "lucide-react";
 import PageLoader from "@/components/PageLoader";
 
 import CityAutocomplete from "@/components/CityAutocomplete";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsAffiliate } from "@/hooks/useIsAffiliate";
 import { supabase } from "@/integrations/supabase/client";
 import { normalizeBirthTime } from "@/lib/astro";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ interface ConsultRow {
 const Profile = () => {
   const { user, profile, loading, refreshProfile, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { isAffiliate } = useIsAffiliate();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnTo = searchParams.get("returnTo");
@@ -69,14 +70,22 @@ const Profile = () => {
 
   const handleSave = async () => {
     if (!user) return;
+    if (!fullName.trim() || !birthDate || !birthTime || !birthCity.trim()) {
+      toast.error("Preencha nome, data, horário e cidade de nascimento para salvar.");
+      return;
+    }
+    if (!birthCityValid && !birthCity.includes(",")) {
+      toast.error("Selecione sua cidade de nascimento na lista de sugestões.");
+      return;
+    }
     setSaving(true);
     const parts = birthCity.split(",").map(s => s.trim());
     const country = parts.length > 1 ? parts[parts.length - 1] : null;
     const { error } = await supabase.from("profiles").update({
-      full_name: fullName.trim() || null,
-      birth_date: birthDate || null,
-      birth_time: birthTime ? normalizeBirthTime(birthTime) : null,
-      birth_city: birthCity.trim() || null,
+      full_name: fullName.trim(),
+      birth_date: birthDate,
+      birth_time: normalizeBirthTime(birthTime),
+      birth_city: birthCity.trim(),
       birth_country: country,
       birth_lat: birthCoords?.lat ?? null,
       birth_lon: birthCoords?.lon ?? null,
@@ -86,7 +95,7 @@ const Profile = () => {
     if (error) { toast.error(error.message); return; }
     toast.success("Perfil salvo com sucesso.");
     await refreshProfile();
-    if (returnTo) {
+    if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
       navigate(returnTo);
     }
   };
@@ -181,6 +190,19 @@ const Profile = () => {
                 <span className="text-[#C9A227] text-xs">→</span>
               </button>
 
+              {(isAffiliate || isAdmin) && (
+                <button
+                  onClick={() => navigate("/afiliado")}
+                  className="w-full py-3 px-3.5 bg-emerald-500/12 hover:bg-emerald-500/20 border border-emerald-400/35 rounded-xl text-emerald-200 font-semibold transition-all text-xs font-ps-ui flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Handshake className="w-4 h-4 text-emerald-300" />
+                    <span>Painel de Afiliado</span>
+                  </div>
+                  <span className="text-emerald-300 text-xs">→</span>
+                </button>
+              )}
+
               {isAdmin && (
                 <button
                   onClick={() => navigate("/admin?tab=coupons")}
@@ -188,7 +210,7 @@ const Profile = () => {
                 >
                   <div className="flex items-center gap-2.5">
                     <Ticket className="w-4 h-4 text-[#F5DE98]" />
-                    <span>Painel Admin • Cupons & Mídia Kit</span>
+                    <span>Painel Admin • Cupons & Afiliados</span>
                   </div>
                   <span className="text-[#F5DE98] text-xs">→</span>
                 </button>

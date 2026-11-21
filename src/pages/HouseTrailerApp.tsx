@@ -14,26 +14,24 @@ import {
   type ConsultationUnlockTier,
 } from "@/lib/consultationUnlocks";
 import { cityDatabase } from "@/data/houses";
+import { FOCUS_MATRIX } from "@/data/focusMatrix";
+import { interpolateCityCopy } from "@/lib/cityCopy";
 import { toast } from "sonner";
 import { houseThemes } from "@/data/houseThemes";
 import ScanningOverlay from "@/components/ScanningOverlay";
 
-const P = {
-  name: "Rafael",
-  house: 11,
-  year: 2026,
-  gender: "M", // Mock data simulating user's gender
-};
+const DEFAULT_TRAILER_HOUSE = 11;
+const DEFAULT_TRAILER_GENDER = "M";
 
 const LIFE_AREAS = [
-  { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", teaser: "A escolha perfeita para quem quer viver um romance leve e sem cobranças. Favorece encontros que nascem naturalmente da amizade, da convivência em grupo e de sonhos em comum." },
-  { id: "trabalho", icon: Briefcase, label: "Trabalho e Carreira", color: "#10b981", teaser: "Desenhado sob medida para quem busca crescer sem precisar fazer tudo sozinho. O terreno é fértil para impulsionar seus projetos através de alianças e apoios do seu mercado." },
-  { id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#f59e0b", teaser: "A rota certa para quem precisa faturar aproveitando conexões e novos públicos. A energia estimula oportunidades financeiras que tendem a fluir por indicações e projetos colaborativos." },
-  { id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", teaser: "Recomendado para quem quer renovar a disposição física de forma motivadora. Convida você a criar constância em novos ambientes, esportes ao ar livre e atividades coletivas." },
-  { id: "networking", icon: Users, label: "Networking e Conexões", color: "#3b82f6", teaser: "O caminho ideal para abrir portas em círculos seletos e ativos. Facilita o acesso a mentores e aliados que apoiam e recomendam genuinamente suas ideias." },
-  { id: "rotina", icon: Calendar, label: "Rotina e Produtividade", color: "#a855f7", teaser: "Excelente para quem quer organizar o cotidiano com leveza e colaboração. Ajuda a otimizar o dia a dia dividindo tarefas, usando tecnologia e contando com o suporte de equipe." },
-  { id: "espiritual", icon: Sparkles, label: "Espiritual e Propósito", color: "#818cf8", teaser: "Para você que busca dar um significado maior aos seus projetos. Tende a despertar uma realização profunda ao colocar seus talentos a serviço de uma causa ou ecossistema." },
-  { id: "identidade", icon: Crown, label: "Identidade e Imagem", color: "#c9a227", teaser: "A estratégia certa se você quer ganhar destaque, relevância e simpatia pública. Ativa uma presença acolhedora e inspiradora que encoraja você a se posicionar como referência na sua tribo." },
+  { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", teaser: "Ative o melhor alinhamento para viver conexões afetivas mais verdadeiras e leves neste novo ciclo." },
+  { id: "trabalho", icon: Briefcase, label: "Trabalho e Carreira", color: "#10b981", teaser: "Direcione a energia do seu ano para ganhar tração profissional, autoridade e novos resultados." },
+  { id: "dinheiro", icon: DollarSign, label: "Dinheiro e Recursos", color: "#f59e0b", teaser: "Fortaleça sua relação com ganhos, precificação e novas oportunidades financeiras nos próximos 12 meses." },
+  { id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", teaser: "Renove sua disposição física, equilíbrio emocional e constância no cuidado com o próprio corpo." },
+  { id: "networking", icon: Users, label: "Networking e Conexões", color: "#3b82f6", teaser: "Aproxime pessoas estratégicas, mentores e alianças capazes de abrir novas portas no seu caminho." },
+  { id: "rotina", icon: Calendar, label: "Rotina e Produtividade", color: "#a855f7", teaser: "Organize seu tempo e sua energia diária para produzir com mais clareza, foco e leveza." },
+  { id: "espiritual", icon: Sparkles, label: "Espiritual e Propósito", color: "#818cf8", teaser: "Aprofunde sua clareza de propósito, intuição e sentido real por trás das escolhas do ano." },
+  { id: "identidade", icon: Crown, label: "Identidade e Imagem", color: "#c9a227", teaser: "Fortaleça seu posicionamento pessoal, autoconfiança e a forma como o mundo percebe o seu valor." },
 ];
 
 // Matriz de Afinidade Astrológica: Define o Match % de cada Foco baseado na Casa
@@ -61,8 +59,8 @@ export default function HouseTrailerApp() {
   const [isPanelHovered, setIsPanelHovered] = useState(false);
   const [selectedIntention, setSelectedIntention] = useState<string | null>(null);
   const [currentHouse, setCurrentHouse] = useState(() => {
-    const parsed = urlHouse ? parseInt(urlHouse, 10) : P.house;
-    return Number.isFinite(parsed) && parsed >= 1 && parsed <= 12 ? parsed : P.house;
+    const parsed = urlHouse ? parseInt(urlHouse, 10) : DEFAULT_TRAILER_HOUSE;
+    return Number.isFinite(parsed) && parsed >= 1 && parsed <= 12 ? parsed : DEFAULT_TRAILER_HOUSE;
   });
 
   useEffect(() => {
@@ -210,7 +208,7 @@ export default function HouseTrailerApp() {
           year: year.toString(),
           mode,
           goal: target,
-          intent: selectedIntention || houseIntent,
+          intent: activeIntentionId || houseIntent,
           result: resultPayload,
         });
 
@@ -256,7 +254,7 @@ export default function HouseTrailerApp() {
           year: year.toString(),
           mode,
           goal: target,
-          intent: selectedIntention || houseIntent,
+          intent: activeIntentionId || houseIntent,
           houses_unlocked: tier === "full_map" ? 12 : 1,
           unlocked_houses: tier === "full_map" ? ALL_TWELVE_HOUSES : [target],
           result: resultPayload,
@@ -279,13 +277,25 @@ export default function HouseTrailerApp() {
       setIsProcessing(false);
     }
   };
+  const activeMode = ((searchParams.get('mode') || sessionStorage.getItem('ps_natal_mode') || 'futuro') as "futuro" | "passado" | "presente");
+  const activeYearDisplay = searchParams.get('year') || sessionStorage.getItem('ps_natal_year') || undefined;
+
   const theme = houseThemes[currentHouse] || houseThemes[11];
-  
-  // Ordena as áreas de vida pelo Match % baseado na casa atual
-  const sortedAreas = [...LIFE_AREAS].map(area => ({
-    ...area,
-    score: AFFINITY_MATRIX[currentHouse]?.[area.id] || 50
-  })).sort((a, b) => b.score - a.score);
+
+  // Constrói os 8 Focos com os textos e scores REAIS da Casa selecionada (FOCUS_MATRIX)
+  const houseFocusMap = FOCUS_MATRIX[currentHouse] || {};
+  const sortedAreas = [...LIFE_AREAS].map(area => {
+    const matrixEntry = houseFocusMap[area.id];
+    const houseTeaser = matrixEntry?.headline
+      ? interpolateCityCopy(matrixEntry.headline, null)
+      : area.teaser;
+    const score = matrixEntry?.match || AFFINITY_MATRIX[currentHouse]?.[area.id] || 50;
+    return {
+      ...area,
+      teaser: houseTeaser,
+      score,
+    };
+  }).sort((a, b) => b.score - a.score);
 
   // Garante que o foco de maior afinidade já venha pré-selecionado para exibir a barra de ação imediatamente
   const activeIntentionId = selectedIntention || sortedAreas[0]?.id || "identidade";
@@ -301,19 +311,19 @@ export default function HouseTrailerApp() {
   const heroGradient = `linear-gradient(to bottom, transparent, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.8)) 60%, ${bgBase} 100%)`;
 
   return (
-    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-36 relative transition-colors duration-1000 pt-16 md:pt-20" style={{ backgroundColor: bgBase }}>
+    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-48 relative transition-colors duration-1000" style={{ backgroundColor: bgBase }}>
 
-      {/* TOP BAR COM BOTÃO VOLTAR */}
-      <div className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-3.5 backdrop-blur-xl border-b border-white/[0.08] flex items-center justify-between" style={{ backgroundColor: navBg }}>
+      {/* SUB-BARRA INLINE (ABAIXO DO HEADER DO CONSUMERSHELL — SEM SOBREPOSIÇÃO) */}
+      <div className="relative z-30 max-w-6xl mx-auto px-4 md:px-8 pt-16 lg:pt-6 pb-2 flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-xs font-semibold uppercase tracking-[0.16em] text-white/90 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-xs font-semibold uppercase tracking-[0.16em] text-white/90 transition-all backdrop-blur-xl"
         >
           <ChevronLeft className="w-4 h-4" />
           Voltar
         </button>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70 truncate text-right">
           Casa {String(currentHouse).padStart(2, "0")} • {theme.subtitle}
         </span>
       </div>
@@ -437,7 +447,7 @@ export default function HouseTrailerApp() {
                 <div className="relative z-20 w-32 h-32 mb-4">
                   <div className="absolute inset-0 rounded-full blur-[20px] transition-colors duration-300" style={{ backgroundColor: `${theme.themeColor}0d` }} />
                   <img 
-                    src={`/memojis/${P.gender === 'M' ? avatarM : avatarF}`} 
+                    src={`/memojis/${DEFAULT_TRAILER_GENDER === 'M' ? avatarM : avatarF}`} 
                     alt={`Persona`} 
                     className="w-full h-full object-contain drop-shadow-xl transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-2 relative z-10"
                   />
@@ -795,7 +805,7 @@ export default function HouseTrailerApp() {
         })()}
       </AnimatePresence>
 
-      <ScanningOverlay visible={isProcessing} mode="futuro" />
+      <ScanningOverlay visible={isProcessing} mode={activeMode} year={activeYearDisplay} />
     </div>
   );
 }

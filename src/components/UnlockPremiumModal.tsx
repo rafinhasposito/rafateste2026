@@ -17,7 +17,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (id: string, type: 'single' | 'full') => void;
-  onBuyCredits?: (requiredCredits?: number) => void;
+  onBuyCredits?: (requiredCredits?: number, purchaseType?: 'single' | 'full') => void;
   targetArea?: UnlockTargetArea | null;
   isEmbedded?: boolean;
   userCredits?: number;
@@ -102,7 +102,7 @@ export default function UnlockPremiumModal({
     if (!hasEnoughCredits(cost)) {
       onClose();
       if (onBuyCredits) {
-        onBuyCredits(cost);
+        onBuyCredits(cost, purchaseType);
       } else {
         toast.error(`Você precisa de ${formatCreditsLabel(cost)} para este desbloqueio.`);
       }

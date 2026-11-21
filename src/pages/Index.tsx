@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Crown, Scroll, Hourglass, Sun, Compass, ChevronLeft, ChevronRight, User, Edit2, Sparkles } from "lucide-react";
-import StarryBackground from "@/components/StarryBackground";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import CityLookup from "@/components/CityLookup";
@@ -12,7 +11,7 @@ import { TemporalSelection } from "@/components/TemporalSelection";
 
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
-import { detectUserLocation, getNextBirthdayYear, normalizeBirthTime } from "@/lib/astro";
+import { detectUserLocation, getCurrentSolarYear, getNextBirthdayYear, normalizeBirthTime } from "@/lib/astro";
 import { getSunSignFromDate } from "./Auth";
 
 type Mode = "futuro" | "passado" | "presente";
@@ -176,15 +175,23 @@ const Index = () => {
     }
 
     if (targetMode && ["passado", "presente", "futuro"].includes(targetMode)) {
-      if (user && !loading && !isNatalProfileComplete(profile)) {
-         const ret = targetPath ? `/?mode=${targetMode}&path=${targetPath}` : `/?mode=${targetMode}`;
-         navigate(`/perfil?returnTo=${encodeURIComponent(ret)}`);
-         return;
+      if (loading) return;
+      const ret = targetPath ? `/?mode=${targetMode}&path=${targetPath}` : `/?mode=${targetMode}`;
+      if (!user) {
+        sessionStorage.setItem("ps_pending_mode", targetMode);
+        navigate(`/auth?returnTo=${encodeURIComponent(ret)}`, { replace: true });
+        return;
+      }
+      if (!isNatalProfileComplete(profile)) {
+        navigate(`/perfil?returnTo=${encodeURIComponent(ret)}`);
+        return;
       }
       setMode(targetMode);
-      if (targetMode === "presente") setYear(currentYear);
-      else if (targetMode === "passado") setYear(String(Number(currentYear) - 1));
-      else setYear(getNextBirthdayYear(profile?.birth_date || birthdate));
+      const activeBirthDate = profile?.birth_date || birthdate;
+      const currentSolar = getCurrentSolarYear(activeBirthDate);
+      if (targetMode === "presente") setYear(currentSolar);
+      else if (targetMode === "passado") setYear(String(Number(currentSolar) - 1));
+      else setYear(getNextBirthdayYear(activeBirthDate));
       
       if (targetPath && ["cidade", "casa", "intencao"].includes(targetPath)) {
         setSearchPath(targetPath);
@@ -250,9 +257,11 @@ const Index = () => {
     // 4. Tudo OK → ir direto para o formulário
     setMode(m);
     setSearchPath(null);
-    if (m === "presente") setYear(currentYear);
-    else if (m === "passado") setYear(String(Number(currentYear) - 1));
-    else setYear(getNextBirthdayYear(profile?.birth_date || birthdate));
+    const activeBirthDate = profile?.birth_date || birthdate;
+    const currentSolar = getCurrentSolarYear(activeBirthDate);
+    if (m === "presente") setYear(currentSolar);
+    else if (m === "passado") setYear(String(Number(currentSolar) - 1));
+    else setYear(getNextBirthdayYear(activeBirthDate));
     setStep(2);
   };
 

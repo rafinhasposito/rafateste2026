@@ -37,7 +37,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { action, pricing_config_id, payment_id, order_id, card_data } = body;
+    const { action, pricing_config_id, payment_id, order_id, card_data, affiliate_code } = body;
 
     const rawToken = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') || '';
     const mpAccessToken = rawToken.trim().replace(/^["']|["']$/g, '');
@@ -161,17 +161,67 @@ serve(async (req) => {
     }
 
     if (!order) {
-      const { data: newOrder, error: orderError } = await supabaseAdmin
+      // Resolve affiliate_id opcional (código ?ref= ou perfil já indicado), sem jamais bloquear a compra
+      let resolvedAffiliateId: string | null = null;
+      try {
+        const cleanRef = typeof affiliate_code === 'string'
+          ? affiliate_code.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '')
+          : '';
+        if (cleanRef.length >= 3) {
+          const { data: affRow } = await supabaseAdmin
+            .from('affiliates')
+            .select('id, user_id, email, active')
+            .ilike('code', cleanRef)
+            .eq('active', true)
+            .maybeSingle();
+          const isSelf = affRow && (
+            affRow.user_id === user.id ||
+            (affRow.email && user.email && affRow.email.toLowerCase() === user.email.toLowerCase())
+          );
+          if (affRow?.id && !isSelf) {
+            resolvedAffiliateId = affRow.id;
+          }
+        }
+        if (!resolvedAffiliateId) {
+          const { data: profRow } = await supabaseAdmin
+            .from('profiles')
+            .select('referred_by_affiliate_id')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          if (profRow?.referred_by_affiliate_id) {
+            resolvedAffiliateId = profRow.referred_by_affiliate_id;
+          }
+        }
+      } catch {
+        // Ignora se migration de afiliados ainda não foi aplicada
+      }
+
+      const orderPayload: Record<string, any> = {
+        user_id: user.id,
+        pricing_config_id: pricingConfig.key,
+        amount: unitPrice,
+        credits_amount: pricingConfig.credits,
+        status: 'pending',
+        ...(resolvedAffiliateId ? { affiliate_id: resolvedAffiliateId } : {})
+      };
+
+      let { data: newOrder, error: orderError } = await supabaseAdmin
         .from('credit_orders')
-        .insert({
-          user_id: user.id,
-          pricing_config_id: pricingConfig.key,
-          amount: unitPrice,
-          credits_amount: pricingConfig.credits,
-          status: 'pending'
-        })
+        .insert(orderPayload)
         .select()
         .single();
+
+      // Fallback seguro caso a coluna affiliate_id ainda não exista no banco remoto
+      if (orderError && resolvedAffiliateId && String(orderError.message || '').includes('affiliate_id')) {
+        delete orderPayload.affiliate_id;
+        const retry = await supabaseAdmin
+          .from('credit_orders')
+          .insert(orderPayload)
+          .select()
+          .single();
+        newOrder = retry.data;
+        orderError = retry.error;
+      }
 
       if (orderError || !newOrder) {
         throw new Error(`Erro ao criar pedido: ${orderError?.message}`);

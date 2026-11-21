@@ -16,8 +16,6 @@ import {
   getTierRequiredCredits,
   type ConsultationUnlockTier,
 } from "@/lib/consultationUnlocks";
-import DestinyResults from "@/components/DestinyResults";
-import { PremiumButton } from "@/components/shell";
 
 interface CityLookupProps {
   mode: string;

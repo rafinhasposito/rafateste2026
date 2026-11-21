@@ -28,12 +28,9 @@ import { chargeConsultation } from "@/lib/credits";
 import { saveConsultation, chargeAndSaveConsultationV1, enrichResultForTier } from "@/lib/consultations";
 import {
   ALL_TWELVE_HOUSES,
-  detectDefaultConsultationTier,
   getTierRequiredCredits,
   type ConsultationUnlockTier,
 } from "@/lib/consultationUnlocks";
-import DestinyResults from "@/components/DestinyResults";
-import { PremiumButton } from "@/components/shell";
 
 interface IntentLookupProps {
   mode: string;
@@ -124,8 +121,7 @@ const IntentLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHo
     }
 
     const userCredits = profile?.credits ?? 0;
-    const defaultTier = detectDefaultConsultationTier(userCredits);
-    const tier: ConsultationUnlockTier = unlockFullMap ? "full_map" : defaultTier;
+    const tier: ConsultationUnlockTier = unlockFullMap ? "full_map" : "single";
     const requiredCredits = getTierRequiredCredits(tier);
     if (!isAdmin && userCredits < requiredCredits) {
       if (unlockFullMap) {

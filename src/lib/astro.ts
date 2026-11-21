@@ -26,6 +26,30 @@ export function getNextBirthdayYear(birthDateStr?: string | null): string {
 }
 
 /**
+ * Calcula o ano do ciclo solar ATUAL (último aniversário já ocorrido).
+ * Se o aniversário deste ano ainda não chegou, o ciclo vigente começou no aniversário do ano passado.
+ */
+export function getCurrentSolarYear(birthDateStr?: string | null): string {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  if (birthDateStr && /^\d{4}-\d{2}-\d{2}/.test(birthDateStr)) {
+    const parts = birthDateStr.split("-");
+    const birthMonth = parseInt(parts[1], 10);
+    const birthDay = parseInt(parts[2], 10);
+    const curMonth = now.getMonth() + 1;
+    const curDay = now.getDate();
+
+    if (curMonth < birthMonth || (curMonth === birthMonth && curDay < birthDay)) {
+      return String(currentYear - 1);
+    }
+    return String(currentYear);
+  }
+
+  return String(currentYear);
+}
+
+/**
  * Normaliza horários "00:00" ou "00:00:00" para "00:01" para evitar bloqueios em nascimentos à meia-noite.
  */
 export function normalizeBirthTime(timeStr?: string | null): string {

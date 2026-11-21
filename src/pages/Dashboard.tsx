@@ -42,9 +42,8 @@ class RootErrorBoundary extends React.Component<
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Calendar, Clock, MapPin, Compass, Crown, Scroll } from "lucide-react";
+import { Calendar, Clock, MapPin, Compass, Crown, Scroll, X } from "lucide-react";
 import { toast } from "sonner";
-import StarryBackground from "@/components/StarryBackground";
 
 import DestinyResults from "@/pages/AppleResultPreviewV3";
 import PageLoader from "@/components/PageLoader";
@@ -129,7 +128,7 @@ function inferSearchType(c: { origin: string | null; intent: string | null }): {
 }
 
 const Dashboard = () => {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, loading: authLoading, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { getCost } = usePricing();
   const costFocus = getCost("cost_focus", 1);
@@ -147,6 +146,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [unlocking, setUnlocking] = useState(false);
   const [autoUnlockDone, setAutoUnlockDone] = useState(false);
+  const [dismissedPassBanner, setDismissedPassBanner] = useState(false);
 
 
   useEffect(() => {
@@ -154,8 +154,14 @@ const Dashboard = () => {
   }, [consultationId]);
 
   useEffect(() => {
-    if (!user) return;
+    if (authLoading) return;
+    if (!user) {
+      const target = consultationId ? `/dashboard?id=${encodeURIComponent(consultationId)}` : "/dashboard";
+      navigate(`/auth?returnTo=${encodeURIComponent(target)}`, { replace: true });
+      return;
+    }
     const fetchData = async () => {
+      setLoading(true);
       let query = supabase
         .from("consultations")
         .select("*")
@@ -173,11 +179,13 @@ const Dashboard = () => {
       const { data } = await query;
       if (data && data.length > 0) {
         setConsultation(data[0] as unknown as ConsultationRow);
+      } else {
+        setConsultation(null);
       }
       setLoading(false);
     };
     fetchData();
-  }, [user, consultationId]);
+  }, [user, authLoading, consultationId, navigate]);
 
   // Auto-select goal house or first unlocked
   useEffect(() => {
@@ -513,23 +521,20 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [consultation?.id, profile?.credits, unlockParam, autoUnlockDone]);
 
-  if (loading) {
+  if (authLoading || loading) {
     return <PageLoader label="Carregando mapa estelar..." />;
   }
 
   if (!consultation) {
     return (
-      <>
-        <StarryBackground />
-        <div className="min-h-dvh flex items-center justify-center">
-          <EmptyState
-            icon={Compass}
-            title="Nenhuma consulta encontrada"
-            description="Calcule sua primeira rota estelar para ver o dashboard."
-            action={{ label: "Calcular Rota", onClick: () => navigate("/") }}
-          />
-        </div>
-      </>
+      <div className="min-h-dvh flex items-center justify-center relative z-10">
+        <EmptyState
+          icon={Compass}
+          title="Nenhuma consulta encontrada"
+          description="Calcule sua primeira rota estelar para ver o dashboard."
+          action={{ label: "Calcular Rota", onClick: () => navigate("/") }}
+        />
+      </div>
     );
   }
 
@@ -579,14 +584,14 @@ const Dashboard = () => {
     const effectiveFocusCap = !isHouseLocked(selectedHouse) ? Math.min(costAllFocuses, 2) : costAllFocuses;
     const smartAllFocusesCost = computeAllFocusesCost(lockedFocusCount, costFocus, effectiveFocusCap);
 
-    const canApplyFullMapPass = actualUnlockedCount < 12 && credits >= remainingFullMapCost;
-    const canApplyExpansaoPass = !canApplyFullMapPass && lockedFocusCount > 0 && credits >= smartAllFocusesCost && smartAllFocusesCost >= 2;
+    const canApplyFullMapPass = !isAdmin && actualUnlockedCount < 12 && credits >= remainingFullMapCost;
+    const canApplyExpansaoPass = !isAdmin && !canApplyFullMapPass && lockedFocusCount > 0 && credits >= smartAllFocusesCost && smartAllFocusesCost >= 2;
 
     return (
       <>
-        {(canApplyFullMapPass || canApplyExpansaoPass) && (
-          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] w-[calc(100%-2rem)] max-w-xl pointer-events-auto">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-[#071122]/95 border border-[#C9A227]/60 backdrop-blur-xl shadow-[0_16px_45px_rgba(0,0,0,0.75)]">
+        {!dismissedPassBanner && (canApplyFullMapPass || canApplyExpansaoPass) && (
+          <div className="fixed bottom-[84px] lg:bottom-6 left-1/2 -translate-x-1/2 z-[45] w-[calc(100%-2rem)] max-w-xl pointer-events-auto">
+            <div className="relative flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3.5 pr-10 sm:pr-4 rounded-2xl bg-[#071122]/95 border border-[#C9A227]/60 backdrop-blur-xl shadow-[0_16px_45px_rgba(0,0,0,0.75)]">
               <div className="flex items-center gap-3 text-left">
                 <div className="w-9 h-9 rounded-xl bg-[#C9A227]/20 border border-[#C9A227]/40 flex items-center justify-center shrink-0">
                   <Crown className="w-4 h-4 text-[#F5DE98]" />
@@ -602,22 +607,33 @@ const Dashboard = () => {
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                disabled={unlocking}
-                onClick={() =>
-                  canApplyFullMapPass
-                    ? handleUnlock(0)
-                    : handleUnlockAllFocuses(FOCUS_AREA_METADATA.map((f) => f.id), selectedHouse)
-                }
-                className="w-full sm:w-auto shrink-0 px-4 py-2.5 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-[11px] uppercase tracking-[0.16em] transition-all active:scale-95"
-              >
-                {unlocking ? "Liberando..." : "Ativar Agora"}
-              </button>
+              <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                <button
+                  type="button"
+                  disabled={unlocking}
+                  onClick={() =>
+                    canApplyFullMapPass
+                      ? handleUnlock(0)
+                      : handleUnlockAllFocuses(FOCUS_AREA_METADATA.map((f) => f.id), selectedHouse)
+                  }
+                  className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-[11px] uppercase tracking-[0.16em] transition-all active:scale-95"
+                >
+                  {unlocking ? "Liberando..." : "Ativar Agora"}
+                </button>
+                <button
+                  type="button"
+                  aria-label="Fechar aviso de passe"
+                  onClick={() => setDismissedPassBanner(true)}
+                  className="absolute top-2 right-2 sm:static w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         )}
         <DestinyResults
+          hideShellChrome={true}
           birthDate={consultation.birthdate}
           birthTime={(consultation as any).birthtime}
           userName={consultation.name || profile?.display_name || undefined}
@@ -665,10 +681,7 @@ const Dashboard = () => {
   }
 
   return (
-    <>
-      <StarryBackground />
-
-      <div className="min-h-[100dvh] px-4 py-8 max-w-7xl mx-auto relative z-10">
+    <div className="min-h-[100dvh] px-4 py-8 max-w-7xl mx-auto relative z-10">
         {/* Top Bar */}
         <div className="flex items-center justify-between mb-8">
           <button onClick={() => navigate("/")} className="text-muted-foreground text-xs uppercase tracking-widest hover:text-primary transition-colors">
@@ -776,8 +789,6 @@ const Dashboard = () => {
 
 
       </div>
-    </>
-
   );
 };
 

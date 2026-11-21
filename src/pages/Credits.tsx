@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Lock,
   Map,
@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { usePricing, type PricingItem } from "@/hooks/usePricing";
 import { redeemCouponCode } from "@/lib/coupons";
+import { getStoredAffiliateRef, syncAffiliateRefForUser } from "@/lib/affiliates";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -90,10 +91,12 @@ function getPackageChecklist(credits: number): {
 }
 
 const Credits = () => {
-  const { user, profile, session, refreshProfile } = useAuth();
+  const { user, profile, session, loading: authLoading, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { packages, costs, loading, getCost } = usePricing();
+  const isRedeemRoute = location.pathname === "/resgatar" || Boolean(searchParams.get("code") || searchParams.get("redeem"));
 
   const initialCoupon = (searchParams.get("code") || searchParams.get("redeem") || "").toUpperCase();
   const [couponCode, setCouponCode] = useState(initialCoupon);
@@ -130,22 +133,22 @@ const Credits = () => {
       refreshProfile();
       const t1 = setTimeout(refreshProfile, 2000);
       const t2 = setTimeout(refreshProfile, 5000);
-      window.history.replaceState({}, document.title, "/credits");
+      navigate("/credits", { replace: true });
       return () => {
         clearTimeout(t1);
         clearTimeout(t2);
       };
     } else if (isFailure) {
       toast.error("O pagamento foi recusado ou cancelado.");
-      window.history.replaceState({}, document.title, "/credits");
+      navigate("/credits", { replace: true });
     } else if (isPending) {
       toast.info("Pagamento pendente. Os créditos serão liberados assim que compensado.");
       refreshProfile();
       const t = setTimeout(refreshProfile, 4000);
-      window.history.replaceState({}, document.title, "/credits");
+      navigate("/credits", { replace: true });
       return () => clearTimeout(t);
     }
-  }, [searchParams, refreshProfile]);
+  }, [searchParams, refreshProfile, navigate]);
 
   const resolveAccessToken = useCallback(async (): Promise<string | null> => {
     let accessToken: string | null = session?.access_token || null;
@@ -217,8 +220,15 @@ const Credits = () => {
         return;
       }
 
+      await syncAffiliateRefForUser();
+      const affiliateCode = getStoredAffiliateRef();
+
       const { data, error } = await supabase.functions.invoke("create-mercadopago-checkout", {
-        body: { action: "create_pix", pricing_config_id: pkg.key },
+        body: {
+          action: "create_pix",
+          pricing_config_id: pkg.key,
+          ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
+        },
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
@@ -245,7 +255,7 @@ const Credits = () => {
   };
 
   const handleSelectPackage = (pkg: PricingItem) => {
-    if (!profile) {
+    if (!user) {
       toast.error("Você precisa estar logado para adquirir créditos.");
       const authTarget = safeReturnTo
         ? `/auth?returnTo=${encodeURIComponent(`/credits?pkg=${pkg.key}&returnTo=${encodeURIComponent(safeReturnTo)}`)}`
@@ -286,7 +296,7 @@ const Credits = () => {
 
   // Auto-seleciona o pacote solicitado via ?pkg= (full, 3/focuses, 1/single ou key exata)
   useEffect(() => {
-    if (loading || selectedPkg || !profile || packages.length === 0) return;
+    if (authLoading || loading || selectedPkg || !user || packages.length === 0) return;
     const requestedPkg = searchParams.get("pkg");
     if (!requestedPkg) return;
 
@@ -305,7 +315,7 @@ const Credits = () => {
       handleSelectPackage(targetPkg);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, packages.length, profile, searchParams]);
+  }, [authLoading, loading, packages.length, user, searchParams]);
 
   // Polling automático a cada 3.5s enquanto o Pix estiver na tela
   useEffect(() => {
@@ -433,6 +443,9 @@ const Credits = () => {
                   const accessToken = await resolveAccessToken();
                   if (!accessToken) throw new Error("Sessão expirada.");
 
+                  await syncAffiliateRefForUser();
+                  const affiliateCode = getStoredAffiliateRef();
+
                   const { data, error } = await supabase.functions.invoke(
                     "create-mercadopago-checkout",
                     {
@@ -441,6 +454,7 @@ const Credits = () => {
                         pricing_config_id: selectedPkg.key,
                         order_id: currentOrderIdRef.current,
                         card_data: cardFormData,
+                        ...(affiliateCode ? { affiliate_code: affiliateCode } : {}),
                       },
                       headers: { Authorization: `Bearer ${accessToken}` },
                     }
@@ -641,7 +655,13 @@ const Credits = () => {
                     Pagamento Confirmado!
                   </h3>
                   <p className="text-white/75 text-base max-w-md leading-relaxed">
-                    Seus <strong className="text-[#F5DE98]">{selectedPkg.credits} créditos</strong> já foram adicionados ao seu saldo.
+                    {selectedPkg.credits >= 6 ? (
+                      <>Seu <strong className="text-[#F5DE98]">Passe Mapa Completo</strong> ({selectedPkg.credits} créditos) já está ativo na sua conta.</>
+                    ) : selectedPkg.credits >= 3 ? (
+                      <>Seu <strong className="text-[#F5DE98]">Passe Expansão</strong> ({selectedPkg.credits} créditos) já está ativo na sua conta.</>
+                    ) : (
+                      <>Seu <strong className="text-[#F5DE98]">{selectedPkg.credits} crédito</strong> já foi adicionado ao seu saldo.</>
+                    )}
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
                     {safeReturnTo ? (
@@ -831,14 +851,25 @@ const Credits = () => {
         className="text-center mb-12"
       >
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A227]/35 bg-[#C9A227]/10 text-[#F5DE98] text-[10px] uppercase tracking-[0.24em] font-semibold mb-4">
-          <Sparkles className="w-3.5 h-3.5 text-[#E5C158]" />
-          Passaporte de Coordenadas
+          {isRedeemRoute ? (
+            <>
+              <Ticket className="w-3.5 h-3.5 text-[#E5C158]" />
+              Resgate de Presente • Mídia Kit
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-3.5 h-3.5 text-[#E5C158]" />
+              Passaporte de Coordenadas
+            </>
+          )}
         </span>
         <h1 className="font-ps-display text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight leading-tight">
-          Escolha Seu Passe Solar
+          {isRedeemRoute ? "Ative Seu Convite Solar" : "Escolha Seu Passe Solar"}
         </h1>
         <p className="text-white/60 text-sm sm:text-base font-light font-ps-ui max-w-xl mx-auto">
-          1 crédito libera 1 Casa. Os pacotes Expansão e Mapa Completo funcionam como passes que liberam tudo de uma vez na consulta que você escolher.
+          {isRedeemRoute
+            ? "Digite ou confirme o código do seu voucher abaixo para liberar seu presente instantaneamente na sua conta."
+            : "1 crédito libera 1 Casa. Os pacotes Expansão e Mapa Completo funcionam como passes que liberam tudo de uma vez na consulta que você escolher."}
         </p>
 
         {profile && (

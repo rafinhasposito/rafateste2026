@@ -8,7 +8,7 @@ export interface PricingItem {
   description: string | null;
   credits: number;
   price_brl: number | null;
-  active: boolean;
+  active?: boolean;
   sort_order: number;
 }
 

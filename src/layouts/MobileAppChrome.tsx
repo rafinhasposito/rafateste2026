@@ -44,15 +44,22 @@ export function MobileAppChrome() {
           )}
         </div>
 
-        {/* Right Side Actions: Onboarding & Credits Pill */}
+        {/* Right Side Actions: Onboarding & Credits/Login Pill */}
         <div className="flex items-center gap-2 pointer-events-auto">
-          {session && (
+          {session ? (
             <Link
               to="/credits"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#C9A227]/30 bg-[#C9A227]/10 text-[#F5DE98] text-[11px] font-ps-ui font-semibold active:scale-95 transition-all shadow-[0_0_10px_rgba(201,162,39,0.15)] backdrop-blur-xl"
             >
               <Coins className="w-3.5 h-3.5 text-[#E5C158]" />
               <span>{profile?.credits ?? 0}</span>
+            </Link>
+          ) : (
+            <Link
+              to="/auth?mode=signin"
+              className="inline-flex items-center px-3 py-1.5 rounded-full border border-white/15 bg-white/[0.06] text-white/90 text-[10px] font-ps-ui uppercase tracking-[0.14em] font-semibold active:scale-95 transition-all backdrop-blur-xl"
+            >
+              Entrar
             </Link>
           )}
 
