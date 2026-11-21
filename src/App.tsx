@@ -1,11 +1,11 @@
 import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
-import { captureAffiliateRefFromUrl } from "@/lib/affiliates";
+import { captureAffiliateRefCode, captureAffiliateRefFromUrl } from "@/lib/affiliates";
 
 // Shells
 import { ConsumerShell } from "./layouts/ConsumerShell";
@@ -65,8 +65,18 @@ const AffiliateRefTracker = () => {
   const location = useLocation();
   useEffect(() => {
     captureAffiliateRefFromUrl();
-  }, [location.search]);
+  }, [location.pathname, location.search]);
   return null;
+};
+
+const AffiliateShortLink = () => {
+  const { code } = useParams<{ code: string }>();
+  useEffect(() => {
+    if (code) {
+      void captureAffiliateRefCode(code);
+    }
+  }, [code]);
+  return <Navigate to="/" replace />;
 };
 
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -87,6 +97,8 @@ const App = () => (
           <AffiliateRefTracker />
           <Routes>
             <Route path="/concepts" element={<ConceptsShowcase />} />
+            <Route path="/i/:code" element={<AffiliateShortLink />} />
+            <Route path="/r/:code" element={<AffiliateShortLink />} />
             
             {/* 1. Consumer Shell (Main App - Preserves state across resize) */}
             <Route element={<ConsumerShell />}>

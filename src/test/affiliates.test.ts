@@ -5,7 +5,11 @@ import {
   buildAffiliateLink,
   buildAffiliateWhatsAppShareUrl,
   calculateCommissionBrl,
+  extractRefFromPathname,
   extractRefFromSearch,
+  formatAffiliateShortPath,
+  formatPartnerIdLabel,
+  generatePartnerNumber,
   getStoredAffiliateRef,
   isValidAffiliateCode,
   normalizeAffiliateCode,
@@ -64,18 +68,37 @@ describe("Sistema de Afiliados — cálculos e rastreamento", () => {
     expect(localStorage.getItem(AFFILIATE_REF_STORAGE_KEY)).toBeNull();
   });
 
-  it("gera link oficial e link de compartilhamento WhatsApp", () => {
-    expect(buildAffiliateLink("camila", "https://protocolosolar.com.br")).toBe(
-      "https://protocolosolar.com.br/?ref=CAMILA"
+  it("gera link curto /i/ oficial e link de compartilhamento WhatsApp", () => {
+    expect(buildAffiliateLink("482917", "https://protocolosolar.com.br")).toBe(
+      "https://protocolosolar.com.br/i/482917"
     );
-    const wa = buildAffiliateWhatsAppShareUrl("camila", "https://protocolosolar.com.br");
+    expect(buildAffiliateLink("CAMILA", "https://protocolosolar.com.br")).toBe(
+      "https://protocolosolar.com.br/i/camila"
+    );
+    expect(formatAffiliateShortPath("482917")).toBe("protocolosolar.com.br/i/482917");
+    expect(formatPartnerIdLabel("482917")).toBe("#482917");
+    expect(formatPartnerIdLabel("CAMILA")).toBe("CAMILA");
+
+    const wa = buildAffiliateWhatsAppShareUrl("482917", "https://protocolosolar.com.br");
     expect(wa).toContain("https://wa.me/?text=");
-    expect(decodeURIComponent(wa)).toContain("https://protocolosolar.com.br/?ref=CAMILA");
+    expect(decodeURIComponent(wa)).toContain("https://protocolosolar.com.br/i/482917");
   });
 
-  it("sugere código automático seguro evitando palavras reservadas", () => {
+  it("extrai código tanto de rotas curtas /i/ e /r/ quanto de ?ref=", () => {
+    expect(extractRefFromPathname("/i/482917")).toBe("482917");
+    expect(extractRefFromPathname("/i/camila")).toBe("CAMILA");
+    expect(extractRefFromPathname("/r/ana-solar")).toBe("ANA-SOLAR");
+    expect(extractRefFromPathname("/parceiros")).toBeNull();
+  });
+
+  it("gera número de cadastro de 6 dígitos e nunca vaza prefixo de e-mail na sugestão", () => {
+    const num = generatePartnerNumber();
+    expect(num).toMatch(/^\d{6}$/);
+    expect(Number(num)).toBeGreaterThanOrEqual(100000);
+    expect(Number(num)).toBeLessThanOrEqual(999999);
+
     expect(suggestAffiliateCodeFromName("Rafael Sposito")).toBe("RAFAEL");
-    expect(suggestAffiliateCodeFromName("todomundorp@gmail.com")).toBe("TODOMUNDORP");
+    expect(suggestAffiliateCodeFromName("todomundorp@gmail.com")).toBe("");
     expect(suggestAffiliateCodeFromName("Admin")).toBe("ADMIN2026");
     expect(RESERVED_AFFILIATE_CODES.has("ADMIN")).toBe(true);
   });

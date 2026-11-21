@@ -25,6 +25,8 @@ import {
   calculateCommissionBrl,
   DEFAULT_COMMISSION_RATE,
   formatBrl,
+  formatPartnerIdLabel,
+  generatePartnerNumber,
   normalizeAffiliateCode,
   type AdminAffiliateCommissionRow,
   type AdminAffiliateRow,
@@ -37,10 +39,10 @@ const AffiliatesManager = () => {
   const [commissions, setCommissions] = useState<AdminAffiliateCommissionRow[]>([]);
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "paid">("all");
 
-  // Formulário de cadastro
+  // Formulário de cadastro (gera nº oficial de 6 dígitos por padrão, editável para VIPs)
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState<string>(() => generatePartnerNumber());
   const [commissionRate, setCommissionRate] = useState<number>(DEFAULT_COMMISSION_RATE);
   const [pixKey, setPixKey] = useState("");
   const [notes, setNotes] = useState("");
@@ -71,12 +73,6 @@ const AffiliatesManager = () => {
 
   const handleNameChange = (value: string) => {
     setName(value);
-    if (!code) {
-      const suggested = normalizeAffiliateCode(value.split(" ")[0] || "");
-      if (suggested.length >= 3) {
-        setCode(suggested);
-      }
-    }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -85,9 +81,9 @@ const AffiliatesManager = () => {
       toast.error("Informe o nome do afiliado.");
       return;
     }
-    const cleanCode = normalizeAffiliateCode(code);
+    const cleanCode = normalizeAffiliateCode(code) || generatePartnerNumber();
     if (cleanCode.length < 3) {
-      toast.error("Informe um código de link com pelo menos 3 caracteres (ex: CAMILA).");
+      toast.error("Informe um nº de cadastro ou código com pelo menos 3 caracteres.");
       return;
     }
     setCreating(true);
@@ -100,10 +96,12 @@ const AffiliatesManager = () => {
         pix_key: pixKey.trim() || undefined,
         notes: notes.trim() || undefined,
       });
-      toast.success(`Afiliado ${cleanCode} cadastrado com ${commissionRate}% de comissão!`);
+      toast.success(
+        `Parceiro ${formatPartnerIdLabel(cleanCode)} cadastrado com ${commissionRate}% de comissão!`
+      );
       setName("");
       setEmail("");
-      setCode("");
+      setCode(generatePartnerNumber());
       setCommissionRate(DEFAULT_COMMISSION_RATE);
       setPixKey("");
       setNotes("");
@@ -269,7 +267,7 @@ const AffiliatesManager = () => {
               Cadastrar Novo Afiliado
             </h3>
             <p className="text-white/55 text-xs sm:text-sm font-ps-ui mt-1">
-              O afiliado recebe link exclusivo (<span className="font-mono text-[#F5DE98]">?ref=CODIGO</span>) e acompanha as vendas em{" "}
+              O parceiro recebe nº de cadastro + link curto (<span className="font-mono text-[#F5DE98]">/i/482917</span>) e acompanha as vendas em{" "}
               <span className="font-mono text-[#F5DE98]">/afiliado</span>.
             </p>
           </div>
@@ -334,16 +332,26 @@ const AffiliatesManager = () => {
 
             <div className="space-y-1.5">
               <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">
-                3. Código do Link (?ref=) *
+                3. Nº de Cadastro / Código (/i/) *
               </label>
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(normalizeAffiliateCode(e.target.value))}
-                placeholder="Ex: CAMILA"
-                required
-                className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] font-mono text-sm font-bold uppercase tracking-wider focus:outline-none focus:border-[#C9A227]"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(normalizeAffiliateCode(e.target.value))}
+                  placeholder="Ex: 482917 ou CAMILA"
+                  required
+                  className="w-full px-3.5 py-3 rounded-xl bg-black/50 border border-white/15 text-[#F5DE98] font-mono text-sm font-bold tracking-wider focus:outline-none focus:border-[#C9A227]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setCode(generatePartnerNumber())}
+                  className="px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/70 hover:text-white"
+                  title="Gerar novo número de cadastro"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -461,7 +469,7 @@ const AffiliatesManager = () => {
                           {aff.name}
                         </h4>
                         <span className="px-2.5 py-0.5 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 text-[#F5DE98] font-mono text-xs font-bold">
-                          ?ref={aff.code}
+                          {formatPartnerIdLabel(aff.code)} · /i/{aff.code.toLowerCase()}
                         </span>
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${

@@ -29,11 +29,13 @@ import {
   buildAffiliateLink,
   buildAffiliateWhatsAppShareUrl,
   calculateCommissionBrl,
+  formatAffiliateShortPath,
   formatBrl,
+  formatPartnerIdLabel,
+  generatePartnerNumber,
   getMyAffiliateDashboard,
   joinAffiliateProgram,
   normalizeAffiliateCode,
-  suggestAffiliateCodeFromName,
   updateMyAffiliatePix,
   type AffiliateDashboardResponse,
 } from "@/lib/affiliates";
@@ -51,9 +53,11 @@ const AffiliateDashboard = () => {
   const [savingPix, setSavingPix] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Estado do auto-cadastro em 1 passo
+  // Estado do auto-cadastro em 1 passo (Número de Cadastro automático)
   const [joinName, setJoinName] = useState("");
-  const [joinCode, setJoinCode] = useState("");
+  const [autoPartnerNumber, setAutoPartnerNumber] = useState<string>(() => generatePartnerNumber());
+  const [useCustomSlug, setUseCustomSlug] = useState(false);
+  const [customSlug, setCustomSlug] = useState("");
   const [joinPix, setJoinPix] = useState("");
   const [joinChannel, setJoinChannel] = useState("");
   const [joining, setJoining] = useState(false);
@@ -66,9 +70,17 @@ const AffiliateDashboard = () => {
 
   useEffect(() => {
     if (!user) return;
-    const defaultName = profile?.full_name || profile?.display_name || user.email?.split("@")[0] || "";
-    setJoinName((prev) => prev || defaultName);
-    setJoinCode((prev) => prev || suggestAffiliateCodeFromName(defaultName || user.email));
+    const rawProfileName = profile?.full_name || profile?.display_name || "";
+    const emailLocal = (user.email || "").split("@")[0]?.toLowerCase() || "";
+    const cleanProfileName =
+      rawProfileName &&
+      !rawProfileName.includes("@") &&
+      rawProfileName.trim().toLowerCase() !== emailLocal
+        ? rawProfileName.trim()
+        : "";
+    if (cleanProfileName) {
+      setJoinName((prev) => prev || cleanProfileName);
+    }
   }, [user, profile?.full_name, profile?.display_name]);
 
   const loadDashboard = useCallback(async (isRefresh = false) => {
@@ -119,27 +131,53 @@ const AffiliateDashboard = () => {
     }
   };
 
+  const activeCodeForSignup = useCustomSlug
+    ? normalizeAffiliateCode(customSlug)
+    : autoPartnerNumber;
+
   const handleJoinAffiliate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (joinName.trim().length < 2) {
-      toast.error("Informe seu nome para ativar seu link.");
+      toast.error("Informe seu nome para ativar seu cadastro.");
       return;
     }
-    const cleanCode = normalizeAffiliateCode(joinCode);
-    if (cleanCode.length < 3) {
-      toast.error("Escolha um código com pelo menos 3 caracteres (ex: RAFAEL).");
+    const candidateCode = useCustomSlug
+      ? normalizeAffiliateCode(customSlug)
+      : autoPartnerNumber;
+    if (candidateCode.length < 3) {
+      toast.error("Escolha um apelido com pelo menos 3 caracteres (ex: camila).");
       return;
     }
     setJoining(true);
     try {
-      await joinAffiliateProgram({
-        name: joinName.trim(),
-        code: cleanCode,
-        pix_key: joinPix.trim() || undefined,
-        channel: joinChannel.trim() || undefined,
-      });
+      let registeredCode = candidateCode;
+      try {
+        await joinAffiliateProgram({
+          name: joinName.trim(),
+          code: candidateCode,
+          pix_key: joinPix.trim() || undefined,
+          channel: joinChannel.trim() || undefined,
+        });
+      } catch (firstErr: any) {
+        // Se for número automático e por raridade colidir, tenta mais 1 número novo automaticamente
+        if (!useCustomSlug && String(firstErr?.message || "").toLowerCase().includes("em uso")) {
+          const retryNum = generatePartnerNumber();
+          setAutoPartnerNumber(retryNum);
+          registeredCode = retryNum;
+          await joinAffiliateProgram({
+            name: joinName.trim(),
+            code: retryNum,
+            pix_key: joinPix.trim() || undefined,
+            channel: joinChannel.trim() || undefined,
+          });
+        } else {
+          throw firstErr;
+        }
+      }
       clearAffiliateCache(user?.id);
-      toast.success(`Link ?ref=${cleanCode} ativado! Você já ganha 20% em cada venda.`);
+      toast.success(
+        `Cadastro ${formatPartnerIdLabel(registeredCode)} ativado! Seu link já está pronto para divulgar.`
+      );
       await loadDashboard(false);
     } catch (err: any) {
       toast.error(err?.message || "Não foi possível ativar seu cadastro.");
@@ -222,7 +260,70 @@ const AffiliateDashboard = () => {
           </div>
 
           {dbReady && (
-            <form onSubmit={handleJoinAffiliate} className="space-y-4 pt-2 border-t border-white/10 text-left">
+            <form onSubmit={handleJoinAffiliate} className="space-y-5 pt-3 border-t border-white/10 text-left">
+              {/* Número de Cadastro Automático + Prévia Limpa do Link */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-black/45 border border-[#C9A227]/35 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-[#F5DE98] font-bold block">
+                      {useCustomSlug ? "Link Personalizado" : "Seu Nº de Cadastro de Parceiro"}
+                    </span>
+                    <p className="font-mono text-sm sm:text-base text-white mt-0.5 break-all">
+                      {activeCodeForSignup
+                        ? formatAffiliateShortPath(activeCodeForSignup)
+                        : "protocolosolar.com.br/i/seunome"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!useCustomSlug && (
+                      <button
+                        type="button"
+                        onClick={() => setAutoPartnerNumber(generatePartnerNumber())}
+                        className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-[11px] text-white/80 font-ps-ui inline-flex items-center gap-1.5"
+                        title="Gerar outro número de cadastro"
+                      >
+                        <RefreshCw className="w-3 h-3" /> Outro nº
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setUseCustomSlug((v) => !v)}
+                      className="px-3 py-1.5 rounded-xl bg-[#C9A227]/15 hover:bg-[#C9A227]/25 border border-[#C9A227]/35 text-[11px] text-[#F5DE98] font-semibold font-ps-ui"
+                    >
+                      {useCustomSlug ? "Usar nº automático" : "Personalizar link"}
+                    </button>
+                  </div>
+                </div>
+
+                {useCustomSlug && (
+                  <div className="flex items-center rounded-xl bg-[#050811] border border-white/15 focus-within:border-[#C9A227] overflow-hidden">
+                    <span className="px-3 py-3 text-xs font-mono text-white/45 bg-white/[0.03] border-r border-white/10 shrink-0">
+                      protocolosolar.com.br/i/
+                    </span>
+                    <input
+                      type="text"
+                      value={customSlug}
+                      onChange={(e) =>
+                        setCustomSlug(
+                          e.target.value
+                            .toLowerCase()
+                            .replace(/[^a-z0-9_-]/g, "")
+                            .slice(0, 32)
+                        )
+                      }
+                      placeholder="seunome"
+                      className="w-full min-h-[44px] px-3 py-2.5 bg-transparent text-sm font-mono font-bold text-[#FFF3D1] placeholder:text-white/30 focus:outline-none"
+                    />
+                  </div>
+                )}
+
+                <p className="text-[11px] text-white/50">
+                  {useCustomSlug
+                    ? "Use apenas letras, números ou hífen (ex: camila, ana-solar)."
+                    : `Número oficial #${autoPartnerNumber} gerado automaticamente — curto, neutro e sem expor seu e-mail.`}
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-[#F5DE98] font-semibold">
@@ -233,28 +334,14 @@ const AffiliateDashboard = () => {
                     required
                     value={joinName}
                     onChange={(e) => setJoinName(e.target.value)}
-                    placeholder="Ex: Camila Rocha"
+                    placeholder="Como você quer aparecer no painel"
                     className="w-full min-h-[48px] px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#C9A227]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-[#F5DE98] font-semibold">
-                    Escolha seu Código do Link *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={joinCode}
-                    onChange={(e) => setJoinCode(normalizeAffiliateCode(e.target.value))}
-                    placeholder="Ex: CAMILA"
-                    className="w-full min-h-[48px] px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-sm font-mono font-bold uppercase tracking-wider text-[#FFF3D1] placeholder:text-white/30 focus:outline-none focus:border-[#C9A227]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/60 font-semibold">
-                    Sua Chave Pix (para receber)
+                  <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/70 font-semibold">
+                    Sua Chave Pix (para receber os 20%)
                   </label>
                   <input
                     type="text"
@@ -265,34 +352,28 @@ const AffiliateDashboard = () => {
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 sm:col-span-2">
                   <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/60 font-semibold">
-                    Onde vai divulgar? (Opcional)
+                    Onde você vai divulgar? (Opcional)
                   </label>
                   <input
                     type="text"
                     value={joinChannel}
                     onChange={(e) => setJoinChannel(e.target.value)}
-                    placeholder="Ex: @instagram, TikTok ou WhatsApp"
+                    placeholder="Ex: WhatsApp com amigos, @instagram ou TikTok"
                     className="w-full min-h-[48px] px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#C9A227]"
                   />
                 </div>
               </div>
 
-              {joinCode && (
-                <div className="px-4 py-3 rounded-xl bg-black/45 border border-[#C9A227]/25 text-xs font-mono text-[#F5DE98]/90 break-all">
-                  Seu link será: <span className="text-white">{buildAffiliateLink(joinCode)}</span>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
                 <button
                   type="submit"
                   disabled={joining}
                   className="w-full sm:flex-1 min-h-[52px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#C9A227] via-[#E5C158] to-[#C9A227] text-black font-ps-ui text-xs font-bold uppercase tracking-[0.16em] inline-flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(201,162,39,0.25)]"
                 >
                   <Rocket className="w-4 h-4" />
-                  {joining ? "Ativando seu link..." : "Ativar Meu Link de Afiliado (20%)"}
+                  {joining ? "Ativando seu cadastro..." : "Ativar Meu Cadastro de Parceiro (20%)"}
                 </button>
 
                 {isAdmin && (
@@ -343,7 +424,7 @@ const AffiliateDashboard = () => {
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A227]/15 border border-[#C9A227]/40 text-[#F5DE98] text-[10px] font-mono font-bold uppercase tracking-[0.18em]">
-              <Sparkles className="w-3 h-3" /> Parceiro Oficial
+              <Sparkles className="w-3 h-3" /> Parceiro {formatPartnerIdLabel(affiliate.code)}
             </span>
             <span
               className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-[0.14em] border ${

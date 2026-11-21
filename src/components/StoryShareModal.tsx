@@ -6,7 +6,7 @@ import { HOUSE_STORY_METAS } from "@/data/storyHouseMetas";
 import { extractShortCityName } from "@/lib/cityCopy";
 import { resolveRealCityPhoto } from "@/lib/storyCityPhoto";
 import { useIsAffiliate } from "@/hooks/useIsAffiliate";
-import { buildAffiliateLink } from "@/lib/affiliates";
+import { buildAffiliateLink, formatPartnerIdLabel } from "@/lib/affiliates";
 
 export interface StoryShareProps {
   isOpen: boolean;
@@ -563,7 +563,7 @@ export const StoryShareModal: React.FC<StoryShareProps> = ({
     setCopied(true);
     toast.success(
       isAffiliate && affiliateCode
-        ? `Seu link de afiliado (?ref=${affiliateCode}) foi copiado!`
+        ? `Seu link de parceiro (${formatPartnerIdLabel(affiliateCode)}) foi copiado!`
         : "Link protocolosolar.com.br copiado!"
     );
     setTimeout(() => setCopied(false), 2200);
@@ -692,7 +692,7 @@ export const StoryShareModal: React.FC<StoryShareProps> = ({
             <div className="flex items-center justify-between gap-2 text-[11px] text-white/55">
               <span>
                 {isAffiliate && affiliateCode
-                  ? `Sticker de link com sua comissão (?ref=${affiliateCode})`
+                  ? `Sticker de link com sua comissão (${formatPartnerIdLabel(affiliateCode)})`
                   : "Cole também o sticker de link nos Stories"}
               </span>
               <button

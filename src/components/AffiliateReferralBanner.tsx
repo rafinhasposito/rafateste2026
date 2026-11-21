@@ -6,6 +6,7 @@ import { useIsAffiliate } from "@/hooks/useIsAffiliate";
 import {
   buildAffiliateLink,
   buildAffiliateWhatsAppShareUrl,
+  formatPartnerIdLabel,
 } from "@/lib/affiliates";
 
 interface AffiliateReferralBannerProps {
@@ -102,8 +103,8 @@ export const AffiliateReferralBanner = ({
             </h3>
             <p className="text-xs sm:text-sm text-white/65 font-ps-ui leading-relaxed">
               {isAffiliate && affiliateCode
-                ? `Seu link exclusivo (?ref=${affiliateCode}) já está ativo. Cada amigo que comprar pelo seu link gera 20% direto para o seu saldo.`
-                : "Ative seu link exclusivo em 10 segundos. O preço para seus amigos continua o mesmo e você ganha 20% em Pix por cada compra."}
+                ? `Seu cadastro de parceiro (${formatPartnerIdLabel(affiliateCode)}) já está ativo. Cada amigo que comprar pelo seu link gera 20% direto para o seu saldo.`
+                : "Ative seu cadastro de parceiro em 10 segundos. O preço para seus amigos continua o mesmo e você ganha 20% em Pix por cada compra."}
             </p>
           </div>
 

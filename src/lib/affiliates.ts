@@ -122,14 +122,29 @@ export const isValidAffiliateCode = (code: string): boolean => {
   return clean.length >= 3 && clean.length <= 32 && /^[A-Z0-9_-]+$/.test(clean);
 };
 
+export const generatePartnerNumber = (): string => {
+  const arr = new Uint32Array(1);
+  if (typeof globalThis.crypto !== "undefined" && typeof globalThis.crypto.getRandomValues === "function") {
+    globalThis.crypto.getRandomValues(arr);
+  } else {
+    arr[0] = Math.floor(Math.random() * 900000);
+  }
+  const num = 100000 + (arr[0] % 900000);
+  return String(num);
+};
+
+export const formatPartnerIdLabel = (code: string | null | undefined): string => {
+  const clean = normalizeAffiliateCode(code);
+  if (!clean) return "";
+  return /^\d+$/.test(clean) ? `#${clean}` : clean;
+};
+
 export const suggestAffiliateCodeFromName = (
-  nameOrEmail: string | null | undefined
+  fullName: string | null | undefined
 ): string => {
-  if (!nameOrEmail) return "";
-  const base = nameOrEmail.includes("@")
-    ? nameOrEmail.split("@")[0]
-    : nameOrEmail.trim().split(/\s+/)[0] || "";
-  const clean = normalizeAffiliateCode(base);
+  if (!fullName || fullName.includes("@")) return "";
+  const firstWord = fullName.trim().split(/\s+/)[0] || "";
+  const clean = normalizeAffiliateCode(firstWord);
   if (clean.length < 3) return "";
   if (RESERVED_AFFILIATE_CODES.has(clean)) return `${clean}2026`;
   return clean;
@@ -155,13 +170,18 @@ export const formatBrl = (value: number): string => {
 };
 
 export const buildAffiliateLink = (code: string, origin?: string): string => {
-  const clean = normalizeAffiliateCode(code);
+  const clean = normalizeAffiliateCode(code).toLowerCase();
   const base =
     origin ||
     (typeof window !== "undefined" && window.location.origin
       ? window.location.origin
       : "https://protocolosolar.com.br");
-  return `${base.replace(/\/$/, "")}/?ref=${encodeURIComponent(clean)}`;
+  return `${base.replace(/\/$/, "")}/i/${encodeURIComponent(clean)}`;
+};
+
+export const formatAffiliateShortPath = (code: string): string => {
+  const clean = normalizeAffiliateCode(code).toLowerCase();
+  return clean ? `protocolosolar.com.br/i/${clean}` : "protocolosolar.com.br/i/seunome";
 };
 
 export const buildAffiliateWhatsAppShareUrl = (
@@ -180,6 +200,19 @@ export const extractRefFromSearch = (search: string): string | null => {
     const raw = params.get("ref") || params.get("afiliado") || params.get("partner");
     if (!raw) return null;
     const clean = normalizeAffiliateCode(raw);
+    return isValidAffiliateCode(clean) ? clean : null;
+  } catch {
+    return null;
+  }
+};
+
+export const extractRefFromPathname = (pathname: string): string | null => {
+  if (!pathname) return null;
+  const match = pathname.match(/^\/(?:i|r)\/([^/?#]+)/i);
+  if (!match?.[1]) return null;
+  try {
+    const decoded = decodeURIComponent(match[1]);
+    const clean = normalizeAffiliateCode(decoded);
     return isValidAffiliateCode(clean) ? clean : null;
   } catch {
     return null;
@@ -228,10 +261,9 @@ export const getStoredAffiliateRef = (nowMs = Date.now()): string | null => {
   }
 };
 
-export const captureAffiliateRefFromUrl = async (): Promise<string | null> => {
-  if (typeof window === "undefined") return null;
-  const code = extractRefFromSearch(window.location.search);
-  if (!code) return null;
+export const captureAffiliateRefCode = async (rawCode: string | null | undefined): Promise<string | null> => {
+  const code = normalizeAffiliateCode(rawCode);
+  if (!isValidAffiliateCode(code)) return null;
 
   saveStoredAffiliateRef(code);
 
@@ -252,6 +284,15 @@ export const captureAffiliateRefFromUrl = async (): Promise<string | null> => {
     // Silently ignore if migration isn't applied yet
   }
   return code;
+};
+
+export const captureAffiliateRefFromUrl = async (): Promise<string | null> => {
+  if (typeof window === "undefined") return null;
+  const code =
+    extractRefFromPathname(window.location.pathname) ||
+    extractRefFromSearch(window.location.search);
+  if (!code) return null;
+  return captureAffiliateRefCode(code);
 };
 
 export const syncAffiliateRefForUser = async (): Promise<void> => {

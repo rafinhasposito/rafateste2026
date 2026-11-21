@@ -10,7 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { buildAffiliateLink } from "@/lib/affiliates";
+import { buildAffiliateLink, formatAffiliateShortPath } from "@/lib/affiliates";
 
 interface AffiliatePromoKitProps {
   code: string;
@@ -107,10 +107,10 @@ const drawStoryPromoPng = async (code: string): Promise<Blob | null> => {
   ctx.font = "400 24px 'Inter', sans-serif";
   ctx.fillText("(cole seu sticker de link do Instagram aqui)", 540, 1525);
 
-  // Rodapé com código
+  // Rodapé com link curto limpo
   ctx.fillStyle = "rgba(245, 222, 152, 0.72)";
   ctx.font = "600 24px 'JetBrains Mono', monospace";
-  ctx.fillText(`protocolosolar.com.br/?ref=${code}`, 540, 1775);
+  ctx.fillText(formatAffiliateShortPath(code), 540, 1775);
 
   return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), "image/png"));
 };
@@ -213,7 +213,7 @@ ${link}`;
             Materiais prontos com seu link
           </h2>
           <p className="text-xs text-white/55 mt-0.5">
-            Todos os textos abaixo já estão preenchidos com <span className="font-mono text-[#F5DE98]">?ref={code}</span>. Copie e publique em 1 clique.
+            Todos os textos abaixo já estão preenchidos com <span className="font-mono text-[#F5DE98]">{formatAffiliateShortPath(code)}</span>. Copie e publique em 1 clique.
           </p>
         </div>
 
@@ -326,7 +326,7 @@ ${link}`;
             </p>
             <p className="text-sm text-white/75 leading-relaxed">
               Baixe o cartão oficial com espaço marcado para você colar o <strong>Sticker de Link</strong> do Instagram com seu endereço{" "}
-              <span className="font-mono text-[#F5DE98]">?ref={code}</span>.
+              <span className="font-mono text-[#F5DE98]">{formatAffiliateShortPath(code)}</span>.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto shrink-0">

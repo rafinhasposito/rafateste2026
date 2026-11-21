@@ -327,10 +327,10 @@ export const PartnersLanding = () => {
                 01
               </div>
               <h3 className="font-ps-display text-xl font-bold text-white">
-                Ative seu código exclusivo
+                Receba seu nº de cadastro
               </h3>
               <p className="text-sm text-white/60 font-ps-ui leading-relaxed">
-                Entre com sua conta, escolha seu código (ex.: <span className="font-mono text-[#F5DE98]">?ref=SEUNOME</span>) e informe sua chave Pix. Zero burocracia.
+                Entre com sua conta, gere seu número oficial de parceiro (ex.: <span className="font-mono text-[#F5DE98]">/i/482917</span>) e informe sua chave Pix. Zero burocracia.
               </p>
             </div>
 
@@ -442,7 +442,7 @@ export const PartnersLanding = () => {
             Pronto para ativar seu link exclusivo?
           </h2>
           <p className="text-white/65 text-sm sm:text-base max-w-xl mx-auto">
-            Leva menos de 10 segundos e você já sai com seu link `?ref=` + kit pronto para divulgar hoje mesmo.
+            Leva menos de 10 segundos e você já sai com seu número oficial de parceiro + link curto + kit pronto para divulgar hoje mesmo.
           </p>
           <button
             type="button"
