@@ -16,11 +16,12 @@ import {
   ShieldCheck,
   ExternalLink,
   Rocket,
-  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import PageLoader from "@/components/PageLoader";
 import { BackButton } from "@/components/ui/BackButton";
+import AffiliatePromoKit from "@/components/AffiliatePromoKit";
+import PartnersLanding from "@/pages/PartnersLanding";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { clearAffiliateCache } from "@/hooks/useIsAffiliate";
@@ -151,77 +152,9 @@ const AffiliateDashboard = () => {
     return <PageLoader label="Carregando painel de afiliado..." />;
   }
 
-  // Visitante deslogado: convite público compartilhável para se tornar afiliado
+  // Visitante deslogado: exibe a Landing Page completa de parceiros (com simulador e FAQ)
   if (!user) {
-    return (
-      <div className="min-h-[100dvh] px-4 sm:px-6 pt-20 lg:pt-12 pb-28 lg:pb-16 max-w-3xl mx-auto relative z-10 overflow-x-hidden">
-        <div className="mb-6 hidden lg:flex">
-          <BackButton label="Voltar" to="/" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-6 sm:p-10 rounded-[32px] border border-[#C9A227]/35 bg-gradient-to-b from-[#0E1A32]/90 via-[#081020]/95 to-[#050811]/95 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.65)] text-center space-y-6"
-        >
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-[#C9A227]/15 border border-[#C9A227]/40 flex items-center justify-center text-[#F5DE98]">
-            <Rocket className="w-7 h-7" />
-          </div>
-
-          <div className="space-y-2">
-            <span className="inline-block text-[10px] font-mono uppercase tracking-[0.22em] text-[#F5DE98]/85 font-semibold">
-              Programa de Afiliados • 20% por Venda
-            </span>
-            <h1 className="font-ps-display text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Indique o Protocolo Solar e ganhe 20% via Pix
-            </h1>
-            <p className="text-white/65 font-ps-ui text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-              Crie seu link exclusivo em segundos, compartilhe com sua audiência ou amigos e acompanhe cada clique e venda confirmada em tempo real. O preço para quem compra continua exatamente o mesmo.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-white/45 mb-1">
-                1 Casa Avulsa (R$ 19,90)
-              </p>
-              <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
-                +{formatBrl(calculateCommissionBrl(19.9, 20))}
-              </p>
-              <p className="text-[11px] text-white/50">20% por venda</p>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-white/45 mb-1">
-                Pacote Expansão (R$ 49,90)
-              </p>
-              <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
-                +{formatBrl(calculateCommissionBrl(49.9, 20))}
-              </p>
-              <p className="text-[11px] text-white/50">20% por venda</p>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-white/45 mb-1">
-                Mapa Completo (R$ 99,90)
-              </p>
-              <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
-                +{formatBrl(calculateCommissionBrl(99.9, 20))}
-              </p>
-              <p className="text-[11px] text-white/50">20% por venda</p>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <button
-              onClick={() => navigate("/auth?returnTo=%2Fafiliado")}
-              className="w-full sm:w-auto min-h-[52px] px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#C9A227] via-[#E5C158] to-[#C9A227] text-black font-ps-ui text-xs font-bold uppercase tracking-[0.16em] inline-flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(201,162,39,0.28)]"
-            >
-              Entrar ou Criar Conta para Ativar Meu Link
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    );
+    return <PartnersLanding />;
   }
 
   const affiliate = dashboard?.affiliate;
@@ -578,6 +511,9 @@ const AffiliateDashboard = () => {
           </p>
         </div>
       </div>
+
+      {/* Kit Pronto de Divulgação (WhatsApp, 3 Stories, Roteiro Reels, Arte 9:16) */}
+      <AffiliatePromoKit code={affiliate.code} affiliateName={affiliate.name} />
 
       {/* Chave Pix para Repasse */}
       <section className="p-5 sm:p-6 rounded-3xl bg-[#08111F]/90 border border-white/10 backdrop-blur-xl mb-8">

@@ -26,7 +26,7 @@ export function MobileAppChrome() {
         <div className="flex items-center gap-2 pointer-events-auto">
           {!showBottomBar ? (
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0C1826]/90 backdrop-blur-xl border border-white/15 text-white active:scale-95 transition-all text-xs font-ps-ui uppercase tracking-wider font-semibold shadow-md"
             >
               <ChevronLeft className="w-4 h-4 text-[#F5DE98]" />

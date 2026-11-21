@@ -273,14 +273,34 @@ const AffiliatesManager = () => {
               <span className="font-mono text-[#F5DE98]">/afiliado</span>.
             </p>
           </div>
-          <a
-            href="/afiliado"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs text-white/80 font-ps-ui transition-all"
-          >
-            Ver tela /afiliado <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                handleCopy(
+                  "recruit-landing",
+                  `${typeof window !== "undefined" ? window.location.origin : "https://protocolosolar.com.br"}/parceiros`,
+                  "Link da página de recrutamento (/parceiros)"
+                )
+              }
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#C9A227]/15 hover:bg-[#C9A227]/25 border border-[#C9A227]/40 text-xs text-[#FFF3D1] font-semibold font-ps-ui transition-all"
+            >
+              {copiedId === "recruit-landing" ? (
+                <Check className="w-3.5 h-3.5 text-emerald-300" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+              Copiar Landing /parceiros
+            </button>
+            <a
+              href="/parceiros"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs text-white/80 font-ps-ui transition-all"
+            >
+              Ver /parceiros <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
         </div>
 
         <form onSubmit={handleCreate} className="space-y-5">

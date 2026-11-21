@@ -15,6 +15,7 @@ import UnlockPremiumModal, { type UnlockTargetArea } from "@/components/UnlockPr
 import { getHouseIntendedFocusId, computeAllFocusesCost } from "@/lib/consultationUnlocks";
 import { interpolateCityCopy } from "@/lib/cityCopy";
 import { StoryShareModal } from "@/components/StoryShareModal";
+import { AffiliateReferralBanner } from "@/components/AffiliateReferralBanner";
 import { MapPin, ArrowUpCircle, Landmark, CircleDollarSign, ChevronDown, ChevronRight, ChevronLeft, Lock, Sparkles, AlertTriangle, ArrowUpRight, Heart, Users, Briefcase, DollarSign, Leaf, Calendar, Crown, Star, Zap, Sun, Target, Shield, ShieldAlert, Eye, Clock, Hourglass, BookOpen, Plane, QrCode, Fingerprint, Hash, CreditCard, Compass, Plus, Unlock, Scroll, Instagram } from "lucide-react";
 
 /* ══════════════════════════════════════════════════
@@ -3007,6 +3008,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
 </Reveal>
         </div>
       </section>
+
+      {/* Convite Indique & Ganhe 20% no Pix */}
+      <AffiliateReferralBanner variant="result" cityName={P_DYNAMIC.city} />
 
       {/* Rodapé de Ações & Navegação Mobile/Desktop */}
       <footer className="w-full border-t border-white/10 bg-[#02050A]/95 backdrop-blur-2xl py-14 px-6 pb-36 md:pb-16 text-center relative z-20">

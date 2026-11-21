@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { HOUSE_STORY_METAS } from "@/data/storyHouseMetas";
 import { extractShortCityName } from "@/lib/cityCopy";
 import { resolveRealCityPhoto } from "@/lib/storyCityPhoto";
+import { useIsAffiliate } from "@/hooks/useIsAffiliate";
+import { buildAffiliateLink } from "@/lib/affiliates";
 
 export interface StoryShareProps {
   isOpen: boolean;
@@ -185,6 +187,7 @@ export const StoryShareModal: React.FC<StoryShareProps> = ({
   const [readyBlob, setReadyBlob] = useState<Blob | null>(null);
   const [copied, setCopied] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const { isAffiliate, affiliateCode } = useIsAffiliate();
 
   const cleanCity = extractShortCityName(city) || "Roma";
   const cleanCountry =
@@ -552,9 +555,17 @@ export const StoryShareModal: React.FC<StoryShareProps> = ({
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText("https://protocolosolar.com.br/");
+    const shareUrl =
+      isAffiliate && affiliateCode
+        ? buildAffiliateLink(affiliateCode, "https://protocolosolar.com.br")
+        : "https://protocolosolar.com.br/";
+    navigator.clipboard.writeText(shareUrl);
     setCopied(true);
-    toast.success("Link protocolosolar.com.br copiado!");
+    toast.success(
+      isAffiliate && affiliateCode
+        ? `Seu link de afiliado (?ref=${affiliateCode}) foi copiado!`
+        : "Link protocolosolar.com.br copiado!"
+    );
     setTimeout(() => setCopied(false), 2200);
   };
 
@@ -677,16 +688,39 @@ export const StoryShareModal: React.FC<StoryShareProps> = ({
             </button>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-white/55 pt-2 border-t border-white/10">
-            <span>Cole também o sticker de link nos Stories</span>
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="text-[#F5B041] hover:underline flex items-center gap-1 font-semibold"
-            >
-              {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
-              <span>{copied ? "Link copiado!" : "Copiar site"}</span>
-            </button>
+          <div className="space-y-2 pt-2 border-t border-white/10">
+            <div className="flex items-center justify-between gap-2 text-[11px] text-white/55">
+              <span>
+                {isAffiliate && affiliateCode
+                  ? `Sticker de link com sua comissão (?ref=${affiliateCode})`
+                  : "Cole também o sticker de link nos Stories"}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="text-[#F5B041] hover:underline flex items-center gap-1 font-semibold shrink-0"
+              >
+                {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+                <span>
+                  {copied
+                    ? "Link copiado!"
+                    : isAffiliate && affiliateCode
+                      ? "Copiar meu link (20%)"
+                      : "Copiar site"}
+                </span>
+              </button>
+            </div>
+            {!isAffiliate && (
+              <p className="text-[11px] text-emerald-300/80 flex items-center justify-between gap-2">
+                <span>Quer ganhar 20% no Pix por cada amigo que clicar no seu Story?</span>
+                <a
+                  href="/afiliado"
+                  className="font-semibold text-emerald-200 underline underline-offset-2 shrink-0"
+                >
+                  Ativar link →
+                </a>
+              </p>
+            )}
           </div>
         </motion.div>
       </div>

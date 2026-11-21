@@ -26,6 +26,7 @@ import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Admin from "./pages/Admin";
 import AffiliateDashboard from "./pages/AffiliateDashboard";
+import PartnersLanding from "./pages/PartnersLanding";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import SolarGameV2 from "./pages/SolarGameV2";
@@ -94,6 +95,8 @@ const App = () => (
               <Route path="/history" element={<History />} />
               <Route path="/perfil" element={<Profile />} />
               <Route path="/afiliado" element={<AffiliateDashboard />} />
+              <Route path="/parceiros" element={<PartnersLanding />} />
+              <Route path="/seja-afiliado" element={<PartnersLanding />} />
               <Route path="/tecnologia" element={<Technology />} />
               <Route path="/app/trailer" element={<HouseTrailerApp />} />
             </Route>

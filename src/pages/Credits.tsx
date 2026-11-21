@@ -24,6 +24,7 @@ import {
 import { usePricing, type PricingItem } from "@/hooks/usePricing";
 import { redeemCouponCode } from "@/lib/coupons";
 import { getStoredAffiliateRef, syncAffiliateRefForUser } from "@/lib/affiliates";
+import { AffiliateReferralBanner } from "@/components/AffiliateReferralBanner";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -689,6 +690,7 @@ const Credits = () => {
                       Minhas Consultas
                     </button>
                   </div>
+                  <AffiliateReferralBanner variant="post-purchase" />
                 </div>
               ) : (
                 <>
