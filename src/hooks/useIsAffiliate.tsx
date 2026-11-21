@@ -4,6 +4,11 @@ import { getMyAffiliateDashboard } from "@/lib/affiliates";
 
 const affiliateCache = new Map<string, { isAffiliate: boolean; code: string | null }>();
 
+export function clearAffiliateCache(userId?: string) {
+  if (userId) affiliateCache.delete(userId);
+  else affiliateCache.clear();
+}
+
 export function useIsAffiliate() {
   const { user } = useAuth();
   const cached = user?.id ? affiliateCache.get(user.id) : undefined;

@@ -9,7 +9,9 @@ import {
   getStoredAffiliateRef,
   isValidAffiliateCode,
   normalizeAffiliateCode,
+  RESERVED_AFFILIATE_CODES,
   saveStoredAffiliateRef,
+  suggestAffiliateCodeFromName,
 } from "@/lib/affiliates";
 
 describe("Sistema de Afiliados — cálculos e rastreamento", () => {
@@ -69,5 +71,12 @@ describe("Sistema de Afiliados — cálculos e rastreamento", () => {
     const wa = buildAffiliateWhatsAppShareUrl("camila", "https://protocolosolar.com.br");
     expect(wa).toContain("https://wa.me/?text=");
     expect(decodeURIComponent(wa)).toContain("https://protocolosolar.com.br/?ref=CAMILA");
+  });
+
+  it("sugere código automático seguro evitando palavras reservadas", () => {
+    expect(suggestAffiliateCodeFromName("Rafael Sposito")).toBe("RAFAEL");
+    expect(suggestAffiliateCodeFromName("todomundorp@gmail.com")).toBe("TODOMUNDORP");
+    expect(suggestAffiliateCodeFromName("Admin")).toBe("ADMIN2026");
+    expect(RESERVED_AFFILIATE_CODES.has("ADMIN")).toBe(true);
   });
 });

@@ -134,12 +134,10 @@ export function DesktopWebChrome() {
                     <Settings className="w-4 h-4 mr-2 text-[#C9A227]" />
                     Minha Conta
                   </DropdownMenuItem>
-                  {(isAffiliate || isAdmin) && (
-                    <DropdownMenuItem onClick={() => navigate("/afiliado")} className="text-emerald-300 hover:bg-white/5 focus:bg-white/5 focus:text-emerald-200 cursor-pointer">
-                      <Handshake className="w-4 h-4 mr-2 text-emerald-300" />
-                      Painel de Afiliado
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem onClick={() => navigate("/afiliado")} className="text-emerald-300 hover:bg-white/5 focus:bg-white/5 focus:text-emerald-200 cursor-pointer">
+                    <Handshake className="w-4 h-4 mr-2 text-emerald-300" />
+                    {isAffiliate ? "Painel de Afiliado" : "Indique e Ganhe 20%"}
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")} className="text-[#F5DE98] font-bold hover:bg-white/5 focus:bg-white/5 cursor-pointer">
                       Painel Admin

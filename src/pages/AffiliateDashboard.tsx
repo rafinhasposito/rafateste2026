@@ -15,24 +15,30 @@ import {
   Users,
   ShieldCheck,
   ExternalLink,
+  Rocket,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import PageLoader from "@/components/PageLoader";
 import { BackButton } from "@/components/ui/BackButton";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { clearAffiliateCache } from "@/hooks/useIsAffiliate";
 import {
   buildAffiliateLink,
   buildAffiliateWhatsAppShareUrl,
   calculateCommissionBrl,
   formatBrl,
   getMyAffiliateDashboard,
+  joinAffiliateProgram,
+  normalizeAffiliateCode,
+  suggestAffiliateCodeFromName,
   updateMyAffiliatePix,
   type AffiliateDashboardResponse,
 } from "@/lib/affiliates";
 
 const AffiliateDashboard = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
 
@@ -44,11 +50,25 @@ const AffiliateDashboard = () => {
   const [savingPix, setSavingPix] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // Estado do auto-cadastro em 1 passo
+  const [joinName, setJoinName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [joinPix, setJoinPix] = useState("");
+  const [joinChannel, setJoinChannel] = useState("");
+  const [joining, setJoining] = useState(false);
+
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate("/auth?returnTo=%2Fafiliado", { replace: true });
+      setLoading(false);
     }
-  }, [authLoading, user, navigate]);
+  }, [authLoading, user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const defaultName = profile?.full_name || profile?.display_name || user.email?.split("@")[0] || "";
+    setJoinName((prev) => prev || defaultName);
+    setJoinCode((prev) => prev || suggestAffiliateCodeFromName(defaultName || user.email));
+  }, [user, profile?.full_name, profile?.display_name]);
 
   const loadDashboard = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -98,15 +118,117 @@ const AffiliateDashboard = () => {
     }
   };
 
-  if (authLoading || loading || !user) {
+  const handleJoinAffiliate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (joinName.trim().length < 2) {
+      toast.error("Informe seu nome para ativar seu link.");
+      return;
+    }
+    const cleanCode = normalizeAffiliateCode(joinCode);
+    if (cleanCode.length < 3) {
+      toast.error("Escolha um código com pelo menos 3 caracteres (ex: RAFAEL).");
+      return;
+    }
+    setJoining(true);
+    try {
+      await joinAffiliateProgram({
+        name: joinName.trim(),
+        code: cleanCode,
+        pix_key: joinPix.trim() || undefined,
+        channel: joinChannel.trim() || undefined,
+      });
+      clearAffiliateCache(user?.id);
+      toast.success(`Link ?ref=${cleanCode} ativado! Você já ganha 20% em cada venda.`);
+      await loadDashboard(false);
+    } catch (err: any) {
+      toast.error(err?.message || "Não foi possível ativar seu cadastro.");
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  if (authLoading || loading) {
     return <PageLoader label="Carregando painel de afiliado..." />;
+  }
+
+  // Visitante deslogado: convite público compartilhável para se tornar afiliado
+  if (!user) {
+    return (
+      <div className="min-h-[100dvh] px-4 sm:px-6 pt-20 lg:pt-12 pb-28 lg:pb-16 max-w-3xl mx-auto relative z-10 overflow-x-hidden">
+        <div className="mb-6 hidden lg:flex">
+          <BackButton label="Voltar" to="/" />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-6 sm:p-10 rounded-[32px] border border-[#C9A227]/35 bg-gradient-to-b from-[#0E1A32]/90 via-[#081020]/95 to-[#050811]/95 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.65)] text-center space-y-6"
+        >
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-[#C9A227]/15 border border-[#C9A227]/40 flex items-center justify-center text-[#F5DE98]">
+            <Rocket className="w-7 h-7" />
+          </div>
+
+          <div className="space-y-2">
+            <span className="inline-block text-[10px] font-mono uppercase tracking-[0.22em] text-[#F5DE98]/85 font-semibold">
+              Programa de Afiliados • 20% por Venda
+            </span>
+            <h1 className="font-ps-display text-3xl sm:text-4xl font-bold text-white tracking-tight">
+              Indique o Protocolo Solar e ganhe 20% via Pix
+            </h1>
+            <p className="text-white/65 font-ps-ui text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+              Crie seu link exclusivo em segundos, compartilhe com sua audiência ou amigos e acompanhe cada clique e venda confirmada em tempo real. O preço para quem compra continua exatamente o mesmo.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-white/45 mb-1">
+                1 Casa Avulsa (R$ 19,90)
+              </p>
+              <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
+                +{formatBrl(calculateCommissionBrl(19.9, 20))}
+              </p>
+              <p className="text-[11px] text-white/50">20% por venda</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-white/45 mb-1">
+                Pacote Expansão (R$ 49,90)
+              </p>
+              <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
+                +{formatBrl(calculateCommissionBrl(49.9, 20))}
+              </p>
+              <p className="text-[11px] text-white/50">20% por venda</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-white/45 mb-1">
+                Mapa Completo (R$ 99,90)
+              </p>
+              <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
+                +{formatBrl(calculateCommissionBrl(99.9, 20))}
+              </p>
+              <p className="text-[11px] text-white/50">20% por venda</p>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <button
+              onClick={() => navigate("/auth?returnTo=%2Fafiliado")}
+              className="w-full sm:w-auto min-h-[52px] px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#C9A227] via-[#E5C158] to-[#C9A227] text-black font-ps-ui text-xs font-bold uppercase tracking-[0.16em] inline-flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(201,162,39,0.28)]"
+            >
+              Entrar ou Criar Conta para Ativar Meu Link
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
   }
 
   const affiliate = dashboard?.affiliate;
   const stats = dashboard?.stats;
   const commissions = dashboard?.commissions ?? [];
 
-  // Usuário autenticado mas ainda não cadastrado como afiliado
+  // Usuário autenticado mas ainda não é afiliado: auto-cadastro instantâneo em 1 passo
   if (!dbReady || !dashboard?.is_affiliate || !affiliate || !stats) {
     return (
       <div className="min-h-[100dvh] px-4 sm:px-6 pt-20 lg:pt-12 pb-28 lg:pb-16 max-w-3xl mx-auto relative z-10 overflow-x-hidden">
@@ -117,33 +239,32 @@ const AffiliateDashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 sm:p-10 rounded-[32px] border border-[#C9A227]/30 bg-gradient-to-b from-[#0E1A32]/90 via-[#081020]/95 to-[#050811]/95 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.65)] text-center space-y-6"
+          className="p-6 sm:p-10 rounded-[32px] border border-[#C9A227]/35 bg-gradient-to-b from-[#0E1A32]/90 via-[#081020]/95 to-[#050811]/95 backdrop-blur-xl shadow-[0_24px_70px_rgba(0,0,0,0.65)] space-y-6"
         >
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-[#C9A227]/15 border border-[#C9A227]/40 flex items-center justify-center text-[#F5DE98]">
-            <Sparkles className="w-7 h-7" />
-          </div>
-
-          <div className="space-y-2">
+          <div className="text-center space-y-2">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#C9A227]/15 border border-[#C9A227]/40 flex items-center justify-center text-[#F5DE98] mb-3">
+              <Sparkles className="w-7 h-7" />
+            </div>
             <span className="inline-block text-[10px] font-mono uppercase tracking-[0.22em] text-[#F5DE98]/85 font-semibold">
-              Programa de Parceiros
+              Programa de Parceiros • 20% por Venda
             </span>
             <h1 className="font-ps-display text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Painel de Afiliados
+              Ative seu Link de Afiliado
             </h1>
             <p className="text-white/65 font-ps-ui text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
               {!dbReady
                 ? "O módulo de afiliados está sendo ativado no servidor. Tente novamente em instantes."
-                : `A conta ${user.email || ""} ainda não está cadastrada como parceira oficial do Protocolo Solar.`}
+                : "Escolha seu código exclusivo abaixo e comece a divulgar agora mesmo. O cliente paga o mesmo valor e você acompanha todas as vendas nesta tela."}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
             <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
               <p className="text-[10px] font-mono uppercase tracking-wider text-white/45 mb-1">
                 1 Casa Avulsa (R$ 19,90)
               </p>
               <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
-                {formatBrl(calculateCommissionBrl(19.9, 20))}
+                +{formatBrl(calculateCommissionBrl(19.9, 20))}
               </p>
               <p className="text-[11px] text-white/50">20% por venda</p>
             </div>
@@ -152,7 +273,7 @@ const AffiliateDashboard = () => {
                 Pacote Expansão (R$ 49,90)
               </p>
               <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
-                {formatBrl(calculateCommissionBrl(49.9, 20))}
+                +{formatBrl(calculateCommissionBrl(49.9, 20))}
               </p>
               <p className="text-[11px] text-white/50">20% por venda</p>
             </div>
@@ -161,28 +282,98 @@ const AffiliateDashboard = () => {
                 Mapa Completo (R$ 99,90)
               </p>
               <p className="font-ps-display text-xl font-bold text-[#F5DE98]">
-                {formatBrl(calculateCommissionBrl(99.9, 20))}
+                +{formatBrl(calculateCommissionBrl(99.9, 20))}
               </p>
               <p className="text-[11px] text-white/50">20% por venda</p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            {isAdmin && (
-              <button
-                onClick={() => navigate("/admin?tab=affiliates")}
-                className="w-full sm:w-auto min-h-[48px] px-6 py-3 rounded-xl bg-gradient-to-r from-[#C9A227] via-[#E5C158] to-[#C9A227] text-black font-ps-ui text-xs font-bold uppercase tracking-[0.16em] hover:brightness-110 transition-all"
-              >
-                Gerenciar Afiliados no Admin
-              </button>
-            )}
-            <button
-              onClick={() => navigate("/")}
-              className="w-full sm:w-auto min-h-[48px] px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-ps-ui text-xs font-semibold uppercase tracking-[0.16em] transition-all"
-            >
-              Voltar para o Início
-            </button>
-          </div>
+          {dbReady && (
+            <form onSubmit={handleJoinAffiliate} className="space-y-4 pt-2 border-t border-white/10 text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-[#F5DE98] font-semibold">
+                    Seu Nome *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={joinName}
+                    onChange={(e) => setJoinName(e.target.value)}
+                    placeholder="Ex: Camila Rocha"
+                    className="w-full min-h-[48px] px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#C9A227]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-[#F5DE98] font-semibold">
+                    Escolha seu Código do Link *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(normalizeAffiliateCode(e.target.value))}
+                    placeholder="Ex: CAMILA"
+                    className="w-full min-h-[48px] px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-sm font-mono font-bold uppercase tracking-wider text-[#FFF3D1] placeholder:text-white/30 focus:outline-none focus:border-[#C9A227]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/60 font-semibold">
+                    Sua Chave Pix (para receber)
+                  </label>
+                  <input
+                    type="text"
+                    value={joinPix}
+                    onChange={(e) => setJoinPix(e.target.value)}
+                    placeholder="CPF, E-mail, Celular ou Aleatória"
+                    className="w-full min-h-[48px] px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#C9A227]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/60 font-semibold">
+                    Onde vai divulgar? (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={joinChannel}
+                    onChange={(e) => setJoinChannel(e.target.value)}
+                    placeholder="Ex: @instagram, TikTok ou WhatsApp"
+                    className="w-full min-h-[48px] px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#C9A227]"
+                  />
+                </div>
+              </div>
+
+              {joinCode && (
+                <div className="px-4 py-3 rounded-xl bg-black/45 border border-[#C9A227]/25 text-xs font-mono text-[#F5DE98]/90 break-all">
+                  Seu link será: <span className="text-white">{buildAffiliateLink(joinCode)}</span>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={joining}
+                  className="w-full sm:flex-1 min-h-[52px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#C9A227] via-[#E5C158] to-[#C9A227] text-black font-ps-ui text-xs font-bold uppercase tracking-[0.16em] inline-flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(201,162,39,0.25)]"
+                >
+                  <Rocket className="w-4 h-4" />
+                  {joining ? "Ativando seu link..." : "Ativar Meu Link de Afiliado (20%)"}
+                </button>
+
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => navigate("/admin?tab=affiliates")}
+                    className="w-full sm:w-auto min-h-[52px] px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-white/85 font-ps-ui text-xs font-semibold uppercase tracking-[0.14em] transition-all"
+                  >
+                    Abrir Admin
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
         </motion.div>
       </div>
     );

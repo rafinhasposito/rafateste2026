@@ -4,6 +4,17 @@ export const AFFILIATE_REF_STORAGE_KEY = "ps_affiliate_ref_v1";
 export const AFFILIATE_CLICK_SESSION_KEY = "ps_affiliate_click_tracked_v1";
 export const AFFILIATE_WINDOW_DAYS = 30;
 export const DEFAULT_COMMISSION_RATE = 20;
+export const RESERVED_AFFILIATE_CODES = new Set([
+  "ADMIN",
+  "SUPORTE",
+  "OFICIAL",
+  "SOLAR",
+  "PROTOCOLO",
+  "API",
+  "AUTH",
+  "CREDITS",
+  "AFILIADO",
+]);
 
 export interface StoredAffiliateRef {
   code: string;
@@ -109,6 +120,19 @@ export const normalizeAffiliateCode = (raw: string | null | undefined): string =
 export const isValidAffiliateCode = (code: string): boolean => {
   const clean = normalizeAffiliateCode(code);
   return clean.length >= 3 && clean.length <= 32 && /^[A-Z0-9_-]+$/.test(clean);
+};
+
+export const suggestAffiliateCodeFromName = (
+  nameOrEmail: string | null | undefined
+): string => {
+  if (!nameOrEmail) return "";
+  const base = nameOrEmail.includes("@")
+    ? nameOrEmail.split("@")[0]
+    : nameOrEmail.trim().split(/\s+/)[0] || "";
+  const clean = normalizeAffiliateCode(base);
+  if (clean.length < 3) return "";
+  if (RESERVED_AFFILIATE_CODES.has(clean)) return `${clean}2026`;
+  return clean;
 };
 
 export const calculateCommissionBrl = (
@@ -279,6 +303,36 @@ export const updateMyAffiliatePix = async (pixKey: string): Promise<void> => {
   if (error) {
     throw new Error(error.message || "Não foi possível salvar sua chave Pix.");
   }
+};
+
+export const joinAffiliateProgram = async (input: {
+  name: string;
+  code: string;
+  pix_key?: string;
+  channel?: string;
+}): Promise<AffiliateProfile> => {
+  const cleanCode = normalizeAffiliateCode(input.code);
+  if (!isValidAffiliateCode(cleanCode)) {
+    throw new Error("Escolha um código entre 3 e 32 caracteres (letras, números ou hífen).");
+  }
+  if (RESERVED_AFFILIATE_CODES.has(cleanCode)) {
+    throw new Error("Este código é reservado. Escolha outro (ex: seu nome ou @).");
+  }
+  const { data, error } = await (supabase as any).rpc("join_affiliate_program_v1", {
+    p_name: input.name.trim(),
+    p_code: cleanCode,
+    p_pix_key: input.pix_key?.trim() || null,
+    p_channel: input.channel?.trim() || null,
+  });
+  if (error) {
+    if (isMissingRpcError(error)) {
+      throw new Error(
+        "Auto-cadastro ainda pendente no banco. Rode a migration 20261121192500_affiliate_self_signup.sql no Supabase."
+      );
+    }
+    throw new Error(error.message || "Não foi possível ativar seu cadastro de afiliado.");
+  }
+  return data as AffiliateProfile;
 };
 
 export const adminGetAffiliatesOverview = async (): Promise<AdminAffiliatesOverview> => {

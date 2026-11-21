@@ -190,18 +190,16 @@ const Profile = () => {
                 <span className="text-[#C9A227] text-xs">→</span>
               </button>
 
-              {(isAffiliate || isAdmin) && (
-                <button
-                  onClick={() => navigate("/afiliado")}
-                  className="w-full py-3 px-3.5 bg-emerald-500/12 hover:bg-emerald-500/20 border border-emerald-400/35 rounded-xl text-emerald-200 font-semibold transition-all text-xs font-ps-ui flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Handshake className="w-4 h-4 text-emerald-300" />
-                    <span>Painel de Afiliado</span>
-                  </div>
-                  <span className="text-emerald-300 text-xs">→</span>
-                </button>
-              )}
+              <button
+                onClick={() => navigate("/afiliado")}
+                className="w-full py-3 px-3.5 bg-emerald-500/12 hover:bg-emerald-500/20 border border-emerald-400/35 rounded-xl text-emerald-200 font-semibold transition-all text-xs font-ps-ui flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Handshake className="w-4 h-4 text-emerald-300" />
+                  <span>{isAffiliate ? "Painel de Afiliado" : "Indique e Ganhe 20% (Afiliado)"}</span>
+                </div>
+                <span className="text-emerald-300 text-xs">→</span>
+              </button>
 
               {isAdmin && (
                 <button
