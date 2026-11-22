@@ -94,7 +94,7 @@ export default function HouseTrailerApp() {
 
 
   const [isProcessing, setIsProcessing] = useState(false);
-  const [usePassNow, setUsePassNow] = useState(true);
+  const [usePassNow, setUsePassNow] = useState(false);
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
   const userCredits = profile?.credits ?? 0;

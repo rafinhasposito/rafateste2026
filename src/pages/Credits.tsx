@@ -1078,32 +1078,6 @@ const Credits = () => {
           })}
         </div>
       )}
-
-      {/* Barra Minimalista e Clara de Como Usar Seus Créditos */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.25 }}
-        className="mt-14 pt-8 border-t border-white/10 max-w-5xl mx-auto"
-      >
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
-            <MapPin className="w-3.5 h-3.5 text-[#C9A227]" />
-            <span className="text-white/75 font-light">1 Crédito Avulso (R$ 19,90):</span>
-            <span className="text-[#F5DE98] font-bold">Libera 1 Casa</span>
-          </div>
-          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-white/[0.08] bg-[#08111F]/70 text-xs">
-            <Crown className="w-3.5 h-3.5 text-[#C9A227]" />
-            <span className="text-white/75 font-light">Pacote Expansão (R$ 49,90):</span>
-            <span className="text-[#F5DE98] font-bold">1 Casa + Todos os 8 Focos</span>
-          </div>
-          <div className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-[#C9A227]/30 bg-[#C9A227]/10 text-xs">
-            <Compass className="w-3.5 h-3.5 text-[#F5DE98]" />
-            <span className="text-white/85 font-light">Mapa Completo (R$ 99,90):</span>
-            <span className="text-[#F5DE98] font-bold">Todas as 12 Casas + Todos os Focos</span>
-          </div>
-        </div>
-      </motion.div>
     </div>
   );
 };

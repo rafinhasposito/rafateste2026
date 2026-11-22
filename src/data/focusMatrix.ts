@@ -293,6 +293,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step2": "Acenda uma vela dourada ou branca e entregue em silêncio o que não está sob seu controle.",
         "step3": "Escreva uma carta curta para o seu 'eu' do próximo aniversário selando seu principal compromisso de alma."
       }
+    },
+    "saude": {
+      "match": 92,
+      "theme": "Vitalidade Física, Impulso Corporal e Autocuidado Ativo",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor da sua vitalidade física, estimulando mais disposição corporal, iniciativa para treinar e cuidado direto com sua energia.",
+      "secret": "Na Casa 1, o corpo responde à atitude. Em {cidade}, o ciclo favorece assumir responsabilidade real pela sua disposição: retomar exercícios, fazer exames preventivos e cortar hábitos que drenam seu fôlego.",
+      "mantra": "Eu cuido do meu corpo com constância e respeito para sustentar minhas escolhas com vigor.",
+      "blindSpot": "Começar treinos intensos demais sem aquecimento ou ignorar sinais de cansaço por excesso de pressa.",
+      "defenseProtocol": "Evolua a carga aos poucos, mantenha hidratação diária e respeite dias reais de recuperação muscular.",
+      "pillars": [
+        {
+          "title": "Disposição em Alta",
+          "description": "Atividades físicas dinâmicas e movimento regular tendem a elevar rapidamente seu nível de energia."
+        },
+        {
+          "title": "Cabeça e Corpo Alinhados",
+          "description": "Reduzir tensões acumuladas na cabeça, pescoço e mandíbula ajuda a melhorar foco e qualidade do sono."
+        },
+        {
+          "title": "Autocuidado Prioritário",
+          "description": "Colocar sua saúde no topo da agenda evita desgastes desnecessários ao longo do ano."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Avaliação e Recomeço",
+          "description": "Os primeiros 4 meses favorecem check-ups preventivos e a escolha de uma atividade física que você realmente goste."
+        },
+        {
+          "title": "Ritmo e Resistência",
+          "description": "No meio do ciclo, manter consistência semanal ajuda a consolidar mais fôlego e força física."
+        },
+        {
+          "title": "Vitalidade Sustentada",
+          "description": "Tendência a fechar o ano com mais autonomia sobre seus hábitos e disposição mais estável."
+        }
+      ],
+      "ritual": {
+        "step1": "No dia do seu aniversário {em_cidade}, faça uma caminhada ao ar livre respirando fundo e observando como seu corpo se sente.",
+        "step2": "Agende os exames preventivos ou consultas de rotina que você vinha adiando.",
+        "step3": "Defina três horários fixos na semana dedicados exclusivamente ao movimento físico."
+      }
     }
   },
   "2": {
@@ -588,6 +630,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step1": "Toque a terra, uma árvore ou caminhe descalço(a) por alguns minutos no dia do aniversário {em_cidade} para aterrar sua energia.",
         "step2": "Escreva 10 motivos concretos pelos quais sua vida já é abundante hoje.",
         "step3": "Faça uma doação discreta ou gesto generoso anônimo para abrir o novo ciclo no fluxo da fartura."
+      }
+    },
+    "saude": {
+      "match": 68,
+      "theme": "Nutrição Consciente, Prazer Saudável e Constância Corporal",
+      "headline": "Celebrar seu aniversário {em_cidade} favorece cuidar da saúde pelos sentidos, priorizando alimentação de qualidade, sono reparador e ritmo corporal sem extremos.",
+      "secret": "Na Casa 2, saúde se constrói com constância e prazer real. Em {cidade}, dietas restritivas demais tendem a falhar — o caminho mais favorável é comida de verdade, sono regular e cuidado especial com garganta e pescoço.",
+      "mantra": "Eu nutro meu corpo com qualidade, calma e constância para viver com bem-estar duradouro.",
+      "blindSpot": "Descontar estresse em comida por conforto excessivo ou cair no sedentarismo por acomodação.",
+      "defenseProtocol": "Combine prazer à mesa com porções equilibradas e mantenha movimento diário leve, mesmo em semanas cheias.",
+      "pillars": [
+        {
+          "title": "Alimentação de Valor",
+          "description": "Escolher ingredientes naturais e refeições feitas com calma favorece digestão e energia estável."
+        },
+        {
+          "title": "Ritmo Sustentável",
+          "description": "Treinos constantes e moderados tendem a trazer melhores resultados do que picos de exaustão."
+        },
+        {
+          "title": "Descanso Reparador",
+          "description": "Proteger suas horas de sono ajuda a equilibrar humor, imunidade e disposição diária."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Ajuste Nutricional",
+          "description": "Nos primeiros 4 meses, revisar compras, hidratação e qualidade das refeições cria base firme."
+        },
+        {
+          "title": "Consistência Física",
+          "description": "Meio do ano propício para fortalecer resistência muscular e manter exames em dia."
+        },
+        {
+          "title": "Equilíbrio Estável",
+          "description": "Ciclo favorável para encerrar o ano sentindo o corpo mais nutrido, sereno e resistente."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, faça uma refeição nutritiva com atenção plena, sem telas por perto.",
+        "step2": "Organize sua rotina de água e horários de dormir para a semana seguinte.",
+        "step3": "Escolha uma prática corporal prazerosa que você consiga sustentar o ano inteiro."
       }
     }
   },
@@ -885,6 +969,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step2": "Observe durante o dia do aniversário uma frase ou símbolo que se repita no seu caminho.",
         "step3": "Escolha um livro de sabedoria prática para ler devagar ao longo dos próximos 3 meses."
       }
+    },
+    "saude": {
+      "match": 64,
+      "theme": "Clareza Mental, Respiração e Desaceleração do Sistema Nervoso",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor da saúde mental e respiratória, convidando você a equilibrar estímulos, telas e pausas para manter a mente leve.",
+      "secret": "Na Casa 3, a mente gira rápido. Em {cidade}, cuidar da saúde passa por proteger seu sistema nervoso: caminhadas diárias, respiração consciente, menos excesso de notificações e atenção a ombros, braços e vias respiratórias.",
+      "mantra": "Eu protejo minha clareza mental com pausas conscientes, respiração calma e foco no essencial.",
+      "blindSpot": "Dormir tarde rolando telas, acumular estímulos demais e sentir cansaço mental mesmo sem esforço físico.",
+      "defenseProtocol": "Crie horários sem celular antes de dormir e inclua pequenas pausas de 5 minutos entre blocos de tarefas.",
+      "pillars": [
+        {
+          "title": "Higiene Digital",
+          "description": "Reduzir ruído de mensagens e notificações favorece sono mais profundo e menos ansiedade."
+        },
+        {
+          "title": "Respiração e Movimento",
+          "description": "Caminhadas curtas, corrida leve ou natação ajudam a oxigenar a mente e aliviar tensões."
+        },
+        {
+          "title": "Postura e Alongamento",
+          "description": "Cuidar de punhos, ombros e cervical evita sobrecarga de quem passa muitas horas no computador."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Despoluição Mental",
+          "description": "Primeiros 4 meses ideais para ajustar sono, reduzir telas à noite e organizar pausas reais."
+        },
+        {
+          "title": "Fôlego e Agilidade",
+          "description": "Meio do ciclo favorável para esportes leves e atividades ao ar livre que renovam o ânimo."
+        },
+        {
+          "title": "Mente Equilibrada",
+          "description": "Tendência a fechar o ano com mais foco, menos agitação mental e energia melhor distribuída."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, passe pelo menos 2 horas offline caminhando ou apreciando a cidade.",
+        "step2": "Configure um limite noturno para notificações no celular a partir de hoje.",
+        "step3": "Pratique 5 minutos de respiração lenta para ancorar mais calma na sua rotina."
+      }
     }
   },
   "4": {
@@ -1180,6 +1306,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step1": "No minuto da sua virada solar {em_cidade}, agradeça em silêncio aos seus pais e antepassados pela vida recebida.",
         "step2": "Coloque um copo de água limpa e flores frescas em um ponto especial da sua casa ao retornar.",
         "step3": "Reserve 10 minutos toda noite para agradecer três bênçãos silenciosas do dia antes de adormecer."
+      }
+    },
+    "saude": {
+      "match": 76,
+      "theme": "Saúde Emocional, Sono Profundo e Recuperação no Lar",
+      "headline": "Celebrar seu aniversário {em_cidade} favorece cuidar da saúde de dentro para fora, priorizando equilíbrio emocional, digestão leve e noites realmente reparadoras.",
+      "secret": "Na Casa 4, o corpo reflete diretamente como estão suas emoções e seu ambiente doméstico. Em {cidade}, o ciclo favorece cozinhar mais em casa, cuidar do estômago e do sono e transformar seu lar em espaço de descanso real.",
+      "mantra": "Eu acolho minhas emoções, cuido do meu descanso e fortaleço minha saúde pela paz interior.",
+      "blindSpot": "Engolir preocupações familiares em silêncio e deixar o estresse emocional refletir em insônia ou gastrite.",
+      "defenseProtocol": "Preserve momentos de recolhimento semanal, faça refeições leves à noite e converse sobre o que sente antes de acumular.",
+      "pillars": [
+        {
+          "title": "Digestão e Nutrição Afetiva",
+          "description": "Comida caseira e horários regulares tendem a melhorar digestão, imunidade e bem-estar."
+        },
+        {
+          "title": "Quarto de Descanso Real",
+          "description": "Investir em silêncio, escuridão e boa temperatura no quarto favorece um sono mais restaurador."
+        },
+        {
+          "title": "Alívio Emocional",
+          "description": "Terapia, escrita ou conversas francas ajudam o corpo a soltar tensões acumuladas."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Cuidado com o Ambiente",
+          "description": "Nos primeiros 4 meses, melhorar conforto do quarto e alimentação em casa já tende a elevar seu vigor."
+        },
+        {
+          "title": "Equilíbrio Emocional",
+          "description": "Meio do ano propício para fortalecer saúde emocional e estabelecer limites saudáveis na rotina."
+        },
+        {
+          "title": "Vitalidade Serena",
+          "description": "Tendência a concluir o ciclo com mais estabilidade emocional e descanso mais consistente."
+        }
+      ],
+      "ritual": {
+        "step1": "No dia do seu aniversário {em_cidade}, desacelere o ritmo e reserve um tempo tranquilo para descansar sem culpa.",
+        "step2": "Escolha uma melhoria concreta para a qualidade do seu sono nesta semana.",
+        "step3": "Planeje refeições mais leves e caseiras para os próximos dias."
       }
     }
   },
@@ -1477,6 +1645,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step2": "Relembre algo que você amava fazer aos 8 anos de idade e traga um pedaço disso para sua vida hoje.",
         "step3": "Faça alguém rir de verdade ou ofereça um elogio inesperado a um desconhecido no dia da sua virada."
       }
+    },
+    "saude": {
+      "match": 78,
+      "theme": "Vigor pelo Prazer, Saúde do Coração e Movimento Alegre",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor da vitalidade ligada ao prazer, favorecendo esportes divertidos, mais sol e leveza para manter o corpo ativo.",
+      "secret": "Na Casa 5, cuidar da saúde funciona muito melhor quando envolve alegria. Em {cidade}, o ciclo favorece trocar treinos tediosos por dança, esportes, atividades ao sol e atenção gentil à saúde cardiovascular e à coluna.",
+      "mantra": "Eu movimento meu corpo com alegria e cultivo vitalidade celebrando o prazer de viver bem.",
+      "blindSpot": "Exagerar em festas, noites viradas ou álcool e perder a constância do cuidado semanal.",
+      "defenseProtocol": "Equilibre diversão com hidratação, boas noites de sono e uma atividade física que dê prazer genuíno.",
+      "pillars": [
+        {
+          "title": "Movimento com Prazer",
+          "description": "Dança, esportes recreativos ou treinos dinâmicos aumentam a adesão e liberam endorfina."
+        },
+        {
+          "title": "Coração e Postura",
+          "description": "Exercícios aeróbicos regulares e fortalecimento das costas ajudam a sustentar mais fôlego."
+        },
+        {
+          "title": "Lazer como Saúde",
+          "description": "Reservar tempo real para hobbies e risadas reduz cortisol e melhora o humor."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Despertar do Prazer",
+          "description": "Nos primeiros 4 meses, teste modalidades novas até encontrar uma atividade que dê vontade de praticar."
+        },
+        {
+          "title": "Fôlego e Expressão",
+          "description": "Meio do ano favorável para ganhar condicionamento físico e aproveitar mais atividades ao ar livre."
+        },
+        {
+          "title": "Energia Leve",
+          "description": "Tendência a fechar o ciclo com corpo mais ativo e relação mais leve com o autocuidado."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, faça algo ao ar livre sob a luz do dia que traga alegria imediata ao seu corpo.",
+        "step2": "Agende uma aula experimental de um esporte, dança ou prática corporal que desperte seu interesse.",
+        "step3": "Combine diversão com um compromisso simples de hidratação e descanso nesta semana."
+      }
     }
   },
   "6": {
@@ -1772,6 +1982,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step1": "Pratique 5 minutos de respiração consciente ao acordar no dia do seu aniversário {em_cidade}.",
         "step2": "Faça um ato discreto de serviço útil a alguém (ou a um animal/causa ambiental) ainda nesta semana.",
         "step3": "Escolha um momento fixo do dia — como o primeiro café — para viver em silêncio absoluto e gratidão."
+      }
+    },
+    "saude": {
+      "match": 98,
+      "theme": "Saúde Preventiva, Condicionamento Físico e Hábitos Sólidos",
+      "headline": "Este é um dos ciclos mais favoráveis para a saúde no mapa: celebrar {em_cidade} joga a favor de check-ups, alimentação equilibrada e condicionamento físico consistente.",
+      "secret": "A Casa 6 é a casa clássica da saúde e do bem-estar cotidiano. Em {cidade}, pequenos ajustes feitos com regularidade — exames preventivos, alimentação limpa, musculação e boa hidratação — tendem a gerar ganhos visíveis de vitalidade.",
+      "mantra": "Eu honro meu corpo todos os dias com hábitos simples, conscientes e sustentáveis.",
+      "blindSpot": "Cair em perfeccionismo rígido com dieta/treino ou somatizar estresse excessivo de trabalho.",
+      "defenseProtocol": "Busque acompanhamento profissional confiável, acompanhe seus exames e valorize a constância acima da perfeição.",
+      "pillars": [
+        {
+          "title": "Prevenção Inteligente",
+          "description": "Check-ups clínicos, exames de sangue e acompanhamento médico trazem clareza e segurança."
+        },
+        {
+          "title": "Força e Mobilidade",
+          "description": "Combinar treino de força, cardio leve e alongamento favorece longevidade e disposição diária."
+        },
+        {
+          "title": "Intestino e Imunidade",
+          "description": "Mais fibras, água e refeições regulares ajudam a estabilizar energia ao longo do dia."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Diagnóstico e Base",
+          "description": "Primeiros 4 meses excelentes para fazer exames, ajustar vitaminas e montar um plano realista."
+        },
+        {
+          "title": "Evolução Constante",
+          "description": "Meio do ciclo propício para perceber mais resistência física, foco e sono regulado."
+        },
+        {
+          "title": "Hábito Consolidado",
+          "description": "Tendência a encerrar o ano com saúde mais acompanhada e rotina corporal funcionando com fluidez."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, comece o dia hidratando bem o corpo e fazendo uma refeição limpa e equilibrada.",
+        "step2": "Marque seus exames anuais ou consulta com médico/nutricionista ainda neste mês.",
+        "step3": "Defina uma meta física realista para os próximos 90 dias e acompanhe semanalmente."
       }
     }
   },
@@ -2069,6 +2321,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step2": "Agradeça por três pessoas que ensinaram lições decisivas para quem você é hoje.",
         "step3": "Durante toda a semana do aniversário, pratique responder a qualquer tensão com calma antes de reagir."
       }
+    },
+    "saude": {
+      "match": 66,
+      "theme": "Equilíbrio Hormonal, Cuidado Compartilhado e Harmonia Corporal",
+      "headline": "Celebrar seu aniversário {em_cidade} favorece cuidar da saúde com apoio e equilíbrio, abrindo espaço para treinos em dupla e atenção especial à hidratação e à lombar.",
+      "secret": "Na Casa 7, a saúde responde muito bem ao equilíbrio e ao acompanhamento. Em {cidade}, contar com personal, nutricionista, médico ou companhia para se exercitar ajuda a manter constância, cuidando também de rins, hidratação e região lombar.",
+      "mantra": "Eu cultivo equilíbrio no corpo e na mente, somando forças com quem apoia meu bem-estar.",
+      "blindSpot": "Negligenciar seus próprios cuidados físicos para atender demandas dos outros o tempo todo.",
+      "defenseProtocol": "Mantenha seus horários de saúde protegidos na agenda e beba água regularmente ao longo do dia.",
+      "pillars": [
+        {
+          "title": "Apoio Profissional",
+          "description": "Ter acompanhamento qualificado ou um parceiro de treino aumenta bastante sua constância."
+        },
+        {
+          "title": "Hidratação e Lombar",
+          "description": "Atenção à ingestão de água, postura sentada e fortalecimento do core protege sua base física."
+        },
+        {
+          "title": "Paz nas Relações",
+          "description": "Resolver atritos com diálogo reduz desgaste emocional e melhora a qualidade do sono."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Alinhamento de Apoio",
+          "description": "Nos primeiros 4 meses, escolha profissionais ou parcerias que ajudem você a manter seus hábitos."
+        },
+        {
+          "title": "Equilíbrio em Movimento",
+          "description": "Meio do ciclo propício para harmonizar ritmo de trabalho, descanso e atividade física."
+        },
+        {
+          "title": "Bem-Estar Compartilhado",
+          "description": "Tendência a fechar o ciclo com saúde mais equilibrada e bons hábitos integrados à vida a dois."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, convide alguém querido para uma caminhada ou atividade saudável juntos.",
+        "step2": "Deixe uma garrafa de água sempre à vista na sua mesa para reforçar sua hidratação diária.",
+        "step3": "Agende uma conversa com um profissional de saúde para ajustar seus cuidados deste ciclo."
+      }
     }
   },
   "8": {
@@ -2364,6 +2658,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step1": "No minuto exato do seu Retorno Solar {em_cidade}, agradeça pelas batalhas que moldaram sua força até aqui.",
         "step2": "Escreva o nome de um ciclo antigo que você encerra com gratidão e guarde apenas a lição que ele trouxe.",
         "step3": "Reserve um momento semanal de silêncio à noite para ouvir sua intuição antes de grandes escolhas."
+      }
+    },
+    "saude": {
+      "match": 74,
+      "theme": "Regeneração Profunda, Detox de Hábitos e Saúde Mental",
+      "headline": "Passar seu aniversário {em_cidade} cria um clima propício para regeneração pela raiz, favorecendo abandonar hábitos desgastantes e cuidar profundamente da saúde emocional.",
+      "secret": "Na Casa 8, a saúde pede profundidade em vez de remendos superficiais. Em {cidade}, o ciclo favorece investigar causas reais de cansaço, cortar excessos (açúcar, álcool, privação de sono) e investir em terapia e recuperação real.",
+      "mantra": "Eu liberto o que desgasta minha energia e invisto na regeneração verdadeira do meu corpo e da minha mente.",
+      "blindSpot": "Guardar tensões intensas até o limite físico ou adiar exames importantes por receio do resultado.",
+      "defenseProtocol": "Encare check-ups com serenidade, corte um hábito claramente nocivo por vez e dê espaço para suporte emocional.",
+      "pillars": [
+        {
+          "title": "Investigação Completa",
+          "description": "Exames detalhados e atenção a sinais sutis ajudam a tratar causas na raiz."
+        },
+        {
+          "title": "Corte de Excessos",
+          "description": "Reduzir substâncias ou padrões que drenam seu vigor abre espaço para rápida recuperação."
+        },
+        {
+          "title": "Saúde Emocional Profunda",
+          "description": "Psicoterapia e práticas de regulação emocional fortalecem corpo e mente em conjunto."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Faxina de Hábitos",
+          "description": "Primeiros 4 meses favoráveis para identificar e cortar o que mais consome sua vitalidade."
+        },
+        {
+          "title": "Regeneração Ativa",
+          "description": "Meio do ciclo propício para tratamentos bem acompanhados e fortalecimento emocional."
+        },
+        {
+          "title": "Vigor Renovado",
+          "description": "Tendência a encerrar o ano sentindo o organismo mais leve, forte e consciente dos próprios limites."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, anote um hábito físico ou mental que você escolhe encerrar neste novo ciclo.",
+        "step2": "Marque os exames de acompanhamento que trazem clareza sobre sua saúde atual.",
+        "step3": "Priorize uma noite de descanso profundo e sem excessos para inaugurar sua fase de regeneração."
       }
     }
   },
@@ -2661,6 +2997,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step2": "Escreva os 3 princípios éticos inegociáveis que guiarão todas as suas escolhas neste novo ano.",
         "step3": "Agradeça antecipadamente pelas portas grandes que o universo já está alinhando para você."
       }
+    },
+    "saude": {
+      "match": 72,
+      "theme": "Ar Livre, Mobilidade e Vitalidade em Expansão",
+      "headline": "Celebrar seu aniversário {em_cidade} favorece renovar sua vitalidade ao ar livre, estimulando movimento amplo, contato com a natureza e atenção gentil a pernas, quadris e fígado.",
+      "secret": "Na Casa 9, confinamento excessivo drena seu ânimo. Em {cidade}, sua saúde tende a responder melhor a trilhas, caminhadas em parques, alongamento de quadris e pernas, alimentação mais leve e pausas em ambientes abertos.",
+      "mantra": "Eu alimento minha vitalidade com movimento livre, natureza e escolhas que ampliam meu fôlego.",
+      "blindSpot": "Exagerar em comidas pesadas ou bebidas durante viagens e esquecer de alongar o corpo.",
+      "defenseProtocol": "Inclua sol matinal, caminhadas ao ar livre e refeições leves que poupem seu fígado e sustentem energia em viagens.",
+      "pillars": [
+        {
+          "title": "Natureza e Luz Solar",
+          "description": "Exposição moderada ao sol da manhã e ambientes abertos favorecem humor e ciclo do sono."
+        },
+        {
+          "title": "Mobilidade de Quadris e Pernas",
+          "description": "Alongamentos, corrida leve ou ciclismo ajudam a manter articulações soltas e bom fôlego."
+        },
+        {
+          "title": "Leveza Digestiva",
+          "description": "Moderação em álcool e ultraprocessados tende a elevar sua disposição durante o ano."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Abertura de Movimento",
+          "description": "Primeiros 4 meses propícios para incluir atividades ao ar livre e soltar o sedentarismo."
+        },
+        {
+          "title": "Fôlego para Viagens",
+          "description": "Meio do ciclo favorável para ganhar resistência aeróbica e cuidar da hidratação em deslocamentos."
+        },
+        {
+          "title": "Vitalidade Expansiva",
+          "description": "Tendência a fechar o ciclo com mais leveza corporal, flexibilidade e mente oxigenada."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, caminhe em um parque, praia ou mirante sob a luz natural.",
+        "step2": "Faça 10 minutos de alongamento focado em pernas, quadris e coluna.",
+        "step3": "Inclua ao menos duas saídas semanais ao ar livre na sua agenda fixa."
+      }
     }
   },
   "10": {
@@ -2956,6 +3334,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step1": "No minuto da sua virada {em_cidade}, dedique as conquistas deste ano a um propósito que vá além do próprio ego.",
         "step2": "Escreva como o seu sucesso pode beneficiar diretamente outras pessoas nos próximos 12 meses.",
         "step3": "Escolha uma mentoria gratuita ou causa social para apoiar discretamente ao longo do ciclo."
+      }
+    },
+    "saude": {
+      "match": 65,
+      "theme": "Sustentabilidade Física, Postura e Prevenção do Burnout",
+      "headline": "Passar seu aniversário {em_cidade} convida a tratar sua saúde com seriedade estratégica, protegendo sua energia contra sobrecarga e cuidando de coluna, joelhos e descanso.",
+      "secret": "Na Casa 10, a ambição costuma crescer — e o corpo precisa de estrutura para acompanhar. Em {cidade}, o ciclo favorece ergonomia, fortalecimento de coluna e joelhos, check-ups odontológicos e limites claros de horário para evitar burnout.",
+      "mantra": "Eu protejo minha saúde como a base mais importante das minhas conquistas de longo prazo.",
+      "blindSpot": "Trabalhar até a exaustão acreditando que descansar é perda de tempo.",
+      "defenseProtocol": "Trate sono, treino e consultas médicas como compromissos inegociáveis na mesma agenda do trabalho.",
+      "pillars": [
+        {
+          "title": "Coluna, Joelhos e Estrutura",
+          "description": "Fortalecimento muscular e ergonomia bem ajustada previnem dores e sustentam sua rotina."
+        },
+        {
+          "title": "Gestão de Estresse",
+          "description": "Definir hora real de encerrar o expediente protege seu sistema nervoso e sua produtividade."
+        },
+        {
+          "title": "Check-up Estrutural",
+          "description": "Cuidar de postura, saúde bucal e exames anuais evita interrupções inesperadas no ano."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Ajuste de Ergonomia",
+          "description": "Primeiros 4 meses ótimos para revisar cadeira, postura, sono e check-ups preventivos."
+        },
+        {
+          "title": "Ritmo Sustentável",
+          "description": "Meio do ano propício para manter disciplina física mesmo nos picos de demanda profissional."
+        },
+        {
+          "title": "Fôlego de Longo Prazo",
+          "description": "Tendência a encerrar o ciclo com mais resistência física e clareza para sustentar grandes metas."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, bloqueie na agenda os seus horários semanais de treino e descanso como reuniões prioritárias.",
+        "step2": "Revise a ergonomia do seu local de trabalho e faça um alongamento completo da coluna.",
+        "step3": "Agende um check-up preventivo (incluindo dentista e exames básicos) ainda neste mês."
       }
     }
   },
@@ -3253,6 +3673,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step2": "Escolha uma causa coletiva que toca seu coração para apoiar regularmente neste ciclo.",
         "step3": "Guarde sua lista de 7 grandes desejos do ano e só abra novamente no próximo aniversário."
       }
+    },
+    "saude": {
+      "match": 68,
+      "theme": "Esportes em Grupo, Circulação e Tecnologia a Favor da Saúde",
+      "headline": "Celebrar seu aniversário {em_cidade} joga a favor de cuidar da saúde em comunidade, usando grupos de treino, hábitos modernos e atenção à circulação para manter o ritmo.",
+      "secret": "Na Casa 11, treinar isolado costuma entediar rápido. Em {cidade}, sua vitalidade tende a crescer com esportes coletivos, grupos de corrida ou pedal, acompanhamento inteligente de sono e atenção especial à circulação e tornozelos.",
+      "mantra": "Eu cuido da minha vitalidade com leveza, movimento em comunidade e hábitos inteligentes.",
+      "blindSpot": "Dormir em horários irregulares por excesso de telas ou acumular tensão nervosa sem descarga física.",
+      "defenseProtocol": "Use esportes em grupo como âncora social da sua saúde e regularize o horário de desacelerar à noite.",
+      "pillars": [
+        {
+          "title": "Treino em Comunidade",
+          "description": "Assessorias, esportes de quadra ou aulas coletivas tornam a constância muito mais natural."
+        },
+        {
+          "title": "Circulação e Movimento",
+          "description": "Caminhar, pedalar ou correr com regularidade favorece saúde vascular e alívio do estresse."
+        },
+        {
+          "title": "Dados a Seu Favor",
+          "description": "Acompanhar sono, passos e hidratação de forma simples ajuda a perceber padrões rapidamente."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Escolha da Tribo",
+          "description": "Primeiros 4 meses favoráveis para entrar em um grupo esportivo ou testar novas modalidades."
+        },
+        {
+          "title": "Ritmo Social Saudável",
+          "description": "Meio do ciclo propício para melhorar condicionamento físico e reduzir estresse mental."
+        },
+        {
+          "title": "Energia Leve e Constante",
+          "description": "Tendência a encerrar o ciclo com novos amigos ativos e hábitos mais flexíveis."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, experimente uma atividade física em grupo ou ao ar livre com amigos.",
+        "step2": "Defina uma meta simples de passos diários ou horas de sono para acompanhar nesta semana.",
+        "step3": "Alongue panturrilhas e tornozelos ao final do dia para aliviar tensões acumuladas."
+      }
     }
   },
   "12": {
@@ -3548,6 +4010,48 @@ export const FOCUS_MATRIX: Record<number, Record<string, any>> = {
         "step1": "No minuto exato do seu Retorno Solar {em_cidade}, faça 5 minutos de silêncio absoluto apenas respirando e recebendo luz.",
         "step2": "Deixe um caderno ao lado da cama para anotar sonhos e insights nas primeiras manhãs do ciclo.",
         "step3": "Entregue conscientemente um grande peso emocional em oração ou meditação, confiando na condução maior."
+      }
+    },
+    "saude": {
+      "match": 90,
+      "theme": "Saúde Mental, Imunidade e Descanso Restaurador",
+      "headline": "Passar seu aniversário {em_cidade} joga a favor da saúde integral, colocando seu sistema nervoso, o sono profundo e o descanso emocional como prioridades do novo ciclo.",
+      "secret": "Na Casa 12, cuidar da mente e do descanso é o maior investimento em imunidade. Em {cidade}, o ciclo favorece terapias, meditação, natação, yoga, contato com água e exames preventivos detalhados para restaurar sua bateria por inteiro.",
+      "mantra": "Eu respeito meus limites, valorizo o descanso e fortaleço minha saúde no silêncio reparador.",
+      "blindSpot": "Ignorar cansaço emocional prolongado ou tentar manter um ritmo frenético quando o corpo pede pausa.",
+      "defenseProtocol": "Proteja noites de 7 a 8 horas de sono, reduza estímulos excessivos e acolha pausas preventivas antes da exaustão.",
+      "pillars": [
+        {
+          "title": "Sono e Sistema Nervoso",
+          "description": "Rotina noturna tranquila tende a melhorar imunidade, memória e estabilidade emocional."
+        },
+        {
+          "title": "Práticas Restauradoras",
+          "description": "Yoga, natação, caminhadas silenciosas ou meditação ajudam a descomprimir o corpo."
+        },
+        {
+          "title": "Cuidado Preventivo",
+          "description": "Acompanhar saúde mental, exames laboratoriais e qualidade dos pés e do descanso faz diferença real."
+        }
+      ],
+      "phases": [
+        {
+          "title": "Descompressão e Exames",
+          "description": "Primeiros 4 meses muito favoráveis para check-ups completos, terapia e reajuste do sono."
+        },
+        {
+          "title": "Restauração Profunda",
+          "description": "Meio do ciclo propício para manter práticas calmas que sustentam clareza e imunidade."
+        },
+        {
+          "title": "Bateria Renovada",
+          "description": "Tendência a encerrar o ano mais descansado(a), sereno(a) e preparado(a) para um novo ciclo ativo."
+        }
+      ],
+      "ritual": {
+        "step1": "No aniversário {em_cidade}, desconecte das notificações por algumas horas e presenteie-se com silêncio ou um banho relaxante.",
+        "step2": "Estabeleça um ritual simples de desligamento 45 minutos antes de dormir.",
+        "step3": "Agende um check-up ou sessão de autocuidado que apoie sua saúde física e emocional."
       }
     }
   }

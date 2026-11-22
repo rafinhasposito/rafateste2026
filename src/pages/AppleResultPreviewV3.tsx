@@ -267,25 +267,25 @@ const LIFE_AREAS = [
   },
   { 
     id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", score: 52, unlocked: false, 
-    teaser: "A força deste destino pede um corpo firme para suportar o peso das suas ambições.", 
-    city: "Vancouver, Canadá",
-    cityDesc: "Natureza implacável e ar puro. Este destino acelera o seu metabolismo e convida ao biohacking natural, purificando a sua vitalidade para suportar o topo da sua carreira.",
-    image: "https://images.unsplash.com/photo-1559511260-66a654ae982a?q=80&w=2118&auto=format&fit=crop",
+    teaser: "A energia deste destino favorece colocar seu corpo e sua disposição no centro das decisões do ciclo.", 
+    city: "Destino Solar",
+    cityDesc: "Este ciclo favorece cuidar da sua energia física, ajustar o sono e estruturar uma rotina sustentável para acompanhar suas metas ao longo do ano.",
+    image: "/images/stories/casa-6.jpg",
     dna: {
-      essencia: "A sua vitalidade é naturalmente alta, mas aqui ela é direcionada para a manutenção da máquina. A energia foca em preservar o seu corpo para aguentar o teto do sucesso.",
-      metodo: "A disciplina assume o controle absoluto da sua biologia. O universo favorece protocolos de biohacking, rotinas de sono e uma alimentação milimetricamente ajustada.",
-      fase: "O corpo já não aceita abusos como antes. O seu momento de vida exige que o autocuidado seja tratado com a mesma prioridade e respeito que a sua conta bancária."
+      essencia: "A sua vitalidade tende a responder melhor quando você trata descanso, movimento e alimentação como pilares práticos do ano.",
+      metodo: "O período joga a favor de constância: pequenos protocolos diários de sono, hidratação e treino geram mais resultado do que extremos pontuais.",
+      fase: "O momento favorece ouvir os sinais do corpo mais cedo e proteger seu ritmo para sustentar os projetos importantes do ciclo."
     },
-    ritual: "Comece o dia com um choque biológico (um banho gelado ou um treino intenso). Depois, faça a sua primeira refeição no melhor e mais limpo restaurante que encontrar, tratando o alimento como combustível premium.",
-    mantra: "Meu corpo é o templo inegociável das minhas ambições. Eu invisto na minha biologia para que ela sustente a minha mente.",
+    ritual: "No seu aniversário, faça uma caminhada ao ar livre sem celular por 20 minutos, hidrate-se bem e anote os 3 hábitos físicos inegociáveis do seu novo ciclo.",
+    mantra: "Eu cuido da minha energia com constância para que meu corpo sustente cada escolha importante deste ciclo.",
     pillars: [
-      { icon: ArrowUpRight, title: "Energia Inesgotável", text: "O magnetismo local impulsiona o seu vigor. A sensação de cansaço crônico cede espaço para uma energia limpa, acompanhando o ritmo da sua ambição mental." },
-      { icon: Crown, title: "Longevidade e Vigor", text: "A vibração faz com que o seu corpo responda instantaneamente aos bons tratos. O universo recompensa seus novos hábitos com uma aparência de saúde radiante." },
+      { icon: ArrowUpRight, title: "Disposição Sustentada", text: "O ciclo favorece trocar picos de cansaço por um ritmo físico mais estável, com mais clareza para conduzir suas metas." },
+      { icon: Crown, title: "Hábitos Consistentes", text: "Pequenas melhorias em sono, alimentação e movimento tendem a se acumular positivamente ao longo dos 12 meses." },
       { icon: Shield, ShieldAlert, title: "Vitalidade Protegida", text: "O foco se volta para sua saúde e prevenção. O ciclo favorece cuidar melhor da imunidade para que sua disposição acompanhe o ritmo das suas metas." }
     ],
     timeline: [
-      { phase: "Fase 1: Diagnóstico e Ajuste", period: "Meses 1 a 4", text: "A vibração pede checagens precisas. A energia favorece identificar pequenas inflamações e ajustar a sua rotina de sono e alimentação para formar um platô firme de biologia." },
-      { phase: "Fase 2: Biohacking e Vigor", period: "Meses 5 a 8", text: "Os novos hábitos começam a rodar no automático. O universo impulsiona uma vitalidade incomum, acabando com a névoa mental e fornecendo combustível limpo para suas conquistas." },
+      { phase: "Fase 1: Diagnóstico e Ajuste", period: "Meses 1 a 4", text: "O início do ciclo favorece exames de rotina, revisão do sono e ajustes práticos na alimentação para criar uma base física mais firme." },
+      { phase: "Fase 2: Ritmo e Constância", period: "Meses 5 a 8", text: "Com hábitos mais regulares, o período tende a oferecer mais foco, clareza mental e resistência no dia a dia." },
       { phase: "Fase 3: Vitalidade Sustentada", period: "Meses 9 a 12", text: "Com os novos hábitos consolidados, a tendência é de mais estabilidade física e fôlego consistente para sustentar o ritmo das suas ambições." }
     ]
   }
@@ -930,23 +930,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
   const [openArea, setOpenArea] = useState<string>("dinheiro");
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [targetLockedArea, setTargetLockedArea] = useState<UnlockTargetArea | null>(null);
-  // Fallbacks genéricos e atmosféricos baseados no luxo e não em cidades específicas
+  // Fallbacks locais confiáveis das 12 Casas (evita fotos externas quebradas)
   const getAtmosphericFallback = (house: number) => {
-    const fallbacks: Record<number, string> = {
-      1: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&w=1000&q=80",
-      2: "https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&w=1000&q=80",
-      3: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1000&q=80",
-      4: "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1000&q=80",
-      5: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80",
-      6: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d4?auto=format&fit=crop&w=1000&q=80",
-      7: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1000&q=80",
-      8: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
-      9: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1000&q=80",
-      10: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
-      11: "https://images.unsplash.com/photo-1511649475669-e288648b2339?auto=format&fit=crop&w=1000&q=80",
-      12: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=1000&q=80"
-    };
-    return fallbacks[house] || fallbacks[2];
+    const safeHouse = Number.isFinite(house) && house >= 1 && house <= 12 ? Math.trunc(house) : 2;
+    return `/images/stories/casa-${safeHouse}.jpg`;
   };
 
   // Extraindo Rotas Alternativas reais do backend para a Casa ativa atual (P_DYNAMIC.house)
@@ -1356,12 +1343,17 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
         }
       : undefined;
     
+    const focusThemeText = tCity(focusData.theme);
+    const focusSummaryText = focusThemeText
+      ? `${focusThemeText} — seu dossiê de ${area.label.toLowerCase()} ${interpolateCityCopy("{em_cidade}", P_DYNAMIC.city)} está aberto abaixo com 3 pilares, leitura pessoal, segredo do ciclo, ritual e linha do tempo de 12 meses.`
+      : area.cityDesc || area.teaser;
+
     return {
       ...area,
       score: finalScore,
       unlocked: isIntended || isPaidFocus || isLocallyUnlocked,
       teaser: tCity(focusData.headline) || area.teaser,
-      full: tCity(focusData.headline) || area.teaser,
+      full: focusSummaryText,
       mantra: tCity(focusData.mantra) || area.mantra,
       themeData: tCity(focusData.theme),
       secretData: tCity(focusData.secret),
@@ -1487,7 +1479,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     offset: ["start 90%", "start 40%"]
   });
   const textScale = useTransform(casaProgress, [0, 1], [1.12, 1]);
-  const textOpacity = useTransform(casaProgress, [0, 1], [0.25, 1]);
+  const textOpacity = useTransform(casaProgress, [0, 1], [0.92, 1]);
 
   return (
     <div className={`min-h-screen text-[#f5f5f7] overflow-x-clip font-sans transition-colors duration-1000 ${props.hideShellChrome ? "lg:-mt-20" : ""}`} style={{ backgroundColor: `color-mix(in srgb, ${houseColor} 6%, #03100B)`, "--hc": houseColor, "--hc10": `${houseColor}1a`, "--hc15": `${houseColor}26`, "--hc20": `${houseColor}33`, "--hc30": `${houseColor}4d`, "--hc40": `${houseColor}66`, "--hc70": `${houseColor}b3` } as React.CSSProperties}>
@@ -1521,7 +1513,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
           />
         </motion.div>
         
-        <div className="absolute top-20 md:top-24 right-6 md:right-10 z-20 flex items-center gap-2 text-white/50">
+        <div className="absolute top-24 md:top-28 right-6 md:right-10 z-20 flex items-center gap-2 text-white/75">
            <MapPin className="w-3.5 h-3.5" />
            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">{heroCountry}</span>
         </div>
@@ -1564,7 +1556,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
           <button
             type="button"
             onClick={() => setIsStoryShareOpen(true)}
-            className="px-6 py-3 rounded-full bg-gradient-to-r from-[#F5B041] via-[#E67E22] to-[#F5B041] text-[#050507] font-ps-display text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-[0_6px_28px_rgba(245,176,65,0.4)] cursor-pointer hover:brightness-110"
+            className="px-6 py-3 rounded-full bg-[#C9A227] hover:bg-[#D9B643] text-[#02050A] font-ps-display text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-[0_6px_28px_rgba(201,162,39,0.32)] cursor-pointer"
           >
             <Instagram className="w-4 h-4" />
             <span>Compartilhar nos Stories (9:16)</span>
@@ -2144,7 +2136,11 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                   <div className="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 bg-black/20" style={{ borderColor: `${area.color}55` }}>
                                     <area.icon className="w-4 h-4" style={{ color: area.color }} />
                                   </div>
-                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">{area.label}</span>
+                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">
+                                    {(area.unlocked || unlockedItems.includes(area.id))
+                                      ? `Foco Ativo • Casa ${P_DYNAMIC.house}`
+                                      : `Foco do Ano • Casa ${P_DYNAMIC.house}`}
+                                  </span>
                                 </div>
 
                                 {(area.unlocked || unlockedItems.includes(area.id)) ? (
@@ -2232,10 +2228,10 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
                     <motion.div
                       key={activeArea.id}
-                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
                       className="absolute inset-0 w-full h-full flex flex-col justify-end"
                     >
                       {/* BACKGROUNDS PREMIUM */}
@@ -2247,13 +2243,15 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       {/* CONTEÚDO — muda conforme desbloqueio */}
                       <div className="relative z-10 p-8 md:p-12 w-full flex flex-col justify-end h-full">
                         
-                        {/* Ícone + label sempre visível */}
+                        {/* Ícone + contexto da Casa */}
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 bg-black/20 backdrop-blur-md" style={{ borderColor: `${activeArea.color}55` }}>
                             <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
                           </div>
                           <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
-                            {activeArea.label}
+                            {(activeArea.unlocked || unlockedItems.includes(activeArea.id))
+                              ? `Foco Ativo • Casa ${P_DYNAMIC.house}`
+                              : `Foco do Ano • Casa ${P_DYNAMIC.house}`}
                           </span>
                         </div>
 
@@ -2811,6 +2809,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
             {isFutureMode && (
             <>
             {/* BLOCO 7: ROTAS ALTERNATIVAS (Cidades Extras) */}
+            {displayContinents.length > 0 && (
             <div className="w-full max-w-5xl mx-auto mt-16 md:mt-20 mb-24 md:mb-32 px-0 sm:px-6">
               <div className="flex items-center gap-4 mb-10 md:mb-12 border-b border-white/5 pb-6 md:pb-8">
                 <Compass className="w-7 h-7 md:w-8 md:h-8 text-white/50 shrink-0" />
@@ -2899,6 +2898,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                 ))}
               </div>
             </div>
+            )}
 
             {/* BLOCO 8: VISÃO COMPLETA (A Grade 360º) */}
             <div id="visao-360" className="w-full max-w-6xl mx-auto mt-20 md:mt-32 mb-24 md:mb-40 px-0 sm:px-6">

@@ -12,7 +12,6 @@ import { saveConsultation, chargeAndSaveConsultationV1, enrichResultForTier } fr
 import { chargeConsultation } from "@/lib/credits";
 import {
   ALL_TWELVE_HOUSES,
-  detectDefaultConsultationTier,
   getTierRequiredCredits,
   type ConsultationUnlockTier,
 } from "@/lib/consultationUnlocks";
@@ -62,11 +61,8 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
   const [cityCoords, setCityCoords] = useState<CityCoords | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LookupResult | null>(null);
-  const [usePassNow, setUsePassNow] = useState(true);
-
-  const userCredits = profile?.credits ?? 0;
-  const availablePassTier = detectDefaultConsultationTier(userCredits);
-  const activeTier: ConsultationUnlockTier = usePassNow ? availablePassTier : "single";
+  // Consulta por cidade avalia uma única coordenada (1 Casa + 1º Foco incluso = 1 crédito)
+  const activeTier = "single" as ConsultationUnlockTier;
 
   const lookupSignatureRef = useRef<string>("");
   const idempotencyKeyRef = useRef<string>(crypto.randomUUID());
@@ -385,22 +381,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
                 </button>
                 <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/60 font-semibold flex flex-wrap items-center justify-center gap-2">
                   <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227' }} />
-                  {activeTier === "full_map" ? (
-                    <span>Passe Mapa Completo Ativo: libera todas as 12 Casas + Todos os Focos</span>
-                  ) : activeTier === "expansao" ? (
-                    <span>Passe Expansão Ativo: libera a Casa + Todos os 8 Focos</span>
-                  ) : (
-                    <span>Consome 1 crédito • Libera 1 Casa</span>
-                  )}
-                  {availablePassTier !== "single" && (
-                    <button
-                      type="button"
-                      onClick={() => setUsePassNow((v) => !v)}
-                      className="underline text-[#F5DE98] hover:text-white transition-colors ml-1"
-                    >
-                      {usePassNow ? "(Guardar passe e usar só 1 crédito)" : "(Usar meu passe agora)"}
-                    </button>
-                  )}
+                  <span>Consome 1 crédito • Libera a Casa desta Cidade + 1º Foco</span>
                 </p>
               </div>
 
