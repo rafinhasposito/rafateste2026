@@ -16,6 +16,13 @@ import {
   RESERVED_AFFILIATE_CODES,
   saveStoredAffiliateRef,
   suggestAffiliateCodeFromName,
+  extractAffiliateTag,
+  applyAffiliateTagToNotes,
+  stripAffiliateTagFromNotes,
+  computeAffiliateConversionPct,
+  isAffiliateInactiveZeroSales,
+  buildAffiliatesPixCsv,
+  type AdminAffiliateRow,
 } from "@/lib/affiliates";
 
 describe("Sistema de Afiliados — cálculos e rastreamento", () => {
@@ -101,5 +108,79 @@ describe("Sistema de Afiliados — cálculos e rastreamento", () => {
     expect(suggestAffiliateCodeFromName("todomundorp@gmail.com")).toBe("");
     expect(suggestAffiliateCodeFromName("Admin")).toBe("ADMIN2026");
     expect(RESERVED_AFFILIATE_CODES.has("ADMIN")).toBe(true);
+  });
+
+  it("gerencia tags/tiers, inatividade de 0 vendas e exportação CSV da Folha Pix", () => {
+    expect(extractAffiliateTag("[VIP] @anasolar")).toBe("VIP");
+    expect(extractAffiliateTag("[INFLUENCER] TikTok")).toBe("INFLUENCER");
+    expect(extractAffiliateTag("Nota comum")).toBe("PADRAO");
+    expect(stripAffiliateTagFromNotes("[VIP] @anasolar")).toBe("@anasolar");
+    expect(applyAffiliateTagToNotes("[VIP] @anasolar", "INFLUENCER")).toBe(
+      "[INFLUENCER] @anasolar"
+    );
+    expect(applyAffiliateTagToNotes("[VIP] @anasolar", "PADRAO")).toBe("@anasolar");
+
+    expect(computeAffiliateConversionPct(100, 5)).toBe(5);
+    expect(computeAffiliateConversionPct(0, 0)).toBe(0);
+
+    const nowMs = Date.parse("2026-11-22T00:00:00Z");
+    const inactive45d = {
+      sales_count: 0,
+      clicks_count: 0,
+      created_at: "2026-10-01T00:00:00Z",
+    };
+    const activeSeller = {
+      sales_count: 2,
+      clicks_count: 15,
+      created_at: "2026-09-01T00:00:00Z",
+    };
+    expect(isAffiliateInactiveZeroSales(inactive45d, 30, false, nowMs)).toBe(true);
+    expect(isAffiliateInactiveZeroSales(inactive45d, 60, false, nowMs)).toBe(false);
+    expect(isAffiliateInactiveZeroSales(activeSeller, 30, false, nowMs)).toBe(false);
+
+    const sampleRows: AdminAffiliateRow[] = [
+      {
+        id: "1",
+        user_id: null,
+        code: "482917",
+        name: "Ana Solar",
+        email: "ana@solar.com",
+        pix_key: "ana@pix.com",
+        commission_rate: 25,
+        active: true,
+        clicks_count: 40,
+        created_at: "2026-11-01T00:00:00Z",
+        notes: "[INFLUENCER]",
+        referred_users_count: 5,
+        sales_count: 3,
+        pending_brl: 49.9,
+        paid_brl: 19.9,
+        total_brl: 69.8,
+        volume_brl: 279.2,
+      },
+      {
+        id: "2",
+        user_id: null,
+        code: "111222",
+        name: "Saldo Baixo",
+        email: null,
+        pix_key: "111",
+        commission_rate: 20,
+        active: true,
+        clicks_count: 5,
+        created_at: "2026-11-01T00:00:00Z",
+        notes: null,
+        referred_users_count: 1,
+        sales_count: 1,
+        pending_brl: 3.98,
+        paid_brl: 0,
+        total_brl: 3.98,
+        volume_brl: 19.9,
+      },
+    ];
+
+    const csvMin20 = buildAffiliatesPixCsv(sampleRows, 20);
+    expect(csvMin20).toContain("#482917;Ana Solar;ana@solar.com;ana@pix.com;49,90;25%");
+    expect(csvMin20).not.toContain("Saldo Baixo");
   });
 });
