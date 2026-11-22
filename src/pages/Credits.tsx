@@ -20,9 +20,16 @@ import {
   Zap,
   HelpCircle,
   Ticket,
+  Gift,
+  ArrowRight,
 } from "lucide-react";
 import { usePricing, type PricingItem } from "@/hooks/usePricing";
-import { redeemCouponCode } from "@/lib/coupons";
+import {
+  clearPendingGiftCode,
+  getPendingGiftCode,
+  redeemCouponCode,
+  savePendingGiftCode,
+} from "@/lib/coupons";
 import { getStoredAffiliateRef, syncAffiliateRefForUser } from "@/lib/affiliates";
 import { AffiliateReferralBanner } from "@/components/AffiliateReferralBanner";
 import { toast } from "sonner";
@@ -99,10 +106,23 @@ const Credits = () => {
   const { packages, costs, loading, getCost } = usePricing();
   const isRedeemRoute = location.pathname === "/resgatar" || Boolean(searchParams.get("code") || searchParams.get("redeem"));
 
-  const initialCoupon = (searchParams.get("code") || searchParams.get("redeem") || "").toUpperCase();
+  const initialCoupon = (
+    searchParams.get("code") ||
+    searchParams.get("redeem") ||
+    (location.pathname === "/resgatar" ? getPendingGiftCode() || "" : "")
+  ).toUpperCase();
   const [couponCode, setCouponCode] = useState(initialCoupon);
   const [redeemingCoupon, setRedeemingCoupon] = useState(false);
   const [redeemedLabel, setRedeemedLabel] = useState<string | null>(null);
+  const autoRedeemAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    const rawCode = searchParams.get("code") || searchParams.get("redeem");
+    if (rawCode) {
+      const saved = savePendingGiftCode(rawCode);
+      if (saved) setCouponCode(saved);
+    }
+  }, [searchParams]);
 
   // Estado da Tela de Checkout Dedicada (Lado a Lado, sem pop-up apertado)
   const [selectedPkg, setSelectedPkg] = useState<PricingItem | null>(null);
@@ -516,32 +536,55 @@ const Credits = () => {
 
   const fmt = (n: number | null) => (n == null ? ["0", "00"] : n.toFixed(2).split("."));
 
+  const executeRedeemCode = useCallback(
+    async (rawCode: string) => {
+      const clean = rawCode.trim().toUpperCase();
+      if (!clean) {
+        toast.error("Digite o código do seu cupom de presente.");
+        return;
+      }
+      savePendingGiftCode(clean);
+      if (!user) {
+        toast.info("Preencha seus dados de nascimento para ativar sua consulta de presente.");
+        navigate(`/auth?setup=true&gift=${encodeURIComponent(clean)}`);
+        return;
+      }
+
+      setRedeemingCoupon(true);
+      try {
+        const res = await redeemCouponCode({ code: clean, userId: user.id });
+        clearPendingGiftCode();
+        await refreshProfile();
+        setRedeemedLabel(res.label);
+        setCouponCode("");
+        toast.success(`Presente ativado: ${res.label}!`);
+      } catch (err: any) {
+        toast.error(err?.message || "Não foi possível resgatar este código.");
+      } finally {
+        setRedeemingCoupon(false);
+      }
+    },
+    [user, navigate, refreshProfile]
+  );
+
   const handleRedeemCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
-    const clean = couponCode.trim().toUpperCase();
-    if (!clean) {
-      toast.error("Digite o código do seu cupom de presente.");
-      return;
-    }
-    if (!user) {
-      toast.info("Entre na sua conta para ativar seu presente.");
-      navigate(`/auth?returnTo=${encodeURIComponent(`/resgatar?code=${encodeURIComponent(clean)}`)}`);
-      return;
-    }
-
-    setRedeemingCoupon(true);
-    try {
-      const res = await redeemCouponCode({ code: clean, userId: user.id });
-      await refreshProfile();
-      setRedeemedLabel(res.label);
-      setCouponCode("");
-      toast.success(`Presente ativado: ${res.label}!`);
-    } catch (err: any) {
-      toast.error(err?.message || "Não foi possível resgatar este código.");
-    } finally {
-      setRedeemingCoupon(false);
-    }
+    await executeRedeemCode(couponCode);
   };
+
+  useEffect(() => {
+    if (
+      !authLoading &&
+      user &&
+      searchParams.get("auto") === "1" &&
+      couponCode &&
+      !redeemedLabel &&
+      !autoRedeemAttemptedRef.current
+    ) {
+      autoRedeemAttemptedRef.current = true;
+      executeRedeemCode(couponCode);
+    }
+  }, [authLoading, user, searchParams, couponCode, redeemedLabel, executeRedeemCode]);
 
   const costConsultation = 1;
   const costSingleHouse = getCost("cost_house_1", 1);
@@ -850,13 +893,13 @@ const Credits = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
+        className="text-center mb-10"
       >
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A227]/35 bg-[#C9A227]/10 text-[#F5DE98] text-[10px] uppercase tracking-[0.24em] font-semibold mb-4">
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A227]/40 bg-[#C9A227]/12 text-[#F5DE98] text-[10px] uppercase tracking-[0.24em] font-semibold mb-4">
           {isRedeemRoute ? (
             <>
-              <Ticket className="w-3.5 h-3.5 text-[#E5C158]" />
-              Resgate de Presente • Mídia Kit
+              <Gift className="w-3.5 h-3.5 text-[#E5C158]" />
+              Convite VIP • Presente Reservado
             </>
           ) : (
             <>
@@ -865,13 +908,28 @@ const Credits = () => {
             </>
           )}
         </span>
-        <h1 className="font-ps-display text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight leading-tight">
-          {isRedeemRoute ? "Ative Seu Convite Solar" : "Escolha Seu Passe Solar"}
-        </h1>
-        <p className="text-white/60 text-sm sm:text-base font-light font-ps-ui max-w-xl mx-auto">
+        <h1 className="font-ps-display font-normal text-3xl sm:text-5xl md:text-6xl text-white mb-4 tracking-tight leading-tight max-w-3xl mx-auto">
           {isRedeemRoute
-            ? "Digite ou confirme o código do seu voucher abaixo para liberar seu presente instantaneamente na sua conta."
-            : "1 crédito libera 1 Casa. Os pacotes Expansão e Mapa Completo funcionam como passes que liberam tudo de uma vez na consulta que você escolher."}
+            ? "Você ganhou uma consulta de presente no Protocolo Solar."
+            : "Escolha Seu Passe Solar"}
+        </h1>
+        <p className="text-white/70 text-sm sm:text-base font-light font-ps-ui max-w-2xl mx-auto leading-relaxed">
+          {isRedeemRoute ? (
+            couponCode ? (
+              <>
+                Seu código{" "}
+                <span className="px-2 py-0.5 rounded-md bg-[#C9A227]/18 border border-[#C9A227]/40 text-[#F5DE98] font-mono font-semibold">
+                  {couponCode}
+                </span>{" "}
+                já está garantido. Antes de colocar sua data de nascimento, veja em 60 segundos
+                como a cidade do seu aniversário muda o seu próximo ano.
+              </>
+            ) : (
+              "Você recebeu um acesso cortesia para descobrir em qual cidade do mundo passar seu próximo aniversário. Veja em 60 segundos como funciona ou ative seu código abaixo."
+            )
+          ) : (
+            "1 crédito libera 1 Casa. Os pacotes Expansão e Mapa Completo funcionam como passes que liberam tudo de uma vez na consulta que você escolher."
+          )}
         </p>
 
         {profile && (
@@ -906,7 +964,7 @@ const Credits = () => {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-3xl mx-auto mb-10"
       >
-        <div className="p-5 sm:p-6 rounded-3xl border border-[#C9A227]/35 bg-[#08111F]/90 backdrop-blur-xl shadow-[0_14px_40px_rgba(0,0,0,0.5)]">
+        <div className="p-6 sm:p-8 rounded-3xl border border-[#C9A227]/40 bg-gradient-to-b from-[#0C182B]/95 to-[#07101E]/95 backdrop-blur-xl shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
           {redeemedLabel ? (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
               <div className="flex items-center gap-3.5">
@@ -917,18 +975,76 @@ const Credits = () => {
                   <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-bold">
                     Presente Ativado com Sucesso
                   </p>
-                  <p className="text-white font-ps-display text-lg font-bold">
+                  <p className="text-white font-ps-display text-lg font-normal">
                     {redeemedLabel}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => navigate(safeReturnTo || "/")}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-xs uppercase tracking-[0.18em] transition-all"
+                onClick={() => navigate(safeReturnTo || "/?mode=futuro")}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-xs uppercase tracking-[0.18em] transition-all"
               >
-                {safeReturnTo ? "Voltar para Minha Consulta" : "Iniciar Minha Consulta Agora"}
+                {safeReturnTo ? "Voltar para Minha Consulta" : "Descobrir Minha Cidade Agora →"}
               </button>
+            </div>
+          ) : isRedeemRoute ? (
+            <div className="space-y-6">
+              {/* Passo 1 recomendado: ver o Onboarding de 60s com o cupom já garantido */}
+              <div className="flex flex-col items-center text-center space-y-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const clean = couponCode.trim().toUpperCase();
+                    if (clean) savePendingGiftCode(clean);
+                    navigate(
+                      clean
+                        ? `/app/onboarding?gift=${encodeURIComponent(clean)}`
+                        : "/app/onboarding"
+                    );
+                  }}
+                  className="w-full sm:w-auto min-h-[54px] px-8 py-4 rounded-2xl bg-[#C9A227] hover:bg-[#D9B643] text-[#02050A] font-ps-ui text-xs sm:text-sm font-bold uppercase tracking-[0.15em] inline-flex items-center justify-center gap-2.5 shadow-[0_12px_36px_rgba(201,162,39,0.32)] transition-all hover:scale-[1.01] active:scale-95"
+                >
+                  <span>Entender Como Funciona e Usar Meu Presente</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </button>
+                <p className="font-ps-ui text-xs text-white/55">
+                  Leva menos de 1 minuto • Seu código permanece salvo automaticamente
+                </p>
+              </div>
+
+              {/* Divisor sutil para quem já conhece o Protocolo Solar e quer ativar direto */}
+              <div className="pt-5 border-t border-white/10">
+                <form
+                  onSubmit={handleRedeemCoupon}
+                  className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
+                >
+                  <div className="text-left">
+                    <p className="font-ps-ui text-xs font-semibold text-[#E8D59B]">
+                      Já conhece o Protocolo Solar?
+                    </p>
+                    <p className="font-ps-ui text-xs text-white/55">
+                      Confirme seu código abaixo para ir direto à sua consulta gratuita:
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      placeholder="EX: SOLAR-VIP"
+                      className="w-full sm:w-48 px-3.5 py-3 rounded-xl bg-black/50 border border-[#C9A227]/35 text-[#F5DE98] font-mono text-xs sm:text-sm font-bold uppercase tracking-wider placeholder:text-white/25 focus:outline-none focus:border-[#C9A227]"
+                    />
+                    <button
+                      type="submit"
+                      disabled={redeemingCoupon}
+                      className="shrink-0 px-5 py-3 rounded-xl bg-white/[0.08] hover:bg-[#C9A227] text-[#F5DE98] hover:text-[#02050A] border border-[#C9A227]/40 font-bold text-xs uppercase tracking-[0.14em] transition-all active:scale-95 disabled:opacity-50"
+                    >
+                      {redeemingCoupon ? "Ativando..." : "Ir Direto →"}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           ) : (
             <form
@@ -969,8 +1085,8 @@ const Credits = () => {
         </div>
       </motion.div>
 
-      {/* Packages Grid */}
-      {loading ? (
+      {/* Packages Grid (Oculto na rota de Presente /resgatar para não parecer página de cobrança) */}
+      {!isRedeemRoute && (loading ? (
         <div className="text-center py-20">
           <div className="w-7 h-7 border-2 border-[#C9A227]/30 border-t-[#C9A227] rounded-full animate-spin mx-auto mb-3" />
           <p className="text-[#F5DE98]/70 font-ps-ui text-[11px] uppercase tracking-[0.2em] font-semibold">
@@ -1077,7 +1193,7 @@ const Credits = () => {
             );
           })}
         </div>
-      )}
+      ))}
     </div>
   );
 };

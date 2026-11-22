@@ -290,3 +290,42 @@ export const redeemCouponCode = async (args: {
     label: meta.label,
   };
 };
+
+export const PENDING_GIFT_CODE_KEY = "ps_pending_gift_code_v1";
+
+export const savePendingGiftCode = (rawCode: string | null | undefined): string | null => {
+  const clean = String(rawCode || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_-]/g, "");
+  if (!clean || clean.length < 3) return null;
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(PENDING_GIFT_CODE_KEY, clean);
+    }
+  } catch {
+    // Ignore localStorage restrictions
+  }
+  return clean;
+};
+
+export const getPendingGiftCode = (): string | null => {
+  try {
+    if (typeof localStorage === "undefined") return null;
+    const val = localStorage.getItem(PENDING_GIFT_CODE_KEY);
+    const clean = String(val || "").trim().toUpperCase();
+    return clean.length >= 3 ? clean : null;
+  } catch {
+    return null;
+  }
+};
+
+export const clearPendingGiftCode = (): void => {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem(PENDING_GIFT_CODE_KEY);
+    }
+  } catch {
+    // Ignore localStorage restrictions
+  }
+};

@@ -2,13 +2,19 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BackButton } from '@/components/ui/BackButton';
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, MapPin, Calendar, Clock, User as UserIcon, CheckCircle2, Mail, ArrowRight, Edit2 } from "lucide-react";
+import { Sparkles, MapPin, Calendar, Clock, User as UserIcon, CheckCircle2, Mail, ArrowRight, Edit2, Gift } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { TERMS_VERSION, PRIVACY_VERSION, TERMS_TEXT, PRIVACY_TEXT } from "@/constants/legal";
 import { normalizeBirthTime } from "@/lib/astro";
+import {
+  clearPendingGiftCode,
+  getPendingGiftCode,
+  redeemCouponCode,
+  savePendingGiftCode,
+} from "@/lib/coupons";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -51,6 +57,9 @@ const Auth = () => {
   const { user, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const urlGift = searchParams.get("gift") || searchParams.get("code");
+  const activeGiftCode = (urlGift ? savePendingGiftCode(urlGift) : null) || getPendingGiftCode();
 
   // Default new visitors (from onboarding or ?setup=true) into the Guided Natal Passport flow
   const initialMode: Mode =
@@ -149,6 +158,19 @@ const Auth = () => {
             });
           } catch (e) {
             console.error("Failed to record terms acceptance:", e);
+          }
+        }
+
+        // 3. Auto-redeem pending VIP gift coupon if present
+        const pendingGift = searchParams.get("gift") || getPendingGiftCode();
+        if (pendingGift) {
+          clearPendingGiftCode();
+          try {
+            const res = await redeemCouponCode({ code: pendingGift, userId: user.id });
+            await refreshProfile();
+            toast.success(`🎁 Presente VIP ativado: ${res.label}! Sua consulta já está liberada.`);
+          } catch (giftErr: any) {
+            toast.info(giftErr?.message || "Seu código de presente já foi verificado.");
           }
         }
 
@@ -446,6 +468,23 @@ const Auth = () => {
              MODO GUIADO DE 1º ACESSO: PASSAPORTE NATAL (PASSO 1 -> PASSO 2)
              ===================================================================== */
           <div className="w-full">
+            {activeGiftCode && (
+              <div className="mb-5 p-3.5 rounded-2xl bg-[#C9A227]/14 border border-[#C9A227]/45 flex items-center gap-3 text-left">
+                <div className="w-8 h-8 rounded-xl bg-[#C9A227]/20 border border-[#C9A227]/40 flex items-center justify-center text-[#F5DE98] shrink-0">
+                  <Gift className="w-4 h-4" />
+                </div>
+                <div className="font-ps-ui text-xs leading-snug">
+                  <p className="text-[#F5DE98] font-semibold">
+                    Presente VIP ativo:{" "}
+                    <span className="font-mono">{activeGiftCode}</span>
+                  </p>
+                  <p className="text-white/70 text-[11px]">
+                    Preencha seus dados de nascimento abaixo para liberar sua consulta gratuita.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Barra de Progresso Visual (Passo 1 de 2 / Passo 2 de 2) */}
             <div className="w-full mb-5">
               <div className="flex items-center justify-between text-[10px] font-ps-ui uppercase tracking-[0.18em] mb-2">

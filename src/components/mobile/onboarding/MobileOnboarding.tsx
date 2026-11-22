@@ -7,8 +7,9 @@ import { Screen4 } from './screens/Screen4';
 import { Screen5 } from './screens/Screen5';
 import { Screen6 } from './screens/Screen6';
 import { OnboardingNav } from './OnboardingNav';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { getPendingGiftCode, savePendingGiftCode } from '@/lib/coupons';
 
 const ONBOARDING_PRELOAD_IMAGES = [
   '/assets/earth-blue.jpg',
@@ -24,7 +25,11 @@ const ONBOARDING_PRELOAD_IMAGES = [
 export default function MobileOnboarding() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
+
+  const urlGift = searchParams.get('gift') || searchParams.get('code');
+  const activeGiftCode = (urlGift ? savePendingGiftCode(urlGift) : null) || getPendingGiftCode();
 
   // Pré-carrega todas as imagens leves das telas 1 a 6 em memória assim que o onboarding abre
   useEffect(() => {
@@ -45,6 +50,14 @@ export default function MobileOnboarding() {
     } else {
       localStorage.setItem('ps_onboarding_completed', 'true');
       sessionStorage.setItem('ps_pending_mode', 'futuro');
+      if (activeGiftCode) {
+        if (user) {
+          navigate(`/resgatar?code=${encodeURIComponent(activeGiftCode)}&skipIntro=1&auto=1`);
+        } else {
+          navigate(`/auth?setup=true&gift=${encodeURIComponent(activeGiftCode)}`);
+        }
+        return;
+      }
       if (user) {
         navigate('/?mode=futuro');
       } else {
@@ -71,7 +84,7 @@ export default function MobileOnboarding() {
           {step === 3 && <Screen3 />}
           {step === 4 && <Screen4 />}
           {step === 5 && <Screen5 />}
-          {step === 6 && <Screen6 onComplete={goNext} />}
+          {step === 6 && <Screen6 onComplete={goNext} giftCode={activeGiftCode} />}
         </motion.div>
       </AnimatePresence>
 
@@ -81,6 +94,7 @@ export default function MobileOnboarding() {
         onNext={goNext}
         onPrev={goPrev}
         isFinal={step === 6}
+        giftCode={activeGiftCode}
       />
     </div>
   );

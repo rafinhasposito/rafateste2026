@@ -1,4 +1,4 @@
-import { ChevronLeft, X } from 'lucide-react';
+import { ChevronLeft, Gift, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface OnboardingNavProps {
@@ -7,6 +7,7 @@ interface OnboardingNavProps {
   onNext: () => void;
   onPrev: () => void;
   isFinal?: boolean;
+  giftCode?: string | null;
 }
 
 /**
@@ -21,6 +22,7 @@ export function OnboardingNav({
   onNext,
   onPrev,
   isFinal = false,
+  giftCode = null,
 }: OnboardingNavProps) {
   const navigate = useNavigate();
 
@@ -46,12 +48,23 @@ export function OnboardingNav({
             />
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 md:gap-3">
+            {giftCode && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A227]/18 border border-[#C9A227]/45 text-[#F5DE98] font-ps-ui text-[10px] md:text-[11px] font-semibold tracking-wider backdrop-blur-md">
+                <Gift className="w-3 h-3 text-[#C9A227] shrink-0" />
+                <span className="hidden sm:inline">Presente ativo:</span>
+                <span className="font-mono">{giftCode}</span>
+              </div>
+            )}
             <span className="font-mono text-[10px] md:text-[11px] text-white/60 tracking-[0.2em]">{step} de {totalSteps}</span>
             <button
               onClick={() => {
                 localStorage.setItem('ps_onboarding_completed', 'true');
-                navigate('/');
+                if (giftCode) {
+                  navigate(`/resgatar?code=${encodeURIComponent(giftCode)}&skipIntro=1`);
+                } else {
+                  navigate('/');
+                }
               }}
               className="h-8 w-8 flex items-center justify-center border border-white/15 hover:border-white/30 bg-black/50 backdrop-blur-md hover:bg-white/10 text-white/80 hover:text-white rounded-full transition-all active:scale-95"
               aria-label="Fechar Onboarding"
@@ -71,7 +84,11 @@ export function OnboardingNav({
               onClick={onNext}
               className="h-14 md:h-16 w-full px-10 rounded-xl font-ps-display font-bold tracking-[0.08em] text-[15px] md:text-[17px] transition-all flex items-center justify-center active:scale-95 hover:scale-[1.02] bg-[#C9A227] text-[#02050A] hover:bg-[#E5C158] shadow-[0_10px_30px_rgba(201,162,39,0.35)]"
             >
-              {isFinal ? 'REVELAR MEU DESTINO' : 'CONTINUAR'}
+              {isFinal
+                ? giftCode
+                  ? 'RESGATAR MEU PRESENTE'
+                  : 'REVELAR MEU DESTINO'
+                : 'CONTINUAR'}
             </button>
           </div>
         </div>

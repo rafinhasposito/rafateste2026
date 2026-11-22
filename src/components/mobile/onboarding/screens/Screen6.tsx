@@ -6,7 +6,13 @@ import { ChevronDown } from 'lucide-react';
  * Tela 6 — O que eu recebo? / Fechamento
  * O usuário vê um mockup de alta qualidade (Roma) e o CTA final.
  */
-export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
+export const Screen6 = ({
+  onComplete,
+  giftCode,
+}: {
+  onComplete?: () => void;
+  giftCode?: string | null;
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [romeVideoPlaying, setRomeVideoPlaying] = useState(false);
 
@@ -52,7 +58,11 @@ export const Screen6 = ({ onComplete }: { onComplete?: () => void }) => {
               whileTap={{ scale: 0.98 }}
               className="group relative inline-flex items-center justify-center bg-[#C9A227] text-[#02050A] hover:bg-[#E5C158] font-ps-display text-sm font-bold uppercase tracking-widest px-8 py-5 rounded-full shadow-[0_10px_36px_rgba(201,162,39,0.35)] transition-all duration-300 w-auto mb-4"
             >
-              <span className="relative z-10">Revelar o Destino do Meu Aniversário</span>
+              <span className="relative z-10">
+                {giftCode
+                  ? `Resgatar Presente (${giftCode}) e Descobrir Minha Cidade`
+                  : 'Revelar o Destino do Meu Aniversário'}
+              </span>
               <div className="absolute inset-0 rounded-full border border-[#F5DE98]/40 scale-105 group-hover:scale-110 transition-transform duration-500 opacity-0 group-hover:opacity-100" />
             </motion.button>
 
