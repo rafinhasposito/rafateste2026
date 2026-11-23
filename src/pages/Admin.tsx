@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
+  Compass,
   ExternalLink,
   Handshake,
   LayoutDashboard,
@@ -24,13 +25,22 @@ import PricingEditor from "@/components/admin/PricingEditor";
 import UsersTable from "@/components/admin/UsersTable";
 import TransactionsTable from "@/components/admin/TransactionsTable";
 import MetricsDashboard, { isPaidPurchaseType } from "@/components/admin/MetricsDashboard";
+import ConsultationsAnalytics from "@/components/admin/ConsultationsAnalytics";
 import CouponsManager from "@/components/admin/CouponsManager";
 import AffiliatesManager from "@/components/admin/AffiliatesManager";
 
-type Tab = "metrics" | "transactions" | "users" | "affiliates" | "coupons" | "pricing";
+type Tab =
+  | "metrics"
+  | "consultations"
+  | "transactions"
+  | "users"
+  | "affiliates"
+  | "coupons"
+  | "pricing";
 
 const VALID_TABS: Tab[] = [
   "metrics",
+  "consultations",
   "transactions",
   "users",
   "affiliates",
@@ -52,9 +62,14 @@ const Admin = () => {
   const [txFilter, setTxFilter] = useState<string>("all");
   const [txSearch, setTxSearch] = useState<string>("");
   const [globalSearch, setGlobalSearch] = useState<string>("");
-  const [badges, setBadges] = useState<{ paidSales: number; users: number }>({
+  const [badges, setBadges] = useState<{
+    paidSales: number;
+    users: number;
+    consultations: number;
+  }>({
     paidSales: 0,
     users: 0,
+    consultations: 0,
   });
 
   useEffect(() => {
@@ -63,13 +78,14 @@ const Admin = () => {
     }
   }, [authLoading, adminLoading, user, navigate]);
 
-  // Carrega contadores leves para os badges da sidebar (Vendas Pagas e Usuários)
+  // Carrega contadores leves para os badges da sidebar (Vendas Pagas, Consultas e Usuários)
   useEffect(() => {
     if (!isAdmin) return;
     (async () => {
       try {
-        const [usersCountRes, txRes] = await Promise.all([
+        const [usersCountRes, consultsCountRes, txRes] = await Promise.all([
           supabase.from("profiles").select("user_id", { count: "exact", head: true }),
+          supabase.from("consultations").select("id", { count: "exact", head: true }),
           supabase.from("credit_transactions").select("amount, type").gt("amount", 0),
         ]);
         const paidSales = (txRes.data ?? []).filter((t: any) =>
@@ -78,6 +94,7 @@ const Admin = () => {
         setBadges({
           paidSales,
           users: usersCountRes.count ?? 0,
+          consultations: consultsCountRes.count ?? 0,
         });
       } catch {
         // Silencioso
@@ -144,6 +161,13 @@ const Admin = () => {
     badge?: string | number;
   }> = [
     { id: "metrics", label: "Dashboard", shortLabel: "Dashboard", icon: LayoutDashboard },
+    {
+      id: "consultations",
+      label: "Consultas",
+      shortLabel: "Consultas",
+      icon: Compass,
+      badge: badges.consultations > 0 ? badges.consultations : undefined,
+    },
     {
       id: "transactions",
       label: "Transações",
@@ -422,6 +446,7 @@ const Admin = () => {
               {tab === "metrics" && (
                 <MetricsDashboard onNavigateTab={handleSelectTab} />
               )}
+              {tab === "consultations" && <ConsultationsAnalytics />}
               {tab === "transactions" && (
                 <div className="space-y-4">
                   <div className="pb-2">

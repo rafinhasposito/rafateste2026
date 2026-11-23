@@ -18,7 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 
-type AdminTab = "metrics" | "pricing" | "coupons" | "affiliates" | "users" | "transactions";
+type AdminTab = "metrics" | "consultations" | "pricing" | "coupons" | "affiliates" | "users" | "transactions";
 type PeriodKey = "today" | "7d" | "30d" | "all";
 type ChartMetricKey = "revenue" | "signups" | "consultations";
 type FeedFilterKey = "paid" | "all" | "bonus" | "spent";
@@ -736,10 +736,10 @@ const MetricsDashboard = ({ onNavigateTab }: MetricsDashboardProps) => {
 
         {/* Card 4 — Consultas Solares Realizadas */}
         <div
-          onClick={() => onNavigateTab?.("transactions", "gastos")}
+          onClick={() => onNavigateTab?.("consultations")}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && onNavigateTab?.("transactions", "gastos")}
+          onKeyDown={(e) => e.key === "Enter" && onNavigateTab?.("consultations")}
           className="group relative overflow-hidden rounded-[28px] p-6 bg-[#0A0B10]/90 border border-white/10 hover:border-[#F5B041]/40 backdrop-blur-2xl cursor-pointer transition-all duration-300 hover:-translate-y-0.5 shadow-[0_14px_34px_rgba(0,0,0,0.45)]"
         >
           <div className="flex items-center justify-between mb-4">

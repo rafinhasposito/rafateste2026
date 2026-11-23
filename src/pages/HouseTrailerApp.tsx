@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { houseThemes } from "@/data/houseThemes";
 import ScanningOverlay from "@/components/ScanningOverlay";
 
-const DEFAULT_TRAILER_HOUSE = 1;
+const DEFAULT_TRAILER_HOUSE = 11;
 const DEFAULT_TRAILER_GENDER = "M";
 
 const LIFE_AREAS = [
@@ -120,15 +120,15 @@ export default function HouseTrailerApp() {
 
     if (!target) return;
 
-    if (!user) {
-      toast.info("Entre na sua conta para revelar as cidades do seu mapa.");
-      navigate(`/auth?returnTo=${encodeURIComponent(currentReturnUrl)}`);
+    if (!name || !birthdate || !birthtime || !birthPlace) {
+      toast.error("Complete seus dados de nascimento para revelar suas cidades.");
+      navigate(`/perfil?returnTo=${encodeURIComponent(currentReturnUrl)}`);
       return;
     }
 
-    if (!name || !birthdate || !birthtime || !birthPlace) {
-      toast.info("Complete seus dados de nascimento para revelar suas cidades.");
-      navigate(`/perfil?returnTo=${encodeURIComponent(currentReturnUrl)}`);
+    if (!user) {
+      toast.error("Entre na sua conta para revelar as cidades do seu mapa.");
+      navigate(`/auth?returnTo=${encodeURIComponent(currentReturnUrl)}`);
       return;
     }
 
@@ -311,14 +311,14 @@ export default function HouseTrailerApp() {
   const heroGradient = `linear-gradient(to bottom, transparent, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.8)) 60%, ${bgBase} 100%)`;
 
   return (
-    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-24 relative transition-colors duration-1000" style={{ backgroundColor: bgBase }}>
+    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-48 relative transition-colors duration-1000" style={{ backgroundColor: bgBase }}>
 
-      {/* TOPO LIMPO (Sem navbar fixa em cima do conteúdo) */}
-      <div className="relative z-30 max-w-6xl mx-auto px-4 md:px-8 pt-6 pb-2 flex items-center justify-between gap-3">
+      {/* SUB-BARRA INLINE (ABAIXO DO HEADER DO CONSUMERSHELL — SEM SOBREPOSIÇÃO) */}
+      <div className="relative z-30 max-w-6xl mx-auto px-4 md:px-8 pt-16 lg:pt-6 pb-2 flex items-center justify-between gap-3">
         <button
           type="button"
-          onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/?mode=futuro&path=casa"))}
-          className="shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-xs font-semibold uppercase tracking-[0.16em] text-white/90 transition-all backdrop-blur-xl"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-xs font-semibold uppercase tracking-[0.16em] text-white/90 transition-all backdrop-blur-xl"
         >
           <ChevronLeft className="w-4 h-4" />
           Voltar
@@ -459,16 +459,16 @@ export default function HouseTrailerApp() {
           </div>
         </motion.div>
 
-        {/* AS 8 ÁREAS DA VIDA INCLUSAS NESTA CASA */}
+        {/* SELEÇÃO DO FOCO EM FORMATO ACCORDION APPLE */}
         <motion.div className="mt-20 pt-16 border-t border-white/5 relative z-10 flex flex-col items-center w-full">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest mb-8" style={{ color: theme.themeColor }}>
-              <Sparkles className="w-3 h-3" />
-              <span>8 Áreas Inclusas na Consulta</span>
+              <Target className="w-3 h-3" />
+              <span>Passo Necessário</span>
             </div>
             
-            <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O impacto nas 8 áreas.</h3>
+            <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">Escolha o seu Foco.</h3>
             <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
-              Ao consultar esta Casa, todas as 8 áreas abaixo já vêm 100% liberadas de graça no seu resultado. Toque para explorar cada uma:
+              O impacto desta Casa muda conforme a sua intenção principal. Veja o percentual de match de cada área abaixo e selecione a que deseja ativar.
             </p>
 
             {/* LAYOUT: SIDEBAR RETRÁTIL + PAINEL QUE CRESCE */}
@@ -626,20 +626,19 @@ export default function HouseTrailerApp() {
                                   <div className="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 bg-black/20" style={{ borderColor: `${area.color}55` }}>
                                     <area.icon className="w-4 h-4" style={{ color: area.color }} />
                                   </div>
-                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">
-                                    Área Inclusa • Casa {currentHouse}
-                                  </span>
+                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">{area.label}</span>
                                 </div>
                                 <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
                                 <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
                                 <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.teaser}</p>
-                                <div
-                                  className="w-full px-5 py-3.5 font-bold text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 border"
-                                  style={{ backgroundColor: `${area.color}22`, borderColor: `${area.color}55`, color: '#fff' }}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleSelectIntention(area.id, e); }}
+                                  className={`w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 ${selectedIntention !== area.id ? 'bg-white text-black' : ''}`}
+                                  style={selectedIntention === area.id ? { backgroundColor: area.color, color: '#fff' } : {}}
                                 >
-                                  <Sparkles className="w-4 h-4" />
-                                  <span>Incluso gratuitamente na consulta ✓</span>
-                                </div>
+                                  {selectedIntention === area.id ? <Sparkles className="w-4 h-4" /> : <Target className="w-4 h-4" />}
+                                  {selectedIntention === area.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
+                                </button>
                               </div>
                             </div>
                           </motion.div>
@@ -662,10 +661,10 @@ export default function HouseTrailerApp() {
                   {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
                     <motion.div
                       key={activeArea.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.22, ease: "easeOut" }}
+                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
                       className="absolute inset-0 w-full h-full flex flex-col justify-end"
                     >
                       {/* BACKGROUNDS PREMIUM */}
@@ -676,13 +675,13 @@ export default function HouseTrailerApp() {
                       {/* CONTEÚDO PRINCIPAL */}
                       <div className="relative z-10 p-8 md:p-12 w-full flex flex-col justify-end h-full">
                         
-                        {/* Ícone pequeno + contexto */}
+                        {/* Ícone pequeno + label da área */}
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 bg-black/20 backdrop-blur-md" style={{ borderColor: `${activeArea.color}55` }}>
                             <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
                           </div>
                           <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
-                            Área Inclusa • Casa {currentHouse}
+                            {activeArea.label}
                           </span>
                         </div>
 
@@ -698,13 +697,14 @@ export default function HouseTrailerApp() {
                         </p>
                         
                         <div>
-                          <div
-                            className="w-full md:w-auto inline-flex items-center justify-center gap-3 px-7 py-4 font-bold text-xs uppercase tracking-widest rounded-2xl border"
-                            style={{ backgroundColor: `${activeArea.color}25`, borderColor: `${activeArea.color}65`, color: '#fff' }}
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleSelectIntention(activeArea.id, e); }}
+                            className={`w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 ${activeIntentionId !== activeArea.id && 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 hover:bg-gray-100'}`}
+                            style={activeIntentionId === activeArea.id ? { backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` } : {}}
                           >
-                            <Sparkles className="w-4 h-4 shrink-0" />
-                            <span>Incluso gratuitamente na consulta desta Casa ✓</span>
-                          </div>
+                            {activeIntentionId === activeArea.id ? <Sparkles className="w-4 h-4 shrink-0" /> : <Target className="w-4 h-4 shrink-0" />}
+                            {activeIntentionId === activeArea.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
+                          </button>
                         </div>
                         
                       </div>
@@ -716,65 +716,94 @@ export default function HouseTrailerApp() {
           </motion.div>
       </section>
       
-      {/* FECHAMENTO NO FINAL DA PÁGINA (In-flow — NÃO fica flutuando em cima da leitura!) */}
-      {(() => {
-        const chosen = LIFE_AREAS.find(a => a.id === activeIntentionId) || sortedAreas[0];
-        const color = theme.themeColor || chosen?.color || '#C9A227';
-        return (
-          <div className="relative z-20 max-w-5xl mx-auto px-4 md:px-6 mt-6 mb-12">
-            <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/15 p-6 md:p-8 rounded-3xl shadow-[0_20px_80px_rgba(0,0,0,0.85)] flex flex-wrap items-center justify-between gap-4" style={{ backgroundColor: navBg }}>
-              
-              <div className="flex items-center gap-3.5 flex-[1_1_16rem] min-w-0">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>
-                  <Sparkles className="w-5 h-5" style={{ color }} />
-                </div>
-                <div>
-                  <h4 className="text-white font-ps-display text-lg md:text-xl font-bold leading-tight">
-                    Quer viver a energia da Casa {currentHouse} no seu próximo aniversário?
-                  </h4>
-                  <p className="text-white/65 text-xs md:text-sm mt-1">
-                    Descubra quais cidades do mundo ativam a Casa {currentHouse} para você (já com todas as 8 áreas da vida liberadas de graça).
-                  </p>
+      {/* STICKY BOTTOM BAR (Sempre acessível com o Foco Principal ou o Foco Escolhido) */}
+      <AnimatePresence>
+        {activeIntentionId && (() => {
+          const chosen = LIFE_AREAS.find(a => a.id === activeIntentionId) || sortedAreas[0];
+          const color = chosen?.color || '#C9A227';
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="fixed bottom-0 left-0 w-full z-50 p-3 md:p-6 pointer-events-none"
+            >
+              <div className="max-w-5xl mx-auto pointer-events-auto">
+                <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/15 p-4 md:p-6 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.85)] flex flex-wrap items-center justify-between gap-3 md:gap-4" style={{ backgroundColor: navBg }}>
+                  
+                  <div className="flex items-center gap-3.5 flex-[1_1_16rem] min-w-0">
+                    <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>
+                      <Sparkles className="w-5 h-5" style={{ color }} />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-ps-display text-base md:text-lg font-bold leading-tight">
+                        Foco: {chosen?.label || `Casa ${currentHouse}`}
+                      </h4>
+                      <p className="text-white/65 text-xs md:text-sm">
+                        {activeTier === "full_map"
+                          ? "Passe Mapa Completo ativo: sua consulta já libera todas as 12 Casas + Todos os Focos."
+                          : activeTier === "expansao"
+                          ? "Passe Expansão ativo: sua consulta já libera esta Casa + Todos os 8 Focos."
+                          : "Escolha revelar as cidades desta Casa ou desbloquear seu Mapa Completo (12 Casas + Todos os Focos)."}
+                        {availablePassTier !== "single" && (
+                          <button
+                            type="button"
+                            onClick={() => setUsePassNow((v) => !v)}
+                            className="ml-2 underline text-[#F5DE98] hover:text-white text-xs font-semibold"
+                          >
+                            {usePassNow ? "(Guardar passe e usar só 1 crédito)" : "(Usar meu passe agora)"}
+                          </button>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid flex-[2_1_36rem] min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-2.5">
+                    <button 
+                      onClick={() => handleRevelarCidades(false)}
+                      disabled={isProcessing}
+                      className="px-6 py-3.5 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-white"
+                      style={{
+                        backgroundColor: color,
+                        boxShadow: `0 0 32px ${color}55`,
+                      }}
+                    >
+                      <Globe className={`w-4 h-4 shrink-0 ${isProcessing ? 'animate-spin' : ''}`} />
+                      <span>
+                        {isProcessing
+                          ? 'Calculando...'
+                          : activeTier === "full_map"
+                          ? 'Revelar Mapa Completo'
+                          : activeTier === "expansao"
+                          ? 'Revelar Casa + Focos'
+                          : 'Revelar Cidades'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] font-bold tracking-wider">
+                        {activeTier === "full_map" ? "Passe Total" : activeTier === "expansao" ? "Passe Expansão" : "1 Créd."}
+                      </span>
+                    </button>
+
+                    {activeTier !== "full_map" && (
+                      <button 
+                        onClick={() => handleRevelarCidades(true)}
+                        disabled={isProcessing}
+                        className="px-5 py-3.5 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(229,193,88,0.2)]"
+                      >
+                        <Sparkles className="w-4 h-4 shrink-0 text-[#E5C158]" />
+                        <span>Desbloquear Mapa Completo</span>
+                        <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold tracking-wider">
+                          12 Casas + Todos os Focos
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                  
                 </div>
               </div>
-
-              <div className="grid flex-[2_1_32rem] min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-3">
-                <button 
-                  onClick={() => handleRevelarCidades(false)}
-                  disabled={isProcessing}
-                  className="px-6 py-4 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-white"
-                  style={{
-                    backgroundColor: color,
-                    boxShadow: `0 0 32px ${color}55`,
-                  }}
-                >
-                  <Globe className={`w-4 h-4 shrink-0 ${isProcessing ? 'animate-spin' : ''}`} />
-                  <span>
-                    {isProcessing
-                      ? 'Calculando...'
-                      : `Revelar Cidades da Casa ${currentHouse}`}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] font-bold tracking-wider">
-                    1 Créd.
-                  </span>
-                </button>
-
-                {activeTier !== "full_map" && (
-                  <button 
-                    onClick={() => handleRevelarCidades(true)}
-                    disabled={isProcessing}
-                    className="px-5 py-4 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(229,193,88,0.2)]"
-                  >
-                    <Sparkles className="w-4 h-4 shrink-0 text-[#E5C158]" />
-                    <span>Desbloquear Todas as 12 Casas</span>
-                  </button>
-                )}
-              </div>
-              
-            </div>
-          </div>
-        );
-      })()}
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
 
       <ScanningOverlay visible={isProcessing} mode={activeMode} year={activeYearDisplay} />
     </div>
