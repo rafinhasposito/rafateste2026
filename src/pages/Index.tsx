@@ -154,10 +154,13 @@ const Index = () => {
 
   const isNatalProfileComplete = (p: any) => !!(p?.full_name && p?.birth_date && p?.birth_time && p?.birth_city);
 
-  // Auto-seleciona modo caso venha do Onboarding (?mode=passado|presente|futuro) ou via pendingMode
+  // Auto-seleciona modo caso venha do Onboarding (?mode=passado|presente|futuro) ou da vitrine /casas (&house=1..12)
   useEffect(() => {
     let targetMode = searchParams.get("mode") as Mode | null;
     const targetPath = searchParams.get("path") as SearchPath | null;
+    const rawHouse = searchParams.get("house");
+    const parsedHouse = rawHouse ? Number(rawHouse) : NaN;
+    const targetHouse = Number.isInteger(parsedHouse) && parsedHouse >= 1 && parsedHouse <= 12 ? parsedHouse : null;
     
     if (!targetMode) {
       targetMode = sessionStorage.getItem("ps_pending_mode") as Mode | null;
@@ -170,7 +173,10 @@ const Index = () => {
 
     if (targetMode && ["passado", "presente", "futuro"].includes(targetMode)) {
       if (loading) return;
-      const ret = targetPath ? `/?mode=${targetMode}&path=${targetPath}` : `/?mode=${targetMode}`;
+      const retParams = new URLSearchParams({ mode: targetMode });
+      if (targetPath) retParams.set("path", targetPath);
+      if (targetHouse) retParams.set("house", String(targetHouse));
+      const ret = `/?${retParams.toString()}`;
       if (!user) {
         sessionStorage.setItem("ps_pending_mode", targetMode);
         navigate(`/auth?returnTo=${encodeURIComponent(ret)}`, { replace: true });
@@ -183,9 +189,34 @@ const Index = () => {
       setMode(targetMode);
       const activeBirthDate = profile?.birth_date || birthdate;
       const currentSolar = getCurrentSolarYear(activeBirthDate);
-      if (targetMode === "presente") setYear(currentSolar);
-      else if (targetMode === "passado") setYear(String(Number(currentSolar) - 1));
-      else setYear(getNextBirthdayYear(activeBirthDate));
+      const resolvedYear =
+        targetMode === "presente"
+          ? currentSolar
+          : targetMode === "passado"
+          ? String(Number(currentSolar) - 1)
+          : getNextBirthdayYear(activeBirthDate);
+      setYear(resolvedYear);
+
+      // Se veio da vitrine /casas com uma Casa pré-selecionada (&house=1..12), abre direto o Trailer de consulta dessa Casa
+      if (targetHouse) {
+        const safeName = profile?.full_name || name || "";
+        const safeDate = profile?.birth_date || birthdate || "";
+        const safeTime = normalizeBirthTime(
+          (profile?.birth_time ? profile.birth_time.slice(0, 5) : "") || birthtime || ""
+        );
+        const safePlace = profile?.birth_city || birthPlace || "";
+        if (safeName) sessionStorage.setItem("ps_natal_name", safeName);
+        if (safeDate) sessionStorage.setItem("ps_natal_date", safeDate);
+        if (safeTime) sessionStorage.setItem("ps_natal_time", safeTime);
+        if (safePlace) sessionStorage.setItem("ps_natal_place", safePlace);
+        sessionStorage.setItem("ps_natal_year", resolvedYear);
+        sessionStorage.setItem("ps_natal_mode", targetMode);
+        navigate(
+          `/app/trailer?house=${targetHouse}&mode=${encodeURIComponent(targetMode)}&year=${encodeURIComponent(resolvedYear)}`,
+          { replace: true }
+        );
+        return;
+      }
       
       if (targetPath && ["cidade", "casa", "intencao"].includes(targetPath)) {
         setSearchPath(targetPath);
