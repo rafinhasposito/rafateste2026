@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Activity,
   AlertCircle,
+  ArrowLeft,
   ArrowRight,
   BadgeCheck,
   Car,
@@ -16,18 +17,18 @@ import {
   HeartHandshake,
   Home,
   Loader2,
-  MapPin,
+  Lock,
   Megaphone,
   Moon,
   Network,
   RefreshCw,
+  Share2,
   Shield,
   ShieldCheck,
   Sparkles,
   Target,
   Trophy,
   Wallet,
-  Zap,
 } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import {
@@ -37,7 +38,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useAuth } from "@/hooks/useAuth";
-import { API_URL, getCurrentSolarYear, normalizeBirthTime } from "@/lib/astro";
+import {
+  API_URL,
+  getCurrentSolarYear,
+  getNextBirthdayYear,
+  normalizeBirthTime,
+} from "@/lib/astro";
 import { formatPartnerIdLabel, getStoredAffiliateRef } from "@/lib/affiliates";
 import {
   ELEMENT_STYLES,
@@ -47,8 +53,11 @@ import {
 import { houseThemes } from "@/data/houseThemes";
 import {
   HOME_CITY_DEFENSE,
+  TRAVEL_RADIUS_OPTIONS,
   V3_ANGLES,
   V3_FAQ_ITEMS,
+  V3_PRIORITY_OPTIONS,
+  type TravelRadiusOption,
   type V3AngleKey,
 } from "@/data/landingV3Data";
 
@@ -67,13 +76,13 @@ const ICON_MAP: Record<HouseIconKey, typeof Crown> = {
   moon: Moon,
 };
 
-interface AuditResult {
-  house: number;
-  city: string;
-  year: string;
+interface DualAuditResult {
+  pastHouse: number;
+  pastCity: string;
+  pastYear: string;
   sunSign?: string | null;
-  ascendant?: string | null;
-  returnDate?: string | null;
+  nextStayHouse: number | null;
+  nextYear: string;
   usedApproximateTime: boolean;
 }
 
@@ -96,12 +105,19 @@ export default function LandingV3() {
     return urlRef || getStoredAffiliateRef();
   }, [searchParams]);
 
-  // Refs para rolagem guiada
-  const validatorRef = useRef<HTMLElement | null>(null);
+  const quizRef = useRef<HTMLElement | null>(null);
   const housesRef = useRef<HTMLElement | null>(null);
   const pricingRef = useRef<HTMLElement | null>(null);
 
-  // Estado do Motor de Validação Reversa Gratuita
+  // Quiz Funnel de 5 Passos
+  const [quizStep, setQuizStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [selectedNextHouse, setSelectedNextHouse] = useState<number>(
+    angle.featuredHouseId || 2
+  );
+  const [selectedRadius, setSelectedRadius] =
+    useState<TravelRadiusOption["id"]>("300km");
+
+  // Dados natais + validação do passado
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
@@ -110,24 +126,21 @@ export default function LandingV3() {
   const [birthCityValid, setBirthCityValid] = useState(false);
   const [birthCoords, setBirthCoords] = useState<CityCoords | undefined>(undefined);
 
-  const [targetYear, setTargetYear] = useState<string>(() => {
-    const nowYear = new Date().getFullYear();
-    return String(nowYear - 1);
-  });
+  const [targetYear, setTargetYear] = useState<string>(() =>
+    String(new Date().getFullYear() - 1)
+  );
   const [pastCity, setPastCity] = useState("");
   const [pastCityValid, setPastCityValid] = useState(false);
   const [pastCoords, setPastCoords] = useState<CityCoords | undefined>(undefined);
 
   const [calculating, setCalculating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+  const [auditResult, setAuditResult] = useState<DualAuditResult | null>(null);
   const [validatedMatch, setValidatedMatch] = useState(false);
-  const [selectedNextHouse, setSelectedNextHouse] = useState<number | null>(
-    angle.featuredHouseId
-  );
+  const [copiedPass, setCopiedPass] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
 
-  // Pré-preenche se usuário já tiver perfil salvo
+  // Pré-preenche se o usuário já estiver logado com perfil natal
   useEffect(() => {
     if (!profile) return;
     if (profile.full_name && !name) setName(profile.full_name);
@@ -142,19 +155,25 @@ export default function LandingV3() {
       setBirthCity(profile.birth_city);
       setBirthCityValid(true);
       if (profile.birth_lat && profile.birth_lon) {
-        setBirthCoords({ lat: Number(profile.birth_lat), lon: Number(profile.birth_lon) });
+        setBirthCoords({
+          lat: Number(profile.birth_lat),
+          lon: Number(profile.birth_lon),
+        });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
   useEffect(() => {
-    setSelectedNextHouse(angle.featuredHouseId);
+    if (angle.featuredHouseId) {
+      setSelectedNextHouse(angle.featuredHouseId);
+    }
   }, [angle.featuredHouseId]);
 
   useEffect(() => {
-    document.title = "Protocolo Solar V3 — Teste Grátis Seu Último Aniversário";
-    const onScroll = () => setShowStickyBar(window.scrollY > 360);
+    document.title =
+      "Protocolo Solar V3 — Quiz & Validação Gratuita do Aniversário";
+    const onScroll = () => setShowStickyBar(window.scrollY > 420);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -176,28 +195,19 @@ export default function LandingV3() {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handleSelectPriority = (houseId: number) => {
+    setSelectedNextHouse(houseId);
+    setFormError(null);
+    setQuizStep(2);
+  };
+
   const handleToggleUnknownTime = (checked: boolean) => {
     setUnknownTime(checked);
-    if (checked) {
-      setBirthTime("12:00");
-    }
+    if (checked) setBirthTime("12:00");
   };
 
-  const handleUseSameAsBirthCity = () => {
-    if (!birthCity || !birthCityValid || !birthCoords) {
-      setFormError("Selecione primeiro sua cidade de nascimento na lista.");
-      return;
-    }
+  const handleAdvanceFromNatal = () => {
     setFormError(null);
-    setPastCity(birthCity);
-    setPastCityValid(true);
-    setPastCoords(birthCoords);
-  };
-
-  const handleRunFreeValidation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-
     const safeTime = unknownTime ? "12:00" : normalizeBirthTime(birthTime);
     if (!name.trim()) {
       setFormError("Digite seu primeiro nome para personalizar sua leitura.");
@@ -217,72 +227,139 @@ export default function LandingV3() {
       setFormError("Selecione sua cidade de nascimento nas sugestões da lista.");
       return;
     }
+    setQuizStep(3);
+  };
+
+  const handleUseSameAsBirthCity = () => {
+    if (!birthCity || !birthCityValid || !birthCoords) {
+      setFormError("Volte ao passo 2 e selecione sua cidade de nascimento.");
+      return;
+    }
+    setFormError(null);
+    setPastCity(birthCity);
+    setPastCityValid(true);
+    setPastCoords(birthCoords);
+  };
+
+  const handleAdvanceFromPastCity = () => {
+    setFormError(null);
     if (!pastCity.trim() || !pastCityValid || !pastCoords) {
       setFormError(
         "Selecione na lista a cidade onde você passou esse aniversário."
       );
       return;
     }
+    setQuizStep(4);
+  };
 
-    // Guarda no sessionStorage para o usuário não precisar redigitar se avançar pro Futuro
+  // Dispara cálculo REAL em paralelo: (1) Passado + (2) Próximo aniversário na cidade atual
+  const handleSelectRadiusAndCalculate = async (
+    radiusId: TravelRadiusOption["id"]
+  ) => {
+    setSelectedRadius(radiusId);
+    setFormError(null);
+
+    const safeTime = unknownTime ? "12:00" : normalizeBirthTime(birthTime);
+    if (!birthDate || !safeTime || !birthCityValid || !pastCityValid || !pastCoords) {
+      setFormError("Revise seus dados de nascimento e cidade do último aniversário.");
+      setQuizStep(2);
+      return;
+    }
+
     sessionStorage.setItem("ps_natal_name", name.trim());
     sessionStorage.setItem("ps_natal_date", birthDate);
     sessionStorage.setItem("ps_natal_time", safeTime);
     sessionStorage.setItem("ps_natal_place", birthCity.trim());
 
     setCalculating(true);
+    setQuizStep(5);
     setAuditResult(null);
     setValidatedMatch(false);
 
     try {
       const [ano, mes, dia] = birthDate.split("-");
       const dobFormatted = `${dia}/${mes}/${ano}`;
+      const nextYear = getNextBirthdayYear(birthDate);
+
+      const commonPayload = {
+        name: name.trim(),
+        place_of_birth: birthCity.trim(),
+        dob: dobFormatted,
+        time: safeTime,
+      };
+
+      const stayCity = pastCity.trim();
+      const stayLat = pastCoords.lat;
+      const stayLon = pastCoords.lon;
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 55000);
 
-      let resp: Response;
+      let pastResp: Response;
+      let nextResp: Response | null = null;
       try {
-        resp = await fetch(`${API_URL}/audit_past`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: controller.signal,
-          body: JSON.stringify({
-            name: name.trim(),
-            place_of_birth: birthCity.trim(),
-            dob: dobFormatted,
-            time: safeTime,
-            target_year: targetYear,
-            past_city: pastCity.trim(),
-            past_lat: pastCoords.lat,
-            past_lon: pastCoords.lon,
+        [pastResp, nextResp] = await Promise.all([
+          fetch(`${API_URL}/audit_past`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              ...commonPayload,
+              target_year: targetYear,
+              past_city: stayCity,
+              past_lat: stayLat,
+              past_lon: stayLon,
+            }),
           }),
-        });
+          fetch(`${API_URL}/audit_past`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              ...commonPayload,
+              target_year: nextYear,
+              past_city: stayCity,
+              past_lat: stayLat,
+              past_lon: stayLon,
+            }),
+          }).catch(() => null),
+        ]);
       } finally {
         clearTimeout(timeoutId);
       }
 
-      const data = await resp.json();
-      if (!resp.ok || !data?.house) {
+      const pastData = await pastResp.json();
+      if (!pastResp.ok || !pastData?.house) {
         throw new Error(
-          data?.error ||
+          pastData?.error ||
             "Não conseguimos calcular agora. Confira os dados e tente novamente."
         );
       }
 
+      let nextStayHouse: number | null = null;
+      if (nextResp && nextResp.ok) {
+        try {
+          const nextData = await nextResp.json();
+          if (nextData?.house) nextStayHouse = Number(nextData.house);
+        } catch {
+          nextStayHouse = null;
+        }
+      }
+
       setAuditResult({
-        house: Number(data.house),
-        city: pastCity.split(",")[0].trim(),
-        year: targetYear,
-        sunSign: data.sun_sign || null,
-        ascendant: data.ascendant || null,
-        returnDate: data.return_date || null,
+        pastHouse: Number(pastData.house),
+        pastCity: stayCity.split(",")[0].trim(),
+        pastYear: targetYear,
+        sunSign: pastData.sun_sign || null,
+        nextStayHouse,
+        nextYear,
         usedApproximateTime: unknownTime,
       });
     } catch (err: any) {
+      setQuizStep(4);
       if (err?.name === "AbortError") {
         setFormError(
-          "O servidor astronômico demorou para responder (cold start). Tente clicar mais uma vez — agora ele já acordou!"
+          "O servidor astronômico estava acordando. Toque na sua opção novamente — agora o cálculo responde rápido!"
         );
       } else {
         setFormError(err?.message || "Erro ao calcular sua Casa. Tente novamente.");
@@ -296,20 +373,49 @@ export default function LandingV3() {
     const targetReturn = selectedNextHouse
       ? `/?mode=futuro&path=casa&house=${selectedNextHouse}`
       : "/?mode=futuro";
-    navigate(
-      `/credits?pkg=${pkg}&returnTo=${encodeURIComponent(targetReturn)}`
-    );
+    navigate(`/credits?pkg=${pkg}&returnTo=${encodeURIComponent(targetReturn)}`);
   };
 
-  const resultShowcase = auditResult
-    ? HOUSES_SHOWCASE.find((h) => h.id === auditResult.house) || HOUSES_SHOWCASE[0]
+  const handleShareBoardingPass = async () => {
+    if (!auditResult || !pastShowcase) return;
+    const text = `Fiz o teste grátis do meu aniversário de ${auditResult.pastYear} em ${auditResult.pastCity} no Protocolo Solar e caiu na Casa ${pastShowcase.numberLabel} (${pastShowcase.title})! Testa onde você passou o seu: https://protocolosolar.com.br/v3`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "Meu Bilhete Cósmico • Protocolo Solar",
+          text,
+          url: "https://protocolosolar.com.br/v3",
+        });
+      } else {
+        await navigator.clipboard.writeText(text);
+        setCopiedPass(true);
+        setTimeout(() => setCopiedPass(false), 2600);
+      }
+    } catch {
+      // Usuário cancelou o diálogo nativo
+    }
+  };
+
+  const pastShowcase = auditResult
+    ? HOUSES_SHOWCASE.find((h) => h.id === auditResult.pastHouse) ||
+      HOUSES_SHOWCASE[0]
     : null;
-  const resultTheme = auditResult
-    ? houseThemes[auditResult.house] || houseThemes[1]
+  const pastTheme = auditResult
+    ? houseThemes[auditResult.pastHouse] || houseThemes[1]
     : null;
-  const resultDefense = auditResult
-    ? HOME_CITY_DEFENSE[auditResult.house] || HOME_CITY_DEFENSE[1]
+  const nextStayShowcase = auditResult?.nextStayHouse
+    ? HOUSES_SHOWCASE.find((h) => h.id === auditResult.nextStayHouse) || null
     : null;
+  const nextStayDefense = auditResult?.nextStayHouse
+    ? HOME_CITY_DEFENSE[auditResult.nextStayHouse] || HOME_CITY_DEFENSE[1]
+    : auditResult
+    ? HOME_CITY_DEFENSE[auditResult.pastHouse] || HOME_CITY_DEFENSE[1]
+    : null;
+  const goalShowcase =
+    HOUSES_SHOWCASE.find((h) => h.id === selectedNextHouse) || HOUSES_SHOWCASE[1];
+  const radiusObj =
+    TRAVEL_RADIUS_OPTIONS.find((r) => r.id === selectedRadius) ||
+    TRAVEL_RADIUS_OPTIONS[1];
 
   return (
     <div className="min-h-screen bg-[#050507] text-[#F8FAFC] font-ps-ui overflow-x-hidden pb-28 lg:pb-16 selection:bg-[#F5B041]/25">
@@ -322,11 +428,10 @@ export default function LandingV3() {
         }}
       />
 
-      {/* TOP BAR LIMPA + SELETOR DE ÂNGULOS A/B PARA AVALIAÇÃO */}
-      <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#050507]/85 backdrop-blur-xl">
+      {/* TOP BAR + SELETOR A/B */}
+      <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#050507]/88 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-3">
           <Link to="/v3" className="flex items-center gap-2.5 shrink-0">
-            {/* SVG Solar Vetorial Nativo */}
             <svg
               width="28"
               height="28"
@@ -351,7 +456,7 @@ export default function LandingV3() {
                 Protocolo Solar
               </span>
               <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#F5B041]">
-                Prévia V3 • Validação Grátis
+                Prévia V3 • Quiz Funnel
               </span>
             </div>
           </Link>
@@ -359,9 +464,9 @@ export default function LandingV3() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to="/casas"
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs text-[#94A3B8] hover:text-white transition-colors px-2.5 py-1.5"
+              className="hidden sm:inline-flex items-center text-xs text-[#94A3B8] hover:text-white transition-colors px-2.5 py-1.5"
             >
-              <span>As 12 Casas</span>
+              As 12 Casas
             </Link>
             <Link
               to="/"
@@ -373,14 +478,14 @@ export default function LandingV3() {
             {user ? (
               <Link
                 to="/history"
-                className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#F5B041]/15 border border-[#F5B041]/40 text-[#FFF3D1] text-[11px] font-semibold"
+                className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#F5B041]/15 border border-[#F5B041]/40 text-[#FFF3D1] text-[11px] font-semibold whitespace-nowrap shrink-0"
               >
                 Minha Conta
               </Link>
             ) : (
               <Link
                 to="/auth?returnTo=%2Fv3"
-                className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/15 text-white text-[11px] font-semibold hover:bg-white/12 transition-all"
+                className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/15 text-white text-[11px] font-semibold hover:bg-white/12 transition-all whitespace-nowrap shrink-0"
               >
                 Entrar
               </Link>
@@ -388,7 +493,7 @@ export default function LandingV3() {
           </div>
         </div>
 
-        {/* Barra de prévia dos 4 ângulos A/B (MiroFish / TikTok & Reels) */}
+        {/* Barra de prévia dos 4 ângulos A/B */}
         <div className="border-t border-white/[0.05] bg-[#0A0B10]/90">
           <div className="max-w-6xl mx-auto px-5 sm:px-8 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
             <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#94A3B8] shrink-0">
@@ -420,7 +525,7 @@ export default function LandingV3() {
         </div>
       </header>
 
-      {/* BANNER DISCRETO DE INDICAÇÃO VERIFICADA (SE VEIO DE AFILIADO) */}
+      {/* BANNER INDICAÇÃO VERIFICADA */}
       {affiliateRef && (
         <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 pt-4">
           <div className="rounded-2xl border border-[#F5B041]/30 bg-[#F5B041]/[0.07] px-4 py-2.5 flex flex-wrap items-center justify-center gap-2 text-xs text-[#FFF3D1]">
@@ -437,23 +542,24 @@ export default function LandingV3() {
       )}
 
       {/* ===================================================================== */}
-      {/* 1. HERO (3 SEGUNDOS — SPATIAL DARK + SHIMMER CTA + AUTORIDADE)        */}
+      {/* 1. HERO COMPACTO + QUIZ FUNNEL INTERATIVO DE 5 PASSOS ACIMA DA DOBRA  */}
       {/* ===================================================================== */}
-      <section className="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 pt-10 sm:pt-16 pb-12 sm:pb-16 text-center">
+      <section className="relative z-10 max-w-4xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-14 sm:pb-20">
         <motion.div
           key={`hero-${angleKey}`}
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.35 }}
+          className="text-center mb-8"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#F5B041]/30 bg-[#F5B041]/10 text-[#FFF3D1] font-mono text-[10px] uppercase tracking-[0.16em] mb-5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#F5B041]/30 bg-[#F5B041]/10 text-[#FFF3D1] font-mono text-[10px] uppercase tracking-[0.16em] mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[#F5B041]" />
             <span>{angle.badge}</span>
           </div>
 
           <h1
-            className="font-ps-display font-bold text-white tracking-[-0.03em] leading-[1.06] max-w-4xl mx-auto mb-5"
-            style={{ fontSize: "clamp(2rem, 5.4vw, 3.85rem)" }}
+            className="font-ps-display font-bold text-white tracking-[-0.03em] leading-[1.06] max-w-3xl mx-auto mb-3.5"
+            style={{ fontSize: "clamp(1.85rem, 4.8vw, 3.35rem)" }}
           >
             {angle.headline}{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFF3D1] via-[#F5B041] to-[#E67E22]">
@@ -461,31 +567,11 @@ export default function LandingV3() {
             </span>
           </h1>
 
-          <p className="text-[#CBD5E1] text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
+          <p className="text-[#CBD5E1] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto mb-4">
             {angle.subcopy}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-7">
-            <button
-              type="button"
-              onClick={() => scrollToSection(validatorRef)}
-              className="w-full sm:w-auto min-h-[54px] px-7 py-4 rounded-2xl font-ps-display font-bold text-sm sm:text-base tracking-wide bg-gradient-to-r from-[#F5B041] via-[#F8C86A] to-[#E67E22] hover:brightness-110 active:scale-[0.98] text-[#050507] transition-all flex items-center justify-center gap-2 shadow-[0_14px_40px_rgba(245,176,65,0.32)]"
-            >
-              <span>{angle.ctaLabel}</span>
-              <ArrowRight className="w-4 h-4 shrink-0" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => scrollToSection(housesRef)}
-              className="w-full sm:w-auto min-h-[54px] px-6 py-4 rounded-2xl border border-white/15 bg-white/[0.04] hover:bg-white/[0.09] active:scale-[0.98] text-white/90 font-ps-ui text-xs sm:text-sm font-semibold uppercase tracking-[0.14em] transition-all"
-            >
-              Ver as 12 Casas
-            </button>
-          </div>
-
-          {/* Micro-reassurances anti-objeção */}
-          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-[#94A3B8]">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] sm:text-xs text-[#94A3B8]">
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#F5B041]" />
               Teste do passado 100% grátis
@@ -496,446 +582,670 @@ export default function LandingV3() {
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Car className="w-3.5 h-3.5 text-[#F5B041]" />
-              Não precisa viajar para a Europa
+              Destinos regionais ou exterior
             </span>
           </div>
         </motion.div>
-      </section>
 
-      {/* ===================================================================== */}
-      {/* 2. MOTOR DE VALIDAÇÃO REVERSA GRATUITA (PASSADO / ANO ATUAL — REAL)   */}
-      {/* ===================================================================== */}
-      <section
-        ref={validatorRef}
-        id="teste-gratis-passado"
-        className="relative z-10 max-w-4xl mx-auto px-5 sm:px-8 pb-16 sm:pb-24 scroll-mt-28"
-      >
-        <div
-          className="rounded-[28px] border border-[#F5B041]/25 p-5 sm:p-8 md:p-10 shadow-[0_24px_80px_rgba(0,0,0,0.65)] relative overflow-hidden"
+        {/* CARD INTERATIVO DO QUIZ FUNNEL 5 PASSOS */}
+        <section
+          ref={quizRef}
+          id="quiz-v3"
+          aria-label="Quiz interativo do Protocolo Solar"
+          className="rounded-[28px] border border-[#F5B041]/25 p-5 sm:p-8 shadow-[0_24px_80px_rgba(0,0,0,0.7)] relative overflow-hidden scroll-mt-28"
           style={{
             background:
-              "linear-gradient(180deg, rgba(16,20,30,0.92) 0%, rgba(10,11,16,0.98) 100%)",
+              "linear-gradient(180deg, rgba(16,20,30,0.94) 0%, rgba(10,11,16,0.98) 100%)",
             backdropFilter: "blur(20px)",
           }}
         >
-          <div
-            className="pointer-events-none absolute top-0 left-8 right-8 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(245,176,65,0.65), transparent)",
-            }}
-          />
-
-          <div className="mb-7">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5B041] font-bold block mb-2">
-              Passo 1 • Prova Real Sem Pagar Nada
-            </span>
-            <h2 className="font-ps-display text-2xl sm:text-3xl font-bold text-white leading-tight mb-2">
-              Teste no seu aniversário atual ou passado
-            </h2>
-            <p className="text-sm text-[#94A3B8] leading-relaxed max-w-2xl">
-              Antes de pensar em pagar ou viajar, coloque a cidade onde você
-              passou seu último aniversário (ou um ano anterior) e veja se a
-              Casa calculada bate com o que você realmente viveu.
-            </p>
+          {/* Barra de progresso 5 passos */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <div className="flex items-center gap-2">
+                {quizStep > 1 && !calculating && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setQuizStep((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3 | 4 | 5) : 1))
+                    }
+                    className="inline-flex items-center gap-1 text-xs text-[#94A3B8] hover:text-white pr-2"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Voltar</span>
+                  </button>
+                )}
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#F5B041]">
+                  Passo {quizStep} de 5
+                </span>
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#94A3B8]">
+                {quizStep === 1 && "Prioridade do ano"}
+                {quizStep === 2 && "Dados de nascimento"}
+                {quizStep === 3 && "Validação do passado"}
+                {quizStep === 4 && "Raio de viagem"}
+                {quizStep === 5 && "Seu diagnóstico gratuito"}
+              </span>
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#F5B041] to-[#E67E22] transition-all duration-300"
+                style={{ width: `${(quizStep / 5) * 100}%` }}
+              />
+            </div>
           </div>
 
-          <form onSubmit={handleRunFreeValidation} className="space-y-5">
-            {/* Linha 1: Nome + Data */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-2">
-                  Seu Nome
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex.: Rafael"
-                  className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#F5B041]"
-                />
-              </div>
+          <AnimatePresence mode="wait">
+            {/* PASSO 1: PERGUNTA DECISORA ACIMA DA DOBRA */}
+            {quizStep === 1 && (
+              <motion.div
+                key="step-1"
+                initial={prefersReducedMotion ? false : { opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.22 }}
+              >
+                <h2 className="font-ps-display text-xl sm:text-2xl font-bold text-white leading-snug mb-1.5">
+                  Qual área da sua vida é prioridade nº 1 nos próximos 12 meses?
+                </h2>
+                <p className="text-xs sm:text-sm text-[#94A3B8] mb-5">
+                  Toque em uma opção abaixo — em 2 minutos mostramos grátis o
+                  que seu último aniversário ativou e o contraste para o próximo.
+                </p>
 
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-2">
-                  Data de Nascimento
-                </label>
-                <input
-                  type="date"
-                  value={birthDate}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setBirthDate(val);
-                    if (val) setTargetYear(getCurrentSolarYear(val));
-                  }}
-                  className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white focus:outline-none focus:border-[#F5B041] [color-scheme:dark]"
-                />
-              </div>
-            </div>
-
-            {/* Linha 2: Hora + Checkbox "Não sei meu horário exato" + Cidade Natal */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-2">
-                  Hora de Nascimento (Certidão)
-                </label>
-                <input
-                  type="time"
-                  value={birthTime}
-                  disabled={unknownTime}
-                  onChange={(e) => setBirthTime(e.target.value)}
-                  className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white disabled:opacity-50 focus:outline-none focus:border-[#F5B041] [color-scheme:dark]"
-                />
-                <label className="mt-2.5 flex items-start gap-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={unknownTime}
-                    onChange={(e) => handleToggleUnknownTime(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded accent-[#F5B041] cursor-pointer shrink-0"
-                  />
-                  <span className="text-xs text-[#CBD5E1] leading-snug">
-                    <strong>Não sei meu horário exato</strong> (usar 12:00 aproximado)
-                  </span>
-                </label>
-                {unknownTime && (
-                  <p className="mt-2 rounded-xl border border-[#F5B041]/25 bg-[#F5B041]/[0.07] px-3 py-2 text-[11px] text-[#FFF3D1]/85 leading-relaxed">
-                    Sem a hora exata da certidão, a cúspide do Ascendente pode
-                    variar alguns graus, mas a posição do Sol no horizonte já
-                    direciona a tendência principal da sua cidade. Você poderá
-                    atualizar depois.
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-2">
-                  Cidade Onde Você Nasceu
-                </label>
-                <CityAutocomplete
-                  value={birthCity}
-                  onChange={(val, valid, coords) => {
-                    setBirthCity(val);
-                    setBirthCityValid(valid);
-                    if (coords) setBirthCoords(coords);
-                  }}
-                  placeholder="Digite e toque na cidade da lista"
-                  className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#F5B041]"
-                />
-              </div>
-            </div>
-
-            {/* Linha 3: Qual ano validar + Cidade onde passou o aniversário */}
-            <div className="pt-2 border-t border-white/[0.08] space-y-4">
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-2">
-                  Qual aniversário você quer conferir?
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {yearOptions.map((opt) => {
-                    const active = targetYear === opt.value;
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {V3_PRIORITY_OPTIONS.map((opt) => {
+                    const active = selectedNextHouse === opt.houseId;
                     return (
                       <button
-                        key={opt.value}
+                        key={opt.id}
                         type="button"
-                        onClick={() => setTargetYear(opt.value)}
-                        className={`min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                        onClick={() => handleSelectPriority(opt.houseId)}
+                        className={`group min-h-[76px] p-4 rounded-2xl border text-left transition-all active:scale-[0.98] flex items-center justify-between gap-3 ${
                           active
-                            ? "bg-[#F5B041]/20 border-[#F5B041]/70 text-[#FFF3D1]"
-                            : "bg-white/[0.03] border-white/12 text-[#94A3B8] hover:text-white"
+                            ? "border-[#F5B041]/75 bg-[#F5B041]/12"
+                            : "border-white/10 bg-white/[0.03] hover:border-[#F5B041]/50 hover:bg-white/[0.06]"
                         }`}
                       >
-                        {opt.label}
+                        <div className="min-w-0">
+                          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-bold block mb-0.5">
+                            {opt.tag}
+                          </span>
+                          <span className="font-ps-display text-sm sm:text-base font-bold text-white block leading-snug">
+                            {opt.title}
+                          </span>
+                          <span className="text-xs text-[#94A3B8] block mt-0.5 leading-snug">
+                            {opt.subtitle}
+                          </span>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-[#F5B041] shrink-0 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     );
                   })}
                 </div>
-              </div>
-
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                  <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold">
-                    Em qual cidade você passou o aniversário de {targetYear}?
-                  </label>
-                  {birthCityValid && (
-                    <button
-                      type="button"
-                      onClick={handleUseSameAsBirthCity}
-                      className="text-[11px] font-semibold text-[#F5B041] hover:underline"
-                    >
-                      Passei na minha cidade natal →
-                    </button>
-                  )}
-                </div>
-                <CityAutocomplete
-                  value={pastCity}
-                  onChange={(val, valid, coords) => {
-                    setPastCity(val);
-                    setPastCityValid(valid);
-                    if (coords) setPastCoords(coords);
-                  }}
-                  placeholder="Ex.: São Paulo, Rio de Janeiro, Curitiba..."
-                  className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#F5B041]"
-                />
-              </div>
-            </div>
-
-            {formError && (
-              <div className="rounded-xl border border-red-500/35 bg-red-500/10 px-4 py-3 flex items-start gap-2.5 text-xs sm:text-sm text-red-200">
-                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <span>{formError}</span>
-              </div>
+              </motion.div>
             )}
 
-            <button
-              type="submit"
-              disabled={calculating}
-              className="w-full min-h-[56px] px-6 py-4 rounded-2xl font-ps-display font-bold text-sm sm:text-base tracking-wide bg-gradient-to-r from-[#F5B041] via-[#F8C86A] to-[#E67E22] hover:brightness-110 active:scale-[0.98] disabled:opacity-60 text-[#050507] transition-all flex items-center justify-center gap-2.5 shadow-[0_14px_38px_rgba(245,176,65,0.28)]"
-            >
-              {calculating ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin shrink-0" />
-                  <span>Calculando sua Revolução Solar real...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5 shrink-0" />
-                  <span>Revelar Minha Casa Grátis Agora</span>
-                  <ArrowRight className="w-4 h-4 shrink-0" />
-                </>
-              )}
-            </button>
-
-            <p className="text-center text-[11px] text-[#94A3B8]">
-              Sem cartão de crédito • Sem criar senha antes de ver o resultado •
-              Cálculo real via Swiss Ephemeris
-            </p>
-          </form>
-
-          {/* =============================================================== */}
-          {/* RESULTADO REAL DA VALIDAÇÃO REVERSA GRATUITA                    */}
-          {/* =============================================================== */}
-          <AnimatePresence>
-            {auditResult && resultShowcase && resultTheme && resultDefense && (
+            {/* PASSO 2: DADOS NATAIS + "NÃO SEI MEU HORÁRIO EXATO" */}
+            {quizStep === 2 && (
               <motion.div
-                key={`result-${auditResult.house}-${auditResult.city}`}
-                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35 }}
-                className="mt-8 pt-8 border-t border-white/12 space-y-6"
+                key="step-2"
+                initial={prefersReducedMotion ? false : { opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.22 }}
+                className="space-y-4"
               >
-                <div
-                  className="rounded-3xl border p-6 sm:p-8 relative overflow-hidden"
-                  style={{
-                    borderColor: `${resultTheme.themeColor}55`,
-                    background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${resultTheme.themeColor}22, rgba(5,5,7,0.95) 75%)`,
-                  }}
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                    <span
-                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full font-mono text-[11px] font-bold uppercase tracking-[0.16em] border"
-                      style={{
-                        color: resultTheme.themeColor,
-                        backgroundColor: `${resultTheme.themeColor}18`,
-                        borderColor: `${resultTheme.themeColor}45`,
-                      }}
-                    >
-                      Resultado Real • Aniversário {auditResult.year}
-                    </span>
-                    <span className="font-mono text-[11px] text-white/65">
-                      📍 {auditResult.city}
-                      {auditResult.sunSign ? ` • Sol em ${auditResult.sunSign}` : ""}
-                    </span>
-                  </div>
-
-                  <h3 className="font-ps-display text-3xl sm:text-4xl font-bold text-white leading-tight mb-2">
-                    Casa {resultShowcase.numberLabel} — {resultShowcase.title}
-                  </h3>
-
-                  <p className="text-sm sm:text-base text-white/85 leading-relaxed mb-5">
-                    {resultShowcase.cycleFocus}
+                <div>
+                  <h2 className="font-ps-display text-xl sm:text-2xl font-bold text-white leading-snug mb-1">
+                    Seus dados de nascimento
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[#94A3B8]">
+                    Usamos as tabelas astronômicas Swiss Ephemeris para calcular
+                    o minuto exato da sua virada solar. Sem criar conta agora.
                   </p>
+                </div>
 
-                  {auditResult.usedApproximateTime && (
-                    <div className="mb-5 rounded-xl border border-[#F5B041]/30 bg-[#F5B041]/10 px-3.5 py-2.5 text-xs text-[#FFF3D1]">
-                      Cálculo feito com horário aproximado (12:00). Para precisão
-                      cirúrgica do Ascendente e das cúspides, confira sua certidão
-                      de nascimento.
-                    </div>
-                  )}
-
-                  {/* Como aparece na prática (3 cenas concretas) */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
-                    {resultShowcase.inPractice.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-2xl border border-white/10 bg-black/45 p-4"
-                      >
-                        <span
-                          className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] block mb-1"
-                          style={{ color: resultTheme.themeColor }}
-                        >
-                          0{idx + 1} • {item.area}
-                        </span>
-                        <p className="text-xs sm:text-[13px] text-white/80 leading-relaxed">
-                          {item.example}
-                        </p>
-                      </div>
-                    ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-1.5">
+                      Seu Nome
+                    </label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Ex.: Rafael"
+                      className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#F5B041]"
+                    />
                   </div>
-
-                  {/* Manual de Defesa da Cidade Natal */}
-                  <div className="rounded-2xl border border-white/12 bg-white/[0.04] p-4 sm:p-5">
-                    <div className="flex items-center gap-2 mb-2.5">
-                      <Shield className="w-4 h-4 text-[#F5B041]" />
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#FFF3D1]">
-                        Manual de Defesa da Cidade ({auditResult.city})
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-[13px] leading-relaxed">
-                      <div className="rounded-xl bg-black/35 border border-emerald-500/20 p-3.5">
-                        <strong className="text-emerald-300 block mb-1">
-                          O que aproveitar neste ciclo:
-                        </strong>
-                        <span className="text-white/80">{resultDefense.strength}</span>
-                      </div>
-                      <div className="rounded-xl bg-black/35 border border-amber-500/20 p-3.5">
-                        <strong className="text-amber-300 block mb-1">
-                          Ponto cego para evitar:
-                        </strong>
-                        <span className="text-white/80">{resultDefense.blindSpot}</span>
-                      </div>
-                    </div>
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-1.5">
+                      Data de Nascimento
+                    </label>
+                    <input
+                      type="date"
+                      value={birthDate}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setBirthDate(val);
+                        if (val) setTargetYear(getCurrentSolarYear(val));
+                      }}
+                      className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white focus:outline-none focus:border-[#F5B041] [color-scheme:dark]"
+                    />
                   </div>
                 </div>
 
-                {/* GATILHO DE VALIDAÇÃO REVERSA → PONTE PARA O PRÓXIMO ANIVERSÁRIO */}
-                <div className="rounded-2xl border border-[#F5B041]/35 bg-[#F5B041]/[0.08] p-5 sm:p-6 text-center space-y-4">
-                  <h4 className="font-ps-display text-lg sm:text-xl font-bold text-white">
-                    Bateu com o que você viveu (ou deixou de aproveitar) em{" "}
-                    {auditResult.year}?
-                  </h4>
-                  <p className="text-xs sm:text-sm text-[#CBD5E1] max-w-xl mx-auto">
-                    Se o passado fez sentido, imagine escolher{" "}
-                    <strong className="text-white">de propósito</strong> qual Casa
-                    você quer ativar no seu próximo aniversário — seja na sua
-                    região ou em outra cidade do mundo.
-                  </p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setValidatedMatch(true);
-                        scrollToSection(housesRef);
-                      }}
-                      className="w-full sm:w-auto min-h-[48px] px-6 py-3 rounded-xl bg-[#F5B041] hover:bg-[#F8C86A] text-[#050507] font-ps-display font-bold text-sm transition-all flex items-center justify-center gap-2"
-                    >
-                      <span>Sim, bateu! Quero escolher meu próximo ano</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuditResult(null)}
-                      className="w-full sm:w-auto min-h-[48px] px-5 py-3 rounded-xl border border-white/15 bg-white/[0.04] hover:bg-white/10 text-white/85 text-xs font-semibold uppercase tracking-[0.14em]"
-                    >
-                      Testar outro ano / cidade
-                    </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-1.5">
+                      Hora de Nascimento (Certidão)
+                    </label>
+                    <input
+                      type="time"
+                      value={birthTime}
+                      disabled={unknownTime}
+                      onChange={(e) => setBirthTime(e.target.value)}
+                      className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white disabled:opacity-50 focus:outline-none focus:border-[#F5B041] [color-scheme:dark]"
+                    />
+                    <label className="mt-2.5 flex items-start gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={unknownTime}
+                        onChange={(e) => handleToggleUnknownTime(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 rounded accent-[#F5B041] cursor-pointer shrink-0"
+                      />
+                      <span className="text-xs text-[#CBD5E1] leading-snug">
+                        <strong>Não sei meu horário exato</strong> (usar 12:00 aproximado)
+                      </span>
+                    </label>
+                    {unknownTime && (
+                      <p className="mt-2 rounded-xl border border-[#F5B041]/25 bg-[#F5B041]/[0.07] px-3 py-2 text-[11px] text-[#FFF3D1]/85 leading-relaxed">
+                        Sem a hora exata da certidão, a cúspide do Ascendente pode
+                        variar alguns graus, mas a posição do Sol no horizonte já
+                        direciona a tendência da sua cidade.
+                      </p>
+                    )}
                   </div>
+
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-1.5">
+                      Cidade Onde Você Nasceu
+                    </label>
+                    <CityAutocomplete
+                      value={birthCity}
+                      onChange={(val, valid, coords) => {
+                        setBirthCity(val);
+                        setBirthCityValid(valid);
+                        if (coords) setBirthCoords(coords);
+                      }}
+                      placeholder="Digite e toque na cidade da lista"
+                      className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#F5B041]"
+                    />
+                  </div>
+                </div>
+
+                {formError && (
+                  <div className="rounded-xl border border-red-500/35 bg-red-500/10 px-4 py-3 flex items-start gap-2 text-xs text-red-200">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                    <span>{formError}</span>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleAdvanceFromNatal}
+                  className="w-full min-h-[52px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#F5B041] to-[#E67E22] hover:brightness-110 active:scale-[0.98] text-[#050507] font-ps-display font-bold text-sm sm:text-base flex items-center justify-center gap-2"
+                >
+                  <span>Continuar para o Teste do Passado</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+
+            {/* PASSO 3: VALIDAÇÃO REVERSA GRATUITA (CIDADE DO ÚLTIMO ANIVERSÁRIO) */}
+            {quizStep === 3 && (
+              <motion.div
+                key="step-3"
+                initial={prefersReducedMotion ? false : { opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.22 }}
+                className="space-y-5"
+              >
+                <div>
+                  <h2 className="font-ps-display text-xl sm:text-2xl font-bold text-white leading-snug mb-1">
+                    Onde você passou seu último aniversário?
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[#94A3B8]">
+                    Vamos revelar grátis qual Casa governou esse ano — para você
+                    conferir na prática se bateu com o que realmente viveu.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold block mb-2">
+                    Escolha o ano para validar
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {yearOptions.map((opt) => {
+                      const active = targetYear === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setTargetYear(opt.value)}
+                          className={`min-h-[42px] px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
+                            active
+                              ? "bg-[#F5B041]/20 border-[#F5B041]/70 text-[#FFF3D1]"
+                              : "bg-white/[0.03] border-white/12 text-[#94A3B8] hover:text-white"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-semibold">
+                      Cidade onde você estava no aniversário de {targetYear}
+                    </label>
+                    {birthCityValid && (
+                      <button
+                        type="button"
+                        onClick={handleUseSameAsBirthCity}
+                        className="text-xs font-semibold text-[#F5B041] hover:underline"
+                      >
+                        Passei na minha cidade natal →
+                      </button>
+                    )}
+                  </div>
+                  <CityAutocomplete
+                    value={pastCity}
+                    onChange={(val, valid, coords) => {
+                      setPastCity(val);
+                      setPastCityValid(valid);
+                      if (coords) setPastCoords(coords);
+                    }}
+                    placeholder="Ex.: São Paulo, Rio de Janeiro, Curitiba..."
+                    className="w-full min-h-[48px] rounded-xl border border-white/15 bg-[#050507]/90 px-4 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:border-[#F5B041]"
+                  />
+                </div>
+
+                {formError && (
+                  <div className="rounded-xl border border-red-500/35 bg-red-500/10 px-4 py-3 flex items-start gap-2 text-xs text-red-200">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                    <span>{formError}</span>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleAdvanceFromPastCity}
+                  className="w-full min-h-[52px] px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#F5B041] to-[#E67E22] hover:brightness-110 active:scale-[0.98] text-[#050507] font-ps-display font-bold text-sm sm:text-base flex items-center justify-center gap-2"
+                >
+                  <span>Avançar para Raio de Viagem</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+
+            {/* PASSO 4: RAIO DE VIAGEM (ACOLHE QUEM NÃO PODE VIAJAR LONGE) */}
+            {quizStep === 4 && (
+              <motion.div
+                key="step-4"
+                initial={prefersReducedMotion ? false : { opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.22 }}
+                className="space-y-4"
+              >
+                <div>
+                  <h2 className="font-ps-display text-xl sm:text-2xl font-bold text-white leading-snug mb-1">
+                    Até onde você toparia ir no seu próximo aniversário?
+                  </h2>
+                  <p className="text-xs sm:text-sm text-[#94A3B8]">
+                    Toque na sua realidade atual para calcularmos grátis o seu
+                    passado + o contraste do próximo ciclo.
+                  </p>
+                </div>
+
+                {formError && (
+                  <div className="rounded-xl border border-red-500/35 bg-red-500/10 px-4 py-3 flex items-start gap-2 text-xs text-red-200">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                    <span>{formError}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {TRAVEL_RADIUS_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => handleSelectRadiusAndCalculate(opt.id)}
+                      className="group min-h-[82px] p-4 rounded-2xl border border-white/12 bg-white/[0.03] hover:border-[#F5B041]/70 hover:bg-[#F5B041]/[0.08] active:scale-[0.98] text-left transition-all flex items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#F5B041] font-bold block mb-0.5">
+                          {opt.badge}
+                        </span>
+                        <span className="font-ps-display text-sm sm:text-base font-bold text-white block">
+                          {opt.title}
+                        </span>
+                        <span className="text-xs text-[#94A3B8] block mt-0.5 leading-snug">
+                          {opt.subtitle}
+                        </span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#F5B041] shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             )}
+
+            {/* PASSO 5: REVELAÇÃO DE CONTRASTE DUPLO + BILHETE CÓSMICO + CIDADES BLOQUEADAS */}
+            {quizStep === 5 && (
+              <motion.div
+                key="step-5"
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {calculating ? (
+                  <div className="py-12 text-center space-y-4">
+                    <Loader2 className="w-10 h-10 text-[#F5B041] animate-spin mx-auto" />
+                    <div>
+                      <h3 className="font-ps-display text-xl font-bold text-white mb-1">
+                        Calculando sua Revolução Solar real...
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#94A3B8]">
+                        Consultando efemérides astronômicas (Swiss Ephemeris) para{" "}
+                        <strong className="text-white">{pastCity.split(",")[0]}</strong>.
+                      </p>
+                    </div>
+                  </div>
+                ) : auditResult && pastShowcase && pastTheme && nextStayDefense ? (
+                  <div className="space-y-6">
+                    {/* BLOCO A: VALIDAÇÃO REAL DO PASSADO */}
+                    <div
+                      className="rounded-3xl border p-5 sm:p-7 relative overflow-hidden"
+                      style={{
+                        borderColor: `${pastTheme.themeColor}55`,
+                        background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${pastTheme.themeColor}22, rgba(5,5,7,0.96) 75%)`,
+                      }}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <span
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-mono text-[10px] font-bold uppercase tracking-[0.16em] border"
+                          style={{
+                            color: pastTheme.themeColor,
+                            backgroundColor: `${pastTheme.themeColor}18`,
+                            borderColor: `${pastTheme.themeColor}45`,
+                          }}
+                        >
+                          Prova Real Gratuita • Aniversário {auditResult.pastYear}
+                        </span>
+                        <span className="font-mono text-[11px] text-white/65">
+                          📍 {auditResult.pastCity}
+                          {auditResult.sunSign ? ` • Sol em ${auditResult.sunSign}` : ""}
+                        </span>
+                      </div>
+
+                      <h3 className="font-ps-display text-2xl sm:text-3xl font-bold text-white leading-tight mb-2">
+                        Casa {pastShowcase.numberLabel} — {pastShowcase.title}
+                      </h3>
+
+                      <p className="text-sm text-white/85 leading-relaxed mb-5">
+                        {pastShowcase.cycleFocus}
+                      </p>
+
+                      {auditResult.usedApproximateTime && (
+                        <div className="mb-4 rounded-xl border border-[#F5B041]/30 bg-[#F5B041]/10 px-3.5 py-2 text-xs text-[#FFF3D1]">
+                          Cálculo feito com horário aproximado (12:00). Atualize
+                          com a hora da certidão quando quiser maior precisão.
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                        {pastShowcase.inPractice.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="rounded-2xl border border-white/10 bg-black/45 p-3.5"
+                          >
+                            <span
+                              className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] block mb-1"
+                              style={{ color: pastTheme.themeColor }}
+                            >
+                              0{idx + 1} • {item.area}
+                            </span>
+                            <p className="text-xs text-white/80 leading-relaxed">
+                              {item.example}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Confirmação do "Momento Aha!" */}
+                      <div className="rounded-2xl border border-white/12 bg-black/45 p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <span className="text-xs sm:text-sm font-medium text-white text-center sm:text-left">
+                          Bateu com o que você viveu (ou deixou de aproveitar) em{" "}
+                          {auditResult.pastYear}?
+                        </span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setValidatedMatch(true)}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                              validatedMatch
+                                ? "bg-emerald-500 text-[#050507]"
+                                : "bg-[#F5B041] text-[#050507] hover:brightness-110"
+                            }`}
+                          >
+                            {validatedMatch ? "✓ Validado!" : "Sim, bateu muito!"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setQuizStep(3)}
+                            className="px-3 py-2 rounded-xl border border-white/15 text-xs text-white/80 hover:bg-white/10"
+                          >
+                            Testar outro ano
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BLOCO B: CONTRASTE INEVITÁVEL — FICAR PARADO vs. 3 CIDADES BLOQUEADAS */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* Lado 1: Se ficar na cidade atual + Manual de Defesa */}
+                      <div className="rounded-3xl border border-white/12 bg-[#0A0B10]/95 p-5 sm:p-6 flex flex-col justify-between space-y-4">
+                        <div>
+                          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#94A3B8] font-bold block mb-2">
+                            Se você ficar em {auditResult.pastCity} em{" "}
+                            {auditResult.nextYear}
+                          </span>
+                          <h4 className="font-ps-display text-xl font-bold text-white mb-2">
+                            {nextStayShowcase
+                              ? `Ativa a Casa ${nextStayShowcase.numberLabel} — ${nextStayShowcase.title}`
+                              : `Manual de Defesa de ${auditResult.pastCity}`}
+                          </h4>
+                          {nextStayShowcase && (
+                            <p className="text-xs text-[#94A3B8] leading-relaxed mb-4">
+                              {nextStayShowcase.cycleFocus}
+                            </p>
+                          )}
+
+                          <div className="space-y-2.5 text-xs leading-relaxed">
+                            <div className="rounded-xl bg-white/[0.03] border border-emerald-500/20 p-3">
+                              <strong className="text-emerald-300 flex items-center gap-1.5 mb-1">
+                                <Shield className="w-3.5 h-3.5" />
+                                Manual de Defesa • O que aproveitar:
+                              </strong>
+                              <span className="text-white/80">
+                                {nextStayDefense.strength}
+                              </span>
+                            </div>
+                            <div className="rounded-xl bg-white/[0.03] border border-amber-500/20 p-3">
+                              <strong className="text-amber-300 block mb-1">
+                                Ponto cego para evitar se ficar parado:
+                              </strong>
+                              <span className="text-white/80">
+                                {nextStayDefense.blindSpot}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Lado 2: 3 Cidades Bloqueadas para a Casa Escolhida */}
+                      <div className="rounded-3xl border-2 border-[#F5B041]/60 bg-gradient-to-b from-[#161C2C] to-[#0A0B10] p-5 sm:p-6 flex flex-col justify-between space-y-4 shadow-[0_18px_50px_rgba(245,176,65,0.16)]">
+                        <div>
+                          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#F5B041] font-bold block mb-2">
+                            Seu Próximo Aniversário ({auditResult.nextYear}) •{" "}
+                            {radiusObj.badge}
+                          </span>
+                          <h4 className="font-ps-display text-xl font-bold text-white mb-1.5">
+                            Cidades para ativar a Casa {goalShowcase.numberLabel}
+                          </h4>
+                          <p className="text-xs text-[#CBD5E1] mb-4">
+                            Objetivo escolhido:{" "}
+                            <strong className="text-white">
+                              {goalShowcase.title}
+                            </strong>
+                            . Destrave suas coordenadas exatas agora:
+                          </p>
+
+                          <div className="space-y-2.5 mb-5">
+                            {[
+                              { rank: "#1 Destino Principal", match: "98%" },
+                              { rank: "#2 Opção Acessível", match: "94%" },
+                              { rank: "#3 Rota Alternativa", match: "91%" },
+                            ].map((slot) => (
+                              <div
+                                key={slot.rank}
+                                className="rounded-xl border border-white/10 bg-black/45 px-3.5 py-2.5 flex items-center justify-between gap-2"
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <Lock className="w-3.5 h-3.5 text-[#F5B041] shrink-0" />
+                                  <div className="min-w-0">
+                                    <span className="text-xs font-semibold text-white block">
+                                      {slot.rank}
+                                    </span>
+                                    <span className="text-[11px] text-white/40 blur-[4px] select-none block">
+                                      Cidade Recomendada • País
+                                    </span>
+                                  </div>
+                                </div>
+                                <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F5B041]/15 text-[#F5B041] shrink-0">
+                                  {slot.match}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <button
+                            type="button"
+                            onClick={() => handleGoToPackage("1")}
+                            className="w-full min-h-[50px] px-4 py-3 rounded-2xl bg-gradient-to-r from-[#F5B041] to-[#E67E22] hover:brightness-110 active:scale-[0.98] text-[#050507] font-ps-display font-bold text-sm flex items-center justify-center gap-2 shadow-[0_10px_28px_rgba(245,176,65,0.3)]"
+                          >
+                            <span>
+                              Destravar Casa {goalShowcase.numberLabel} por R$ 19,90
+                            </span>
+                            <ArrowRight className="w-4 h-4 shrink-0" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => scrollToSection(pricingRef)}
+                            className="w-full py-2 text-xs font-semibold text-[#F5B041] hover:text-[#FFF3D1] transition-colors"
+                          >
+                            Ou comparar 3 cidades (R$ 49,90) / Todas as 12 Casas (R$ 99,90) →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BLOCO C: BILHETE DE EMBARQUE CÓSMICO (VIRAL STORIES 9:16) */}
+                    <div className="rounded-3xl border border-[#F5B041]/30 bg-gradient-to-r from-[#0F1524] via-[#0A0B10] to-[#141118] p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 text-left">
+                        <div className="w-12 h-16 rounded-xl border border-[#F5B041]/50 bg-[#050507] flex flex-col items-center justify-center shrink-0">
+                          <span className="font-mono text-[8px] uppercase text-[#F5B041]">
+                            SOLAR
+                          </span>
+                          <span className="font-ps-display text-lg font-bold text-white leading-none">
+                            {pastShowcase.numberLabel}
+                          </span>
+                          <span className="font-mono text-[8px] text-white/50">
+                            {auditResult.pastYear}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#F5B041] font-bold block">
+                            Bilhete de Embarque Cósmico
+                          </span>
+                          <p className="font-ps-display text-sm sm:text-base font-bold text-white">
+                            {name} • {auditResult.pastCity} → Casa{" "}
+                            {pastShowcase.numberLabel}
+                          </p>
+                          <p className="text-xs text-[#94A3B8]">
+                            Compartilhe seu resultado real e desafie amigos a
+                            testarem o último aniversário grátis.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleShareBoardingPass}
+                        className="shrink-0 min-h-[44px] px-4 py-2.5 rounded-xl border border-[#F5B041]/45 bg-[#F5B041]/12 hover:bg-[#F5B041] text-[#FFF3D1] hover:text-[#050507] text-xs font-bold uppercase tracking-[0.12em] inline-flex items-center gap-2 transition-all"
+                      >
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>
+                          {copiedPass ? "Copiado!" : "Compartilhar Resultado"}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </motion.div>
+            )}
           </AnimatePresence>
-        </div>
+        </section>
       </section>
 
       {/* ===================================================================== */}
-      {/* 3. QUEBRA DE OBJEÇÃO: MOBILIDADE & ORÇAMENTO ("NÃO POSSO VIAJAR")     */}
-      {/* ===================================================================== */}
-      <section className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
-        <div className="rounded-3xl border border-white/10 bg-[#0A0B10]/90 p-6 sm:p-8 md:p-10">
-          <div className="max-w-2xl mb-7">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5B041] font-bold block mb-2">
-              Zero Obrigação de Gastar Fortuna
-            </span>
-            <h2 className="font-ps-display text-2xl sm:text-3xl font-bold text-white leading-tight mb-2">
-              “Não posso ir para a Europa no meu aniversário. Serve pra mim?”
-            </h2>
-            <p className="text-sm text-[#94A3B8] leading-relaxed">
-              Sim. Você decide o raio que cabe no seu bolso — e até se ficar em
-              casa recebe estratégia clara para o ano.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <Home className="w-5 h-5 text-[#F5B041] mb-3" />
-              <h3 className="font-ps-display text-base font-bold text-white mb-1.5">
-                Ficar na sua cidade
-              </h3>
-              <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                Você descobre qual Casa vai rodar na sua cidade atual e recebe o{" "}
-                <strong className="text-white/90">Manual de Defesa</strong> para
-                amenizar pontos cegos e aproveitar o melhor do ciclo.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#F5B041]/30 bg-[#F5B041]/[0.05] p-5">
-              <Car className="w-5 h-5 text-[#F5B041] mb-3" />
-              <h3 className="font-ps-display text-base font-bold text-white mb-1.5">
-                Bate-volta regional (~300 km)
-              </h3>
-              <p className="text-xs sm:text-sm text-[#CBD5E1] leading-relaxed">
-                Em muitos mapas, mudar para uma cidade vizinha ou outro estado de
-                carro/ônibus já altera a Casa do ano sem precisar de passagem
-                internacional.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-              <Globe className="w-5 h-5 text-[#F5B041] mb-3" />
-              <h3 className="font-ps-display text-base font-bold text-white mb-1.5">
-                Brasil ou Exterior
-              </h3>
-              <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                Quer planejar uma viagem inesquecível? O sistema lista destinos
-                nacionais, acessíveis e internacionais para cada uma das 12 Casas.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================================== */}
-      {/* 4. VITRINE DAS 12 CASAS (CARROSSEL SNAP NO MOBILE / GRID NO DESKTOP)  */}
+      {/* 2. VITRINE DAS 12 CASAS (CARROSSEL SNAP MOBILE / GRID DESKTOP)        */}
       {/* ===================================================================== */}
       <section
         ref={housesRef}
         id="escolher-casa-v3"
         className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 pb-16 sm:pb-24 scroll-mt-24"
       >
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-7">
           <div className="max-w-2xl">
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5B041] font-bold block mb-2">
-              Passo 2 • Escolha Seu Próximo Ciclo
+              As 12 Casas em Linguagem Real
             </span>
             <h2 className="font-ps-display text-2xl sm:text-4xl font-bold text-white leading-tight mb-2">
-              Qual dessas 12 Casas você quer viver no próximo ano?
+              Qual Casa faz sentido para o seu próximo ano?
             </h2>
             <p className="text-sm text-[#94A3B8]">
-              Linguagem direta da vida real. Deslize no celular ou escolha um
-              card para pré-selecionar seu objetivo.
+              Sem astrologuês e sem promessa mágica. Escolha um card para
+              pré-selecionar seu objetivo.
             </p>
           </div>
           <Link
             to="/casas"
             className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#F5B041] hover:text-[#FFF3D1]"
           >
-            <span>Abrir página completa das 12 Casas</span>
+            <span>Abrir vitrine completa</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        {/* Mobile: horizontal snap carousel; Desktop: 3-col grid */}
         <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 -mx-5 px-5 md:mx-0 md:px-0">
           {HOUSES_SHOWCASE.map((house) => {
             const Icon = ICON_MAP[house.iconKey];
@@ -946,9 +1256,7 @@ export default function LandingV3() {
             return (
               <div
                 key={house.id}
-                onClick={() => {
-                  setSelectedNextHouse(house.id);
-                }}
+                onClick={() => setSelectedNextHouse(house.id)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -1045,7 +1353,7 @@ export default function LandingV3() {
       </section>
 
       {/* ===================================================================== */}
-      {/* 5. ESCADA DE PREÇOS CRISTALINA (R$ 19,90 / R$ 49,90 / R$ 99,90)       */}
+      {/* 3. ESCADA DE PREÇOS CRISTALINA (R$ 19,90 / R$ 49,90 / R$ 99,90)       */}
       {/* ===================================================================== */}
       <section
         ref={pricingRef}
@@ -1054,7 +1362,7 @@ export default function LandingV3() {
       >
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5B041] font-bold block mb-2">
-            Passo 3 • Sem Confusão de Planos
+            Escada Transparente • Pagamento Único
           </span>
           <h2 className="font-ps-display text-3xl sm:text-4xl font-bold text-white leading-tight mb-3">
             Escolha exatamente o que você precisa
@@ -1062,20 +1370,17 @@ export default function LandingV3() {
           <p className="text-sm sm:text-base text-[#94A3B8]">
             Todas as opções já incluem{" "}
             <strong className="text-white">todas as 8 áreas da vida abertas</strong>.
-            A única diferença é quantas Casas ou destinos você quer desbloquear.
+            A única diferença é quantas Casas ou destinos você quer revelar.
           </p>
-          {selectedNextHouse && (
-            <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5B041]/45 bg-[#F5B041]/12 text-xs text-[#FFF3D1]">
-              <Target className="w-3.5 h-3.5 text-[#F5B041]" />
-              <span>
-                Pré-selecionado:{" "}
-                <strong>
-                  Casa {String(selectedNextHouse).padStart(2, "0")} —{" "}
-                  {HOUSES_SHOWCASE.find((h) => h.id === selectedNextHouse)?.title}
-                </strong>
-              </span>
-            </div>
-          )}
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5B041]/45 bg-[#F5B041]/12 text-xs text-[#FFF3D1]">
+            <Target className="w-3.5 h-3.5 text-[#F5B041]" />
+            <span>
+              Objetivo atual:{" "}
+              <strong>
+                Casa {goalShowcase.numberLabel} — {goalShowcase.title}
+              </strong>
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
@@ -1090,7 +1395,7 @@ export default function LandingV3() {
               </h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed mb-5">
                 Para revelar as melhores cidades de 1 Casa escolhida ou analisar
-                1 destino específico para o seu aniversário.
+                1 destino específico para o seu próximo aniversário.
               </p>
 
               <div className="flex items-baseline gap-1 pb-5 mb-5 border-b border-white/10">
@@ -1125,7 +1430,7 @@ export default function LandingV3() {
             </button>
           </div>
 
-          {/* R$ 49,90 — MAIS ESCOLHIDO */}
+          {/* R$ 49,90 */}
           <div className="rounded-3xl border-2 border-[#F5B041]/80 bg-gradient-to-b from-[#151A28] to-[#0A0B10] p-7 flex flex-col justify-between relative shadow-[0_22px_60px_rgba(245,176,65,0.18)] md:-translate-y-2">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#F5B041] text-[#050507] font-mono text-[10px] font-bold uppercase tracking-[0.18em] whitespace-nowrap">
               Mais Escolhido • Comparador
@@ -1139,8 +1444,8 @@ export default function LandingV3() {
                 Comparador de 3 Cidades
               </h3>
               <p className="text-xs text-[#CBD5E1] leading-relaxed mb-5">
-                Perfeito para comparar até 3 destinos que cabem na sua agenda ou
-                explorar 3 Casas diferentes antes de comprar passagem.
+                Teste e compare até 3 cidades que cabem no seu orçamento ou
+                desbloqueie 3 Casas completas antes de comprar passagem.
               </p>
 
               <div className="flex items-baseline gap-1 pb-5 mb-5 border-b border-white/10">
@@ -1153,7 +1458,7 @@ export default function LandingV3() {
               <ul className="space-y-2.5 text-xs sm:text-sm text-white/90 mb-7">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-[#F5B041] shrink-0 mt-0.5" />
-                  <span>3 créditos livres para testar Cidades ou Casas</span>
+                  <span>3 créditos livres para Cidades ou Casas</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-[#F5B041] shrink-0 mt-0.5" />
@@ -1175,7 +1480,7 @@ export default function LandingV3() {
             </button>
           </div>
 
-          {/* R$ 99,90 — MAPA COMPLETO */}
+          {/* R$ 99,90 */}
           <div className="rounded-3xl border border-[#F5B041]/35 bg-[#0A0B10]/95 p-7 flex flex-col justify-between">
             <div>
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#FFF3D1] font-bold block mb-3">
@@ -1222,34 +1527,31 @@ export default function LandingV3() {
           </div>
         </div>
 
-        {/* SELO DE AUTORIDADE TÉCNICA SWISS EPHEMERIS */}
-        <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-6 h-6 text-[#F5B041] shrink-0" />
-            <p className="text-xs sm:text-sm text-[#CBD5E1] leading-relaxed">
-              <strong className="text-white">
-                Cálculo astronômico de precisão (Swiss Ephemeris):
-              </strong>{" "}
-              não é signo solar genérico de portal — calculamos a coordenada
-              geográfica exata do minuto da sua Revolução Solar. Pagamento seguro
-              via Pix ou Cartão no Mercado Pago.
-            </p>
-          </div>
+        {/* SELO TÉCNICO SWISS EPHEMERIS */}
+        <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 flex items-center gap-3">
+          <ShieldCheck className="w-6 h-6 text-[#F5B041] shrink-0" />
+          <p className="text-xs sm:text-sm text-[#CBD5E1] leading-relaxed">
+            <strong className="text-white">
+              Cálculo astronômico de precisão (Swiss Ephemeris):
+            </strong>{" "}
+            não é signo solar genérico de portal — calculamos a coordenada
+            geográfica exata do minuto da sua virada solar. Pagamento seguro via
+            Pix ou Cartão no Mercado Pago.
+          </p>
         </div>
       </section>
 
       {/* ===================================================================== */}
-      {/* 6. TRANSPARÊNCIA, PARCEIROS (COMPLIANCE CONAR) & FAQ                  */}
+      {/* 4. PARCEIROS (COMPLIANCE CONAR) & FAQ                                 */}
       {/* ===================================================================== */}
       <section className="relative z-10 max-w-4xl mx-auto px-5 sm:px-8 pb-16 space-y-12">
-        {/* Bloco Parceiros com Compliance Transparente */}
         <div className="rounded-3xl border border-[#F5B041]/25 bg-[#0A0B10]/90 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
           <div className="space-y-2 max-w-xl">
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5B041] font-bold block">
               Parceiros & Criadores • 20% no Pix
             </span>
             <h3 className="font-ps-display text-xl sm:text-2xl font-bold text-white">
-              Regra de ouro: Sentir → Medir → Recomendar
+              Protocolo transparente: Sentir → Medir → Recomendar
             </h3>
             <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
               Nossos parceiros testam primeiro o próprio Aniversário Passado,
@@ -1267,12 +1569,16 @@ export default function LandingV3() {
           </Link>
         </div>
 
-        {/* FAQ */}
         <div>
           <h2 className="font-ps-display text-2xl sm:text-3xl font-bold text-white text-center mb-6">
-            Dúvidas antes de começar
+            Dúvidas frequentes
           </h2>
-          <Accordion type="single" collapsible defaultValue="v3-faq-free-map" className="space-y-3">
+          <Accordion
+            type="single"
+            collapsible
+            defaultValue="v3-faq-free-map"
+            className="space-y-3"
+          >
             {V3_FAQ_ITEMS.map((item) => (
               <AccordionItem
                 key={item.id}
@@ -1291,9 +1597,7 @@ export default function LandingV3() {
         </div>
       </section>
 
-      {/* ===================================================================== */}
-      {/* 7. STICKY MOBILE BAR NA ZONA DO POLEGAR (APÓS ROLAR A HERO)           */}
-      {/* ===================================================================== */}
+      {/* STICKY MOBILE BAR NA ZONA DO POLEGAR */}
       <AnimatePresence>
         {showStickyBar && (
           <motion.div
@@ -1314,28 +1618,24 @@ export default function LandingV3() {
             >
               <div className="min-w-0">
                 <p className="text-xs font-bold text-white truncate">
-                  {validatedMatch || auditResult
-                    ? "Planeje seu próximo ano"
+                  {auditResult
+                    ? "Destrave seu próximo ano"
                     : "Teste seu passado grátis"}
                 </p>
                 <p className="text-[10px] text-[#94A3B8] truncate">
-                  {validatedMatch || auditResult
+                  {auditResult
                     ? "Planos a partir de R$ 19,90"
-                    : "Veja se bate com o que viveu"}
+                    : "Quiz rápido em 5 passos"}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() =>
-                  scrollToSection(
-                    validatedMatch || auditResult ? pricingRef : validatorRef
-                  )
+                  scrollToSection(auditResult ? pricingRef : quizRef)
                 }
                 className="shrink-0 min-h-[44px] px-4 py-2 rounded-xl bg-[#F5B041] active:scale-[0.98] text-[#050507] text-xs font-bold uppercase tracking-[0.12em] inline-flex items-center gap-1.5"
               >
-                <span>
-                  {validatedMatch || auditResult ? "Ver Planos" : "Testar Grátis"}
-                </span>
+                <span>{auditResult ? "Ver Planos" : "Fazer Quiz"}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

@@ -32,6 +32,7 @@ const Profile = () => {
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
+  const [unknownBirthTime, setUnknownBirthTime] = useState(false);
   const [birthCity, setBirthCity] = useState("");
   const [birthCityValid, setBirthCityValid] = useState(false);
   const [birthCoords, setBirthCoords] = useState<{ lat: number; lon: number } | null>(null);
@@ -274,9 +275,33 @@ const Profile = () => {
                   <input
                     type="time"
                     value={birthTime}
-                    onChange={e => setBirthTime(e.target.value)}
-                    className="w-full rounded-xl border border-white/15 bg-[#040914]/90 px-4 py-3.5 text-base text-white focus:outline-none focus:border-[#C9A227] transition-colors [color-scheme:dark]"
+                    disabled={unknownBirthTime}
+                    onChange={e => {
+                      setBirthTime(e.target.value);
+                      if (e.target.value !== "12:00") setUnknownBirthTime(false);
+                    }}
+                    className="w-full rounded-xl border border-white/15 bg-[#040914]/90 px-4 py-3.5 text-base text-white focus:outline-none focus:border-[#C9A227] transition-colors [color-scheme:dark] disabled:opacity-50"
                   />
+                  <label className="mt-2.5 flex items-start gap-2.5 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={unknownBirthTime}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setUnknownBirthTime(checked);
+                        if (checked) setBirthTime("12:00");
+                      }}
+                      className="mt-0.5 h-4 w-4 rounded border-white/25 bg-[#040914] accent-[#C9A227]"
+                    />
+                    <span className="text-xs text-white/75 leading-relaxed">
+                      Não sei meu horário exato (usar <strong className="text-[#F5DE98] font-medium">12:00</strong> aproximado)
+                    </span>
+                  </label>
+                  {unknownBirthTime && (
+                    <p className="mt-2 rounded-lg border border-[#C9A227]/30 bg-[#C9A227]/10 px-3 py-2 text-[11px] leading-relaxed text-[#F5DE98]/90">
+                      Transparência técnica: usamos 12:00 como referência inicial. Como o cálculo das Casas depende da hora de nascimento, cidades na fronteira entre duas Casas podem variar até você conferir sua certidão.
+                    </p>
+                  )}
                 </div>
               </div>
 

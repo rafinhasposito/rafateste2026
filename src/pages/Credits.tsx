@@ -30,7 +30,7 @@ import {
   redeemCouponCode,
   savePendingGiftCode,
 } from "@/lib/coupons";
-import { getStoredAffiliateRef, syncAffiliateRefForUser } from "@/lib/affiliates";
+import { formatPartnerIdLabel, getStoredAffiliateRef, syncAffiliateRefForUser } from "@/lib/affiliates";
 import { AffiliateReferralBanner } from "@/components/AffiliateReferralBanner";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -1085,6 +1085,24 @@ const Credits = () => {
         </div>
       </motion.div>
 
+      {/* Banner discreto de indicação verificada (quando o usuário veio de um parceiro) */}
+      {!isRedeemRoute && (() => {
+        const storedRef = getStoredAffiliateRef();
+        if (!storedRef) return null;
+        return (
+          <div className="max-w-3xl mx-auto mb-6 px-4 py-3 rounded-2xl border border-[#C9A227]/30 bg-[#081222]/85 flex flex-wrap items-center justify-center gap-2 text-center">
+            <ShieldCheck className="w-4 h-4 text-[#F5DE98] shrink-0" />
+            <span className="font-ps-ui text-xs text-white/80">
+              Indicação verificada •{" "}
+              <strong className="text-[#F5DE98] font-semibold">
+                {formatPartnerIdLabel(storedRef)}
+              </strong>{" "}
+              — exatamente os mesmos preços oficiais (R$ 19,90 / R$ 49,90 / R$ 99,90).
+            </span>
+          </div>
+        );
+      })()}
+
       {/* Packages Grid (Oculto na rota de Presente /resgatar para não parecer página de cobrança) */}
       {!isRedeemRoute && (loading ? (
         <div className="text-center py-20">
@@ -1194,6 +1212,25 @@ const Credits = () => {
           })}
         </div>
       ))}
+
+      {/* Selo de Autoridade Técnica & Transparência (Swiss Ephemeris + Mercado Pago) */}
+      {!isRedeemRoute && !loading && (
+        <div className="max-w-5xl mx-auto mt-10 p-5 sm:p-6 rounded-2xl border border-white/10 bg-[#060E1B]/85 backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5 text-left">
+            <div className="w-10 h-10 rounded-xl bg-[#C9A227]/15 border border-[#C9A227]/35 flex items-center justify-center text-[#F5DE98] shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <p className="font-ps-ui text-[11px] uppercase tracking-[0.2em] text-[#F5DE98] font-semibold">
+                Cálculo Astronômico Swiss Ephemeris • Zero Signo Genérico
+              </p>
+              <p className="font-ps-ui text-xs sm:text-sm text-white/65 leading-relaxed">
+                Cada pacote entrega o mesmo motor de efemérides de alta precisão e todas as 8 áreas da vida por Casa liberada. Sem assinatura recorrente — pagamento único via Pix ou Cartão no Mercado Pago.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

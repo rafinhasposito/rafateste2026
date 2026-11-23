@@ -33,7 +33,7 @@ const FAQ_ITEMS = [
   {
     id: "faq-price",
     q: "O preço muda para quem compra pelo meu link?",
-    a: "Não. Quem entra pelo seu link paga exatamente os mesmos valores oficiais (R$ 19,90 na 1 Casa, R$ 49,90 no Pacote Expansão e R$ 99,90 no Mapa Completo). Os 20% saem da nossa margem.",
+    a: "Não. Quem entra pelo seu link paga exatamente os mesmos valores oficiais (R$ 19,90 na 1 Casa, R$ 49,90 no Pacote 3 Consultas e R$ 99,90 no Mapa Completo). Os 20% saem da nossa margem.",
   },
   {
     id: "faq-window",
@@ -320,7 +320,7 @@ export const PartnersLanding = () => {
                 </div>
                 <div className="px-4 py-3 flex items-center justify-between gap-3 text-sm">
                   <div className="min-w-0">
-                    <span className="font-ps-ui font-medium text-white">Pacote Expansão</span>
+                    <span className="font-ps-ui font-medium text-white">Pacote 3 Consultas</span>
                     <span className="font-ps-ui text-xs text-[#94A3B8] ml-2">R$ 49,90</span>
                   </div>
                   <span className="font-ps-ui font-semibold text-[#F5DE98] tabular-nums shrink-0">
@@ -505,6 +505,50 @@ export const PartnersLanding = () => {
                   Indique a ferramenta para clientes planejarem a viagem da Revolução Solar e gere renda recorrente.
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4.5 PROTOCOLO DE DIVULGAÇÃO AUTÊNTICA & COMPLIANCE CONAR */}
+        <section className="rounded-[26px] border border-[#C9A227]/30 bg-gradient-to-br from-[#0D1A30]/92 via-[#07101E]/95 to-[#050A14]/98 p-6 sm:p-10 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="space-y-2 max-w-2xl">
+              <span className="inline-flex items-center gap-2 font-ps-ui text-[11px] uppercase tracking-[0.22em] text-[#C9A227] font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5" /> Protocolo de Divulgação que Converte
+              </span>
+              <h2 className="font-ps-display font-normal text-2xl sm:text-3xl text-white leading-tight">
+                Sentir → Medir → Recomendar (sem parecer venda forçada)
+              </h2>
+            </div>
+            <span className="self-start sm:self-auto px-3 py-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 font-mono text-[11px] uppercase tracking-[0.16em] text-emerald-200">
+              Compliance CONAR • #publi
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#F5DE98]">
+                01 • Valide seu próprio ano
+              </span>
+              <p className="font-ps-ui text-sm text-[#CBD5E1] leading-relaxed">
+                Antes de indicar, teste gratuitamente o seu <strong className="text-white">Aniversário Passado</strong>. Mostrar o próprio resultado real gera 3x mais confiança do que prometer resultados prontos.
+              </p>
+            </div>
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#F5DE98]">
+                02 • Explique o mecanismo em 15s
+              </span>
+              <p className="font-ps-ui text-sm text-[#CBD5E1] leading-relaxed">
+                Mostre a diferença prática: não é horóscopo genérico — é cálculo astronômico (Swiss Ephemeris) que revela como mudar a cidade do aniversário muda a Casa principal do ano.
+              </p>
+            </div>
+            <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#F5DE98]">
+                03 • Sinalize a parceria
+              </span>
+              <p className="font-ps-ui text-sm text-[#CBD5E1] leading-relaxed">
+                Use <strong className="text-white">#publi</strong> ou <strong className="text-white">#parceiro</strong> (norma CONAR) e lembre sua audiência: o preço oficial (R$ 19,90 / 49,90 / 99,90) nunca muda pelo seu link.
+              </p>
             </div>
           </div>
         </section>

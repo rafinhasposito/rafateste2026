@@ -11,52 +11,140 @@ export interface V3AngleConfig {
   featuredHouseId: number | null;
 }
 
+// Headlines 100% compliance Meta Ads (zero "Atributos Pessoais") e TikTok Ads (zero promessa mágica)
 export const V3_ANGLES: Record<V3AngleKey, V3AngleConfig> = {
   padrao: {
     key: "padrao",
-    label: "Padrão (Validação Grátis)",
+    label: "Padrão • Quiz + Passado Grátis",
     badge: "Cálculo Astronômico Swiss Ephemeris • Zero Horóscopo Genérico",
-    headline: "Descubra grátis o que a cidade do seu último aniversário",
+    headline: "Descubra grátis qual Casa a cidade do seu último aniversário",
     highlight: "ativou no seu ano.",
     subcopy:
-      "Seu mapa de nascimento é fixo, mas o lugar onde você passa a virada do aniversário destaca qual das 12 áreas da vida puxa os próximos 12 meses. Teste no seu aniversário atual ou passado antes de decidir qualquer coisa.",
-    ctaLabel: "Testar Grátis Meu Ano Atual / Passado",
+      "Explore como a localização geográfica da virada do aniversário altera qual das 12 áreas ganha destaque nos próximos 12 meses. Faça o teste gratuito do seu último ano antes de decidir qualquer plano.",
+    ctaLabel: "Começar Teste Grátis (2 min)",
     featuredHouseId: null,
   },
   fitness: {
     key: "fitness",
     label: "Teste 1 • Rotina & Fitness (Casa 06)",
-    badge: "Casa 06 • Rotina, Dieta & Alta Performance",
-    headline: "Por que sua dieta e seus treinos",
-    highlight: "sempre morrem em março?",
+    badge: "Casa 06 • Rotina, Disciplina & Alta Performance",
+    headline: "Como o mapa do aniversário influencia o ritmo da rotina,",
+    highlight: "dos treinos e da disciplina.",
     subcopy:
-      "Não é falta de força de vontade. A cidade onde você passa o aniversário define qual área da vida ganha ritmo nos próximos 12 meses. Veja grátis qual Casa governou seu último ano e entenda como a Casa 06 favorece constância sem burnout.",
-    ctaLabel: "Fazer Teste Grátis do Meu Ano Agora",
+      "Na Revolução Solar relocada, cada cidade destaca um setor diferente do ano — e a Casa 06 concentra o foco em hábitos, constância e saúde física. Teste grátis qual Casa rodou no seu último aniversário.",
+    ctaLabel: "Fazer Teste Grátis da Minha Rotina",
     featuredHouseId: 6,
   },
   carreira: {
     key: "carreira",
-    label: "Teste 2 • Carreira & Posicionamento (Casa 10)",
-    badge: "Casa 10 & Casa 02 • Autoridade, Carreira & Caixa",
-    headline: "Você trabalha o dobro dos outros, mas quem aparece mais",
-    highlight: "é quem cresce?",
+    label: "Teste 2 • Carreira & Visibilidade (Casa 10)",
+    badge: "Casa 10 & Casa 02 • Posicionamento, Carreira & Caixa",
+    headline: "Veja como a cidade do aniversário muda o foco em",
+    highlight: "carreira, visibilidade e finanças.",
     subcopy:
-      "Entregar bem nos bastidores não basta quando o ciclo do ano não favorece visibilidade. Teste grátis qual Casa o seu último aniversário ativou e veja onde a Casa 10 e a Casa 02 colocam seu trabalho em destaque.",
-    ctaLabel: "Testar Grátis Meu Último Aniversário",
+      "O Protocolo Solar calcula em quais coordenadas do Brasil ou do mundo a Casa 10 (reconhecimento e liderança) e a Casa 02 (caixa e patrimônio) entram em destaque. Valide primeiro no seu último aniversário grátis.",
+    ctaLabel: "Simular Meu Ano Profissional Grátis",
     featuredHouseId: 10,
   },
   cetico: {
     key: "cetico",
     label: "Teste 3 • Cético / Prova do Passado",
     badge: "Validação Reversa Gratuita • Teste Às Cegas",
-    headline: "Não acredita que o lugar do aniversário muda o ano?",
-    highlight: "Teste onde você já passou.",
+    headline: "Antes de planejar o próximo aniversário, teste grátis",
+    highlight: "onde você já passou.",
     subcopy:
-      "Antes de pagar qualquer real ou planejar viagem, coloque a cidade onde você passou seu aniversário anterior. Veja qual Casa o algoritmo calcula e confira se bate com o que você realmente viveu.",
-    ctaLabel: "Fazer Teste Cego do Aniversário Passado",
+      "Coloque a cidade do seu último aniversário e confira se o cálculo astronômico da Casa ativada bate com o que realmente aconteceu nos últimos 12 meses — sem cartão e sem criar senha antes.",
+    ctaLabel: "Fazer Teste Cego do Passado Grátis",
     featuredHouseId: null,
   },
 };
+
+export interface V3PriorityOption {
+  id: string;
+  houseId: number;
+  title: string;
+  subtitle: string;
+  tag: string;
+}
+
+export const V3_PRIORITY_OPTIONS: V3PriorityOption[] = [
+  {
+    id: "dinheiro",
+    houseId: 2,
+    title: "Dinheiro & Caixa Forte",
+    subtitle: "Precificar melhor, organizar finanças e construir reserva",
+    tag: "Casa 02",
+  },
+  {
+    id: "carreira",
+    houseId: 10,
+    title: "Carreira, Fama & Modo CEO",
+    subtitle: "Ganhar visibilidade, autoridade no nicho e grandes contratos",
+    tag: "Casa 10",
+  },
+  {
+    id: "fitness",
+    houseId: 6,
+    title: "Rotina Fit, Dieta & Saúde",
+    subtitle: "Manter treinos, alimentação e agenda rodando no ritmo",
+    tag: "Casa 06",
+  },
+  {
+    id: "amor",
+    houseId: 7,
+    title: "Amor, Casamento & Alianças",
+    subtitle: "Relacionamento sério ou sociedades estratégicas de valor",
+    tag: "Casa 07",
+  },
+  {
+    id: "virada",
+    houseId: 9,
+    title: "Viagens, Exterior & Expansão",
+    subtitle: "Sair da bolha, estudar, viajar ou expandir fronteiras",
+    tag: "Casa 09",
+  },
+  {
+    id: "cetico",
+    houseId: 1,
+    title: "Só quero testar meu passado primeiro",
+    subtitle: "Validar grátis se o último aniversário bateu com a vida real",
+    tag: "Teste Cego",
+  },
+];
+
+export interface TravelRadiusOption {
+  id: "home" | "300km" | "3000km" | "world";
+  title: string;
+  subtitle: string;
+  badge: string;
+}
+
+export const TRAVEL_RADIUS_OPTIONS: TravelRadiusOption[] = [
+  {
+    id: "home",
+    title: "Vou passar na minha cidade atual",
+    subtitle: "Quero ver minha Casa local + Manual de Defesa da Cidade Natal",
+    badge: "Custo R$ 0 viagem",
+  },
+  {
+    id: "300km",
+    title: "Até ~300 km de carro ou ônibus",
+    subtitle: "Bate-volta regional ou cidades vizinhas no fim de semana",
+    badge: "Regional",
+  },
+  {
+    id: "3000km",
+    title: "Até 3.000 km (Brasil / América do Sul)",
+    subtitle: "Capitais, praias ou destinos nacionais e vizinhos",
+    badge: "Nacional / LatAm",
+  },
+  {
+    id: "world",
+    title: "Qualquer lugar do mundo",
+    subtitle: "Europa, EUA, Ásia e rotas internacionais completas",
+    badge: "Global",
+  },
+];
 
 export interface HomeCityDefenseGuide {
   houseId: number;
@@ -143,26 +231,26 @@ export const V3_FAQ_ITEMS = [
   {
     id: "v3-faq-free-map",
     q: "Por que pagar se existe mapa astral grátis na internet?",
-    a: "Mapa astral natal grátis mostra apenas o céu estático do dia em que você nasceu. O Protocolo Solar executa cálculos astronômicos geográficos (Swiss Ephemeris) para o minuto exato da sua Revolução Solar anual em diferentes cidades do mundo — e traduz tudo em linguagem prática, sem jargão. Por isso liberamos o teste gratuito do seu aniversário atual ou passado logo acima para você validar antes de pagar.",
+    a: "Mapa astral natal grátis mostra apenas o céu estático do dia em que você nasceu. O Protocolo Solar executa cálculos astronômicos geográficos (Swiss Ephemeris) para o minuto exato da sua Revolução Solar anual em diferentes cidades do mundo — e traduz tudo em linguagem prática, sem jargão. Por isso liberamos a validação gratuita do seu aniversário passado e da sua cidade atual antes de qualquer pagamento.",
   },
   {
     id: "v3-faq-no-time",
     q: "Não sei meu horário exato de nascimento. Consigo usar?",
-    a: "Sim. Basta marcar a opção “Não sei meu horário exato” no teste acima. O sistema usa 12:00 como referência solar e informa com transparência que a cúspide exata do Ascendente pode variar alguns graus sem a certidão — assim você não trava agora e pode atualizar seu horário depois quando encontrar.",
+    a: "Sim. Basta marcar “Não sei meu horário exato” no passo 2 do quiz. O sistema usa 12:00 como referência solar e informa com transparência que a cúspide exata do Ascendente pode variar alguns graus sem a certidão — assim você não trava agora e pode atualizar depois.",
   },
   {
     id: "v3-faq-no-travel",
     q: "Não tenho dinheiro para viajar para a Europa. Serve para mim?",
-    a: "Com certeza. A relocalização funciona com cidades brasileiras, destinos regionais (muitas vezes a poucas horas de carro) e exterior. E mesmo se você decidir passar o aniversário na sua própria cidade, o relatório mostra exatamente qual Casa ficará ativa e o Manual de Defesa da Cidade Natal para aproveitar o melhor do ciclo.",
+    a: "Sim. A relocalização funciona com destinos regionais (muitas vezes até ~300 km de carro), capitais brasileiras ou exterior. E se você decidir ficar na sua cidade natal, o relatório já entrega o Manual de Defesa da Cidade Natal mostrando como aproveitar o melhor da Casa local.",
   },
   {
     id: "v3-faq-pricing",
     q: "Qual a diferença exata entre R$ 19,90, R$ 49,90 e R$ 99,90?",
-    a: "Todas as consultas já incluem todas as 8 áreas da vida abertas. A diferença está em quantas Casas/destinos você desbloqueia: R$ 19,90 libera 1 Casa ou 1 Cidade (ideal para validar 1 objetivo); R$ 49,90 libera 3 Consultas para comparar até 3 destinos ou Casas antes de decidir a viagem; R$ 99,90 libera o Mapa Completo com todas as 12 Casas do seu próximo aniversário de uma só vez.",
+    a: "Todas as consultas já incluem todas as 8 áreas da vida abertas. R$ 19,90 libera 1 Casa escolhida ou 1 Cidade específica; R$ 49,90 libera 3 Consultas para comparar até 3 destinos ou Casas antes da viagem; R$ 99,90 libera o Mapa Completo com todas as 12 Casas do seu próximo aniversário de uma só vez.",
   },
   {
     id: "v3-faq-affiliate",
     q: "Como funciona a indicação de parceiros (20% no Pix)?",
-    a: "Qualquer usuário ou criador pode ativar seu link exclusivo (/i/CODIGO) sem pagar nada e receber 20% via Pix por vendas reais confirmadas — sem alterar o preço para o comprador. Seguimos compliance transparente (sinalização #publi e recomendação baseada em teste real do Aniversário Passado, sem promessas mágicas).",
+    a: "Qualquer usuário ou criador pode ativar seu link exclusivo (/i/CODIGO) gratuitamente e receber 20% via Pix por vendas confirmadas, mantendo o mesmo preço oficial para quem compra. Seguimos protocolo transparente: testar primeiro o próprio Aniversário Passado e sinalizar #publi conforme o CONAR.",
   },
 ];
