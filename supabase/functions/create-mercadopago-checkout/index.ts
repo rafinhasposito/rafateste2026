@@ -51,6 +51,120 @@ serve(async (req) => {
     const notificationUrl = rawNotif || (supabaseUrl ? `${supabaseUrl}/functions/v1/mercadopago-webhook` : undefined);
 
     // =========================================================================
+    // ACTION 0: ADMIN SYNC PAYMENT (Conciliação de vendas Mercado Pago no Admin)
+    // =========================================================================
+    if (action === 'admin_sync_payment') {
+      const { data: adminRole } = await supabaseAdmin
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (!adminRole) {
+        return new Response(JSON.stringify({ error: 'Apenas administradores podem conciliar pagamentos.' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const paymentsToCheck: any[] = [];
+      if (payment_id && String(payment_id).trim()) {
+        const cleanId = String(payment_id).trim().replace(/\D/g, '');
+        const singleRes = await fetch(`https://api.mercadopago.com/v1/payments/${cleanId}`, {
+          headers: {
+            "Authorization": `Bearer ${mpAccessToken}`,
+            "Content-Type": "application/json"
+          }
+        });
+        if (!singleRes.ok) {
+          const errTxt = await singleRes.text();
+          return new Response(JSON.stringify({ error: `Transação ${cleanId} não encontrada no Mercado Pago (${singleRes.status}): ${errTxt}` }), {
+            status: 404,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        paymentsToCheck.push(await singleRes.json());
+      } else {
+        const searchRes = await fetch(
+          `https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&limit=40&status=approved`,
+          {
+            headers: {
+              "Authorization": `Bearer ${mpAccessToken}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        if (searchRes.ok) {
+          const searchData = await searchRes.json();
+          if (Array.isArray(searchData?.results)) {
+            paymentsToCheck.push(...searchData.results);
+          }
+        }
+      }
+
+      let newlyProcessed = 0;
+      let alreadyApproved = 0;
+      const details: Array<{ paymentId: string; status: string; orderId: string | null; outcome: string; amount: number }> = [];
+
+      for (const p of paymentsToCheck) {
+        const pId = String(p?.id || '');
+        const pStatus = String(p?.status || '');
+        const extRef = p?.external_reference ? String(p.external_reference).trim() : null;
+        const txAmount = Number(p?.transaction_amount || 0);
+
+        if (pStatus !== 'approved') {
+          details.push({ paymentId: pId, status: pStatus, orderId: extRef, outcome: `Status no MP: ${pStatus}`, amount: txAmount });
+          continue;
+        }
+
+        if (!extRef) {
+          details.push({ paymentId: pId, status: pStatus, orderId: null, outcome: 'Sem external_reference do site', amount: txAmount });
+          continue;
+        }
+
+        const { data: orderRow } = await supabaseAdmin
+          .from('credit_orders')
+          .select('id, amount, status')
+          .eq('id', extRef)
+          .maybeSingle();
+
+        if (!orderRow) {
+          details.push({ paymentId: pId, status: pStatus, orderId: extRef, outcome: 'Pedido não encontrado em credit_orders', amount: txAmount });
+          continue;
+        }
+
+        if (orderRow.status === 'approved') {
+          alreadyApproved++;
+          details.push({ paymentId: pId, status: pStatus, orderId: extRef, outcome: 'Já contabilizado no banco', amount: txAmount });
+          continue;
+        }
+
+        if (txAmount >= Number(orderRow.amount) - 0.01) {
+          const { data: procOk, error: procErr } = await supabaseAdmin.rpc('process_mercadopago_payment', {
+            p_order_id: orderRow.id,
+            p_payment_id: pId
+          });
+          if (!procErr && procOk) {
+            newlyProcessed++;
+            details.push({ paymentId: pId, status: pStatus, orderId: extRef, outcome: 'Conciliado e creditado agora!', amount: txAmount });
+          } else {
+            details.push({ paymentId: pId, status: pStatus, orderId: extRef, outcome: procErr?.message || 'Já processado', amount: txAmount });
+          }
+        }
+      }
+
+      return new Response(JSON.stringify({
+        checked: paymentsToCheck.length,
+        newlyProcessed,
+        alreadyApproved,
+        details
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // =========================================================================
     // ACTION 1: CHECK PAYMENT STATUS (Usado pelo polling do Pix em tempo real)
     // =========================================================================
     if (action === 'check_payment') {
