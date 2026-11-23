@@ -459,16 +459,16 @@ export default function HouseTrailerApp() {
           </div>
         </motion.div>
 
-        {/* SELEÇÃO DO FOCO EM FORMATO ACCORDION APPLE */}
+        {/* AS 8 ÁREAS DA VIDA EM FORMATO ACCORDION APPLE */}
         <motion.div className="mt-20 pt-16 border-t border-white/5 relative z-10 flex flex-col items-center w-full">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest mb-8" style={{ color: theme.themeColor }}>
-              <Target className="w-3 h-3" />
-              <span>Passo Necessário</span>
+              <Sparkles className="w-3 h-3" />
+              <span>As 8 Áreas da Vida</span>
             </div>
             
-            <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">Escolha o seu Foco.</h3>
+            <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O impacto em cada área.</h3>
             <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
-              O impacto desta Casa muda conforme a sua intenção principal. Veja o percentual de match de cada área abaixo e selecione a que deseja ativar.
+              Veja como a Casa {currentHouse} atua em cada área da sua vida ao longo do ano.
             </p>
 
             {/* LAYOUT: SIDEBAR RETRÁTIL + PAINEL QUE CRESCE */}
@@ -630,15 +630,7 @@ export default function HouseTrailerApp() {
                                 </div>
                                 <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
                                 <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
-                                <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.teaser}</p>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleSelectIntention(area.id, e); }}
-                                  className={`w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 ${selectedIntention !== area.id ? 'bg-white text-black' : ''}`}
-                                  style={selectedIntention === area.id ? { backgroundColor: area.color, color: '#fff' } : {}}
-                                >
-                                  {selectedIntention === area.id ? <Sparkles className="w-4 h-4" /> : <Target className="w-4 h-4" />}
-                                  {selectedIntention === area.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
-                                </button>
+                                <p className="text-white/80 text-sm font-light leading-relaxed">{area.teaser}</p>
                               </div>
                             </div>
                           </motion.div>
@@ -661,10 +653,10 @@ export default function HouseTrailerApp() {
                   {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
                     <motion.div
                       key={activeArea.id}
-                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
                       className="absolute inset-0 w-full h-full flex flex-col justify-end"
                     >
                       {/* BACKGROUNDS PREMIUM */}
@@ -681,7 +673,7 @@ export default function HouseTrailerApp() {
                             <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
                           </div>
                           <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
-                            {activeArea.label}
+                            Casa {currentHouse}
                           </span>
                         </div>
 
@@ -692,20 +684,9 @@ export default function HouseTrailerApp() {
 
                         <div className="w-16 h-px mb-6" style={{ backgroundColor: `${activeArea.color}80` }} />
                         
-                        <p className="text-white/75 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl drop-shadow-md">
+                        <p className="text-white/80 text-base md:text-lg font-light leading-relaxed max-w-xl drop-shadow-md">
                           {activeArea.teaser}
                         </p>
-                        
-                        <div>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); handleSelectIntention(activeArea.id, e); }}
-                            className={`w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 ${activeIntentionId !== activeArea.id && 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 hover:bg-gray-100'}`}
-                            style={activeIntentionId === activeArea.id ? { backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` } : {}}
-                          >
-                            {activeIntentionId === activeArea.id ? <Sparkles className="w-4 h-4 shrink-0" /> : <Target className="w-4 h-4 shrink-0" />}
-                            {activeIntentionId === activeArea.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
-                          </button>
-                        </div>
                         
                       </div>
                     </motion.div>
@@ -716,11 +697,11 @@ export default function HouseTrailerApp() {
           </motion.div>
       </section>
       
-      {/* STICKY BOTTOM BAR (Sempre acessível com o Foco Principal ou o Foco Escolhido) */}
+      {/* STICKY BOTTOM BAR (Ação de consulta/compra para a Casa selecionada) */}
       <AnimatePresence>
         {activeIntentionId && (() => {
           const chosen = LIFE_AREAS.find(a => a.id === activeIntentionId) || sortedAreas[0];
-          const color = chosen?.color || '#C9A227';
+          const color = theme.themeColor || chosen?.color || '#C9A227';
           return (
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -737,14 +718,14 @@ export default function HouseTrailerApp() {
                     </div>
                     <div>
                       <h4 className="text-white font-ps-display text-base md:text-lg font-bold leading-tight">
-                        Foco: {chosen?.label || `Casa ${currentHouse}`}
+                        Casa {currentHouse} • {theme.subtitle}
                       </h4>
                       <p className="text-white/65 text-xs md:text-sm">
                         {activeTier === "full_map"
-                          ? "Passe Mapa Completo ativo: sua consulta já libera todas as 12 Casas + Todos os Focos."
+                          ? "Passe Mapa Completo ativo: sua consulta libera todas as 12 Casas."
                           : activeTier === "expansao"
-                          ? "Passe Expansão ativo: sua consulta já libera esta Casa + Todos os 8 Focos."
-                          : "Escolha revelar as cidades desta Casa ou desbloquear seu Mapa Completo (12 Casas + Todos os Focos)."}
+                          ? "Passe Expansão ativo: sua consulta libera esta Casa completa."
+                          : "Revele as cidades desta Casa ou desbloqueie todas as 12 Casas."}
                         {availablePassTier !== "single" && (
                           <button
                             type="button"

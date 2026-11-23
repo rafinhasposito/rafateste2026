@@ -2014,18 +2014,6 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                         <span className={`block font-ps-display text-sm font-bold truncate ${isActive ? 'text-white' : 'text-white/80'}`}>
                           {area.label}
                         </span>
-                        <span className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider mt-0.5 text-white/45">
-                          {isAreaOpen ? (
-                            <span style={{ color: area.color }}>● Aberto</span>
-                          ) : hasFreeFirstFocus ? (
-                            <span className="text-emerald-300/90">● 1º Foco Incluso</span>
-                          ) : (
-                            <>
-                              <Lock className="w-2.5 h-2.5 shrink-0" />
-                              <span>{props.focusCost ?? 1} Créd.</span>
-                            </>
-                          )}
-                        </span>
                       </div>
                     </button>
                   );
@@ -2076,19 +2064,6 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             <span className={`block font-ps-display text-base font-bold truncate transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/75'}`}>
                               {area.label}
                             </span>
-                            {(area.unlocked || isUnlockedLocally) ? (
-                              <span className="shrink-0 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/15 bg-white/5" style={{ color: area.color }}>
-                                Aberto
-                              </span>
-                            ) : hasFreeFirstFocus ? (
-                              <span className="shrink-0 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
-                                Incluso
-                              </span>
-                            ) : (
-                              <span className="shrink-0 inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/15 bg-black/40 text-white/60">
-                                <Lock className="w-2.5 h-2.5" /> {props.focusCost ?? 1} Créd.
-                              </span>
-                            )}
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
@@ -2136,9 +2111,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                     <area.icon className="w-4 h-4" style={{ color: area.color }} />
                                   </div>
                                   <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">
-                                    {(area.unlocked || unlockedItems.includes(area.id))
-                                      ? `Foco Ativo • Casa ${P_DYNAMIC.house}`
-                                      : `Foco do Ano • Casa ${P_DYNAMIC.house}`}
+                                    Casa {P_DYNAMIC.house}
                                   </span>
                                 </div>
 
@@ -2146,14 +2119,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                                   <>
                                     <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
                                     <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
-                                    <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.full}</p>
-                                    <div
-                                      className="w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2"
-                                      style={{ backgroundColor: area.color, color: '#fff', boxShadow: `0 0 30px ${area.color}40` }}
-                                    >
-                                      <Sparkles className="w-4 h-4" />
-                                      Foco Ativado ✓
-                                    </div>
+                                    <p className="text-white/80 text-sm font-light leading-relaxed">{area.full}</p>
                                   </>
                                 ) : hasFreeFirstFocus ? (
                                   <>
@@ -2248,9 +2214,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                             <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
                           </div>
                           <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
-                            {(activeArea.unlocked || unlockedItems.includes(activeArea.id))
-                              ? `Foco Ativo • Casa ${P_DYNAMIC.house}`
-                              : `Foco do Ano • Casa ${P_DYNAMIC.house}`}
+                            Casa {P_DYNAMIC.house}
                           </span>
                         </div>
 
@@ -2261,16 +2225,9 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                               {activeArea.label}
                             </h3>
                             <div className="w-16 h-px mb-6" style={{ backgroundColor: `${activeArea.color}80` }} />
-                            <p className="text-white/75 text-base md:text-lg font-light leading-relaxed mb-10 max-w-xl drop-shadow-md">
+                            <p className="text-white/75 text-base md:text-lg font-light leading-relaxed max-w-xl drop-shadow-md">
                               {activeArea.full}
                             </p>
-                            <div
-                              className="w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3"
-                              style={{ backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` }}
-                            >
-                              <Sparkles className="w-4 h-4 shrink-0" />
-                              Foco Ativado ✓
-                            </div>
                           </>
                         ) : hasFreeFirstFocus ? (
                           <>

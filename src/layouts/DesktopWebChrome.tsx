@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Coins, LogOut, Settings, BookOpen, Handshake, Crown, Sparkles } from "lucide-react";
+import { Coins, LogOut, Settings, BookOpen, Handshake, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -62,9 +62,9 @@ export function DesktopWebChrome() {
               Descobrir
             </Link>
             <Link 
-              to="/?mode=futuro&path=casa" 
+              to="/casas" 
               className={`inline-flex items-center gap-1.5 text-sm font-ps-ui font-semibold transition-colors ${
-                location.search.includes("path=casa") || location.pathname.startsWith("/app/trailer")
+                location.pathname.startsWith("/casas")
                   ? "text-[#F5DE98]"
                   : "text-[#E8D59B]/90 hover:text-[#F5DE98]"
               }`}

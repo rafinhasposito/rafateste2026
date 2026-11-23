@@ -171,17 +171,14 @@ const Index = () => {
     if (targetMode && ["passado", "presente", "futuro"].includes(targetMode)) {
       if (loading) return;
       const ret = targetPath ? `/?mode=${targetMode}&path=${targetPath}` : `/?mode=${targetMode}`;
-      // Permite explorar a vitrine das 12 Casas (GoalCards + Trailers) mesmo antes de logar
-      if (targetPath !== "casa") {
-        if (!user) {
-          sessionStorage.setItem("ps_pending_mode", targetMode);
-          navigate(`/auth?returnTo=${encodeURIComponent(ret)}`, { replace: true });
-          return;
-        }
-        if (!isNatalProfileComplete(profile)) {
-          navigate(`/perfil?returnTo=${encodeURIComponent(ret)}`);
-          return;
-        }
+      if (!user) {
+        sessionStorage.setItem("ps_pending_mode", targetMode);
+        navigate(`/auth?returnTo=${encodeURIComponent(ret)}`, { replace: true });
+        return;
+      }
+      if (!isNatalProfileComplete(profile)) {
+        navigate(`/perfil?returnTo=${encodeURIComponent(ret)}`);
+        return;
       }
       setMode(targetMode);
       const activeBirthDate = profile?.birth_date || birthdate;
@@ -566,12 +563,12 @@ const Index = () => {
                     Quer entender o que significa cada uma das 12 Casas?
                   </h4>
                   <p className="text-xs font-ps-ui text-white/65 mt-0.5">
-                    Assista aos trailers interativos da Casa 1 à Casa 12 antes de escolher.
+                    Veja a explicação completa da Casa 1 à Casa 12 antes de escolher.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
                   <Link 
-                    to="/?mode=futuro&path=casa" 
+                    to="/casas" 
                     className="px-4 py-2.5 rounded-xl bg-[#C9A227]/20 hover:bg-[#C9A227] border border-[#C9A227]/50 text-[#F5DE98] hover:text-[#02050A] text-xs font-ps-ui font-bold uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1.5"
                   >
                     <Crown className="w-3.5 h-3.5" /> 
@@ -732,7 +729,7 @@ const Index = () => {
                       : mode === 'presente'
                       ? 'Em qual cidade você passou seu último aniversário?'
                       : 'Digite a cidade que você quer testar:'
-                    : 'Toque na área que você quer viver para ver o Trailer da Casa:'}
+                    : 'Escolha a Casa que você quer consultar:'}
                 </h1>
                 {searchPath === 'cidade' && mode === 'futuro' && (
                   <button

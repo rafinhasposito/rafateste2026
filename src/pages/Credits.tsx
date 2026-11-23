@@ -67,7 +67,7 @@ function getPackageChecklist(credits: number): {
       ctaLabel: "Comprar 1 Crédito Avulso",
       bullets: [
         "Libera 1 Casa ou 1 Cidade escolhida",
-        "Inclui TODAS as 8 áreas da vida liberadas de graça",
+        "Inclui todas as 8 áreas da vida",
         "Rotas principais + leitura de 12 meses completa",
       ],
     };

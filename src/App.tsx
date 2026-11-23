@@ -18,6 +18,8 @@ import AppleResultPreviewV3 from "./pages/AppleResultPreviewV3";
 import HouseResult from "./pages/HouseResult";
 import HouseTrailer from "./pages/HouseTrailer";
 import HouseTrailerApp from "./pages/HouseTrailerApp";
+import HousesGuide from "./pages/HousesGuide";
+import HouseDetailGuide from "./pages/HouseDetailGuide";
 import DossierSandbox from "./pages/DossierSandbox";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -110,6 +112,8 @@ const App = () => (
               <Route path="/parceiros" element={<PartnersLanding />} />
               <Route path="/seja-afiliado" element={<PartnersLanding />} />
               <Route path="/tecnologia" element={<Technology />} />
+              <Route path="/casas" element={<HousesGuide />} />
+              <Route path="/casas/:houseId" element={<HouseDetailGuide />} />
               <Route path="/app/trailer" element={<HouseTrailerApp />} />
             </Route>
 
