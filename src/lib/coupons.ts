@@ -28,28 +28,28 @@ export const COUPON_REWARD_META: Record<
   }
 > = {
   "1_casa": {
-    label: "1 Casa Avulsa",
+    label: "1 Casa ou Cidade Completa",
     shortLabel: "1 Casa (1 Crédito)",
     badge: "PRESENTE • 1 CASA SOLAR",
     credits: 1,
     valueBrl: "R$ 19,90",
-    description: "Libera 1 Casa ou Cidade escolhida com o 1º Foco Principal incluso.",
+    description: "Libera 1 Casa ou Cidade escolhida já com todas as 8 áreas da vida abertas.",
   },
   expansao: {
-    label: "Passe Expansão (1 Casa + Todos os Focos)",
-    shortLabel: "Passe Expansão (Casa + Focos)",
-    badge: "PRESENTE VIP • PASSE EXPANSÃO",
+    label: "Pacote 3 Casas / Cidades (3 Créditos)",
+    shortLabel: "3 Casas / Cidades (3 Créditos)",
+    badge: "PRESENTE VIP • 3 CONSULTAS COMPLETAS",
     credits: 3,
     valueBrl: "R$ 49,90",
-    description: "Desbloqueia 1 Casa escolhida com TODOS os 8 Focos liberados em qualquer consulta.",
+    description: "Libera até 3 Casas ou 3 Cidades completas à sua escolha (todas com as 8 áreas da vida abertas).",
   },
   full_map: {
-    label: "Passe Mapa Completo (12 Casas + Todos os Focos)",
-    shortLabel: "Mapa Completo (12 Casas + Focos)",
+    label: "Mapa Completo (Todas as 12 Casas)",
+    shortLabel: "Mapa Completo (12 Casas)",
     badge: "PRESENTE EXCLUSIVO • MAPA COMPLETO 360º",
     credits: 7,
     valueBrl: "R$ 99,90",
-    description: "Acesso total: desbloqueia TODAS as 12 Casas + TODOS os Focos na consulta escolhida.",
+    description: "Acesso total: desbloqueia TODAS as 12 Casas + todas as 8 áreas da vida na consulta escolhida.",
   },
 };
 

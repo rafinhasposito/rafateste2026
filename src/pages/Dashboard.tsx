@@ -584,12 +584,16 @@ const Dashboard = () => {
     const effectiveFocusCap = !isHouseLocked(selectedHouse) ? Math.min(costAllFocuses, 2) : costAllFocuses;
     const smartAllFocusesCost = computeAllFocusesCost(lockedFocusCount, costFocus, effectiveFocusCap);
 
-    const canApplyFullMapPass = !isAdmin && actualUnlockedCount < 12 && credits >= remainingFullMapCost;
-    const canApplyExpansaoPass = !isAdmin && !canApplyFullMapPass && lockedFocusCount > 0 && credits >= smartAllFocusesCost && smartAllFocusesCost >= 2;
+    // O Mapa Completo (12 Casas) só existe no modo Futuro; os 8 Focos já vêm 100% grátis em qualquer Casa aberta
+    const canApplyFullMapPass =
+      currentMode === "futuro" &&
+      !isAdmin &&
+      actualUnlockedCount < 12 &&
+      credits >= remainingFullMapCost;
 
     return (
       <>
-        {!dismissedPassBanner && (canApplyFullMapPass || canApplyExpansaoPass) && (
+        {!dismissedPassBanner && canApplyFullMapPass && (
           <div className="fixed bottom-[84px] lg:bottom-6 left-1/2 -translate-x-1/2 z-[45] w-[calc(100%-2rem)] max-w-xl pointer-events-auto">
             <div className="relative flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3.5 pr-10 sm:pr-4 rounded-2xl bg-[#071122]/95 border border-[#C9A227]/60 backdrop-blur-xl shadow-[0_16px_45px_rgba(0,0,0,0.75)]">
               <div className="flex items-center gap-3 text-left">
@@ -598,12 +602,10 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#F5DE98]">
-                    {canApplyFullMapPass ? "Passe Mapa Completo Disponível" : "Passe Expansão Disponível"}
+                    Passe Mapa Completo Disponível
                   </p>
                   <p className="text-xs text-white/75">
-                    {canApplyFullMapPass
-                      ? "Libere todas as 12 Casas + Todos os Focos nesta consulta com 1 toque."
-                      : `Libere todos os 8 Focos da Casa ${selectedHouse} nesta consulta.`}
+                    Libere todas as 12 Casas nesta consulta com 1 toque ({remainingFullMapCost} créditos).
                   </p>
                 </div>
               </div>
@@ -611,11 +613,7 @@ const Dashboard = () => {
                 <button
                   type="button"
                   disabled={unlocking}
-                  onClick={() =>
-                    canApplyFullMapPass
-                      ? handleUnlock(0)
-                      : handleUnlockAllFocuses(FOCUS_AREA_METADATA.map((f) => f.id), selectedHouse)
-                  }
+                  onClick={() => handleUnlock(0)}
                   className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-bold text-[11px] uppercase tracking-[0.16em] transition-all active:scale-95"
                 >
                   {unlocking ? "Liberando..." : "Ativar Agora"}

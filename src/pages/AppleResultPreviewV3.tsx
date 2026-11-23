@@ -266,7 +266,7 @@ const LIFE_AREAS = [
     ]
   },
   { 
-    id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", score: 52, unlocked: false, 
+    id: "saude", icon: Leaf, label: "Saúde e Vitalidade", color: "#22c55e", score: 52, unlocked: true, 
     teaser: "A energia deste destino favorece colocar seu corpo e sua disposição no centro das decisões do ciclo.", 
     city: "Destino Solar",
     cityDesc: "Este ciclo favorece cuidar da sua energia física, ajustar o sono e estruturar uma rotina sustentável para acompanhar suas metas ao longo do ano.",
@@ -1328,7 +1328,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     }
 
     if (!focusData) {
-      return { ...area, score: finalScore };
+      return { ...area, score: finalScore, unlocked: true };
     }
     
     const isIntended = (area.id === intendedAreaId);

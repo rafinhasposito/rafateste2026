@@ -39,23 +39,23 @@ const REWARD_OPTIONS: {
 }[] = [
   {
     type: "1_casa",
-    title: "1 Casa Avulsa",
-    subtitle: "Libera 1 Casa escolhida + 1º Foco Principal",
+    title: "1 Casa / Cidade Completa",
+    subtitle: "Libera 1 Casa ou Cidade + todas as 8 áreas da vida",
     priceTag: "Equivale a R$ 19,90 (1 Créd.)",
     Icon: MapPin,
   },
   {
     type: "expansao",
-    title: "Passe Expansão (Casa + Focos)",
-    subtitle: "Libera 1 Casa escolhida + TODOS os 8 Focos",
-    priceTag: "Equivale a R$ 49,90 (Passe Expansão)",
+    title: "Pacote 3 Casas / Cidades",
+    subtitle: "Libera até 3 Casas ou 3 Cidades completas (com 8 áreas)",
+    priceTag: "Equivale a R$ 49,90 (3 Créd.)",
     Icon: Crown,
   },
   {
     type: "full_map",
-    title: "Mapa Completo (12 Casas + Focos)",
-    subtitle: "Libera TODAS as 12 Casas + TODOS os Focos",
-    priceTag: "Equivale a R$ 99,90 (Passe Total)",
+    title: "Mapa Completo (12 Casas)",
+    subtitle: "Libera TODAS as 12 Casas + todas as 8 áreas da vida",
+    priceTag: "Equivale a R$ 99,90 (7 Créd.)",
     Icon: Compass,
   },
 ];
@@ -179,7 +179,7 @@ const CouponsManager = () => {
               Criar Cupom de Resgate
             </h3>
             <p className="text-white/55 text-xs sm:text-sm font-ps-ui mt-1">
-              Escolha se o presente libera 1 Casa, o Passe Expansão (Casa + Todos os Focos) ou o Mapa Completo (12 Casas + Todos os Focos).
+              Escolha se o presente libera 1 Casa/Cidade, o Pacote 3 Casas/Cidades ou o Mapa Completo (12 Casas).
             </p>
           </div>
         </div>

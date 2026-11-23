@@ -658,7 +658,7 @@ const Credits = () => {
                     {packages.map((p) => {
                       const isCurrent = p.key === selectedPkg.key;
                       const formattedPrice = Number(p.price_brl || 0).toFixed(2).replace(".", ",");
-                      const shortTitle = p.credits <= 1 ? "1 Casa Avulsa" : p.credits <= 5 ? "Pacote Expansão" : "Mapa Completo";
+                      const shortTitle = p.credits <= 1 ? "1 Casa / Cidade" : p.credits <= 5 ? "3 Casas / Cidades" : "Mapa Completo";
                       return (
                         <button
                           key={p.key}
@@ -700,9 +700,9 @@ const Credits = () => {
                   </h3>
                   <p className="text-white/75 text-base max-w-md leading-relaxed">
                     {selectedPkg.credits >= 6 ? (
-                      <>Seu <strong className="text-[#F5DE98]">Passe Mapa Completo</strong> ({selectedPkg.credits} créditos) já está ativo na sua conta.</>
+                      <>Seu <strong className="text-[#F5DE98]">Mapa Completo (12 Casas)</strong> ({selectedPkg.credits} créditos) já está ativo na sua conta.</>
                     ) : selectedPkg.credits >= 3 ? (
-                      <>Seu <strong className="text-[#F5DE98]">Passe Expansão</strong> ({selectedPkg.credits} créditos) já está ativo na sua conta.</>
+                      <>Seu <strong className="text-[#F5DE98]">Pacote 3 Casas / Cidades</strong> ({selectedPkg.credits} créditos) já está ativo na sua conta.</>
                     ) : (
                       <>Seu <strong className="text-[#F5DE98]">{selectedPkg.credits} crédito</strong> já foi adicionado ao seu saldo.</>
                     )}
@@ -928,7 +928,7 @@ const Credits = () => {
               "Você recebeu um acesso cortesia para descobrir em qual cidade do mundo passar seu próximo aniversário. Veja em 60 segundos como funciona ou ative seu código abaixo."
             )
           ) : (
-            "1 crédito libera 1 Casa. Os pacotes Expansão e Mapa Completo funcionam como passes que liberam tudo de uma vez na consulta que você escolher."
+            "Cada crédito libera 1 Casa ou 1 Cidade completa (já com todas as 8 áreas da vida abertas). Escolha 1 consulta avulsa, o pacote de 3 consultas ou o Mapa Completo das 12 Casas."
           )}
         </p>
 
@@ -946,12 +946,12 @@ const Credits = () => {
             </span>
             {profile.credits >= 7 && (
               <span className="px-3 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 text-[#F5DE98] text-[10px] font-bold uppercase tracking-wider">
-                Passe Mapa Completo Ativo (12 Casas + Focos)
+                Saldo para Mapa Completo (12 Casas)
               </span>
             )}
             {profile.credits >= 3 && profile.credits < 7 && (
               <span className="px-3 py-1 rounded-full bg-[#C9A227]/20 border border-[#C9A227]/45 text-[#F5DE98] text-[10px] font-bold uppercase tracking-wider">
-                Passe Expansão Ativo (1 Casa + Todos os Focos)
+                Saldo para {profile.credits} Casas ou Cidades Completas
               </span>
             )}
           </div>
@@ -1060,7 +1060,7 @@ const Credits = () => {
                     Possui um Código de Presente ou Mídia Kit?
                   </p>
                   <p className="text-white/55 text-xs font-light">
-                    Insira seu cupom para liberar sua Casa, Passe Expansão ou Mapa Completo.
+                    Insira seu cupom para liberar 1 Casa, o Pacote 3 Casas ou o Mapa Completo (12 Casas).
                   </p>
                 </div>
               </div>

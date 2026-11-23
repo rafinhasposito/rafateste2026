@@ -9,7 +9,6 @@ import { chargeConsultation } from "@/lib/credits";
 import { saveConsultation, chargeAndSaveConsultationV1, enrichResultForTier } from "@/lib/consultations";
 import {
   ALL_TWELVE_HOUSES,
-  detectDefaultConsultationTier,
   getTierRequiredCredits,
   type ConsultationUnlockTier,
 } from "@/lib/consultationUnlocks";
@@ -94,12 +93,9 @@ export default function HouseTrailerApp() {
 
 
   const [isProcessing, setIsProcessing] = useState(false);
-  const [usePassNow, setUsePassNow] = useState(false);
   const { user, profile, refreshProfile } = useAuth();
   const { isAdmin } = useIsAdmin();
   const userCredits = profile?.credits ?? 0;
-  const availablePassTier = detectDefaultConsultationTier(userCredits);
-  const activeTier: ConsultationUnlockTier = usePassNow ? availablePassTier : "single";
 
   const handleRevelarCidades = async (unlockFullMap: boolean = false) => {
     const id = searchParams.get('id');
@@ -132,14 +128,14 @@ export default function HouseTrailerApp() {
       return;
     }
 
-    const tier: ConsultationUnlockTier = unlockFullMap ? "full_map" : activeTier;
+    const tier: ConsultationUnlockTier = unlockFullMap ? "full_map" : "single";
     const requiredCredits = getTierRequiredCredits(tier);
     if (!isAdmin && userCredits < requiredCredits) {
       if (unlockFullMap) {
-        toast.info("Ative o Passe Mapa Completo para desbloquear todas as 12 Casas + Todos os Focos de uma vez!");
+        toast.info("Adquira o Mapa Completo (7 créditos) para desbloquear todas as 12 Casas de uma vez!");
         navigate(`/credits?pkg=full&returnTo=${encodeURIComponent(currentReturnUrl)}`);
       } else {
-        toast.error("Você não possui créditos suficientes. Adquira 1 Casa Avulsa, o Pacote Expansão ou o Mapa Completo.");
+        toast.error("Você não possui créditos suficientes. Adquira 1 Casa Avulsa, o Pacote 3 Casas ou o Mapa Completo.");
         navigate(`/credits?pkg=1&returnTo=${encodeURIComponent(currentReturnUrl)}`);
       }
       return;
@@ -721,20 +717,7 @@ export default function HouseTrailerApp() {
                         Casa {currentHouse} • {theme.subtitle}
                       </h4>
                       <p className="text-white/65 text-xs md:text-sm">
-                        {activeTier === "full_map"
-                          ? "Passe Mapa Completo ativo: sua consulta libera todas as 12 Casas."
-                          : activeTier === "expansao"
-                          ? "Passe Expansão ativo: sua consulta libera esta Casa completa."
-                          : "Revele as cidades desta Casa ou desbloqueie todas as 12 Casas."}
-                        {availablePassTier !== "single" && (
-                          <button
-                            type="button"
-                            onClick={() => setUsePassNow((v) => !v)}
-                            className="ml-2 underline text-[#F5DE98] hover:text-white text-xs font-semibold"
-                          >
-                            {usePassNow ? "(Guardar passe e usar só 1 crédito)" : "(Usar meu passe agora)"}
-                          </button>
-                        )}
+                        Revele as melhores cidades desta Casa (já com todas as 8 áreas da vida liberadas) ou desbloqueie todas as 12 Casas.
                       </p>
                     </div>
                   </div>
@@ -750,30 +733,22 @@ export default function HouseTrailerApp() {
                       }}
                     >
                       <Globe className={`w-4 h-4 shrink-0 ${isProcessing ? 'animate-spin' : ''}`} />
-                      <span>
-                        {isProcessing
-                          ? 'Calculando...'
-                          : activeTier === "full_map"
-                          ? 'Revelar Mapa Completo'
-                          : activeTier === "expansao"
-                          ? 'Revelar Casa + Focos'
-                          : 'Revelar Cidades'}
-                      </span>
+                      <span>{isProcessing ? 'Calculando...' : 'Revelar Cidades'}</span>
                       <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] font-bold tracking-wider">
-                        {activeTier === "full_map" ? "Passe Total" : activeTier === "expansao" ? "Passe Expansão" : "1 Créd."}
+                        1 Créd.
                       </span>
                     </button>
 
-                    {activeTier !== "full_map" && (
+                    {activeMode === "futuro" && (
                       <button 
                         onClick={() => handleRevelarCidades(true)}
                         disabled={isProcessing}
                         className="px-5 py-3.5 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(229,193,88,0.2)]"
                       >
                         <Sparkles className="w-4 h-4 shrink-0 text-[#E5C158]" />
-                        <span>Desbloquear Mapa Completo</span>
+                        <span>Mapa Completo</span>
                         <span className="px-2 py-0.5 rounded-full bg-[#E5C158]/25 text-[#F6D97A] text-[10px] font-bold tracking-wider">
-                          12 Casas + Todos os Focos
+                          12 Casas · 7 Créd.
                         </span>
                       </button>
                     )}

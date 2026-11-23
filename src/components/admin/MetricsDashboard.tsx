@@ -276,8 +276,8 @@ const MetricsDashboard = ({ onNavigateTab }: MetricsDashboardProps) => {
           priceBrl = FALLBACK_PRICE_BY_CREDITS[t.amount] ?? t.amount * 19.9;
         }
 
-        if (t.amount === 1) packageLabel = "1 Casa Avulsa (1 crédito)";
-        else if (t.amount === 3) packageLabel = "Pacote Expansão (3 créditos)";
+        if (t.amount === 1) packageLabel = "1 Casa / Cidade (1 crédito)";
+        else if (t.amount === 3) packageLabel = "Pacote 3 Casas / Cidades (3 créditos)";
         else if (t.amount >= 7) packageLabel = `Mapa Completo (${t.amount} créditos)`;
       }
 
@@ -363,9 +363,9 @@ const MetricsDashboard = ({ onNavigateTab }: MetricsDashboardProps) => {
     const expansaoPrice = priceByCredits.get(3) ?? FALLBACK_PRICE_BY_CREDITS[3];
     const fullPrice = priceByCredits.get(7) ?? FALLBACK_PRICE_BY_CREDITS[7];
     const packageMix = {
-      single: { label: "1 Casa Avulsa", price: fmtBrl(singlePrice), count: 0, revenue: 0, color: "#10B981" },
-      expansao: { label: "Pacote Expansão", price: fmtBrl(expansaoPrice), count: 0, revenue: 0, color: "#F5B041" },
-      full: { label: "Mapa Completo", price: fmtBrl(fullPrice), count: 0, revenue: 0, color: "#8B5CF6" },
+      single: { label: "1 Casa / Cidade", price: fmtBrl(singlePrice), count: 0, revenue: 0, color: "#10B981" },
+      expansao: { label: "Pacote 3 Casas / Cidades", price: fmtBrl(expansaoPrice), count: 0, revenue: 0, color: "#F5B041" },
+      full: { label: "Mapa Completo (12)", price: fmtBrl(fullPrice), count: 0, revenue: 0, color: "#8B5CF6" },
     };
     paidTxsInPeriod.forEach((t) => {
       if (t.amount === 1) {
