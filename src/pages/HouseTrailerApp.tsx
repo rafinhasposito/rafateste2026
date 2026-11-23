@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { houseThemes } from "@/data/houseThemes";
 import ScanningOverlay from "@/components/ScanningOverlay";
 
-const DEFAULT_TRAILER_HOUSE = 11;
+const DEFAULT_TRAILER_HOUSE = 1;
 const DEFAULT_TRAILER_GENDER = "M";
 
 const LIFE_AREAS = [
@@ -626,19 +626,20 @@ export default function HouseTrailerApp() {
                                   <div className="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 bg-black/20" style={{ borderColor: `${area.color}55` }}>
                                     <area.icon className="w-4 h-4" style={{ color: area.color }} />
                                   </div>
-                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">{area.label}</span>
+                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">
+                                    Área Inclusa • Casa {currentHouse}
+                                  </span>
                                 </div>
                                 <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
                                 <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
                                 <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.teaser}</p>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleSelectIntention(area.id, e); }}
-                                  className={`w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 ${selectedIntention !== area.id ? 'bg-white text-black' : ''}`}
-                                  style={selectedIntention === area.id ? { backgroundColor: area.color, color: '#fff' } : {}}
+                                <div
+                                  className="w-full px-5 py-3.5 font-bold text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 border"
+                                  style={{ backgroundColor: `${area.color}22`, borderColor: `${area.color}55`, color: '#fff' }}
                                 >
-                                  {selectedIntention === area.id ? <Sparkles className="w-4 h-4" /> : <Target className="w-4 h-4" />}
-                                  {selectedIntention === area.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
-                                </button>
+                                  <Sparkles className="w-4 h-4" />
+                                  <span>Incluso gratuitamente na consulta ✓</span>
+                                </div>
                               </div>
                             </div>
                           </motion.div>
@@ -661,10 +662,10 @@ export default function HouseTrailerApp() {
                   {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
                     <motion.div
                       key={activeArea.id}
-                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
                       className="absolute inset-0 w-full h-full flex flex-col justify-end"
                     >
                       {/* BACKGROUNDS PREMIUM */}
@@ -675,13 +676,13 @@ export default function HouseTrailerApp() {
                       {/* CONTEÚDO PRINCIPAL */}
                       <div className="relative z-10 p-8 md:p-12 w-full flex flex-col justify-end h-full">
                         
-                        {/* Ícone pequeno + label da área */}
+                        {/* Ícone pequeno + contexto */}
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 bg-black/20 backdrop-blur-md" style={{ borderColor: `${activeArea.color}55` }}>
                             <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
                           </div>
                           <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
-                            {activeArea.label}
+                            Área Inclusa • Casa {currentHouse}
                           </span>
                         </div>
 
@@ -697,14 +698,13 @@ export default function HouseTrailerApp() {
                         </p>
                         
                         <div>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); handleSelectIntention(activeArea.id, e); }}
-                            className={`w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 ${activeIntentionId !== activeArea.id && 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 hover:bg-gray-100'}`}
-                            style={activeIntentionId === activeArea.id ? { backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` } : {}}
+                          <div
+                            className="w-full md:w-auto inline-flex items-center justify-center gap-3 px-7 py-4 font-bold text-xs uppercase tracking-widest rounded-2xl border"
+                            style={{ backgroundColor: `${activeArea.color}25`, borderColor: `${activeArea.color}65`, color: '#fff' }}
                           >
-                            {activeIntentionId === activeArea.id ? <Sparkles className="w-4 h-4 shrink-0" /> : <Target className="w-4 h-4 shrink-0" />}
-                            {activeIntentionId === activeArea.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
-                          </button>
+                            <Sparkles className="w-4 h-4 shrink-0" />
+                            <span>Incluso gratuitamente na consulta desta Casa ✓</span>
+                          </div>
                         </div>
                         
                       </div>
