@@ -173,7 +173,7 @@ export default function HousesGuide() {
                     {house.title}
                   </h2>
 
-                  {/* Perfil (identificação em 3 segundos) */}
+                  {/* Para quem é (identificação no 1º segundo) */}
                   <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 mb-3">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
@@ -181,7 +181,7 @@ export default function HousesGuide() {
                         className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em]"
                         style={{ color: themeHex }}
                       >
-                        Perfil
+                        Para quem é
                       </span>
                     </div>
                     <p className="font-ps-ui text-[13px] text-white/90 leading-snug font-medium">
@@ -189,15 +189,15 @@ export default function HousesGuide() {
                     </p>
                   </div>
 
-                  {/* Foco do Ciclo (tom seguro de tendência) */}
+                  {/* A energia da cidade (direto ao ponto) */}
                   <div className="px-0.5">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
                       <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em] text-white/55">
-                        Foco do Ciclo
+                        A energia da cidade
                       </span>
                     </div>
-                    <p className="font-ps-ui text-[13px] text-white/72 leading-relaxed">
+                    <p className="font-ps-ui text-[13px] text-white/75 leading-relaxed">
                       {house.cycleFocus}
                     </p>
                   </div>

@@ -177,7 +177,7 @@ export default function HouseDetailGuide() {
                 className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em]"
                 style={{ color: theme.themeColor }}
               >
-                Perfil
+                Para quem é
               </span>
             </div>
             <p className="font-ps-ui text-sm text-white/90 leading-relaxed">
@@ -189,7 +189,7 @@ export default function HouseDetailGuide() {
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-4 h-4 shrink-0 text-[#F5DE98]" />
               <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/65">
-                Foco do Ciclo
+                A energia da cidade
               </span>
             </div>
             <p className="font-ps-ui text-sm text-white/85 leading-relaxed">
@@ -213,6 +213,57 @@ export default function HouseDetailGuide() {
             <p className="font-ps-ui text-[11px] text-white/45 mt-1.5">
               Referência simbólica; suas cidades reais dependem da sua data e hora de nascimento.
             </p>
+          </div>
+        </motion.div>
+
+        {/* COMO FUNCIONA NA PRÁTICA (3 CENAS DA VIDA REAL) */}
+        <motion.div
+          key={`practice-${currentHouse}`}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="relative z-20 mt-14 md:mt-20 w-full max-w-5xl mx-auto px-5 sm:px-6"
+        >
+          <div className="rounded-[28px] border border-white/10 bg-white/[0.03] backdrop-blur-2xl p-6 sm:p-8 md:p-10">
+            <div className="text-center max-w-2xl mx-auto mb-8">
+              <span
+                style={{ color: theme.themeColor }}
+                className="text-[10px] font-bold uppercase tracking-[0.28em] block mb-2.5"
+              >
+                Na Vida Real
+              </span>
+              <h3 className="font-ps-display text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
+                Como a Casa {currentHouse} funciona na prática
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+              {showcase.inPractice.map((item, idx) => (
+                <div
+                  key={`${currentHouse}-prac-${idx}`}
+                  className="rounded-2xl border border-white/[0.08] bg-black/35 p-5 flex flex-col gap-2 text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-6 h-6 rounded-lg flex items-center justify-center font-mono text-[11px] font-bold shrink-0"
+                      style={{
+                        backgroundColor: `${theme.themeColor}22`,
+                        color: theme.themeColor,
+                        border: `1px solid ${theme.themeColor}45`,
+                      }}
+                    >
+                      0{idx + 1}
+                    </span>
+                    <h4 className="font-ps-display text-sm sm:text-base font-bold text-white leading-snug">
+                      {item.area}
+                    </h4>
+                  </div>
+                  <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/78 leading-relaxed">
+                    {item.example}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
 
