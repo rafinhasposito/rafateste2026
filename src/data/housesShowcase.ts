@@ -20,9 +20,8 @@ export interface HouseShowcaseItem {
   element: HouseElement;
   iconKey: HouseIconKey;
   title: string;
-  hook: string;
-  unlocks: string;
   idealFor: string;
+  unlocks: string;
   symbolCity: {
     name: string;
     country: string;
@@ -67,11 +66,10 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     element: "Fogo",
     iconKey: "crown",
     title: "Autonomia, Liderança & Nova Identidade",
-    hook: "O ano de sair da sombra, parar de pedir aprovação e assumir o controle total das suas decisões.",
-    unlocks:
-      "Reacende coragem, presença marcante e clareza para iniciar projetos próprios e conduzir a sua agenda sem depender da validação dos outros.",
     idealFor:
-      "Quem adiou decisões importantes, sente que viveu no piloto automático ou quer uma virada visível na imagem e na liderança pessoal.",
+      "Quem vive em função dos outros, quem quer mudar de visual/estilo ou abrir um projeto solo.",
+    unlocks:
+      "O ano de parar de pedir licença, resgatar a coragem e assumir o papel principal da sua vida.",
     symbolCity: {
       name: "Nova York",
       country: "EUA",
@@ -83,12 +81,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "02",
     element: "Terra",
     iconKey: "wallet",
-    title: "Dinheiro, Segurança & Patrimônio",
-    hook: "O ano de valorizar o seu trabalho, estancar vazamentos de grana e construir um caixa sólido.",
-    unlocks:
-      "Direciona foco para precificação justa, organização financeira, aumento de margem e decisões concretas de acumulação de patrimônio.",
+    title: "Dinheiro, Caixa Forte & Patrimônio",
     idealFor:
-      "Quem trabalha muito mas vê o dinheiro escapar, quer cobrar o que realmente vale ou precisa construir reserva e estabilidade real.",
+      "Autônomos, prestadores de serviço e quem cansa de trabalhar sem ver a cor do dinheiro.",
+    unlocks:
+      "O ano de cobrar o preço justo pelo seu talento, fechar torneiras de gastos bobos e acumular reserva financeira.",
     symbolCity: {
       name: "Zurique",
       country: "Suíça",
@@ -100,12 +97,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "03",
     element: "Ar",
     iconKey: "megaphone",
-    title: "Vendas, Comunicação & Negócios Ágeis",
-    hook: "Destrava a fala, acelera reuniões e faz o seu nome e suas propostas circularem no mercado.",
-    unlocks:
-      "Favorece poder de persuasão, negociações rápidas, produção de conteúdo, vendas consultivas e aprendizados que viram resultado rápido.",
+    title: "Vendas, Fala Destravada & Contatos Rápidos",
     idealFor:
-      "Quem precisa vender mais, aparecer com segurança no mercado ou fechar acordos ágeis por meio de boas conversas.",
+      "Corretores, comerciantes, negociadores, quem faz reuniões diárias ou cria conteúdo curto.",
+    unlocks:
+      "Destrava a timidez na comunicação, multiplica reuniões e faz o seu nome circular rápido no mercado.",
     symbolCity: {
       name: "Londres",
       country: "Reino Unido",
@@ -117,12 +113,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "04",
     element: "Água",
     iconKey: "home",
-    title: "Família, Imóveis & Paz Emocional",
-    hook: "Foco em reformas, compra de imóveis, fortalecimento das raízes e proteção do seu refúgio familiar.",
-    unlocks:
-      "Cria base emocional estável para resolver pendências de família, estruturar sua casa e construir segurança de dentro para fora.",
+    title: "Família, Imóveis & Porto Seguro",
     idealFor:
-      "Quem planeja comprar, reformar ou mudar de casa, quer fortalecer laços familiares ou precisa de paz mental para sustentar o próximo salto.",
+      "Quem quer comprar/reformar casa, planeja gravidez ou precisa de paz e privacidade no lar.",
+    unlocks:
+      "Protege sua intimidade, fortalece raízes e ancora seus investimentos em bens duráveis e refúgio familiar.",
     symbolCity: {
       name: "Florença",
       country: "Itália",
@@ -134,12 +129,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "05",
     element: "Fogo",
     iconKey: "flame",
-    title: "Palco, Romance & Autoestima",
-    hook: "O ano do magnetismo pessoal, da diversão sem culpa, do romance leve e dos projetos autorais.",
-    unlocks:
-      "Aumenta carisma, criatividade, prazer de viver e abertura para romances vibrantes e projetos com a sua assinatura pessoal.",
+    title: "Palco, Magnetismo & Prazer de Viver",
     idealFor:
-      "Quem passou tempo demais só no modo obrigação e quer voltar a se sentir magnético, criativo, leve e valorizado.",
+      "Solteiros em busca de romance, criadores autorais e quem perdeu a alegria na rotina.",
+    unlocks:
+      "Acende o brilho pessoal, atrai romances envolventes e coloca a sua criatividade sob aplausos.",
     symbolCity: {
       name: "Rio de Janeiro",
       country: "Brasil",
@@ -151,12 +145,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "06",
     element: "Terra",
     iconKey: "activity",
-    title: "Rotina Fit, Disciplina & Alta Performance",
-    hook: "A engrenagem do relógio suíço: constância na dieta, treinos firmes e produtividade no trabalho.",
-    unlocks:
-      "Dá o ritmo de um relógio suíço para você não furar a dieta, manter treinos constantes e organizar sua rotina sem estresse.",
+    title: "Mundo Fit, Rotina & Alta Performance",
     idealFor:
-      "Para quem quer emagrecer, quem está à beira do burnout ou quem precisa transformar tarefas manuais em processos eficientes de trabalho.",
+      "Quem vive furando a dieta, não consegue manter treinos, sofre com desorganização ou está à beira do burnout.",
+    unlocks:
+      "A disciplina de um relógio suíço: constância na alimentação, treinos no automático e produtividade sem estresse.",
     symbolCity: {
       name: "Tóquio",
       country: "Japão",
@@ -168,12 +161,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "07",
     element: "Ar",
     iconKey: "handshake",
-    title: "Parcerias, Casamento & Alianças",
-    hook: "Compromissos sólidos no amor e sociedades de negócios onde um mais um soma dez.",
-    unlocks:
-      "Coloca holofote em relacionamentos maduros, contratos estratégicos e parcerias complementares que multiplicam resultados.",
+    title: "Casamento, Parcerias & Contratos de Ouro",
     idealFor:
-      "Quem quer viver um relacionamento sério de verdade, renovar o casamento ou encontrar o sócio ou cliente-chave certo.",
+      "Quem quer namoro sério, casamento ou sociedades comerciais estratégicas.",
+    unlocks:
+      "O fim do caminho solitário: alianças sólidas onde um mais um soma dez, tanto no amor quanto nos negócios.",
     symbolCity: {
       name: "Paris",
       country: "França",
@@ -185,12 +177,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "08",
     element: "Água",
     iconKey: "refresh",
-    title: "Grandes Viradas, Auditoria & Dinheiro Compartilhado",
-    hook: "Encerramento de ciclos desgastados, renegociação de dívidas e atração de recursos externos.",
-    unlocks:
-      "Traz lucidez para cortar o que drena energia, reestruturar finanças complexas e abrir portas para investimentos, sócios ou capital de terceiros.",
+    title: "Grandes Viradas, Heranças & Dinheiro Compartilhado",
     idealFor:
-      "Quem sabe que precisa virar uma página definitiva, resolver pendências financeiras profundas ou escalar com recursos compartilhados.",
+      "Quem precisa encerrar ciclos desgastados, renegociar dívidas, aprovar vistos/processos ou atrair investidores.",
+    unlocks:
+      "Auditoria profunda de vida: desapego cirúrgico do passado e desbloqueio de recursos de terceiros.",
     symbolCity: {
       name: "Singapura",
       country: "Singapura",
@@ -202,12 +193,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "09",
     element: "Fogo",
     iconKey: "globe",
-    title: "Viagens, Internacionalização & Grande Visão",
-    hook: "O salto para fora da bolha: expansão de horizontes, estudos de elite e projetos internacionais.",
-    unlocks:
-      "Amplia repertório, abre caminhos para viagens marcantes, formações de alto nível, negócios fora do eixo habitual e visão de longo prazo.",
+    title: "Internacionalização, Estudos de Elite & Salto de Vida",
     idealFor:
-      "Quem sente que o ambiente atual ficou pequeno e quer expandir fronteiras culturais, acadêmicas ou comerciais.",
+      "Nômades digitais, estudantes, quem sonha morar fora ou quer expandir negócios além das fronteiras.",
+    unlocks:
+      "O salto para fora da bolha: viagens marcantes, proteção em causas da justiça e expansão radical de horizontes.",
     symbolCity: {
       name: "Lisboa",
       country: "Portugal",
@@ -219,12 +209,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "10",
     element: "Terra",
     iconKey: "trophy",
-    title: "Modo CEO, Sucesso Público & Autoridade",
-    hook: "O efeito Anitta: sair dos bastidores para o topo, atrair grandes clientes e ser reconhecido no seu nicho.",
-    unlocks:
-      "Eleva visibilidade profissional, posicionamento de autoridade e foco em entregas de grande impacto que consolidam sua reputação.",
+    title: "Fama, Modo CEO & Reconhecimento de Elite",
     idealFor:
-      "Quem já entrega muito nos bastidores e decidiu ocupar o espaço de liderança, reconhecimento e alto valor no mercado.",
+      "Influenciadores, cantores, artistas, blogueiros, CEOs e empreendedores que precisam ser vistos.",
+    unlocks:
+      "O Efeito Anitta: sai dos bastidores para os holofotes mundiais, ganha autoridade no nicho e atrai grandes contratos.",
     symbolCity: {
       name: "Dubai",
       country: "Emirados Árabes",
@@ -236,12 +225,11 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     numberLabel: "11",
     element: "Ar",
     iconKey: "network",
-    title: "Conexões, Internet & Escala Coletiva",
-    hook: "O ano em que o seu networking trabalha por você: grupos influentes, parcerias e crescimento digital.",
-    unlocks:
-      "Acelera audiência, comunidades, indicações qualificadas e projetos que ganham força quando conectados às pessoas certas.",
+    title: "Networking VIP, Comunidades & Escala Digital",
     idealFor:
-      "Quem quer parar de remar sozinho, crescer no digital, entrar em mesas maiores e escalar através de comunidade e alianças.",
+      "Infoprodutores, líderes comunitários, gestores de eventos e quem vive de audiência e parcerias.",
+    unlocks:
+      "Sua rede trabalha por você: atração de padrinhos influentes, indicações espontâneas e viralização de projetos.",
     symbolCity: {
       name: "São Francisco",
       country: "EUA",
@@ -254,11 +242,10 @@ export const HOUSES_SHOWCASE: HouseShowcaseItem[] = [
     element: "Água",
     iconKey: "moon",
     title: "Bastidores, Blindagem & Deep Work",
-    hook: "Incubação de projetos sigilosos, recarga profunda de energia e descanso longe do barulho do mundo.",
-    unlocks:
-      "Protege sua mente contra excesso de ruído, favorece foco silencioso em projetos estratégicos e restaura clareza emocional e espiritual.",
     idealFor:
-      "Quem veio de anos intensos e precisa recarregar a bateria, fechar ciclos internos ou construir um grande projeto em silêncio antes de lançar.",
+      "Quem vai escrever um livro, gestar um projeto sigiloso, fazer terapia profunda ou precisa de detox social.",
+    unlocks:
+      "Incubação silenciosa: recarga profunda de energia, intuição afiada e proteção longe da inveja e do barulho do mundo.",
     symbolCity: {
       name: "Kyoto",
       country: "Japão",

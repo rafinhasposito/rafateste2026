@@ -23,6 +23,7 @@ import {
   Trophy,
   Wallet,
   X,
+  Zap,
 } from "lucide-react";
 import {
   ELEMENT_STYLES,
@@ -213,14 +214,38 @@ export default function HousesGuide() {
                   </div>
 
                   {/* Título com apelo real */}
-                  <h2 className="font-ps-display text-lg sm:text-[19px] font-bold text-white leading-snug mb-2.5 group-hover:text-[#F5DE98] transition-colors">
+                  <h2 className="font-ps-display text-lg sm:text-[19px] font-bold text-white leading-snug mb-3.5 group-hover:text-[#F5DE98] transition-colors">
                     {house.title}
                   </h2>
 
-                  {/* Frase de impacto na vida real */}
-                  <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/68 leading-relaxed">
-                    “{house.hook}”
-                  </p>
+                  {/* Gancho 1: Ideal para (identificação no 1º segundo) */}
+                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 mb-3">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
+                      <span
+                        className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em]"
+                        style={{ color: themeHex }}
+                      >
+                        Ideal para
+                      </span>
+                    </div>
+                    <p className="font-ps-ui text-[13px] text-white/90 leading-snug font-medium">
+                      {house.idealFor}
+                    </p>
+                  </div>
+
+                  {/* Gancho 2: O que destrava na vida real */}
+                  <div className="px-0.5">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
+                      <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em] text-white/55">
+                        O que destrava
+                      </span>
+                    </div>
+                    <p className="font-ps-ui text-[13px] text-white/72 leading-relaxed">
+                      “{house.unlocks}”
+                    </p>
+                  </div>
                 </div>
 
                 {/* Rodapé sutil de ação */}
@@ -354,29 +379,32 @@ export default function HousesGuide() {
 
                       {/* 4 BLOCOS CURTOS E ESCANEÁVEIS */}
                       <div className="flex flex-col gap-2.5 sm:gap-3.5 mb-5 sm:mb-6">
-                        {/* Bloco 1: O que destrava */}
+                        {/* Bloco 1: Ideal para */}
                         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
                           <div className="flex items-center gap-2 mb-1">
-                            <Sparkles className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
+                            <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
+                            <span
+                              className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em]"
+                              style={{ color: themeHex }}
+                            >
+                              Ideal para
+                            </span>
+                          </div>
+                          <p className="font-ps-ui text-[13.5px] sm:text-[15px] text-white/92 leading-relaxed font-medium">
+                            {selectedHouse.idealFor}
+                          </p>
+                        </div>
+
+                        {/* Bloco 2: O que destrava */}
+                        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
                             <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
                               O que destrava
                             </span>
                           </div>
-                          <p className="font-ps-ui text-[13.5px] sm:text-[15px] text-white/90 leading-relaxed">
-                            {selectedHouse.unlocks}
-                          </p>
-                        </div>
-
-                        {/* Bloco 2: Para quem é o ano perfeito */}
-                        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
-                            <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
-                              Para quem é o ano perfeito
-                            </span>
-                          </div>
-                          <p className="font-ps-ui text-[13.5px] sm:text-[15px] text-white/85 leading-relaxed">
-                            {selectedHouse.idealFor}
+                          <p className="font-ps-ui text-[13.5px] sm:text-[15px] text-white/88 leading-relaxed">
+                            “{selectedHouse.unlocks}”
                           </p>
                         </div>
 
