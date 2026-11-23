@@ -21,14 +21,12 @@ export const enrichResultForTier = (
       unlocked_focuses: buildFullMapUnlockedFocuses(),
     };
   }
-  if (tier === "expansao") {
-    return {
-      ...baseResult,
-      unlocked_houses_list: [targetHouse],
-      unlocked_focuses: buildHouseAllFocuses(baseResult.unlocked_focuses, targetHouse),
-    };
-  }
-  return baseResult;
+  return {
+    ...baseResult,
+    all_focuses_unlocked: true,
+    unlocked_houses_list: [targetHouse],
+    unlocked_focuses: buildHouseAllFocuses(baseResult.unlocked_focuses, targetHouse),
+  };
 };
 
 export interface SaveConsultationArgs {

@@ -38,44 +38,56 @@ function DesktopScene({ onSelectMode }: Props) {
 
           {/* Subcopy */}
           <motion.p
-            className="font-ps-ui text-white/80 font-light leading-relaxed mb-9 max-w-lg text-lg drop-shadow-md"
+            className="font-ps-ui text-white/80 font-light leading-relaxed mb-7 max-w-lg text-lg drop-shadow-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.16, duration: 0.5 }}
           >
-            O sistema calcula a cidade exata no mundo para ativar a mudança que você quer viver nos próximos 12 meses.
+            Escolha o que quer viver nos próximos 12 meses ou teste uma cidade para o seu aniversário.
           </motion.p>
 
-          {/* Main CTA */}
-          <motion.button
-            onClick={() => onSelectMode("futuro")}
-            className="h-15 py-4 px-11 rounded-xl font-ps-display font-bold tracking-[0.08em] text-base lg:text-lg hover:scale-[1.03] hover:bg-[#E5C158] active:scale-95 transition-all mb-12 flex items-center justify-center gap-3"
-            style={{
-              background: "#C9A227",
-              color: "#02050A",
-              boxShadow: "0 10px 36px rgba(201,162,39,0.34)",
-            }}
+          {/* Main CTA + Direct 12 Houses Trailer Button */}
+          <motion.div
+            className="flex flex-wrap items-center gap-3.5 mb-10"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.22, duration: 0.45 }}
           >
-            DESCOBRIR MEU DESTINO
-          </motion.button>
+            <button
+              onClick={() => onSelectMode("futuro")}
+              className="h-14 py-4 px-9 rounded-xl font-ps-display font-bold tracking-[0.06em] text-base lg:text-lg hover:scale-[1.02] hover:bg-[#E5C158] active:scale-95 transition-all flex items-center justify-center gap-3"
+              style={{
+                background: "#C9A227",
+                color: "#02050A",
+                boxShadow: "0 10px 36px rgba(201,162,39,0.34)",
+              }}
+            >
+              PLANEJAR PRÓXIMO ANIVERSÁRIO
+            </button>
 
-          {/* Secondary Paths - Premium Cards */}
+            <Link
+              to="/app/trailer?house=1"
+              className="h-14 px-6 rounded-xl border border-[#C9A227]/45 bg-[#08111F]/90 hover:bg-[#C9A227]/15 text-[#F5DE98] font-ps-ui text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all backdrop-blur-xl"
+            >
+              <span>Ver Explicação das 12 Casas</span>
+              <span>→</span>
+            </Link>
+          </motion.div>
+
+          {/* Secondary Paths - Simple & Direct */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.45 }}
             className="max-w-lg"
           >
-            <p className="font-ps-ui text-[11px] text-white/55 uppercase tracking-[0.28em] font-medium mb-3.5">
-              Explorar outros momentos
+            <p className="font-ps-ui text-[11px] text-white/55 uppercase tracking-[0.24em] font-medium mb-3">
+              Ou consulte onde você já passou seu aniversário:
             </p>
             <div className="flex gap-4">
               {[
-                { id: "presente" as Mode, label: "Presente", sub: "A energia do seu ano atual", border: "border-[#10B981]/35 hover:border-[#10B981]/70", text: "text-[#A7F3D0]" },
-                { id: "passado" as Mode, label: "Passado", sub: "Reveja aniversários anteriores", border: "border-[#94A3B8]/35 hover:border-[#94A3B8]/70", text: "text-[#E2E8F0]" },
+                { id: "presente" as Mode, label: "Meu Ano Atual", sub: "Onde passei meu último aniversário", border: "border-[#10B981]/35 hover:border-[#10B981]/70", text: "text-[#A7F3D0]" },
+                { id: "passado" as Mode, label: "Aniversário Passado", sub: "Conferir um ano que já passou", border: "border-[#94A3B8]/35 hover:border-[#94A3B8]/70", text: "text-[#E2E8F0]" },
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -131,21 +143,21 @@ function MobileTimeline({ onSelectMode }: Props) {
 
           {/* Subcopy */}
           <motion.p
-            className="font-ps-ui text-white/80 font-light leading-relaxed mb-7 max-w-sm drop-shadow"
+            className="font-ps-ui text-white/80 font-light leading-relaxed mb-5 max-w-sm drop-shadow"
             style={{ fontSize: "clamp(14px, 3.8vw, 15.5px)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.16, duration: 0.5 }}
           >
-            O sistema calcula a cidade exata no mundo para ativar a mudança que você quer viver nos próximos 12 meses.
+            Escolha o que quer viver nos próximos 12 meses ou teste uma cidade para o seu aniversário.
           </motion.p>
 
           {/* Main CTA */}
           <motion.button
             onClick={() => onSelectMode("futuro")}
-            className="w-full h-14 rounded-xl font-ps-display font-bold tracking-wide flex items-center justify-center gap-2 active:scale-95 transition-all mb-6"
+            className="w-full h-14 rounded-xl font-ps-display font-bold tracking-wide flex items-center justify-center gap-2 active:scale-95 transition-all mb-3"
             style={{
-              fontSize: "0.98rem",
+              fontSize: "0.95rem",
               background: "#C9A227",
               color: "#02050A",
               boxShadow: "0 10px 30px rgba(201,162,39,0.36)",
@@ -154,8 +166,17 @@ function MobileTimeline({ onSelectMode }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.22, duration: 0.45 }}
           >
-            DESCOBRIR MEU DESTINO
+            PLANEJAR PRÓXIMO ANIVERSÁRIO
           </motion.button>
+
+          {/* Direct 12 Houses Trailer Button on Mobile */}
+          <Link
+            to="/app/trailer?house=1"
+            className="w-full h-11 mb-5 rounded-xl border border-[#C9A227]/45 bg-[#08111F]/90 text-[#F5DE98] font-ps-ui text-xs font-semibold uppercase tracking-[0.14em] flex items-center justify-center gap-2 active:scale-95 transition-all backdrop-blur-xl"
+          >
+            <span>Ver Explicação das 12 Casas</span>
+            <span>→</span>
+          </Link>
 
           {/* Secondary Paths */}
           <motion.div
@@ -163,13 +184,13 @@ function MobileTimeline({ onSelectMode }: Props) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.28, duration: 0.45 }}
           >
-            <p className="font-ps-ui text-[10px] text-white/55 uppercase tracking-[0.25em] text-center mb-3">
-              Explorar outros momentos
+            <p className="font-ps-ui text-[10px] text-white/55 uppercase tracking-[0.22em] text-center mb-2.5">
+              Ou veja onde você já passou:
             </p>
             <div className="flex gap-3">
               {[
-                { id: "presente" as Mode, label: "Presente", sub: "Ano Atual", border: "border-[#10B981]/30 hover:border-[#10B981]/60", text: "text-[#A7F3D0]" },
-                { id: "passado" as Mode, label: "Passado", sub: "Anos Anteriores", border: "border-[#94A3B8]/35 hover:border-[#94A3B8]/65", text: "text-[#E2E8F0]" },
+                { id: "presente" as Mode, label: "Meu Ano Atual", sub: "Último Aniversário", border: "border-[#10B981]/30 hover:border-[#10B981]/60", text: "text-[#A7F3D0]" },
+                { id: "passado" as Mode, label: "Ano Passado", sub: "Anos Anteriores", border: "border-[#94A3B8]/35 hover:border-[#94A3B8]/65", text: "text-[#E2E8F0]" },
               ].map((opt) => (
                 <button
                   key={opt.id}

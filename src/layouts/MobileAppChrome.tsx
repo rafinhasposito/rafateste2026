@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Compass, Scroll, User, ChevronLeft, Sparkles, BookOpen, Coins } from "lucide-react";
+import { Compass, Scroll, User, ChevronLeft, Crown, BookOpen, Coins } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -8,14 +8,13 @@ export function MobileAppChrome() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // The bottom bar appears on main app views including dashboard and result preview
-  const showBottomBar = ["/", "/history", "/perfil", "/tecnologia", "/dashboard", "/v3-preview"].some(
-    (p) => location.pathname === p || location.pathname.startsWith("/v3-preview")
+  // The bottom bar appears on main app views including dashboard, 12 houses trailer and result preview
+  const showBottomBar = ["/", "/history", "/perfil", "/tecnologia", "/dashboard", "/v3-preview", "/app/trailer"].some(
+    (p) => location.pathname === p || location.pathname.startsWith("/v3-preview") || location.pathname.startsWith("/app/trailer")
   );
 
   const isHome = location.pathname === "/";
-  const isDashboard = location.pathname === "/dashboard" || location.pathname.startsWith("/v3-preview");
-  const isTecnologia = location.pathname === "/tecnologia";
+  const isHousesTrailer = location.pathname.startsWith("/app/trailer");
   const isOnboarding = location.pathname === "/app/onboarding";
 
   return (
@@ -102,7 +101,22 @@ export function MobileAppChrome() {
               <span className="text-[10px] font-ps-ui font-medium tracking-wide">Descobrir</span>
             </Link>
 
-            {/* 2. Consultas */}
+            {/* 2. As 12 Casas (Trailers) */}
+            <Link
+              to="/app/trailer?house=1"
+              className={cn(
+                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
+                isHousesTrailer ? "text-[#F5DE98]" : "text-[#8E9CAE] hover:text-white"
+              )}
+            >
+              {isHousesTrailer && (
+                <div className="absolute top-0 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#C9A227] to-transparent rounded-full" />
+              )}
+              <Crown className="w-5 h-5 text-[#C9A227]" />
+              <span className="text-[10px] font-ps-ui font-semibold tracking-wide">As 12 Casas</span>
+            </Link>
+
+            {/* 3. Consultas */}
             <Link
               to="/history"
               className={cn(
@@ -115,21 +129,6 @@ export function MobileAppChrome() {
               )}
               <Scroll className="w-5 h-5" />
               <span className="text-[10px] font-ps-ui font-medium tracking-wide">Consultas</span>
-            </Link>
-
-            {/* 3. Como Funciona */}
-            <Link
-              to="/tecnologia"
-              className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
-                isTecnologia ? "text-[#F5DE98]" : "text-[#8E9CAE] hover:text-white"
-              )}
-            >
-              {isTecnologia && (
-                <div className="absolute top-0 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#C9A227] to-transparent rounded-full" />
-              )}
-              <Sparkles className="w-5 h-5 text-[#C9A227]" />
-              <span className="text-[10px] font-ps-ui font-medium tracking-wide">Como Funciona</span>
             </Link>
 
             {/* 4. Conta */}

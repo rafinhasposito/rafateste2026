@@ -61,39 +61,39 @@ function getPackageChecklist(credits: number): {
 } {
   if (credits <= 1) {
     return {
-      badge: "Crédito Avulso • 1 Casa",
-      displayTitle: "1 Casa Avulsa",
-      subtitle: "Para revelar 1 Casa ou Cidade escolhida (já com o 1º Foco Principal incluso).",
+      badge: "Crédito Avulso • 1 Casa Completa",
+      displayTitle: "1 Casa ou Cidade",
+      subtitle: "Para consultar 1 Cidade ou revelar as melhores cidades de 1 Casa (já com todas as 8 áreas da vida liberadas).",
       ctaLabel: "Comprar 1 Crédito Avulso",
       bullets: [
-        "Libera 1 Casa ou Cidade escolhida",
-        "Inclui 1º Foco Principal + Rotas da Casa",
-        "Ou abre +1 Casa / +1 Foco avulso no mapa",
+        "Libera 1 Casa ou 1 Cidade escolhida",
+        "Inclui TODAS as 8 áreas da vida liberadas de graça",
+        "Rotas principais + leitura de 12 meses completa",
       ],
     };
   }
   if (credits <= 5) {
     return {
-      badge: "Passe Expansão • Casa + Focos",
-      displayTitle: "Pacote Expansão",
-      subtitle: "Passe válido para qualquer consulta: libera 1 Casa escolhida com TODOS os Focos desbloqueados.",
-      ctaLabel: "Escolher Pacote Expansão",
+      badge: "3 Consultas • Comparar Destinos",
+      displayTitle: "Pacote 3 Casas / Cidades",
+      subtitle: "Para testar até 3 Cidades diferentes ou desbloquear 3 Casas completas (todas com as 8 áreas da vida abertas).",
+      ctaLabel: "Escolher Pacote 3 Consultas",
       bullets: [
-        "Desbloqueia 1 Casa escolhida + TODOS os 8 Focos",
-        "Serve para qualquer consulta que você escolher",
-        "Abre todas as áreas da vida naquela Casa de uma vez",
+        "Libera 3 Casas ou 3 Cidades completas à sua escolha",
+        "Inclui TODAS as 8 áreas da vida liberadas em cada uma",
+        "Perfeito para comparar 3 destinos de aniversário",
       ],
     };
   }
   return {
     badge: "Super Promoção • Acesso Total",
-    displayTitle: "Mapa Completo",
-    subtitle: "Passe válido para qualquer consulta: desbloqueia TODAS as 12 Casas + TODOS os Focos de uma só vez.",
-    ctaLabel: "Desbloquear Mapa Completo",
+    displayTitle: "Mapa Completo (12 Casas)",
+    subtitle: "Desbloqueia TODAS as 12 Casas do seu aniversário de uma só vez (com todas as 8 áreas da vida abertas).",
+    ctaLabel: "Desbloquear Todas as 12 Casas",
     bullets: [
-      "Libera TODAS as 12 Casas do seu aniversário",
-      "Inclui TODOS os 8 Focos em todas as 12 Casas",
-      "Na consulta escolhida, o sistema já libera TUDO",
+      "Libera TODAS as 12 Casas do seu aniversário de uma vez",
+      "Inclui TODAS as 8 áreas da vida em todas as 12 Casas",
+      "Visão 360º completa de todos os seus destinos no mundo",
     ],
   };
 }

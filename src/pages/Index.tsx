@@ -93,22 +93,16 @@ const modeOptions = [
 
 const pathOptions = [
   {
-    id: "cidade" as SearchPath,
-    icon: MapPin,
-    title: "Por Cidade",
-    desc: "Já tenho um destino em mente.",
-  },
-  {
     id: "casa" as SearchPath,
     icon: Crown,
-    title: "Por Área da Vida",
-    desc: "Quero focar em dinheiro, amor, carreira ou saúde.",
+    title: "Quero descobrir minha melhor cidade",
+    desc: "Escolha o que quer viver (Dinheiro, Amor, Carreira, Saúde...) e veja os melhores destinos.",
   },
   {
-    id: "intencao" as SearchPath,
-    icon: Scroll,
-    title: "Por Objetivo do Ano",
-    desc: "Sei o que quero viver e quero descobrir as melhores cidades.",
+    id: "cidade" as SearchPath,
+    icon: MapPin,
+    title: "Já tenho uma cidade em mente",
+    desc: "Digite qualquer cidade do mundo e veja como será seu ano se passar o aniversário lá.",
   },
 ];
 
@@ -196,6 +190,10 @@ const Index = () => {
       if (targetPath && ["cidade", "casa", "intencao"].includes(targetPath)) {
         setSearchPath(targetPath);
         setStep(3);
+      } else if (targetMode === "presente" || targetMode === "passado") {
+        // Presente e Passado pulam o menu intermediário e abrem direto o campo da cidade!
+        setSearchPath("cidade");
+        setStep(3);
       } else {
         setStep(2);
       }
@@ -254,14 +252,24 @@ const Index = () => {
       navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${m}`)}`);
       return;
     }
-    // 4. Tudo OK → ir direto para o formulário
+    // 4. Tudo OK → Presente e Passado abrem direto o campo da cidade (1 passo só!)
     setMode(m);
-    setSearchPath(null);
     const activeBirthDate = profile?.birth_date || birthdate;
     const currentSolar = getCurrentSolarYear(activeBirthDate);
-    if (m === "presente") setYear(currentSolar);
-    else if (m === "passado") setYear(String(Number(currentSolar) - 1));
-    else setYear(getNextBirthdayYear(activeBirthDate));
+    if (m === "presente") {
+      setYear(currentSolar);
+      setSearchPath("cidade");
+      setStep(3);
+      return;
+    }
+    if (m === "passado") {
+      setYear(String(Number(currentSolar) - 1));
+      setSearchPath("cidade");
+      setStep(3);
+      return;
+    }
+    setYear(getNextBirthdayYear(activeBirthDate));
+    setSearchPath(null);
     setStep(2);
   };
 
@@ -456,44 +464,21 @@ const Index = () => {
                 );
               })()}
 
-              {/* Cards: Luxury Majestic Cards Adaptados ao Modo e com Respiro Mobile/Web */}
-              <div className="flex flex-col gap-4 sm:gap-5 md:grid md:grid-cols-3 md:gap-6 w-full">
+              {/* Cards: 2 Escolhas Diretas e Zero Confusão */}
+              <div className="flex flex-col gap-4 sm:gap-5 md:grid md:grid-cols-2 md:gap-6 w-full max-w-4xl">
                 {(() => {
                    const theme = mode ? modeThemes[mode] : modeThemes.futuro;
                    return pathOptions.map((opt) => {
                      const Icon = opt.icon;
-                     const cardDesc =
-                        mode === "passado"
-                          ? opt.id === "cidade"
-                            ? "Digite a cidade onde você passou um aniversário anterior e veja qual área da sua vida ela ativou naquele ano."
-                            : opt.id === "casa"
-                            ? "Descubra quais cidades teriam ativado dinheiro, amor, carreira ou saúde naquele ano específico."
-                            : "Veja onde teria sido o melhor lugar do mundo para viver o que você buscava naquele ano."
-                          : mode === "presente"
-                          ? opt.id === "cidade"
-                            ? "Informe a cidade onde você passou seu último aniversário para ver a leitura completa do seu ano atual."
-                            : opt.id === "casa"
-                            ? "Veja quais cidades ativam dinheiro, amor, carreira ou saúde na configuração do seu ano atual."
-                            : "Compare onde seus objetivos atuais estariam mais favorecidos neste ciclo."
-                          : opt.id === "cidade"
-                          ? "Já tem uma viagem ou cidade em mente? Veja o que passar a virada do seu aniversário lá ativa no seu ano."
-                          : opt.id === "casa"
-                          ? "Escolha a área que você quer priorizar agora: dinheiro, amor, carreira, saúde, visibilidade ou recomeço."
-                          : "Diga o que você quer viver nos próximos 12 meses e descubra as melhores cidades do mundo para isso.";
-                     
+                     const cardDesc = opt.desc;
                      const cardTag =
-                        opt.id === "cidade"
-                          ? mode === "passado" ? "Cidade onde passei" : mode === "presente" ? "Último aniversário" : "Já tenho destino"
-                          : opt.id === "casa"
-                          ? "12 Áreas (Casas)"
-                          : "Metas & Desejos";
-
+                        opt.id === "casa"
+                          ? "Recomendado • 12 Casas"
+                          : "Testar um Destino";
                      const cardAction =
-                        opt.id === "cidade"
-                          ? mode === "passado" ? "Rever Cidade" : mode === "presente" ? "Ler Meu Ano Atual" : "Testar uma Cidade"
-                          : opt.id === "casa"
-                          ? "Escolher Área da Vida"
-                          : "Definir Objetivo";
+                        opt.id === "casa"
+                          ? "Escolher pelas 12 Casas"
+                          : "Digitar uma Cidade";
 
                      return (
                         <motion.button
@@ -501,13 +486,12 @@ const Index = () => {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectPath(opt.id)}
-                          className="relative w-full overflow-hidden rounded-3xl border backdrop-blur-2xl transition-all duration-300 group flex flex-col justify-between text-left p-5 sm:p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.10),0_16px_40px_rgba(0,0,0,0.65)]"
+                          className="relative w-full overflow-hidden rounded-3xl border backdrop-blur-2xl transition-all duration-300 group flex flex-col justify-between text-left p-6 sm:p-7 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.10),0_16px_40px_rgba(0,0,0,0.65)]"
                           style={{
-                            borderColor: `rgba(${theme.rgb}, 0.36)`,
+                            borderColor: `rgba(${theme.rgb}, 0.42)`,
                             background: theme.cardBg,
                           }}
                         >
-                          {/* Filete superior de luz do modo ativo */}
                           <div
                             className="absolute top-0 inset-x-0 h-[1.5px] transition-opacity duration-500"
                             style={{
@@ -515,10 +499,9 @@ const Index = () => {
                             }}
                           />
                           
-                          {/* Top Row: Ícone + Categoria Tag */}
-                          <div className="w-full flex items-center justify-between mb-3.5 md:mb-5">
+                          <div className="w-full flex items-center justify-between mb-4">
                             <div
-                              className="w-11 h-11 md:w-14 md:h-14 rounded-2xl border flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
+                              className="w-12 h-12 rounded-2xl border flex items-center justify-center group-hover:scale-105 transition-transform duration-300"
                               style={{
                                 borderColor: `rgba(${theme.rgb}, 0.42)`,
                                 background: `linear-gradient(135deg, rgba(${theme.rgb}, 0.22) 0%, rgba(${theme.rgb}, 0.05) 100%)`,
@@ -526,14 +509,14 @@ const Index = () => {
                                 boxShadow: `0 0 20px rgba(${theme.rgb}, 0.16)`,
                               }}
                             >
-                              <Icon className="w-5 h-5 md:w-6 md:h-6" strokeWidth={1.75} />
+                              <Icon className="w-6 h-6" strokeWidth={1.75} />
                             </div>
 
                             <span
-                              className="px-3 py-1 rounded-full border text-[9px] uppercase tracking-[0.18em] font-semibold"
+                              className="px-3 py-1 rounded-full border text-[10px] uppercase tracking-[0.16em] font-semibold"
                               style={{
-                                borderColor: `rgba(${theme.rgb}, 0.28)`,
-                                backgroundColor: `rgba(${theme.rgb}, 0.10)`,
+                                borderColor: `rgba(${theme.rgb}, 0.32)`,
+                                backgroundColor: `rgba(${theme.rgb}, 0.12)`,
                                 color: theme.light,
                               }}
                             >
@@ -541,27 +524,31 @@ const Index = () => {
                             </span>
                           </div>
 
-                          {/* Conteúdo textual com respiro nobre */}
-                          <div className="flex-1 w-full mb-4 md:mb-6">
-                            <h3 className="font-ps-display text-xl sm:text-2xl md:text-2xl text-white font-medium mb-1.5 md:mb-2.5 tracking-wide transition-colors">
+                          <div className="flex-1 w-full mb-5">
+                            <h3 className="font-ps-display text-2xl sm:text-3xl text-white font-normal mb-2 tracking-tight">
                               {opt.title}
                             </h3>
-                            <p className="font-ps-ui text-white/75 text-xs sm:text-sm font-light leading-relaxed">
+                            <p className="font-ps-ui text-white/75 text-sm font-light leading-relaxed">
                               {cardDesc}
                             </p>
                           </div>
 
-                          {/* Botão de ação explícito luxuoso */}
                           <div
-                            className="w-full py-2.5 md:py-3 px-4 rounded-xl border flex items-center justify-between text-[11px] md:text-xs font-ps-ui uppercase tracking-[0.16em] font-semibold transition-all"
+                            className="w-full py-3.5 px-5 rounded-xl border flex items-center justify-between text-xs font-ps-ui uppercase tracking-[0.16em] font-bold transition-all"
                             style={{
-                              borderColor: `rgba(${theme.rgb}, 0.34)`,
-                              background: `linear-gradient(90deg, rgba(${theme.rgb}, 0.16) 0%, rgba(${theme.rgb}, 0.08) 50%, rgba(${theme.rgb}, 0.16) 100%)`,
-                              color: theme.light,
+                              borderColor: `rgba(${theme.rgb}, 0.45)`,
+                              background:
+                                opt.id === "casa"
+                                  ? "#C9A227"
+                                  : `linear-gradient(90deg, rgba(${theme.rgb}, 0.18) 0%, rgba(${theme.rgb}, 0.10) 100%)`,
+                              color: opt.id === "casa" ? "#02050A" : theme.light,
                             }}
                           >
                             <span>{cardAction}</span>
-                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ color: theme.light }} />
+                            <ChevronRight
+                              className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                              style={{ color: opt.id === "casa" ? "#02050A" : theme.light }}
+                            />
                           </div>
                         </motion.button>
                      );
@@ -569,26 +556,30 @@ const Index = () => {
                 })()}
               </div>
 
-              {/* Guia / Onboarding Banner de Apoio */}
-              <div className="w-full mt-8 p-4 sm:p-5 rounded-2xl border border-white/10 bg-[#070E1A]/80 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-lg">
+              {/* Atalho Direto para assistir aos Trailers das 12 Casas */}
+              <div className="w-full max-w-4xl mt-6 p-4 sm:p-5 rounded-2xl border border-[#C9A227]/35 bg-[#070E1A]/90 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left shadow-lg">
                 <div>
-                  <h4 className="text-sm font-ps-display text-white tracking-wide">Primeira vez por aqui?</h4>
-                  <p className="text-xs font-ps-ui text-white/60 mt-0.5">Veja o guia rápido de 1 minuto ou entenda como funciona o cálculo.</p>
+                  <h4 className="text-base font-ps-display text-white">
+                    Quer entender o que significa cada uma das 12 Casas?
+                  </h4>
+                  <p className="text-xs font-ps-ui text-white/65 mt-0.5">
+                    Assista aos trailers interativos da Casa 1 à Casa 12 antes de escolher.
+                  </p>
                 </div>
-                <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
                   <Link 
-                    to="/app/onboarding" 
-                    className="px-3.5 py-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-ps-ui font-medium transition-all active:scale-95 flex items-center gap-1.5"
+                    to="/app/trailer?house=1" 
+                    className="px-4 py-2.5 rounded-xl bg-[#C9A227]/20 hover:bg-[#C9A227] border border-[#C9A227]/50 text-[#F5DE98] hover:text-[#02050A] text-xs font-ps-ui font-bold uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1.5"
                   >
-                    <Compass className="w-3.5 h-3.5 text-[#C9A227]" /> 
-                    <span>Guia Rápido</span>
+                    <Crown className="w-3.5 h-3.5" /> 
+                    <span>Ver Trailers das 12 Casas →</span>
                   </Link>
                   <Link 
-                    to="/tecnologia" 
-                    className="px-3.5 py-2 rounded-xl border border-[#C9A227]/40 bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#F5DE98] text-xs font-ps-ui font-medium transition-all active:scale-95 flex items-center gap-1.5"
+                    to="/app/onboarding" 
+                    className="px-3.5 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-ps-ui font-medium transition-all active:scale-95 flex items-center gap-1.5"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-[#E5C158]" /> 
-                    <span>Como Funciona</span>
+                    <Compass className="w-3.5 h-3.5 text-[#C9A227]" /> 
+                    <span>Guia Rápido (1 min)</span>
                   </Link>
                 </div>
               </div>
@@ -622,16 +613,26 @@ const Index = () => {
 
             <div className="w-full max-w-5xl mx-auto px-5 sm:px-8 flex flex-col items-center relative z-10">
 
-              {/* ── Nav Row — Voltar + Modo Ativo ── */}
+              {/* ── Nav Row — Voltar + Barra Compacta de Dados & Ano ── */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
-                className="w-full flex items-center justify-between mb-6 md:mb-9">
-                <button onClick={() => setStep(2)}
+                className="w-full flex flex-wrap items-center justify-between gap-3 mb-5">
+                <button
+                  onClick={() => {
+                    if (mode === "presente" || mode === "passado") {
+                      setMode(null);
+                      setSearchPath(null);
+                      setStep(1);
+                    } else {
+                      setStep(2);
+                    }
+                  }}
                   className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.05] hover:bg-white/[0.1] backdrop-blur-xl transition-all duration-300 text-white/80 hover:text-white text-[10px] tracking-[0.2em] uppercase font-semibold active:scale-95">
                   <ChevronLeft className="w-3.5 h-3.5" /> Voltar
                 </button>
+
+                {/* Seletor Compacto de Ano + Modo */}
                 {(() => {
                   const theme = mode ? modeThemes[mode] : modeThemes.futuro;
-                  const ModeIcon = modeOptions.find(m => m.id === mode)?.icon || Compass;
                   return (
                     <div
                       className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-xl"
@@ -640,82 +641,15 @@ const Index = () => {
                         backgroundColor: `rgba(${theme.rgb}, 0.12)`,
                       }}
                     >
-                      <ModeIcon className="w-3.5 h-3.5" style={{ color: theme.light }} />
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: theme.light }}>
-                        {modeOptions.find(m => m.id === mode)?.title}
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: theme.light }}>
+                        {mode === "passado" ? "Aniversário de:" : mode === "presente" ? "Ano Atual:" : "Aniversário:"}
                       </span>
-                    </div>
-                  );
-                })()}
-              </motion.div>
-
-              {/* ── Dados de Nascimento — Apple Glass Card ── */}
-              {isNatalProfileComplete(profile) && (() => {
-                const sunSign = profile?.birth_date ? getSunSignFromDate(profile.birth_date) : null;
-                const userCredits = profile?.credits ?? 0;
-                return (
-                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="w-full max-w-4xl flex flex-wrap items-center justify-between gap-4 md:gap-6 px-5 sm:px-8 py-4 sm:py-5 rounded-3xl border mb-6 md:mb-10 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.45)]"
-                    style={{
-                      borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.30)` : 'rgba(201,162,39,0.30)',
-                      background: 'rgba(8, 15, 28, 0.80)'
-                    }}>
-                    <div className="flex flex-wrap gap-6 sm:gap-10">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Viajante</span>
-                        <span className="font-ps-display text-white/95 text-base sm:text-lg tracking-wide">
-                          {profile?.full_name}
-                          {sunSign ? ` • ${sunSign.symbol} ${sunSign.name}` : ""}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Cidade de Nascimento</span>
-                        <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_city}</span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[8px] uppercase tracking-[0.3em] font-bold text-white/45">Data e Horário</span>
-                        <span className="font-ps-ui text-white/75 text-xs sm:text-sm">{profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {userCredits === 0 && (
-                        <Link
-                          to="/credits"
-                          className="px-3 py-1.5 rounded-lg bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] font-ps-ui text-[10px] font-bold uppercase tracking-[0.14em] transition-all"
-                        >
-                          ⚡ Ativar Créditos
-                        </Link>
-                      )}
-                      <button onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
-                        className="text-[10px] uppercase tracking-[0.2em] font-bold hover:scale-105 transition-transform"
-                        style={{ color: activeTheme ? activeTheme.light : '#F5DE98' }}>
-                        Editar
-                      </button>
-                    </div>
-                  </motion.div>
-                );
-              })()}
-
-              {/* ── ANO HERO — Design Luxo Adaptado à Cor do Modo ── */}
-              {(() => {
-                const theme = mode ? modeThemes[mode] : modeThemes.futuro;
-                return (
-                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-                    className="flex flex-col items-center mb-6 md:mb-10 relative w-full">
-                    <span className="text-[10px] uppercase tracking-[0.42em] font-bold mb-2 md:mb-3" style={{ color: theme.light }}>
-                      {mode === "passado" ? "Ano que Você Quer Rever" : mode === "presente" ? "Seu Ano Atual" : "Ano do Seu Aniversário"}
-                    </span>
-                    <div className="relative flex items-center justify-center gap-3 sm:gap-6">
                       {mode !== "presente" && (
                         <button
                           type="button"
                           aria-label="Ano anterior"
                           onClick={() => setYear(String((parseInt(year, 10) || new Date().getFullYear()) - 1))}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border bg-[#081120]/90 hover:bg-[#101F38] flex items-center justify-center text-xl font-light transition-all active:scale-90 shadow-lg shrink-0"
-                          style={{
-                            borderColor: `rgba(${theme.rgb}, 0.40)`,
-                            color: theme.light,
-                          }}
+                          className="w-6 h-6 rounded-full border border-white/20 bg-black/40 hover:bg-white/10 flex items-center justify-center text-xs font-bold text-white"
                         >
                           −
                         </button>
@@ -723,63 +657,98 @@ const Index = () => {
                       <input
                         type="number"
                         aria-label="Ano do aniversário"
-                        className="year-hero-input text-center text-6xl sm:text-8xl md:text-[120px] font-ps-display bg-transparent border-b outline-none font-bold tracking-tight leading-none w-44 sm:w-64 md:w-80 py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        style={{
-                          background: 'transparent',
-                          color: theme.light,
-                          borderColor: `rgba(${theme.rgb}, 0.35)`,
-                          textShadow: `0 4px 32px rgba(${theme.rgb}, 0.35)`,
-                        }}
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
                         disabled={mode === "presente"}
+                        className="w-14 text-center font-ps-display text-base font-bold bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        style={{ color: theme.light }}
                       />
                       {mode !== "presente" && (
                         <button
                           type="button"
                           aria-label="Próximo ano"
                           onClick={() => setYear(String((parseInt(year, 10) || new Date().getFullYear()) + 1))}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border bg-[#081120]/90 hover:bg-[#101F38] flex items-center justify-center text-xl font-light transition-all active:scale-90 shadow-lg shrink-0"
-                          style={{
-                            borderColor: `rgba(${theme.rgb}, 0.40)`,
-                            color: theme.light,
-                          }}
+                          className="w-6 h-6 rounded-full border border-white/20 bg-black/40 hover:bg-white/10 flex items-center justify-center text-xs font-bold text-white"
                         >
                           +
                         </button>
                       )}
                     </div>
-                    {mode === "presente" ? (
-                      <div className="mt-3 px-4 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
-                        <span className="text-[9px] uppercase tracking-widest text-white/60">Ano Atual</span>
-                      </div>
-                    ) : (
-                      <span className="mt-2 text-[10px] font-ps-ui text-white/45 tracking-wide">
-                        Use os botões − e + ou toque no número para mudar o ano
+                  );
+                })()}
+              </motion.div>
+
+              {/* ── Pílula Compacta de Dados de Nascimento (1 linha limpa) ── */}
+              {isNatalProfileComplete(profile) && (() => {
+                const sunSign = profile?.birth_date ? getSunSignFromDate(profile.birth_date) : null;
+                const userCredits = profile?.credits ?? 0;
+                return (
+                  <div
+                    className="w-full max-w-4xl flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5 rounded-2xl border mb-6 backdrop-blur-xl text-xs font-ps-ui"
+                    style={{
+                      borderColor: activeTheme ? `rgba(${activeTheme.rgb}, 0.25)` : 'rgba(201,162,39,0.25)',
+                      background: 'rgba(8, 15, 28, 0.75)'
+                    }}
+                  >
+                    <div className="flex flex-wrap items-center gap-2 text-white/85">
+                      <span className="font-semibold text-white">{profile?.full_name}</span>
+                      {sunSign && <span className="text-[#F5DE98]">• {sunSign.symbol} {sunSign.name}</span>}
+                      <span className="text-white/55">• 📍 {profile?.birth_city}</span>
+                      <span className="text-white/55 hidden sm:inline">
+                        • {profile?.birth_date?.split('-').reverse().join('/')} às {profile?.birth_time?.slice(0,5)}
                       </span>
-                    )}
-                  </motion.div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {userCredits === 0 && (
+                        <Link
+                          to="/credits"
+                          className="px-2.5 py-1 rounded-lg bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] text-[10px] font-bold uppercase tracking-wider"
+                        >
+                          ⚡ Ativar Créditos
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => navigate(`/perfil?returnTo=${encodeURIComponent(`/?mode=${mode}&path=${searchPath}`)}`)}
+                        className="text-[11px] font-semibold underline hover:text-white"
+                        style={{ color: activeTheme ? activeTheme.light : '#F5DE98' }}
+                      >
+                        Alterar dados
+                      </button>
+                    </div>
+                  </div>
                 );
               })()}
 
-              {/* ── Pergunta Adaptada ao Modo ── */}
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="w-full text-center mb-6 md:mb-10 max-w-3xl">
+              {/* ── Pergunta Direta e Autoexplicativa ── */}
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+                className="w-full text-center mb-6 max-w-3xl">
                 <h1 className="text-2xl sm:text-4xl md:text-5xl font-ps-display text-white leading-tight tracking-tight drop-shadow-2xl">
                   {searchPath === 'cidade'
                     ? mode === 'passado'
-                      ? `Onde você passou seu aniversário em ${year}?`
+                      ? `Em qual cidade você passou seu aniversário em ${year}?`
                       : mode === 'presente'
-                      ? 'Onde você passou seu último aniversário?'
-                      : 'Qual cidade você quer consultar?'
-                    : searchPath === 'casa'
-                    ? mode === 'passado'
-                      ? `Qual área da vida você quer conferir em ${year}?`
-                      : 'Qual área da vida você quer priorizar?'
-                    : mode === 'passado'
-                    ? `Qual objetivo você buscava viver em ${year}?`
-                    : 'O que você quer viver neste novo ciclo?'}
+                      ? 'Em qual cidade você passou seu último aniversário?'
+                      : 'Digite a cidade que você quer testar:'
+                    : 'Toque na área que você quer viver para ver o Trailer da Casa:'}
                 </h1>
+                {searchPath === 'cidade' && mode === 'futuro' && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchPath('casa')}
+                    className="mt-2.5 text-xs font-ps-ui text-[#F5DE98] hover:underline"
+                  >
+                    Não tem cidade definida? Escolha pelas 12 Casas →
+                  </button>
+                )}
+                {searchPath === 'casa' && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchPath('cidade')}
+                    className="mt-2.5 text-xs font-ps-ui text-[#F5DE98] hover:underline"
+                  >
+                    Já tem uma cidade em mente? Testar por Cidade →
+                  </button>
+                )}
               </motion.div>
 
               {/* ── Campo de busca — Largura ampla e simétrica para grids ── */}

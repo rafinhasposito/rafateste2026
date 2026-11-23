@@ -1267,7 +1267,8 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     || (props.unlockedHousesList !== undefined && props.unlockedHousesList.length >= 12)
     || [1,2,3,4,5,6,7,8,9,10,11,12].every(num => props.isHouseUnlocked ? props.isHouseUnlocked(num) : unlockedItems.includes(num.toString()));
 
-  const hasFreeFirstFocus = !intendedAreaId && !LIFE_AREAS.some(a => unlockedItems.includes(a.id) || (props.unlockedFocuses?.[String(P_DYNAMIC.house)] || []).includes(a.id));
+  // Todos os 8 focos já vêm 100% liberados de graça em qualquer Casa desbloqueada
+  const hasFreeFirstFocus = false;
   const [activeDossierCard, setActiveDossierCard] = useState<number | null>(0);
   const baseHouseId = String(P_DYNAMIC.house) as keyof typeof BASE_HOUSE_PROFILES;
   const houseBaseData = (BASE_HOUSE_PROFILES as any)[baseHouseId];
@@ -1351,7 +1352,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
     return {
       ...area,
       score: finalScore,
-      unlocked: isIntended || isPaidFocus || isLocallyUnlocked,
+      unlocked: true,
       teaser: tCity(focusData.headline) || area.teaser,
       full: focusSummaryText,
       mantra: tCity(focusData.mantra) || area.mantra,
@@ -1642,9 +1643,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                       Casa {P_DYNAMIC.house}
                     </span>
                     <span className="font-ps-display text-3xl sm:text-5xl md:text-6xl lg:text-[68px] text-transparent bg-clip-text bg-gradient-to-r from-[var(--hc)] to-white/70 leading-tight pb-2 tracking-tight max-w-4xl">
-                      {isFutureMode
-                        ? (hasFreeFirstFocus ? "Escolha Seu Foco" : `Foco em ${currentActiveData?.label?.split(" ")[0]}`)
-                        : currentHouseTheme.subtitle}
+                      {currentHouseTheme.subtitle}
                     </span>
                   </h3>
 
@@ -1967,7 +1966,7 @@ export default function AppleResultPreviewV3(props: DestinyResultsProps) {
                   )}
                   
 {/* Área Desbloqueada & Paywall via Acordeão Estilo Mapeamento 360 */}
-                  <div className="w-full mt-4 flex flex-col lg:flex-row gap-6 lg:min-h-[700px] text-left">
+                  <div id="focus-switcher-8-areas" className="w-full mt-4 flex flex-col lg:flex-row gap-6 lg:min-h-[700px] text-left">
                                   {/* COLUNA ESQUERDA: SIDEBAR COM NOME, ÍCONE E STATUS DE CADA FOCO */}
               <div
                 className="hidden lg:flex w-[260px] shrink-0 flex-col gap-2 items-stretch min-h-[700px]"

@@ -381,7 +381,7 @@ const CityLookup = ({ mode, name, birthdate, birthtime, birthPlace, year, onHous
                 </button>
                 <p className="font-ps-ui text-[9px] uppercase tracking-[0.16em] text-white/60 font-semibold flex flex-wrap items-center justify-center gap-2">
                   <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: mode === 'passado' ? '#94A3B8' : mode === 'presente' ? '#10B981' : '#C9A227' }} />
-                  <span>Consome 1 crédito • Libera a Casa desta Cidade + 1º Foco</span>
+                  <span>Consome 1 crédito • Libera a Casa desta Cidade + Todas as 8 Áreas da Vida</span>
                 </p>
               </div>
 

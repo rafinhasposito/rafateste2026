@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Coins, LogOut, Settings, BookOpen, Handshake } from "lucide-react";
+import { Coins, LogOut, Settings, BookOpen, Handshake, Crown, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -62,13 +62,26 @@ export function DesktopWebChrome() {
               Descobrir
             </Link>
             <Link 
-              to="/tecnologia" 
-              className={`text-sm font-ps-ui font-medium transition-colors ${
-                location.pathname === "/tecnologia" ? "text-[#F5DE98]" : "text-white/65 hover:text-white"
+              to="/app/trailer?house=1" 
+              className={`inline-flex items-center gap-1.5 text-sm font-ps-ui font-semibold transition-colors ${
+                location.pathname.startsWith("/app/trailer")
+                  ? "text-[#F5DE98]"
+                  : "text-[#E8D59B]/90 hover:text-[#F5DE98]"
               }`}
             >
-              Como Funciona
+              <Crown className="w-3.5 h-3.5 text-[#C9A227]" />
+              <span>As 12 Casas</span>
             </Link>
+            {session && (
+              <Link 
+                to="/history" 
+                className={`text-sm font-ps-ui font-medium transition-colors ${
+                  location.pathname === "/history" ? "text-[#F5DE98]" : "text-white/65 hover:text-white"
+                }`}
+              >
+                Minhas Consultas
+              </Link>
+            )}
             <Link 
               to={isAffiliate ? "/afiliado" : "/parceiros"} 
               className={`text-sm font-ps-ui font-medium transition-colors ${
@@ -79,16 +92,6 @@ export function DesktopWebChrome() {
             >
               Parceiros
             </Link>
-            {session && (
-              <Link 
-                to="/history" 
-                className={`text-sm font-ps-ui font-medium transition-colors ${
-                  location.pathname === "/history" ? "text-[#F5DE98]" : "text-white/65 hover:text-white"
-                }`}
-              >
-                Consultas Anteriores
-              </Link>
-            )}
           </nav>
         </div>
 
