@@ -1,19 +1,15 @@
-import { useEffect, useState, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Activity,
   ArrowRight,
-  ChevronLeft,
-  ChevronRight,
   Compass,
   Crown,
   Flame,
   Globe,
   HeartHandshake,
   Home,
-  MapPin,
   Megaphone,
   Moon,
   Network,
@@ -22,14 +18,12 @@ import {
   Target,
   Trophy,
   Wallet,
-  X,
   Zap,
 } from "lucide-react";
 import {
   ELEMENT_STYLES,
   HOUSES_SHOWCASE,
   type HouseIconKey,
-  type HouseShowcaseItem,
 } from "@/data/housesShowcase";
 import { houseThemes } from "@/data/houseThemes";
 
@@ -51,19 +45,12 @@ const ICON_MAP: Record<HouseIconKey, typeof Crown> = {
 export default function HousesGuide() {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
-  const [selectedHouseId, setSelectedHouseId] = useState<number | null>(null);
   const [showStickyCta, setShowStickyCta] = useState(false);
-
-  const selectedHouse: HouseShowcaseItem | null =
-    selectedHouseId !== null
-      ? HOUSES_SHOWCASE.find((h) => h.id === selectedHouseId) ?? null
-      : null;
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, []);
 
-  // Show sticky bar only after scrolling past the hero
   useEffect(() => {
     const onScroll = () => {
       setShowStickyCta(window.scrollY > 220);
@@ -72,38 +59,6 @@ export default function HousesGuide() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Lock background scroll & keyboard navigation while Bottom Sheet is open
-  const goPrevHouse = useCallback(() => {
-    setSelectedHouseId((curr) => (curr === null ? null : curr === 1 ? 12 : curr - 1));
-  }, []);
-
-  const goNextHouse = useCallback(() => {
-    setSelectedHouseId((curr) => (curr === null ? null : curr === 12 ? 1 : curr + 1));
-  }, []);
-
-  useEffect(() => {
-    if (selectedHouseId === null) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelectedHouseId(null);
-      else if (e.key === "ArrowLeft") goPrevHouse();
-      else if (e.key === "ArrowRight") goNextHouse();
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [selectedHouseId, goPrevHouse, goNextHouse]);
-
-  const handleActivateHouse = (houseId: number) => {
-    setSelectedHouseId(null);
-    navigate(`/?mode=futuro&path=casa&house=${houseId}`);
-  };
 
   return (
     <div className="min-h-screen bg-[#02050A] text-white pt-20 pb-40 lg:pt-28 lg:pb-32 relative overflow-x-hidden">
@@ -140,12 +95,12 @@ export default function HousesGuide() {
           <p className="font-ps-ui text-sm sm:text-base text-white/70 leading-relaxed max-w-xl mx-auto">
             O seu mapa de nascimento é fixo, mas a cidade onde você passa o
             aniversário destaca qual dessas 12 áreas ganha os holofotes nos
-            próximos 12 meses. Toque em qualquer Casa para explorar o ciclo
-            completo.
+            próximos 12 meses. Toque em qualquer Casa para ver a página
+            completa dela.
           </p>
         </motion.header>
 
-        {/* 2. GRID MOBILE-FIRST DE 12 SUPERPODERES */}
+        {/* 2. GRID MOBILE-FIRST DE 12 CASAS (CLIQUE ABRE PÁGINA COMPLETA /casas/:id) */}
         <section
           aria-label="Vitrine das 12 Casas Solares"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"
@@ -159,7 +114,7 @@ export default function HousesGuide() {
               <motion.button
                 key={house.id}
                 type="button"
-                onClick={() => setSelectedHouseId(house.id)}
+                onClick={() => navigate(`/casas/${house.id}`)}
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: Math.min(index * 0.025, 0.28) }}
@@ -263,244 +218,9 @@ export default function HousesGuide() {
         </section>
       </div>
 
-      {/* 3. BOTTOM SHEET (MOBILE) / MODAL LUXURY (DESKTOP) — PORTALED ACIMA DO CHROME */}
-      {typeof document !== "undefined" &&
-        createPortal(
-          <AnimatePresence>
-            {selectedHouse && (() => {
-              const SelectedIcon = ICON_MAP[selectedHouse.iconKey];
-              const houseTheme = houseThemes[selectedHouse.id];
-              const themeHex = houseTheme?.themeColor || "#C9A227";
-              const elStyle = ELEMENT_STYLES[selectedHouse.element];
-              const energyPoints = houseTheme?.energyPoints || [];
-
-              return (
-                <motion.div
-                  key="house-sheet-backdrop"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={() => setSelectedHouseId(null)}
-                  className="fixed inset-0 z-[100] bg-black/78 backdrop-blur-md flex items-end md:items-center justify-center md:p-6"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="house-sheet-title"
-                >
-                  <motion.div
-                    key={`sheet-card-${selectedHouse.id}`}
-                    initial={prefersReducedMotion ? { opacity: 0 } : { y: 48, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0 }}
-                    transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="relative w-full md:max-w-xl max-h-[90svh] flex flex-col overflow-hidden rounded-t-[28px] md:rounded-[30px] border-t md:border border-white/15 bg-[#070D19]/98 shadow-[0_-24px_80px_rgba(0,0,0,0.9)]"
-                  >
-                    {/* Brilho sutil no topo na cor da Casa */}
-                    <div
-                      className="pointer-events-none absolute inset-x-0 top-0 h-40 opacity-25"
-                      style={{
-                        background: `radial-gradient(ellipse 85% 90% at 50% 0%, ${themeHex}, transparent 75%)`,
-                      }}
-                    />
-
-                    {/* Handle bar mobile */}
-                    <div className="md:hidden flex justify-center pt-2.5 pb-1 relative z-10 shrink-0">
-                      <div className="w-11 h-1.5 rounded-full bg-white/20" />
-                    </div>
-
-                    {/* Área rolável do dossiê */}
-                    <div className="relative z-10 flex-1 overflow-y-auto px-5 pt-3 pb-4 sm:px-7 sm:pt-7 sm:pb-5">
-                      {/* Top controls: Prev / Next + Close */}
-                      <div className="flex items-center justify-between gap-2 mb-3.5 sm:mb-5">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-9 h-9 rounded-xl flex items-center justify-center border"
-                            style={{
-                              backgroundColor: `${themeHex}22`,
-                              borderColor: `${themeHex}50`,
-                            }}
-                          >
-                            <SelectedIcon className="w-4.5 h-4.5" style={{ color: themeHex }} />
-                          </div>
-                          <span
-                            className="font-mono text-xs font-bold uppercase tracking-[0.18em]"
-                            style={{ color: themeHex }}
-                          >
-                            Casa {selectedHouse.numberLabel}
-                          </span>
-                          <span
-                            className="px-2 py-0.5 rounded-full text-[10px] font-ps-ui font-semibold uppercase tracking-[0.12em] border"
-                            style={{
-                              color: elStyle.text,
-                              backgroundColor: elStyle.bg,
-                              borderColor: elStyle.border,
-                            }}
-                          >
-                            {elStyle.label}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={goPrevHouse}
-                            aria-label="Casa anterior"
-                            className="w-9 h-9 rounded-full border border-white/12 bg-white/[0.05] hover:bg-white/[0.12] flex items-center justify-center text-white/80 hover:text-white transition-colors"
-                          >
-                            <ChevronLeft className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={goNextHouse}
-                            aria-label="Próxima Casa"
-                            className="w-9 h-9 rounded-full border border-white/12 bg-white/[0.05] hover:bg-white/[0.12] flex items-center justify-center text-white/80 hover:text-white transition-colors"
-                          >
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedHouseId(null)}
-                            aria-label="Fechar detalhes"
-                            className="w-9 h-9 rounded-full border border-white/12 bg-white/[0.05] hover:bg-white/[0.12] flex items-center justify-center text-white/80 hover:text-white transition-colors ml-1"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Título da Casa */}
-                      <h2
-                        id="house-sheet-title"
-                        className="font-ps-display text-[22px] sm:text-3xl font-bold text-white leading-tight mb-4 sm:mb-5"
-                      >
-                        {selectedHouse.title}
-                      </h2>
-
-                      {/* DOSSIÊ COMPLETO DA CASA (Estruturado e sem promessas deterministas) */}
-                      <div className="flex flex-col gap-3 mb-5 sm:mb-6">
-                        {/* Bloco 1: Perfil & Foco do Ciclo */}
-                        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4 space-y-2.5">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
-                              <span
-                                className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em]"
-                                style={{ color: themeHex }}
-                              >
-                                Perfil
-                              </span>
-                            </div>
-                            <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/92 leading-relaxed font-medium">
-                              {selectedHouse.profile}
-                            </p>
-                          </div>
-                          <div className="pt-2.5 border-t border-white/[0.06]">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
-                              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
-                                Foco do Ciclo
-                              </span>
-                            </div>
-                            <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/82 leading-relaxed">
-                              {selectedHouse.cycleFocus}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Bloco 2: Os 3 Pilares desta Casa */}
-                        {energyPoints.length > 0 && (
-                          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
-                            <div className="flex items-center gap-2 mb-2.5">
-                              <Sparkles className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
-                              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
-                                Pilares da Casa {selectedHouse.numberLabel}
-                              </span>
-                            </div>
-                            <div className="flex flex-col divide-y divide-white/[0.06]">
-                              {energyPoints.map((pt, idx) => (
-                                <div key={idx} className={idx === 0 ? "pb-2.5" : "py-2.5 last:pb-0"}>
-                                  <div className="flex items-baseline gap-2.5">
-                                    <span
-                                      className="font-mono text-[11px] font-bold shrink-0"
-                                      style={{ color: themeHex }}
-                                    >
-                                      0{idx + 1}
-                                    </span>
-                                    <div className="min-w-0">
-                                      <h3 className="font-ps-display text-sm font-bold text-white leading-snug mb-0.5">
-                                        {pt.title}
-                                      </h3>
-                                      <p className="font-ps-ui text-[12.5px] sm:text-[13px] text-white/70 leading-relaxed">
-                                        {pt.text}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Bloco 3: Exemplo de Cidade-Símbolo */}
-                        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
-                          <div className="flex items-center gap-2 mb-1">
-                            <MapPin className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
-                            <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
-                              Exemplo de Cidade-Símbolo
-                            </span>
-                          </div>
-                          <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/90 leading-relaxed">
-                            <strong className="text-white font-semibold">
-                              {selectedHouse.symbolCity.name} ({selectedHouse.symbolCity.country})
-                            </strong>{" "}
-                            — {selectedHouse.symbolCity.reason}
-                          </p>
-                          <p className="font-ps-ui text-[11px] text-white/45 mt-1.5">
-                            Exemplo simbólico desta energia. No seu mapa, as cidades reais são calculadas pela sua data e hora de nascimento.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bloco 4: Rodapé fixo na gaveta com CTA sempre visível */}
-                    <div
-                      className="relative z-10 shrink-0 border-t border-white/[0.08] bg-[#070D19]/95 px-5 pt-3.5 sm:px-7 sm:pt-4"
-                      style={{
-                        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)",
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => handleActivateHouse(selectedHouse.id)}
-                        className="w-full min-h-[50px] px-4 sm:px-5 py-3 rounded-2xl font-ps-display font-bold text-[13.5px] sm:text-base tracking-wide bg-[#C9A227] hover:bg-[#E5C158] active:scale-[0.98] text-[#02050A] transition-all flex items-center justify-center gap-2 shadow-[0_12px_34px_rgba(201,162,39,0.34)]"
-                      >
-                        <span>Explorar cidades para a Casa {selectedHouse.numberLabel}</span>
-                        <ArrowRight className="w-4 h-4 shrink-0" />
-                      </button>
-
-                      <div className="mt-2.5 text-center">
-                        <Link
-                          to={`/casas/${selectedHouse.id}`}
-                          onClick={() => setSelectedHouseId(null)}
-                          className="inline-flex items-center gap-1.5 text-xs font-ps-ui text-white/55 hover:text-[#F5DE98] transition-colors py-1"
-                        >
-                          <span>Ver impacto completo nas 8 áreas da vida</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              );
-            })()}
-          </AnimatePresence>,
-          document.body
-        )}
-
-      {/* 5. BARRA FIXA DISCRETA NO RODAPÉ (Aparece após rolar a Hero e some quando a gaveta abre) */}
+      {/* BARRA FIXA DISCRETA NO RODAPÉ (Aparece após rolar a Hero) */}
       <AnimatePresence>
-        {showStickyCta && selectedHouseId === null && (
+        {showStickyCta && (
           <motion.div
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

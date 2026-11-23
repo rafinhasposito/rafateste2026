@@ -12,9 +12,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Compass,
+  MapPin,
+  Target,
+  Zap,
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FOCUS_MATRIX } from "@/data/focusMatrix";
+import { HOUSES_SHOWCASE } from "@/data/housesShowcase";
 import { interpolateCityCopy } from "@/lib/cityCopy";
 import { houseThemes } from "@/data/houseThemes";
 
@@ -61,6 +65,7 @@ export default function HouseDetailGuide() {
   }, [currentHouse]);
 
   const theme = houseThemes[currentHouse] || houseThemes[1];
+  const showcase = HOUSES_SHOWCASE.find((h) => h.id === currentHouse) || HOUSES_SHOWCASE[0];
 
   const houseFocusMap = FOCUS_MATRIX[currentHouse] || {};
   const sortedAreas = [...LIFE_AREAS]
@@ -153,12 +158,66 @@ export default function HouseDetailGuide() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="text-xl md:text-3xl font-ps-display font-light tracking-tight text-white/80 mt-[-30px] md:mt-[-60px]"
           >
-            {theme.subtitle}
+            {showcase.title}
           </motion.h2>
         </motion.div>
 
+        {/* RESUMO RÁPIDO PARA DECISÃO (CLARO EM 5 SEGUNDOS) */}
+        <motion.div
+          key={`summary-${currentHouse}`}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="relative z-20 mt-12 md:mt-16 w-full max-w-5xl mx-auto px-5 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          <div className="rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 text-left">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="w-4 h-4 shrink-0" style={{ color: theme.themeColor }} />
+              <span
+                className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em]"
+                style={{ color: theme.themeColor }}
+              >
+                Perfil
+              </span>
+            </div>
+            <p className="font-ps-ui text-sm text-white/90 leading-relaxed">
+              {showcase.profile}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 text-left">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="w-4 h-4 shrink-0 text-[#F5DE98]" />
+              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/65">
+                Foco do Ciclo
+              </span>
+            </div>
+            <p className="font-ps-ui text-sm text-white/85 leading-relaxed">
+              {showcase.cycleFocus}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 text-left">
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin className="w-4 h-4 shrink-0 text-[#F5DE98]" />
+              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/65">
+                Cidade-Símbolo
+              </span>
+            </div>
+            <p className="font-ps-ui text-sm text-white/90 leading-relaxed">
+              <strong className="text-white font-semibold">
+                {showcase.symbolCity.name} ({showcase.symbolCity.country})
+              </strong>{" "}
+              — {showcase.symbolCity.reason}
+            </p>
+            <p className="font-ps-ui text-[11px] text-white/45 mt-1.5">
+              Referência simbólica; suas cidades reais dependem da sua data e hora de nascimento.
+            </p>
+          </div>
+        </motion.div>
+
         {/* A ENERGIA DO ANO */}
-        <motion.div className="relative z-20 mt-28 max-w-4xl mx-auto px-6">
+        <motion.div className="relative z-20 mt-20 md:mt-24 max-w-4xl mx-auto px-6">
           <span
             style={{ color: theme.themeColor }}
             className="text-[10px] font-bold uppercase tracking-[0.3em] block mb-10 text-center"
@@ -568,18 +627,18 @@ export default function HouseDetailGuide() {
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
             <div>
               <h4 className="font-ps-display text-lg md:text-xl font-bold text-white">
-                Quer saber quais cidades ativam a Casa {currentHouse} no seu mapa?
+                Decidiu que a Casa {String(currentHouse).padStart(2, "0")} faz sentido para o seu próximo ano?
               </h4>
               <p className="font-ps-ui text-xs md:text-sm text-white/60 mt-1">
                 O cálculo usa sua data, hora e cidade de nascimento para encontrar suas coordenadas exatas.
               </p>
             </div>
             <Link
-              to="/?mode=futuro"
+              to={`/?mode=futuro&path=casa&house=${currentHouse}`}
               className="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-ps-ui text-xs font-bold uppercase tracking-[0.16em] bg-[#C9A227] hover:bg-[#E5C158] text-[#02050A] transition-all shadow-[0_8px_28px_rgba(201,162,39,0.28)]"
             >
               <Compass className="w-4 h-4" />
-              <span>Fazer minha consulta</span>
+              <span>Explorar cidades para a Casa {String(currentHouse).padStart(2, "0")}</span>
             </Link>
           </div>
         </div>
