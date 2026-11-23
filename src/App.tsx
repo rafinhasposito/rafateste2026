@@ -20,6 +20,7 @@ import HouseTrailer from "./pages/HouseTrailer";
 import HouseTrailerApp from "./pages/HouseTrailerApp";
 import HousesGuide from "./pages/HousesGuide";
 import HouseDetailGuide from "./pages/HouseDetailGuide";
+import LandingV3 from "./pages/LandingV3";
 import DossierSandbox from "./pages/DossierSandbox";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -137,6 +138,7 @@ const App = () => (
             <Route path="/northstar" element={<NorthStarFlow />} />
             <Route path="/apple-3d" element={<AppleScrollExplosion />} />
             <Route path="/app/onboarding-v2" element={<Suspense fallback={<div className="min-h-screen bg-black" />}><OnboardingV2 /></Suspense>} />
+            <Route path="/v3" element={<LandingV3 />} />
             <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
             <Route path="/v2-preview" element={<AppleResultPreview />} />
