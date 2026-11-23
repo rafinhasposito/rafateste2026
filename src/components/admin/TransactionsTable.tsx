@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle2, RefreshCw, Search, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  Copy,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
 import { isPaidPurchaseType } from "./MetricsDashboard";
 
 interface Tx {
@@ -16,16 +23,30 @@ interface Tx {
   price_brl?: number;
 }
 
+interface PendingOrder {
+  id: string;
+  user_id: string;
+  pricing_config_id: string;
+  amount: number;
+  credits_amount: number;
+  status: string;
+  created_at: string;
+  user_email: string;
+  user_name: string;
+  package_label: string;
+}
+
 interface TransactionsTableProps {
   initialFilter?: string;
   initialSearch?: string;
 }
 
+// Espelha pricing_config de produção (usado só se a tabela não responder)
 const FALLBACK_PRICE_BY_CREDITS: Record<number, number> = {
   1: 19.9,
-  3: 39.9,
-  7: 59.9,
-  12: 59.9,
+  3: 49.9,
+  7: 99.9,
+  12: 99.9,
 };
 
 const fmtBrl = (v: number) =>
@@ -52,6 +73,7 @@ const formatTxTypeBadge = (type: string, amount: number) => {
 
 const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTableProps) => {
   const [txs, setTxs] = useState<Tx[]>([]);
+  const [pendingOrders, setPendingOrders] = useState<PendingOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>(initialFilter || "all");
   const [searchQuery, setSearchQuery] = useState(initialSearch || "");
@@ -59,7 +81,10 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
   const [syncingMp, setSyncingMp] = useState(false);
 
   useEffect(() => {
-    if (initialFilter && ["all", "pago", "gratis", "gastos"].includes(initialFilter)) {
+    if (
+      initialFilter &&
+      ["all", "pago", "pendentes", "gratis", "gastos"].includes(initialFilter)
+    ) {
       setTypeFilter(initialFilter);
     }
   }, [initialFilter]);
@@ -72,7 +97,7 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
 
   const loadTransactions = useCallback(async () => {
     setLoading(true);
-    const [txRes, profilesRes, pricingRes] = await Promise.all([
+    const [txRes, profilesRes, pricingRes, ordersRes] = await Promise.all([
       supabase
         .from("credit_transactions")
         .select("id, user_id, amount, type, description, created_at")
@@ -83,13 +108,16 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
         .select("user_id, email, full_name, display_name"),
       supabase
         .from("pricing_config")
-        .select("key, category, credits, price_brl"),
+        .select("key, label, category, credits, price_brl"),
+      supabase
+        .from("credit_orders")
+        .select("id, user_id, pricing_config_id, amount, credits_amount, status, created_at")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(300),
     ]);
 
-    const profMap = new Map<
-      string,
-      { email: string; name: string }
-    >();
+    const profMap = new Map<string, { email: string; name: string }>();
     (profilesRes.data ?? []).forEach((p: any) => {
       profMap.set(p.user_id, {
         email: p.email ?? "—",
@@ -101,11 +129,14 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
     });
 
     const priceByKey = new Map<string, number>();
+    const labelByKey = new Map<string, string>();
     const priceByCredits = new Map<number, number>();
     (pricingRes.data ?? [])
       .filter((p: any) => p.category === "package" && p.price_brl != null)
       .forEach((p: any) => {
-        priceByKey.set(String(p.key).trim(), Number(p.price_brl));
+        const key = String(p.key).trim();
+        priceByKey.set(key, Number(p.price_brl));
+        labelByKey.set(key, p.label || key);
         priceByCredits.set(Number(p.credits), Number(p.price_brl));
       });
 
@@ -135,7 +166,29 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
       };
     });
 
+    const enrichedOrders: PendingOrder[] = ((ordersRes.data ?? []) as any[]).map(
+      (o) => {
+        const prof = profMap.get(o.user_id);
+        const key = String(o.pricing_config_id || "").trim();
+        return {
+          id: o.id,
+          user_id: o.user_id,
+          pricing_config_id: key,
+          amount: Number(o.amount || 0),
+          credits_amount: Number(o.credits_amount || 0),
+          status: o.status,
+          created_at: o.created_at,
+          user_email: prof?.email ?? "—",
+          user_name: prof?.name ?? "Cliente",
+          package_label:
+            labelByKey.get(key) ||
+            `${o.credits_amount || 1} crédito(s) (${key || "pacote"})`,
+        };
+      }
+    );
+
     setTxs(enriched);
+    setPendingOrders(enrichedOrders);
     setLoading(false);
   }, []);
 
@@ -163,7 +216,9 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
 
       if (cleanId && details.length > 0) {
         const d = details[0];
-        toast.success(`Transação ${d.paymentId}: ${d.outcome} (R$ ${Number(d.amount || 0).toFixed(2)})`);
+        toast.success(
+          `Transação ${d.paymentId}: ${d.outcome} (R$ ${Number(d.amount || 0).toFixed(2)})`
+        );
       } else if (newly > 0) {
         toast.success(
           `${newly} venda(s) aprovada(s) no Mercado Pago foram conciliadas e creditadas!`
@@ -187,10 +242,11 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
     return {
       all: txs.length,
       pago: txs.filter((t) => t.amount > 0 && isPaidPurchaseType(t.type)).length,
+      pendentes: pendingOrders.length,
       gratis: txs.filter((t) => t.amount > 0 && !isPaidPurchaseType(t.type)).length,
       gastos: txs.filter((t) => t.amount < 0).length,
     };
-  }, [txs]);
+  }, [txs, pendingOrders]);
 
   const filtered = useMemo(() => {
     return txs.filter((t) => {
@@ -210,6 +266,23 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
       return true;
     });
   }, [txs, searchQuery, typeFilter]);
+
+  const filteredPending = useMemo(() => {
+    if (!searchQuery.trim()) return pendingOrders;
+    const q = searchQuery.toLowerCase();
+    return pendingOrders.filter(
+      (o) =>
+        o.user_email.toLowerCase().includes(q) ||
+        o.user_name.toLowerCase().includes(q) ||
+        o.package_label.toLowerCase().includes(q) ||
+        o.pricing_config_id.toLowerCase().includes(q)
+    );
+  }, [pendingOrders, searchQuery]);
+
+  const pendingTotalBrl = useMemo(
+    () => filteredPending.reduce((acc, o) => acc + o.amount, 0),
+    [filteredPending]
+  );
 
   if (loading) return <p className="text-white/50 text-sm">Carregando transações…</p>;
 
@@ -263,6 +336,7 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
           {[
             { id: "all", label: `Todas (${counts.all})` },
             { id: "pago", label: `Pagos R$ (${counts.pago})` },
+            { id: "pendentes", label: `Checkouts Pendentes (${counts.pendentes})` },
             { id: "gratis", label: `Cupons / Bônus (${counts.gratis})` },
             { id: "gastos", label: `Consultas (${counts.gastos})` },
           ].map((t) => (
@@ -270,9 +344,11 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
               key={t.id}
               type="button"
               onClick={() => setTypeFilter(t.id)}
-              className={`px-5 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.16em] transition-all duration-300 border ${
+              className={`px-4 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-300 border ${
                 typeFilter === t.id
-                  ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                  ? t.id === "pendentes"
+                    ? "bg-[#F5B041] text-[#050507] border-[#F5B041] shadow-[0_0_20px_rgba(245,176,65,0.28)]"
+                    : "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                   : "bg-[#0A0B10]/80 border-white/10 text-white/50 hover:text-white hover:bg-white/5"
               }`}
             >
@@ -293,72 +369,142 @@ const TransactionsTable = ({ initialFilter, initialSearch }: TransactionsTablePr
         </div>
       </div>
 
-      {/* Lista de Transações */}
-      <div className="space-y-2">
-        {filtered.map((t) => {
-          const badge = formatTxTypeBadge(t.type, t.amount);
-          const isPaid = t.amount > 0 && isPaidPurchaseType(t.type);
+      {/* Lista de Checkouts Pendentes / Carrinhos Abandonados */}
+      {typeFilter === "pendentes" ? (
+        <div className="space-y-3">
+          <div className="p-3.5 rounded-2xl bg-[#F5B041]/10 border border-[#F5B041]/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="text-[#FFF3D1]">
+              <strong>{filteredPending.length}</strong> tentativas de compra geradas no checkout ainda com status <code className="text-[#F5B041]">pending</code>.
+            </span>
+            <span className="font-mono font-bold text-[#F5B041]">
+              Potencial em aberto: {fmtBrl(pendingTotalBrl)}
+            </span>
+          </div>
 
-          return (
-            <div
-              key={t.id}
-              className="border border-white/10 bg-[#0A0B10]/85 rounded-2xl backdrop-blur-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-white/[0.04] transition-colors"
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <span className="text-white/45 font-mono text-[11px] w-28 shrink-0">
-                  {new Date(t.created_at).toLocaleString("pt-BR", {
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
-                </span>
+          <div className="space-y-2">
+            {filteredPending.map((o) => (
+              <div
+                key={o.id}
+                className="border border-white/10 bg-[#0A0B10]/85 rounded-2xl backdrop-blur-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-white/[0.04] transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <span className="text-white/45 font-mono text-[11px] w-28 shrink-0">
+                    {new Date(o.created_at).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </span>
 
-                <div className="min-w-0">
-                  <p className="text-white font-bold truncate">{t.user_name}</p>
-                  <p className="text-white/45 text-[11px] truncate">{t.user_email}</p>
+                  <div className="min-w-0">
+                    <p className="text-white font-bold truncate">{o.user_name}</p>
+                    <p className="text-white/45 text-[11px] truncate">{o.user_email}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5">
+                  <span className="text-white/60 text-[11px]">
+                    {o.package_label} ({o.credits_amount} cr)
+                  </span>
+
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#F5B041]/15 border border-[#F5B041]/35 text-[#F5B041] font-mono font-bold">
+                    <Clock className="w-3 h-3" />
+                    {fmtBrl(o.amount)}
+                  </span>
+
+                  {o.user_email && o.user_email !== "—" && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard?.writeText(o.user_email);
+                        toast.success(`E-mail copiado: ${o.user_email}`);
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/[0.05] hover:bg-white/10 border border-white/15 text-white/75 text-[10px] font-semibold transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Copiar e-mail
+                    </button>
+                  )}
                 </div>
               </div>
+            ))}
 
-              <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3">
-                <span
-                  className="text-white/45 truncate max-w-[240px] hidden lg:inline"
-                  title={t.description || ""}
-                >
-                  {t.description}
-                </span>
-
-                <span
-                  className={`text-[10px] uppercase tracking-wider font-bold border px-2.5 py-1 rounded-xl ${badge.cls}`}
-                >
-                  {badge.label}
-                </span>
-
-                {isPaid && t.price_brl ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 font-mono font-bold">
-                    <CheckCircle2 className="w-3 h-3" />+{fmtBrl(t.price_brl)}
-                  </span>
-                ) : null}
-
-                <span
-                  className={`font-mono font-bold w-14 text-right text-sm ${
-                    t.amount > 0 ? "text-[#10b981]" : "text-[#F5B041]"
-                  }`}
-                >
-                  {t.amount > 0 ? "+" : ""}
-                  {t.amount} cr
-                </span>
+            {filteredPending.length === 0 && (
+              <div className="text-center py-10 rounded-2xl border border-dashed border-white/10 bg-white/[0.01]">
+                <p className="text-white/60 text-sm">
+                  Nenhum checkout pendente encontrado neste filtro.
+                </p>
               </div>
-            </div>
-          );
-        })}
-
-        {filtered.length === 0 && (
-          <div className="text-center py-10 rounded-2xl border border-dashed border-white/10 bg-white/[0.01]">
-            <p className="text-white/60 text-sm">
-              Nenhuma transação encontrada neste filtro.
-            </p>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        /* Lista de Transações Concluídas */
+        <div className="space-y-2">
+          {filtered.map((t) => {
+            const badge = formatTxTypeBadge(t.type, t.amount);
+            const isPaid = t.amount > 0 && isPaidPurchaseType(t.type);
+
+            return (
+              <div
+                key={t.id}
+                className="border border-white/10 bg-[#0A0B10]/85 rounded-2xl backdrop-blur-md p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs hover:bg-white/[0.04] transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <span className="text-white/45 font-mono text-[11px] w-28 shrink-0">
+                    {new Date(t.created_at).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </span>
+
+                  <div className="min-w-0">
+                    <p className="text-white font-bold truncate">{t.user_name}</p>
+                    <p className="text-white/45 text-[11px] truncate">{t.user_email}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3">
+                  <span
+                    className="text-white/45 truncate max-w-[240px] hidden lg:inline"
+                    title={t.description || ""}
+                  >
+                    {t.description}
+                  </span>
+
+                  <span
+                    className={`text-[10px] uppercase tracking-wider font-bold border px-2.5 py-1 rounded-xl ${badge.cls}`}
+                  >
+                    {badge.label}
+                  </span>
+
+                  {isPaid && t.price_brl ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 font-mono font-bold">
+                      <CheckCircle2 className="w-3 h-3" />+{fmtBrl(t.price_brl)}
+                    </span>
+                  ) : null}
+
+                  <span
+                    className={`font-mono font-bold w-14 text-right text-sm ${
+                      t.amount > 0 ? "text-[#10b981]" : "text-[#F5B041]"
+                    }`}
+                  >
+                    {t.amount > 0 ? "+" : ""}
+                    {t.amount} cr
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+
+          {filtered.length === 0 && (
+            <div className="text-center py-10 rounded-2xl border border-dashed border-white/10 bg-white/[0.01]">
+              <p className="text-white/60 text-sm">
+                Nenhuma transação encontrada neste filtro.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

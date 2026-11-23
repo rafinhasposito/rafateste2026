@@ -77,11 +77,12 @@ export const isPaidPurchaseType = (type: string | null | undefined): boolean => 
   return t === "compra_mercadopago" || t === "purchase";
 };
 
+// Espelha pricing_config de produção (usado só se a tabela não responder)
 const FALLBACK_PRICE_BY_CREDITS: Record<number, number> = {
   1: 19.9,
-  3: 39.9,
-  7: 59.9,
-  12: 59.9,
+  3: 49.9,
+  7: 99.9,
+  12: 99.9,
 };
 
 const fmtBrl = (v: number) =>
@@ -357,11 +358,14 @@ const MetricsDashboard = ({ onNavigateTab }: MetricsDashboardProps) => {
       else byMode.futuro++;
     });
 
-    // Mix de pacotes vendidos no período
+    // Mix de pacotes vendidos no período (preços dinâmicos de pricing_config)
+    const singlePrice = priceByCredits.get(1) ?? FALLBACK_PRICE_BY_CREDITS[1];
+    const expansaoPrice = priceByCredits.get(3) ?? FALLBACK_PRICE_BY_CREDITS[3];
+    const fullPrice = priceByCredits.get(7) ?? FALLBACK_PRICE_BY_CREDITS[7];
     const packageMix = {
-      single: { label: "1 Casa Avulsa", price: "R$ 19,90", count: 0, revenue: 0, color: "#10B981" },
-      expansao: { label: "Pacote Expansão", price: "R$ 39,90", count: 0, revenue: 0, color: "#F5B041" },
-      full: { label: "Mapa Completo", price: "R$ 59,90", count: 0, revenue: 0, color: "#8B5CF6" },
+      single: { label: "1 Casa Avulsa", price: fmtBrl(singlePrice), count: 0, revenue: 0, color: "#10B981" },
+      expansao: { label: "Pacote Expansão", price: fmtBrl(expansaoPrice), count: 0, revenue: 0, color: "#F5B041" },
+      full: { label: "Mapa Completo", price: fmtBrl(fullPrice), count: 0, revenue: 0, color: "#8B5CF6" },
     };
     paidTxsInPeriod.forEach((t) => {
       if (t.amount === 1) {
@@ -453,7 +457,7 @@ const MetricsDashboard = ({ onNavigateTab }: MetricsDashboardProps) => {
       paidTxsInPeriod,
       periodTxs,
     };
-  }, [profiles, consultations, enrichedTxs, periodCutoffIso]);
+  }, [profiles, consultations, enrichedTxs, periodCutoffIso, priceByCredits]);
 
   // Lista filtrada do feed "Últimas Vendas & Movimentações"
   const feedItems = useMemo(() => {

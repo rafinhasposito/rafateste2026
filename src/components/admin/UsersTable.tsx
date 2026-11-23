@@ -35,7 +35,7 @@ const UsersTable = () => {
       .from("profiles")
       .select("user_id, email, display_name, full_name, credits, created_at")
       .order("created_at", { ascending: false })
-      .limit(100);
+      .limit(1500);
 
     if (error) {
       toast.error("Erro ao carregar usuários");
