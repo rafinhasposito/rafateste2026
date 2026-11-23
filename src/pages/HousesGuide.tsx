@@ -139,9 +139,9 @@ export default function HousesGuide() {
 
           <p className="font-ps-ui text-sm sm:text-base text-white/70 leading-relaxed max-w-xl mx-auto">
             O seu mapa de nascimento é fixo, mas a cidade onde você passa o
-            aniversário escolhe qual dessas 12 áreas ganha os holofotes nos
-            próximos 12 meses. Toque em qualquer Casa para ver o que ela
-            destrava na prática.
+            aniversário destaca qual dessas 12 áreas ganha os holofotes nos
+            próximos 12 meses. Toque em qualquer Casa para explorar o ciclo
+            completo.
           </p>
         </motion.header>
 
@@ -213,12 +213,12 @@ export default function HousesGuide() {
                     </span>
                   </div>
 
-                  {/* Título com apelo real */}
+                  {/* Tema da Casa */}
                   <h2 className="font-ps-display text-lg sm:text-[19px] font-bold text-white leading-snug mb-3.5 group-hover:text-[#F5DE98] transition-colors">
                     {house.title}
                   </h2>
 
-                  {/* Gancho 1: Ideal para (identificação no 1º segundo) */}
+                  {/* Perfil (identificação em 3 segundos) */}
                   <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 mb-3">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
@@ -226,24 +226,24 @@ export default function HousesGuide() {
                         className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em]"
                         style={{ color: themeHex }}
                       >
-                        Ideal para
+                        Perfil
                       </span>
                     </div>
                     <p className="font-ps-ui text-[13px] text-white/90 leading-snug font-medium">
-                      {house.idealFor}
+                      {house.profile}
                     </p>
                   </div>
 
-                  {/* Gancho 2: O que destrava na vida real */}
+                  {/* Foco do Ciclo (tom seguro de tendência) */}
                   <div className="px-0.5">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
                       <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em] text-white/55">
-                        O que destrava
+                        Foco do Ciclo
                       </span>
                     </div>
                     <p className="font-ps-ui text-[13px] text-white/72 leading-relaxed">
-                      “{house.unlocks}”
+                      {house.cycleFocus}
                     </p>
                   </div>
                 </div>
@@ -269,8 +269,10 @@ export default function HousesGuide() {
           <AnimatePresence>
             {selectedHouse && (() => {
               const SelectedIcon = ICON_MAP[selectedHouse.iconKey];
-              const themeHex = houseThemes[selectedHouse.id]?.themeColor || "#C9A227";
+              const houseTheme = houseThemes[selectedHouse.id];
+              const themeHex = houseTheme?.themeColor || "#C9A227";
               const elStyle = ELEMENT_STYLES[selectedHouse.element];
+              const energyPoints = houseTheme?.energyPoints || [];
 
               return (
                 <motion.div
@@ -292,10 +294,7 @@ export default function HousesGuide() {
                     exit={prefersReducedMotion ? { opacity: 0 } : { y: 40, opacity: 0 }}
                     transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
                     onClick={(e) => e.stopPropagation()}
-                    className="relative w-full md:max-w-xl max-h-[92svh] overflow-y-auto rounded-t-[28px] md:rounded-[30px] border-t md:border border-white/15 bg-[#070D19]/98 shadow-[0_-24px_80px_rgba(0,0,0,0.9)]"
-                    style={{
-                      paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)",
-                    }}
+                    className="relative w-full md:max-w-xl max-h-[90svh] flex flex-col overflow-hidden rounded-t-[28px] md:rounded-[30px] border-t md:border border-white/15 bg-[#070D19]/98 shadow-[0_-24px_80px_rgba(0,0,0,0.9)]"
                   >
                     {/* Brilho sutil no topo na cor da Casa */}
                     <div
@@ -306,11 +305,12 @@ export default function HousesGuide() {
                     />
 
                     {/* Handle bar mobile */}
-                    <div className="md:hidden flex justify-center pt-2.5 pb-1 relative z-10">
+                    <div className="md:hidden flex justify-center pt-2.5 pb-1 relative z-10 shrink-0">
                       <div className="w-11 h-1.5 rounded-full bg-white/20" />
                     </div>
 
-                    <div className="relative z-10 px-5 pt-3 pb-4 sm:p-7">
+                    {/* Área rolável do dossiê */}
+                    <div className="relative z-10 flex-1 overflow-y-auto px-5 pt-3 pb-4 sm:px-7 sm:pt-7 sm:pb-5">
                       {/* Top controls: Prev / Next + Close */}
                       <div className="flex items-center justify-between gap-2 mb-3.5 sm:mb-5">
                         <div className="flex items-center gap-2">
@@ -377,36 +377,70 @@ export default function HousesGuide() {
                         {selectedHouse.title}
                       </h2>
 
-                      {/* 4 BLOCOS CURTOS E ESCANEÁVEIS */}
-                      <div className="flex flex-col gap-2.5 sm:gap-3.5 mb-5 sm:mb-6">
-                        {/* Bloco 1: Ideal para */}
-                        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
-                            <span
-                              className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em]"
-                              style={{ color: themeHex }}
-                            >
-                              Ideal para
-                            </span>
+                      {/* DOSSIÊ COMPLETO DA CASA (Estruturado e sem promessas deterministas) */}
+                      <div className="flex flex-col gap-3 mb-5 sm:mb-6">
+                        {/* Bloco 1: Perfil & Foco do Ciclo */}
+                        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4 space-y-2.5">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
+                              <span
+                                className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em]"
+                                style={{ color: themeHex }}
+                              >
+                                Perfil
+                              </span>
+                            </div>
+                            <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/92 leading-relaxed font-medium">
+                              {selectedHouse.profile}
+                            </p>
                           </div>
-                          <p className="font-ps-ui text-[13.5px] sm:text-[15px] text-white/92 leading-relaxed font-medium">
-                            {selectedHouse.idealFor}
-                          </p>
+                          <div className="pt-2.5 border-t border-white/[0.06]">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
+                              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
+                                Foco do Ciclo
+                              </span>
+                            </div>
+                            <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/82 leading-relaxed">
+                              {selectedHouse.cycleFocus}
+                            </p>
+                          </div>
                         </div>
 
-                        {/* Bloco 2: O que destrava */}
-                        <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
-                            <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
-                              O que destrava
-                            </span>
+                        {/* Bloco 2: Os 3 Pilares desta Casa */}
+                        {energyPoints.length > 0 && (
+                          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
+                            <div className="flex items-center gap-2 mb-2.5">
+                              <Sparkles className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
+                              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/60">
+                                Pilares da Casa {selectedHouse.numberLabel}
+                              </span>
+                            </div>
+                            <div className="flex flex-col divide-y divide-white/[0.06]">
+                              {energyPoints.map((pt, idx) => (
+                                <div key={idx} className={idx === 0 ? "pb-2.5" : "py-2.5 last:pb-0"}>
+                                  <div className="flex items-baseline gap-2.5">
+                                    <span
+                                      className="font-mono text-[11px] font-bold shrink-0"
+                                      style={{ color: themeHex }}
+                                    >
+                                      0{idx + 1}
+                                    </span>
+                                    <div className="min-w-0">
+                                      <h3 className="font-ps-display text-sm font-bold text-white leading-snug mb-0.5">
+                                        {pt.title}
+                                      </h3>
+                                      <p className="font-ps-ui text-[12.5px] sm:text-[13px] text-white/70 leading-relaxed">
+                                        {pt.text}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <p className="font-ps-ui text-[13.5px] sm:text-[15px] text-white/88 leading-relaxed">
-                            “{selectedHouse.unlocks}”
-                          </p>
-                        </div>
+                        )}
 
                         {/* Bloco 3: Exemplo de Cidade-Símbolo */}
                         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3.5 sm:p-4">
@@ -416,7 +450,7 @@ export default function HousesGuide() {
                               Exemplo de Cidade-Símbolo
                             </span>
                           </div>
-                          <p className="font-ps-ui text-[13.5px] sm:text-[15px] text-white/90 leading-relaxed">
+                          <p className="font-ps-ui text-[13.5px] sm:text-sm text-white/90 leading-relaxed">
                             <strong className="text-white font-semibold">
                               {selectedHouse.symbolCity.name} ({selectedHouse.symbolCity.country})
                             </strong>{" "}
@@ -427,24 +461,31 @@ export default function HousesGuide() {
                           </p>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Bloco 4: Botão de Ação Direta */}
+                    {/* Bloco 4: Rodapé fixo na gaveta com CTA sempre visível */}
+                    <div
+                      className="relative z-10 shrink-0 border-t border-white/[0.08] bg-[#070D19]/95 px-5 pt-3.5 sm:px-7 sm:pt-4"
+                      style={{
+                        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)",
+                      }}
+                    >
                       <button
                         type="button"
                         onClick={() => handleActivateHouse(selectedHouse.id)}
-                        className="w-full min-h-[52px] px-4 sm:px-5 py-3.5 rounded-2xl font-ps-display font-bold text-[13.5px] sm:text-base tracking-wide bg-[#C9A227] hover:bg-[#E5C158] active:scale-[0.98] text-[#02050A] transition-all flex items-center justify-center gap-2 shadow-[0_12px_34px_rgba(201,162,39,0.34)]"
+                        className="w-full min-h-[50px] px-4 sm:px-5 py-3 rounded-2xl font-ps-display font-bold text-[13.5px] sm:text-base tracking-wide bg-[#C9A227] hover:bg-[#E5C158] active:scale-[0.98] text-[#02050A] transition-all flex items-center justify-center gap-2 shadow-[0_12px_34px_rgba(201,162,39,0.34)]"
                       >
-                        <span>Quero ativar a Casa {selectedHouse.numberLabel} no meu aniversário</span>
+                        <span>Explorar cidades para a Casa {selectedHouse.numberLabel}</span>
                         <ArrowRight className="w-4 h-4 shrink-0" />
                       </button>
 
-                      <div className="mt-3 text-center">
+                      <div className="mt-2.5 text-center">
                         <Link
                           to={`/casas/${selectedHouse.id}`}
                           onClick={() => setSelectedHouseId(null)}
                           className="inline-flex items-center gap-1.5 text-xs font-ps-ui text-white/55 hover:text-[#F5DE98] transition-colors py-1"
                         >
-                          <span>Ver leitura completa das 8 áreas nesta Casa</span>
+                          <span>Ver impacto completo nas 8 áreas da vida</span>
                           <ArrowRight className="w-3 h-3" />
                         </Link>
                       </div>
