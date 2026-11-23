@@ -62,9 +62,9 @@ export function DesktopWebChrome() {
               Descobrir
             </Link>
             <Link 
-              to="/app/trailer?house=1" 
+              to="/?mode=futuro&path=casa" 
               className={`inline-flex items-center gap-1.5 text-sm font-ps-ui font-semibold transition-colors ${
-                location.pathname.startsWith("/app/trailer")
+                location.search.includes("path=casa") || location.pathname.startsWith("/app/trailer")
                   ? "text-[#F5DE98]"
                   : "text-[#E8D59B]/90 hover:text-[#F5DE98]"
               }`}

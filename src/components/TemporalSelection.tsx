@@ -66,7 +66,7 @@ function DesktopScene({ onSelectMode }: Props) {
             </button>
 
             <Link
-              to="/app/trailer?house=1"
+              to="/?mode=futuro&path=casa"
               className="h-14 px-6 rounded-xl border border-[#C9A227]/45 bg-[#08111F]/90 hover:bg-[#C9A227]/15 text-[#F5DE98] font-ps-ui text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all backdrop-blur-xl"
             >
               <span>Ver Explicação das 12 Casas</span>
@@ -169,9 +169,9 @@ function MobileTimeline({ onSelectMode }: Props) {
             PLANEJAR PRÓXIMO ANIVERSÁRIO
           </motion.button>
 
-          {/* Direct 12 Houses Trailer Button on Mobile */}
+          {/* Direct 12 Houses Grid Button on Mobile */}
           <Link
-            to="/app/trailer?house=1"
+            to="/?mode=futuro&path=casa"
             className="w-full h-11 mb-5 rounded-xl border border-[#C9A227]/45 bg-[#08111F]/90 text-[#F5DE98] font-ps-ui text-xs font-semibold uppercase tracking-[0.14em] flex items-center justify-center gap-2 active:scale-95 transition-all backdrop-blur-xl"
           >
             <span>Ver Explicação das 12 Casas</span>

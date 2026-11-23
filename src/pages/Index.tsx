@@ -171,14 +171,17 @@ const Index = () => {
     if (targetMode && ["passado", "presente", "futuro"].includes(targetMode)) {
       if (loading) return;
       const ret = targetPath ? `/?mode=${targetMode}&path=${targetPath}` : `/?mode=${targetMode}`;
-      if (!user) {
-        sessionStorage.setItem("ps_pending_mode", targetMode);
-        navigate(`/auth?returnTo=${encodeURIComponent(ret)}`, { replace: true });
-        return;
-      }
-      if (!isNatalProfileComplete(profile)) {
-        navigate(`/perfil?returnTo=${encodeURIComponent(ret)}`);
-        return;
+      // Permite explorar a vitrine das 12 Casas (GoalCards + Trailers) mesmo antes de logar
+      if (targetPath !== "casa") {
+        if (!user) {
+          sessionStorage.setItem("ps_pending_mode", targetMode);
+          navigate(`/auth?returnTo=${encodeURIComponent(ret)}`, { replace: true });
+          return;
+        }
+        if (!isNatalProfileComplete(profile)) {
+          navigate(`/perfil?returnTo=${encodeURIComponent(ret)}`);
+          return;
+        }
       }
       setMode(targetMode);
       const activeBirthDate = profile?.birth_date || birthdate;
@@ -568,11 +571,11 @@ const Index = () => {
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
                   <Link 
-                    to="/app/trailer?house=1" 
+                    to="/?mode=futuro&path=casa" 
                     className="px-4 py-2.5 rounded-xl bg-[#C9A227]/20 hover:bg-[#C9A227] border border-[#C9A227]/50 text-[#F5DE98] hover:text-[#02050A] text-xs font-ps-ui font-bold uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1.5"
                   >
                     <Crown className="w-3.5 h-3.5" /> 
-                    <span>Ver Trailers das 12 Casas →</span>
+                    <span>Ver as 12 Casas →</span>
                   </Link>
                   <Link 
                     to="/app/onboarding" 

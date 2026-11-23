@@ -110,8 +110,8 @@ const App = () => (
               <Route path="/parceiros" element={<PartnersLanding />} />
               <Route path="/seja-afiliado" element={<PartnersLanding />} />
               <Route path="/tecnologia" element={<Technology />} />
-              <Route path="/app/trailer" element={<HouseTrailerApp />} />
             </Route>
+            <Route path="/app/trailer" element={<HouseTrailerApp />} />
 
             {/* 2. Focused Shell (Immersive Flows) */}
             <Route element={<FocusedShell />}>

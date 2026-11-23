@@ -20,23 +20,8 @@ import { toast } from "sonner";
 import { houseThemes } from "@/data/houseThemes";
 import ScanningOverlay from "@/components/ScanningOverlay";
 
-const DEFAULT_TRAILER_HOUSE = 1;
+const DEFAULT_TRAILER_HOUSE = 11;
 const DEFAULT_TRAILER_GENDER = "M";
-
-const SHORT_HOUSE_THEMES: Record<number, string> = {
-  1: "Recomeço & Autonomia",
-  2: "Dinheiro & Patrimônio",
-  3: "Comunicação & Vendas",
-  4: "Lar & Família",
-  5: "Amor, Prazer & Criação",
-  6: "Saúde & Rotina",
-  7: "Casamento & Parcerias",
-  8: "Virada & Renascimento",
-  9: "Viagens & Expansão",
-  10: "Carreira & Sucesso",
-  11: "Amigos & Networking",
-  12: "Espiritualidade & Paz",
-};
 
 const LIFE_AREAS = [
   { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", teaser: "Ative o melhor alinhamento para viver conexões afetivas mais verdadeiras e leves neste novo ciclo." },
@@ -136,7 +121,7 @@ export default function HouseTrailerApp() {
     if (!target) return;
 
     if (!user) {
-      toast.info("Crie sua conta gratuita e informe seus dados de nascimento para revelar suas cidades.");
+      toast.info("Entre na sua conta para revelar as cidades do seu mapa.");
       navigate(`/auth?returnTo=${encodeURIComponent(currentReturnUrl)}`);
       return;
     }
@@ -325,91 +310,22 @@ export default function HouseTrailerApp() {
   const navBg = `color-mix(in srgb, ${theme.themeColor} 10%, rgba(0,0,0,0.6))`;
   const heroGradient = `linear-gradient(to bottom, transparent, color-mix(in srgb, ${theme.themeColor} 12%, rgba(0,0,0,0.8)) 60%, ${bgBase} 100%)`;
 
-  const selectTrailerHouse = (houseNum: number) => {
-    setCurrentHouse(houseNum);
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.set("house", String(houseNum));
-    navigate(`/app/trailer?${nextParams.toString()}`, { replace: true });
-  };
-
   return (
-    <div className="min-h-screen text-white font-sans overflow-x-clip selection:bg-white/10 pt-14 lg:pt-0 pb-48 relative transition-colors duration-1000" style={{ backgroundColor: bgBase }}>
+    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/10 pb-24 relative transition-colors duration-1000" style={{ backgroundColor: bgBase }}>
 
-      {/* BARRA SELETORA DAS 12 CASAS (SEMPRE VISÍVEL NO TOPO PARA NAVEGAR ENTRE OS TRAILERS) */}
-      <div className="sticky top-14 lg:top-20 z-30 bg-[#030710]/92 backdrop-blur-2xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.65)]">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-[11px] font-ps-ui font-semibold uppercase tracking-[0.14em] text-white/90 transition-all"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-              <span>Início</span>
-            </button>
-
-            <span className="font-ps-ui text-[11px] uppercase tracking-[0.18em] text-[#F5DE98] font-semibold text-center">
-              Toque em uma Casa para ver o Trailer ({currentHouse} de 12)
-            </span>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => selectTrailerHouse(currentHouse > 1 ? currentHouse - 1 : 12)}
-                className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/12 text-xs text-white/85"
-                title="Casa anterior"
-              >
-                ←
-              </button>
-              <button
-                type="button"
-                onClick={() => selectTrailerHouse(currentHouse < 12 ? currentHouse + 1 : 1)}
-                className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/12 text-xs text-white/85"
-                title="Próxima Casa"
-              >
-                →
-              </button>
-            </div>
-          </div>
-
-          {/* Pílulas das 12 Casas (Carrossel Horizontal no Mobile / Grade no Desktop) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-            {ALL_TWELVE_HOUSES.map((hNum) => {
-              const isSelected = hNum === currentHouse;
-              const hColor = houseThemes[hNum]?.themeColor || "#C9A227";
-              return (
-                <button
-                  key={hNum}
-                  type="button"
-                  onClick={() => selectTrailerHouse(hNum)}
-                  className={`shrink-0 px-3 py-1.5 rounded-xl font-ps-ui text-xs transition-all flex items-center gap-1.5 border ${
-                    isSelected
-                      ? "text-white font-bold shadow-lg scale-[1.02]"
-                      : "bg-white/[0.03] hover:bg-white/[0.08] border-white/10 text-white/65 hover:text-white"
-                  }`}
-                  style={
-                    isSelected
-                      ? {
-                          backgroundColor: `${hColor}28`,
-                          borderColor: hColor,
-                          boxShadow: `0 0 18px ${hColor}35`,
-                        }
-                      : undefined
-                  }
-                >
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: hColor }}
-                  />
-                  <span>Casa {hNum}</span>
-                  <span className="text-[11px] opacity-80 hidden sm:inline">
-                    · {SHORT_HOUSE_THEMES[hNum]}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {/* TOPO LIMPO (Sem navbar fixa em cima do conteúdo) */}
+      <div className="relative z-30 max-w-6xl mx-auto px-4 md:px-8 pt-6 pb-2 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/?mode=futuro&path=casa"))}
+          className="shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-xs font-semibold uppercase tracking-[0.16em] text-white/90 transition-all backdrop-blur-xl"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Voltar
+        </button>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70 truncate text-right">
+          Casa {String(currentHouse).padStart(2, "0")} • {theme.subtitle}
+        </span>
       </div>
 
       {/* HERO E VÍDEO (EXATAMENTE COMO NO FINAL) */}
@@ -543,18 +459,16 @@ export default function HouseTrailerApp() {
           </div>
         </motion.div>
 
-        {/* AS 8 ÁREAS DA VIDA (TODAS INCLUSAS GRATUITAMENTE NA CONSULTA) */}
+        {/* AS 8 ÁREAS DA VIDA INCLUSAS NESTA CASA */}
         <motion.div className="mt-20 pt-16 border-t border-white/5 relative z-10 flex flex-col items-center w-full">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest mb-6" style={{ color: theme.themeColor }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase font-bold tracking-widest mb-8" style={{ color: theme.themeColor }}>
               <Sparkles className="w-3 h-3" />
               <span>8 Áreas Inclusas na Consulta</span>
             </div>
             
-            <h3 className="text-3xl md:text-5xl font-ps-display font-bold text-center mb-3">
-              Como a Casa {currentHouse} movimenta cada área.
-            </h3>
-            <p className="text-white/60 text-center text-base md:text-lg max-w-2xl mx-auto mb-12">
-              Ao consultar esta Casa, todas as 8 áreas abaixo já vêm 100% liberadas de graça no seu resultado. Toque em qualquer uma para ver uma prévia:
+            <h3 className="text-4xl md:text-6xl font-ps-display font-bold text-center mb-4">O impacto nas 8 áreas.</h3>
+            <p className="text-white/50 text-center text-lg max-w-2xl mx-auto mb-16">
+              Ao consultar esta Casa, todas as 8 áreas abaixo já vêm 100% liberadas de graça no seu resultado. Toque para explorar cada uma:
             </p>
 
             {/* LAYOUT: SIDEBAR RETRÁTIL + PAINEL QUE CRESCE */}
@@ -712,24 +626,19 @@ export default function HouseTrailerApp() {
                                   <div className="w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 bg-black/20" style={{ borderColor: `${area.color}55` }}>
                                     <area.icon className="w-4 h-4" style={{ color: area.color }} />
                                   </div>
-                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">
-                                    Área Inclusa • Casa {currentHouse}
-                                  </span>
+                                  <span className="text-white/60 text-[10px] uppercase font-bold tracking-[0.25em]">{area.label}</span>
                                 </div>
                                 <h3 className="font-ps-display text-3xl font-bold text-white leading-tight mb-4">{area.label}</h3>
                                 <div className="w-12 h-px mb-4" style={{ backgroundColor: `${area.color}80` }} />
                                 <p className="text-white/80 text-sm font-light leading-relaxed mb-6">{area.teaser}</p>
-                                <div
-                                  className="w-full px-5 py-3.5 font-bold text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 border"
-                                  style={{
-                                    backgroundColor: `${area.color}22`,
-                                    borderColor: `${area.color}55`,
-                                    color: '#fff',
-                                  }}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleSelectIntention(area.id, e); }}
+                                  className={`w-full px-6 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 ${selectedIntention !== area.id ? 'bg-white text-black' : ''}`}
+                                  style={selectedIntention === area.id ? { backgroundColor: area.color, color: '#fff' } : {}}
                                 >
-                                  <Sparkles className="w-4 h-4" />
-                                  <span>Incluso gratuitamente na consulta ✓</span>
-                                </div>
+                                  {selectedIntention === area.id ? <Sparkles className="w-4 h-4" /> : <Target className="w-4 h-4" />}
+                                  {selectedIntention === area.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
+                                </button>
                               </div>
                             </div>
                           </motion.div>
@@ -752,10 +661,10 @@ export default function HouseTrailerApp() {
                   {sortedAreas.filter(a => a.id === (hoveredArea || sortedAreas[0].id)).map((activeArea) => (
                     <motion.div
                       key={activeArea.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.22, ease: "easeOut" }}
+                      initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
                       className="absolute inset-0 w-full h-full flex flex-col justify-end"
                     >
                       {/* BACKGROUNDS PREMIUM */}
@@ -766,13 +675,13 @@ export default function HouseTrailerApp() {
                       {/* CONTEÚDO PRINCIPAL */}
                       <div className="relative z-10 p-8 md:p-12 w-full flex flex-col justify-end h-full">
                         
-                        {/* Ícone pequeno + contexto */}
+                        {/* Ícone pequeno + label da área */}
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 bg-black/20 backdrop-blur-md" style={{ borderColor: `${activeArea.color}55` }}>
                             <activeArea.icon className="w-5 h-5" style={{ color: activeArea.color }} />
                           </div>
                           <span className="text-white/60 text-xs uppercase font-bold tracking-[0.25em]">
-                            Área Inclusa • Casa {currentHouse}
+                            {activeArea.label}
                           </span>
                         </div>
 
@@ -788,17 +697,14 @@ export default function HouseTrailerApp() {
                         </p>
                         
                         <div>
-                          <div
-                            className="w-full md:w-auto inline-flex items-center justify-center gap-3 px-7 py-4 font-bold text-xs uppercase tracking-widest rounded-2xl border"
-                            style={{
-                              backgroundColor: `${activeArea.color}25`,
-                              borderColor: `${activeArea.color}65`,
-                              color: '#fff',
-                            }}
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleSelectIntention(activeArea.id, e); }}
+                            className={`w-full md:w-auto px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 ${activeIntentionId !== activeArea.id && 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 hover:bg-gray-100'}`}
+                            style={activeIntentionId === activeArea.id ? { backgroundColor: activeArea.color, color: '#fff', boxShadow: `0 0 50px ${activeArea.color}80` } : {}}
                           >
-                            <Sparkles className="w-4 h-4 shrink-0" />
-                            <span>Incluso gratuitamente na consulta desta Casa ✓</span>
-                          </div>
+                            {activeIntentionId === activeArea.id ? <Sparkles className="w-4 h-4 shrink-0" /> : <Target className="w-4 h-4 shrink-0" />}
+                            {activeIntentionId === activeArea.id ? 'Foco Ativado ✓' : 'Ativar Este Foco'}
+                          </button>
                         </div>
                         
                       </div>
@@ -810,73 +716,65 @@ export default function HouseTrailerApp() {
           </motion.div>
       </section>
       
-      {/* STICKY BOTTOM BAR (Compacta no celular e elegante no desktop) */}
-      <AnimatePresence>
-        {(() => {
-          const color = theme.themeColor || '#C9A227';
-          return (
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              className="fixed bottom-16 lg:bottom-0 left-0 w-full z-40 p-2.5 md:p-5 pointer-events-none"
-            >
-              <div className="max-w-5xl mx-auto pointer-events-auto">
-                <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/15 p-3 md:p-4 rounded-2xl shadow-[0_-20px_80px_rgba(0,0,0,0.85)] flex flex-col sm:flex-row items-center justify-between gap-2.5 md:gap-4" style={{ backgroundColor: navBg }}>
-                  
-                  <div className="flex items-center gap-2.5 w-full sm:w-auto min-w-0">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>
-                      <Crown className="w-4 h-4 md:w-5 md:h-5" style={{ color }} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-white font-ps-display text-sm md:text-lg font-bold leading-tight truncate">
-                        Casa {currentHouse} • {SHORT_HOUSE_THEMES[currentHouse]}
-                      </h4>
-                      <p className="text-white/65 text-[11px] md:text-xs hidden sm:block">
-                        Revela suas melhores cidades no mundo para a Casa {currentHouse} + todas as 8 áreas de graça.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                    <button 
-                      onClick={() => handleRevelarCidades(false)}
-                      disabled={isProcessing}
-                      className="flex-1 sm:flex-initial px-4 md:px-6 py-2.5 md:py-3.5 font-bold uppercase tracking-wider text-xs rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-white"
-                      style={{
-                        backgroundColor: color,
-                        boxShadow: `0 0 28px ${color}55`,
-                      }}
-                    >
-                      <Globe className={`w-3.5 h-3.5 md:w-4 md:h-4 shrink-0 ${isProcessing ? 'animate-spin' : ''}`} />
-                      <span>
-                        {isProcessing
-                          ? 'Calculando...'
-                          : `Ver Cidades da Casa ${currentHouse}`}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] font-bold">
-                        1 Créd.
-                      </span>
-                    </button>
-
-                    {activeTier !== "full_map" && (
-                      <button 
-                        onClick={() => handleRevelarCidades(true)}
-                        disabled={isProcessing}
-                        className="hidden md:inline-flex px-4 py-3.5 font-bold uppercase tracking-wider text-xs rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all items-center justify-center gap-1.5"
-                      >
-                        <Sparkles className="w-3.5 h-3.5 shrink-0 text-[#E5C158]" />
-                        <span>Liberar 12 Casas</span>
-                      </button>
-                    )}
-                  </div>
-                  
+      {/* FECHAMENTO NO FINAL DA PÁGINA (In-flow — NÃO fica flutuando em cima da leitura!) */}
+      {(() => {
+        const chosen = LIFE_AREAS.find(a => a.id === activeIntentionId) || sortedAreas[0];
+        const color = theme.themeColor || chosen?.color || '#C9A227';
+        return (
+          <div className="relative z-20 max-w-5xl mx-auto px-4 md:px-6 mt-6 mb-12">
+            <div className="backdrop-blur-xl transition-colors duration-1000 border border-white/15 p-6 md:p-8 rounded-3xl shadow-[0_20px_80px_rgba(0,0,0,0.85)] flex flex-wrap items-center justify-between gap-4" style={{ backgroundColor: navBg }}>
+              
+              <div className="flex items-center gap-3.5 flex-[1_1_16rem] min-w-0">
+                <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}22`, border: `1px solid ${color}44` }}>
+                  <Sparkles className="w-5 h-5" style={{ color }} />
+                </div>
+                <div>
+                  <h4 className="text-white font-ps-display text-lg md:text-xl font-bold leading-tight">
+                    Quer viver a energia da Casa {currentHouse} no seu próximo aniversário?
+                  </h4>
+                  <p className="text-white/65 text-xs md:text-sm mt-1">
+                    Descubra quais cidades do mundo ativam a Casa {currentHouse} para você (já com todas as 8 áreas da vida liberadas de graça).
+                  </p>
                 </div>
               </div>
-            </motion.div>
-          );
-        })()}
-      </AnimatePresence>
+
+              <div className="grid flex-[2_1_32rem] min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-3">
+                <button 
+                  onClick={() => handleRevelarCidades(false)}
+                  disabled={isProcessing}
+                  className="px-6 py-4 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-white"
+                  style={{
+                    backgroundColor: color,
+                    boxShadow: `0 0 32px ${color}55`,
+                  }}
+                >
+                  <Globe className={`w-4 h-4 shrink-0 ${isProcessing ? 'animate-spin' : ''}`} />
+                  <span>
+                    {isProcessing
+                      ? 'Calculando...'
+                      : `Revelar Cidades da Casa ${currentHouse}`}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] font-bold tracking-wider">
+                    1 Créd.
+                  </span>
+                </button>
+
+                {activeTier !== "full_map" && (
+                  <button 
+                    onClick={() => handleRevelarCidades(true)}
+                    disabled={isProcessing}
+                    className="px-5 py-4 font-bold uppercase tracking-widest text-xs md:text-sm rounded-full border border-[#E5C158]/60 bg-[#E5C158]/15 hover:bg-[#E5C158]/25 text-[#F6D97A] hover:scale-[1.02] active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(229,193,88,0.2)]"
+                  >
+                    <Sparkles className="w-4 h-4 shrink-0 text-[#E5C158]" />
+                    <span>Desbloquear Todas as 12 Casas</span>
+                  </button>
+                )}
+              </div>
+              
+            </div>
+          </div>
+        );
+      })()}
 
       <ScanningOverlay visible={isProcessing} mode={activeMode} year={activeYearDisplay} />
     </div>

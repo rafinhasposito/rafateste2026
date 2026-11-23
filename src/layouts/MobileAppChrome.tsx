@@ -8,13 +8,13 @@ export function MobileAppChrome() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // The bottom bar appears on main app views including dashboard, 12 houses trailer and result preview
-  const showBottomBar = ["/", "/history", "/perfil", "/tecnologia", "/dashboard", "/v3-preview", "/app/trailer"].some(
-    (p) => location.pathname === p || location.pathname.startsWith("/v3-preview") || location.pathname.startsWith("/app/trailer")
+  // The bottom bar appears on main app views including dashboard and result preview (NOT inside /app/trailer)
+  const showBottomBar = ["/", "/history", "/perfil", "/tecnologia", "/dashboard", "/v3-preview"].some(
+    (p) => location.pathname === p || location.pathname.startsWith("/v3-preview")
   );
 
-  const isHome = location.pathname === "/";
-  const isHousesTrailer = location.pathname.startsWith("/app/trailer");
+  const isHousesGrid = location.pathname === "/" && location.search.includes("path=casa");
+  const isHome = location.pathname === "/" && !isHousesGrid;
   const isOnboarding = location.pathname === "/app/onboarding";
 
   return (
@@ -101,15 +101,15 @@ export function MobileAppChrome() {
               <span className="text-[10px] font-ps-ui font-medium tracking-wide">Descobrir</span>
             </Link>
 
-            {/* 2. As 12 Casas (Trailers) */}
+            {/* 2. As 12 Casas (Vitrine GoalCards) */}
             <Link
-              to="/app/trailer?house=1"
+              to="/?mode=futuro&path=casa"
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
-                isHousesTrailer ? "text-[#F5DE98]" : "text-[#8E9CAE] hover:text-white"
+                isHousesGrid ? "text-[#F5DE98]" : "text-[#8E9CAE] hover:text-white"
               )}
             >
-              {isHousesTrailer && (
+              {isHousesGrid && (
                 <div className="absolute top-0 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#C9A227] to-transparent rounded-full" />
               )}
               <Crown className="w-5 h-5 text-[#C9A227]" />
