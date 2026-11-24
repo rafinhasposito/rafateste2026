@@ -201,19 +201,16 @@ export default function HouseDetailGuide() {
 
           <div className="rounded-2xl border border-white/10 bg-black/45 backdrop-blur-xl p-5 text-left">
             <div className="flex items-center gap-2 mb-2">
-              <MapPin className="w-4 h-4 shrink-0 text-[#F5DE98]" />
-              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-white/65">
-                Cidade-Símbolo
+              <Compass className="w-4 h-4 shrink-0 text-[#EAB344]" />
+              <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.2em] text-[#F3DC9B]">
+                Quais cidades ativam?
               </span>
             </div>
             <p className="font-ps-ui text-sm text-white/90 leading-relaxed">
               <strong className="text-white font-semibold">
-                {showcase.symbolCity.name} ({showcase.symbolCity.country})
+                Muda de pessoa para pessoa:
               </strong>{" "}
-              — {showcase.symbolCity.reason}
-            </p>
-            <p className="font-ps-ui text-[11px] text-white/45 mt-1.5">
-              Referência simbólica; suas cidades reais dependem da sua data e hora de nascimento.
+              não existe cidade fixa para a Casa {currentHouse}. Calculamos quais cidades do Brasil e do mundo ativam essa área especificamente para a sua data, hora e local de nascimento.
             </p>
           </div>
         </motion.div>

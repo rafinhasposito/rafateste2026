@@ -24,13 +24,14 @@ import { HouseVideoPreview } from "@/components/HouseVideoPreview";
 import { MobileHomeFlow } from "@/components/mobile/MobileHomeFlow";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { HOUSES_SHOWCASE } from "@/data/housesShowcase";
-import { API_URL, getCurrentSolarYear, getNextBirthdayYear } from "@/lib/astro";
+import { getCurrentSolarYear } from "@/lib/astro";
+import { prewarmSolarApi, runFreePastAudit } from "@/lib/pastAuditClient";
 import { saveStoredAffiliateRef } from "@/lib/affiliates";
 import {
   FREE_PAST_STORAGE_KEY,
   type StoredFreePastPayload,
 } from "@/pages/FreePastResult";
-import { useI18n } from "@/lib/i18n";
+import { type SupportedLocale, useI18n } from "@/lib/i18n";
 import { toast } from "sonner";
 
 interface LandingV3Props {
@@ -40,76 +41,77 @@ interface LandingV3Props {
 interface BoardingDestination {
   id: string;
   code: string;
+  cityLabel: Record<SupportedLocale, string>;
   houseNum: number;
   houseCode: string;
-  coords: string;
   videoSrc: string;
   posterSrc: string;
 }
 
+// Exemplo específico da personagem Ana (19/08, 14:35, SP) — deixa claro que são cidades do mapa DELA
 const BOARDING_DESTINATIONS: BoardingDestination[] = [
   {
     id: "zurich",
     code: "ZRH",
+    cityLabel: { pt: "Zurique", es: "Zúrich", en: "Zurich", fr: "Zurich", it: "Zurigo" },
     houseNum: 2,
     houseCode: "02",
-    coords: "47°22'N · 08°32'E",
-    videoSrc: "/videos/houses/casa-02.mp4",
-    posterSrc: "/videos/houses/casa-02-poster.jpg",
+    videoSrc: "/videos/v3/ana-zurique.mp4",
+    posterSrc: "/videos/v3/ana-zurique-poster.jpg",
   },
   {
     id: "rome",
     code: "FCO",
+    cityLabel: { pt: "Roma", es: "Roma", en: "Rome", fr: "Rome", it: "Roma" },
     houseNum: 5,
     houseCode: "05",
-    coords: "41°54'N · 12°29'E",
-    videoSrc: "/videos/houses/casa-05.mp4",
-    posterSrc: "/videos/houses/casa-05-poster.jpg",
+    videoSrc: "/videos/v3/demo-roma-casa7.mp4",
+    posterSrc: "/images/v3/demo-roma-casa7.jpg",
   },
   {
     id: "paris",
     code: "CDG",
+    cityLabel: { pt: "Paris", es: "París", en: "Paris", fr: "Paris", it: "Parigi" },
     houseNum: 7,
     houseCode: "07",
-    coords: "48°51'N · 02°21'E",
-    videoSrc: "/videos/houses/casa-07.mp4",
-    posterSrc: "/videos/houses/casa-07-poster.jpg",
+    videoSrc: "/assets/cities/paris.mp4",
+    posterSrc: "/images/abertura/paris.jpg",
   },
   {
     id: "ny",
     code: "JFK",
-    houseNum: 1,
-    houseCode: "01",
-    coords: "40°43'N · 74°00'W",
-    videoSrc: "/videos/houses/casa-01.mp4",
-    posterSrc: "/videos/houses/casa-01-poster.jpg",
+    cityLabel: { pt: "Nova York", es: "Nueva York", en: "New York", fr: "New York", it: "New York" },
+    houseNum: 10,
+    houseCode: "10",
+    videoSrc: "/videos/v3/demo-ny-casa10.mp4",
+    posterSrc: "/images/v3/demo-ny-casa10.jpg",
   },
 ];
 
 const COMPARISON_REELS = [
   {
     id: "zurich",
+    cityLabel: { pt: "Zurique (Suíça)", es: "Zúrich (Suiza)", en: "Zurich (Switzerland)", fr: "Zurich (Suisse)", it: "Zurigo (Svizzera)" },
     houseNum: 2,
     houseLabel: "02",
-    coords: "47°22'N",
-    videoSrc: "/videos/houses/casa-02.mp4",
-    posterSrc: "/videos/houses/casa-02-poster.jpg",
+    videoSrc: "/videos/v3/ana-zurique.mp4",
+    posterSrc: "/videos/v3/ana-zurique-poster.jpg",
   },
   {
     id: "rome",
+    cityLabel: { pt: "Roma (Itália)", es: "Roma (Italia)", en: "Rome (Italy)", fr: "Rome (Italie)", it: "Roma (Italia)" },
     houseNum: 5,
     houseLabel: "05",
-    coords: "41°54'N",
-    videoSrc: "/videos/houses/casa-05.mp4",
-    posterSrc: "/videos/houses/casa-05-poster.jpg",
+    videoSrc: "/videos/v3/demo-roma-casa7.mp4",
+    posterSrc: "/images/v3/demo-roma-casa7.jpg",
   },
   {
     id: "ny",
-    houseNum: 1,
-    houseLabel: "01",
-    coords: "40°43'N",
-    videoSrc: "/videos/houses/casa-01.mp4",
-    posterSrc: "/videos/houses/casa-01-poster.jpg",
+    cityLabel: { pt: "Nova York (EUA)", es: "Nueva York (EE. UU.)", en: "New York (USA)", fr: "New York (USA)", it: "New York (USA)" },
+    houseNum: 10,
+    houseLabel: "10",
+    videoSrc: "/videos/v3/demo-ny-casa10.mp4",
+    posterSrc: "/images/v3/demo-ny-casa10.jpg",
   },
 ];
 
@@ -126,7 +128,11 @@ export default function LandingV3({ embeddedInShell = true }: LandingV3Props) {
 function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
+
+  useEffect(() => {
+    prewarmSolarApi();
+  }, []);
 
   // Preserve affiliate ref if present
   useEffect(() => {
@@ -296,90 +302,31 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
 
   const handleCalculatePast = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pastCity.trim() || !pastCoords) {
-      toast.error("Digite e selecione na lista a cidade onde passou o aniversário.");
+    if (!pastCity.trim()) {
+      toast.error("Informe a cidade onde você passou seu aniversário.");
       return;
-    }
-
-    const effectiveTime = unknownTime ? "12:00" : birthTime || "12:00";
-    const [yyyy, mm, dd] = birthDate.split("-");
-    const formattedBirthDate = yyyy && mm && dd ? `${dd}/${mm}/${yyyy}` : birthDate;
-    const nextBirthdayYear = getNextBirthdayYear(birthDate);
-
-    // Save natal data in sessionStorage so Profile / Checkout never asks again (WCAG 3.3.7 Redundant Entry)
-    sessionStorage.setItem("ps_natal_name", firstName.trim());
-    sessionStorage.setItem("ps_natal_date", birthDate);
-    sessionStorage.setItem("ps_natal_time", effectiveTime);
-    sessionStorage.setItem("ps_natal_place", birthCity.trim());
-    sessionStorage.setItem("ps_natal_unknown_time", unknownTime ? "1" : "0");
-    if (birthCoords) {
-      sessionStorage.setItem("ps_natal_lat", String(birthCoords.lat));
-      sessionStorage.setItem("ps_natal_lon", String(birthCoords.lon));
     }
 
     setCalculating(true);
     try {
-      const baseReq = {
-        date: formattedBirthDate,
-        time: effectiveTime,
-        city: pastCity.trim(),
-        lat: pastCoords.lat,
-        lon: pastCoords.lon,
-        birth_city: birthCity.trim(),
-        birth_lat: birthCoords?.lat,
-        birth_lon: birthCoords?.lon,
-      };
-
-      const [pastRes, nextStayRes] = await Promise.all([
-        fetch(`${API_URL}/audit_past`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...baseReq, year: Number(pastYear) }),
-        }),
-        fetch(`${API_URL}/audit_past`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...baseReq, year: Number(nextBirthdayYear) }),
-        }).catch(() => null),
-      ]);
-
-      if (!pastRes.ok) {
-        throw new Error("Falha ao calcular efemérides.");
-      }
-
-      const pastData = await pastRes.json();
-      const nextStayData = nextStayRes && nextStayRes.ok ? await nextStayRes.json() : null;
-
-      const resolvedHouse = Number(pastData?.house || pastData?.sun_house || 1);
-      const parts = pastCity.split(",").map((s) => s.trim());
-      const pastShort = parts[0] || pastCity.trim();
-      const pastCountry = parts[parts.length - 1] || "Brasil";
-
-      const payload: StoredFreePastPayload = {
-        userName: firstName.trim(),
+      const payload = await runFreePastAudit({
+        firstName,
         birthDate,
-        birthTime: effectiveTime,
-        birthPlace: birthCity.trim(),
+        birthTime,
+        unknownTime,
+        birthCity,
+        birthCoords,
         pastYear,
-        pastCityDisplay: pastCity.trim(),
-        pastCityShort: pastShort,
-        pastCountry,
-        pastLat: pastCoords.lat,
-        pastLon: pastCoords.lon,
-        pastHouse: resolvedHouse >= 1 && resolvedHouse <= 12 ? resolvedHouse : 1,
-        sunSign: pastData?.sun_sign || null,
-        ascendant: pastData?.ascendant || pastData?.sr_ascendant || null,
-        returnDate: pastData?.return_date || null,
-        returnTimeUtc: pastData?.return_time_utc || null,
-        nextYear: String(nextBirthdayYear),
-        nextStayHouse: nextStayData?.house ? Number(nextStayData.house) : null,
-        usedApproximateTime: unknownTime,
-      };
-
+        pastCity,
+        pastCoords,
+      });
       sessionStorage.setItem(FREE_PAST_STORAGE_KEY, JSON.stringify(payload));
       navigate("/meu-passado");
-    } catch {
-      toast.error("Não foi possível concluir o cálculo agora. Confira os dados e tente novamente.");
+    } catch (err: any) {
+      toast.error(
+        err?.message ||
+          "Não foi possível concluir o cálculo agora. Confira as cidades informadas e tente novamente."
+      );
     } finally {
       setCalculating(false);
     }
@@ -525,23 +472,20 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
 
                   {/* Top Boarding Pass Header Strip */}
                   <div className="absolute top-3.5 left-4 right-4 flex items-center justify-between gap-2 z-10">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#060911]/80 backdrop-blur-md border border-white/15 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#F3DC9B]">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#060911]/85 backdrop-blur-md border border-white/15 font-sans text-[11px] font-semibold text-[#F3DC9B]">
                       <Plane className="w-3 h-3 text-[#EAB344]" />
                       <span>{t.hero.passHeader}</span>
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full bg-[#060911]/80 backdrop-blur-md border border-white/12 font-mono text-[10px] text-[#F8FAFC]/85">
-                      {activeDest.coords}
                     </span>
                   </div>
 
                   {/* Bottom Route Title Inside Video */}
                   <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-3 z-10">
                     <div>
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.14em] text-[#EAB344]">
-                        {t.hero.destinationLabel}
+                      <span className="block font-sans text-[11px] font-medium text-[#F3DC9B]">
+                        {t.hero.destinationLabel}:
                       </span>
                       <div className="font-display text-2xl sm:text-3xl font-bold text-[#F8FAFC] leading-tight">
-                        {activeDestCopy?.city} <span className="font-mono text-sm text-[#F3DC9B]">({activeDest.code})</span>
+                        {activeDest.cityLabel[locale]} <span className="font-mono text-sm text-[#F3DC9B]">({activeDest.code})</span>
                       </div>
                     </div>
                     <span className="px-3 py-1.5 rounded-xl bg-[#EAB344] text-[#070A12] font-mono text-xs font-bold uppercase tracking-[0.1em] shadow-md">
@@ -554,7 +498,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                 <div className="p-4 sm:p-5 bg-[#0B111E] border-t border-white/10 space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="rounded-xl bg-[#111A2E]/80 border border-white/[0.07] px-3.5 py-2.5">
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-[#B0BCCF]">
+                      <span className="block font-sans text-[11px] text-[#B0BCCF]">
                         {t.hero.houseLabel}
                       </span>
                       <span className="font-sans text-sm font-semibold text-[#F8FAFC]">
@@ -562,7 +506,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                       </span>
                     </div>
                     <div className="rounded-xl bg-[#111A2E]/80 border border-white/[0.07] px-3.5 py-2.5">
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-[#B0BCCF]">
+                      <span className="block font-sans text-[11px] text-[#B0BCCF]">
                         {t.hero.focusLabel}
                       </span>
                       <span className="font-sans text-sm font-semibold text-[#F3DC9B] truncate block">
@@ -579,7 +523,6 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                     <div className="grid grid-cols-4 gap-2">
                       {BOARDING_DESTINATIONS.map((dest, idx) => {
                         const isSelected = idx === activeDestIndex;
-                        const copy = t.houses[dest.houseNum];
                         return (
                           <button
                             key={dest.id}
@@ -592,7 +535,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                             }`}
                           >
                             <span className="block font-sans text-xs font-semibold truncate">
-                              {copy?.city}
+                              {dest.cityLabel[locale]}
                             </span>
                             <span className="block font-mono text-[10px] opacity-80">
                               Casa {dest.houseCode}
@@ -778,22 +721,17 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B111E] via-transparent to-black/25" />
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-[#060911]/80 backdrop-blur-md border border-white/15 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#F3DC9B]">
-                        Casa {reel.houseLabel}
-                      </span>
-                      <span className="px-2.5 py-1 rounded-full bg-[#060911]/75 backdrop-blur-md font-mono text-[10px] text-white/80">
-                        {reel.coords}
+                      <span className="px-2.5 py-1 rounded-full bg-[#060911]/85 backdrop-blur-md border border-white/15 font-sans text-[10px] font-semibold text-[#F3DC9B]">
+                        Ana · Casa {reel.houseLabel}
                       </span>
                     </div>
                   </div>
 
                   <div className="p-5 flex-1 flex flex-col justify-between gap-3">
                     <div>
-                      <div className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.12em] text-[#EAB344] mb-1">
+                      <div className="flex items-center gap-1.5 text-xs font-sans font-semibold text-[#EAB344] mb-1">
                         <MapPin className="w-3.5 h-3.5" />
-                        <span>
-                          {houseCopy?.city}, {houseCopy?.country}
-                        </span>
+                        <span>{reel.cityLabel[locale]}</span>
                       </div>
                       <h4 className="font-display text-xl font-bold text-[#F8FAFC] group-hover:text-[#F3DC9B] transition-colors">
                         {houseCopy?.title}
@@ -1070,7 +1008,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                     </button>
                     <button
                       type="submit"
-                      disabled={calculating || !pastCityValid}
+                      disabled={calculating || pastCity.trim().length < 2}
                       className="ps-btn-gold col-span-2 text-sm disabled:opacity-50"
                     >
                       <span>
@@ -1147,8 +1085,8 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
 
                   <div className="p-4 flex-1 flex flex-col justify-between gap-2">
                     <div>
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-[#EAB344] truncate">
-                        {localized?.city} · {localized?.shortTag}
+                      <span className="block font-sans text-[11px] font-semibold text-[#EAB344] truncate">
+                        {localized?.shortTag}
                       </span>
                       <h3 className="font-display text-base sm:text-lg font-bold text-[#F8FAFC] leading-snug mt-0.5 group-hover:text-[#F3DC9B] transition-colors line-clamp-2">
                         {localized?.title || house.title}

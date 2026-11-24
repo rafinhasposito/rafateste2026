@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import ScanningOverlay from "@/components/ScanningOverlay";
-import { API_URL, getCurrentSolarYear, getNextBirthdayYear } from "@/lib/astro";
+import { getCurrentSolarYear } from "@/lib/astro";
+import { prewarmSolarApi, runFreePastAudit } from "@/lib/pastAuditClient";
 import { type SupportedLocale, useI18n } from "@/lib/i18n";
 import {
   FREE_PAST_STORAGE_KEY,
@@ -39,22 +40,22 @@ interface MobileStoryExample {
 const STORY_EXAMPLES: MobileStoryExample[] = [
   {
     id: "zurich",
-    videoSrc: "/videos/houses/casa-02.mp4",
-    posterSrc: "/videos/houses/casa-02-poster.jpg",
+    videoSrc: "/videos/v3/ana-zurique.mp4",
+    posterSrc: "/videos/v3/ana-zurique-poster.jpg",
     city: { pt: "Zurique", es: "Zúrich", en: "Zurich", fr: "Zurich", it: "Zurigo" },
     theme: { pt: "Dinheiro", es: "Dinero", en: "Wealth", fr: "Argent", it: "Denaro" },
   },
   {
     id: "rome",
-    videoSrc: "/videos/houses/casa-05.mp4",
-    posterSrc: "/videos/houses/casa-05-poster.jpg",
+    videoSrc: "/videos/v3/demo-roma-casa7.mp4",
+    posterSrc: "/images/v3/demo-roma-casa7.jpg",
     city: { pt: "Roma", es: "Roma", en: "Rome", fr: "Rome", it: "Roma" },
     theme: { pt: "Amor", es: "Amor", en: "Love", fr: "Amour", it: "Amore" },
   },
   {
     id: "ny",
-    videoSrc: "/videos/houses/casa-01.mp4",
-    posterSrc: "/videos/houses/casa-01-poster.jpg",
+    videoSrc: "/videos/v3/demo-ny-casa10.mp4",
+    posterSrc: "/images/v3/demo-ny-casa10.jpg",
     city: { pt: "Nova York", es: "Nueva York", en: "New York", fr: "New York", it: "New York" },
     theme: { pt: "Carreira", es: "Carrera", en: "Career", fr: "Carrière", it: "Carriera" },
   },
@@ -112,7 +113,7 @@ const MOBILE_COPY: Record<SupportedLocale, MobileCopy> = {
     headlineStart: "A cidade do seu aniversário ",
     headlineHighlight: "muda o seu ano.",
     subline: "Descubra grátis o que ativou no seu último aniversário e veja se bateu com o que você viveu.",
-    samePersonHint: "Mesma pessoa no aniversário — toque para ver:",
+    samePersonHint: "Exemplo no mapa da Ana (as suas cidades mudam):",
     ctaFree: "Fazer meu teste grátis",
     ctaVideo: "Vídeo (1m30)",
     ctaNextYear: "Próximo aniversário",
@@ -429,6 +430,10 @@ export function MobileHomeFlow() {
   const { locale, t } = useI18n();
   const c = MOBILE_COPY[locale] || MOBILE_COPY.pt;
 
+  useEffect(() => {
+    prewarmSolarApi();
+  }, []);
+
   // Determine initial mobile view from URL hash (#consulta-gratuita or #planos)
   const [view, setView] = useState<MobileView>(() => {
     if (typeof window === "undefined") return "hook";
@@ -537,84 +542,31 @@ export function MobileHomeFlow() {
 
   const handleSubmitPast = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pastCity.trim() || !pastCoords) {
-      toast.error("Selecione na lista a cidade onde passou seu aniversário.");
+    if (!pastCity.trim()) {
+      toast.error("Informe a cidade onde passou seu aniversário.");
       return;
-    }
-
-    const effectiveTime = unknownTime ? "12:00" : birthTime || "12:00";
-    const [yyyy, mm, dd] = birthDate.split("-");
-    const formattedBirthDate = yyyy && mm && dd ? `${dd}/${mm}/${yyyy}` : birthDate;
-    const nextBirthdayYear = getNextBirthdayYear(birthDate);
-
-    sessionStorage.setItem("ps_natal_name", firstName.trim());
-    sessionStorage.setItem("ps_natal_date", birthDate);
-    sessionStorage.setItem("ps_natal_time", effectiveTime);
-    sessionStorage.setItem("ps_natal_place", birthCity.trim());
-    sessionStorage.setItem("ps_natal_unknown_time", unknownTime ? "1" : "0");
-    if (birthCoords) {
-      sessionStorage.setItem("ps_natal_lat", String(birthCoords.lat));
-      sessionStorage.setItem("ps_natal_lon", String(birthCoords.lon));
     }
 
     setCalculating(true);
     try {
-      const baseReq = {
-        date: formattedBirthDate,
-        time: effectiveTime,
-        city: pastCity.trim(),
-        lat: pastCoords.lat,
-        lon: pastCoords.lon,
-        birth_city: birthCity.trim(),
-        birth_lat: birthCoords?.lat,
-        birth_lon: birthCoords?.lon,
-      };
-
-      const [pastRes, nextStayRes] = await Promise.all([
-        fetch(`${API_URL}/audit_past`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...baseReq, year: Number(pastYear) }),
-        }),
-        fetch(`${API_URL}/audit_past`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...baseReq, year: Number(nextBirthdayYear) }),
-        }).catch(() => null),
-      ]);
-
-      if (!pastRes.ok) throw new Error("API error");
-
-      const pastData = await pastRes.json();
-      const nextStayData = nextStayRes && nextStayRes.ok ? await nextStayRes.json() : null;
-      const resolvedHouse = Number(pastData?.house || pastData?.sun_house || 1);
-      const parts = pastCity.split(",").map((s) => s.trim());
-
-      const payload: StoredFreePastPayload = {
-        userName: firstName.trim(),
+      const payload = await runFreePastAudit({
+        firstName,
         birthDate,
-        birthTime: effectiveTime,
-        birthPlace: birthCity.trim(),
+        birthTime,
+        unknownTime,
+        birthCity,
+        birthCoords,
         pastYear,
-        pastCityDisplay: pastCity.trim(),
-        pastCityShort: parts[0] || pastCity.trim(),
-        pastCountry: parts[parts.length - 1] || "Brasil",
-        pastLat: pastCoords.lat,
-        pastLon: pastCoords.lon,
-        pastHouse: resolvedHouse >= 1 && resolvedHouse <= 12 ? resolvedHouse : 1,
-        sunSign: pastData?.sun_sign || null,
-        ascendant: pastData?.ascendant || pastData?.sr_ascendant || null,
-        returnDate: pastData?.return_date || null,
-        returnTimeUtc: pastData?.return_time_utc || null,
-        nextYear: String(nextBirthdayYear),
-        nextStayHouse: nextStayData?.house ? Number(nextStayData.house) : null,
-        usedApproximateTime: unknownTime,
-      };
-
+        pastCity,
+        pastCoords,
+      });
       sessionStorage.setItem(FREE_PAST_STORAGE_KEY, JSON.stringify(payload));
       navigate("/meu-passado");
-    } catch {
-      toast.error("Não foi possível calcular agora. Verifique a cidade selecionada.");
+    } catch (err: any) {
+      toast.error(
+        err?.message ||
+          "Não foi possível calcular agora. Confira as cidades informadas e tente novamente."
+      );
     } finally {
       setCalculating(false);
     }
@@ -1091,7 +1043,7 @@ export function MobileHomeFlow() {
 
                 <button
                   type="submit"
-                  disabled={calculating || !pastCityValid}
+                  disabled={calculating || pastCity.trim().length < 2}
                   className="ps-btn-gold w-full h-14 text-[15px] disabled:opacity-50"
                 >
                   <span>{calculating ? c.calculatingBtn : c.revealBtn}</span>

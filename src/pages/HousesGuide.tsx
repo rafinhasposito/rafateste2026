@@ -181,17 +181,15 @@ export default function HousesGuide() {
                     </span>
                   </div>
 
-                  {/* Bottom Symbol City Pill + Live Indicator */}
+                  {/* Bottom Theme Tag + Personalization Indicator (ZERO Fixed Cities!) */}
                   <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#060911]/75 backdrop-blur-md border border-white/12 text-[11px] font-sans font-medium text-[#F3DC9B]">
-                      <MapPin className="w-3 h-3 text-[#EAB344]" />
-                      <span>
-                        {localized?.city || house.symbolCity.name} · {localized?.shortTag}
-                      </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#060911]/80 backdrop-blur-md border border-white/12 text-[11px] font-sans font-semibold text-[#F3DC9B]">
+                      <Sparkles className="w-3 h-3 text-[#EAB344]" />
+                      <span>{localized?.shortTag}</span>
                     </span>
 
-                    <span className="w-7 h-7 rounded-full bg-[#060911]/75 backdrop-blur-md border border-white/15 flex items-center justify-center text-[#F3DC9B] group-hover:bg-[#EAB344] group-hover:text-[#070A12] transition-colors">
-                      <Play className="w-3 h-3 fill-current ml-0.5" />
+                    <span className="px-2.5 py-1 rounded-full bg-[#060911]/80 backdrop-blur-md border border-white/12 text-[10px] font-sans font-medium text-[#B0BCCF] group-hover:text-white transition-colors">
+                      Varia p/ cada pessoa
                     </span>
                   </div>
                 </div>
