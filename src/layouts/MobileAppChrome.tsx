@@ -9,12 +9,12 @@ export function MobileAppChrome() {
   const navigate = useNavigate();
 
   // The bottom bar appears on main app views including /casas guide grid (NOT inside /casas/:id or /app/trailer)
-  const showBottomBar = ["/", "/casas", "/history", "/perfil", "/tecnologia", "/dashboard", "/v3-preview"].some(
+  const showBottomBar = ["/", "/consultar", "/v1-arquivo", "/casas", "/history", "/perfil", "/tecnologia", "/dashboard", "/v3-preview"].some(
     (p) => location.pathname === p || (p === "/v3-preview" && location.pathname.startsWith("/v3-preview"))
   );
 
   const isHousesGuide = location.pathname.startsWith("/casas");
-  const isHome = location.pathname === "/";
+  const isHome = location.pathname === "/" || location.pathname === "/consultar";
   const isOnboarding = location.pathname === "/app/onboarding";
 
   return (

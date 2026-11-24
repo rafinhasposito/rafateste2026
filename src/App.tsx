@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -82,6 +82,21 @@ const AffiliateShortLink = () => {
   return <Navigate to="/" replace />;
 };
 
+// Entrada inteligente em /: se vier com ?mode= (fluxo de consulta/retorno de checkout/auth),
+// abre o calculador Index sem forçar onboarding; caso contrário, renderiza a nova Home Editorial Visual integrada ao Shell.
+const HomeEntry = () => {
+  const [searchParams] = useSearchParams();
+  if (searchParams.get("mode") || searchParams.get("resetOnboarding")) {
+    return <Index skipAutoOnboarding />;
+  }
+  return <LandingV3 embeddedInShell />;
+};
+
+const V3Redirect = () => {
+  const location = useLocation();
+  return <Navigate to={{ pathname: "/", search: location.search }} replace />;
+};
+
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const App = () => (
@@ -105,7 +120,9 @@ const App = () => (
             
             {/* 1. Consumer Shell (Main App - Preserves state across resize) */}
             <Route element={<ConsumerShell />}>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<HomeEntry />} />
+              <Route path="/consultar" element={<Index skipAutoOnboarding />} />
+              <Route path="/v1-arquivo" element={<Index skipAutoOnboarding />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/history" element={<History />} />
               <Route path="/perfil" element={<Profile />} />
@@ -138,7 +155,7 @@ const App = () => (
             <Route path="/northstar" element={<NorthStarFlow />} />
             <Route path="/apple-3d" element={<AppleScrollExplosion />} />
             <Route path="/app/onboarding-v2" element={<Suspense fallback={<div className="min-h-screen bg-black" />}><OnboardingV2 /></Suspense>} />
-            <Route path="/v3" element={<LandingV3 />} />
+            <Route path="/v3" element={<V3Redirect />} />
             <Route path="/showcase-onboarding" element={<MobileOnboarding />} />
 
             <Route path="/v2-preview" element={<AppleResultPreview />} />

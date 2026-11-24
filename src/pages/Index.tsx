@@ -108,7 +108,11 @@ const pathOptions = [
 
 const currentYear = new Date().getFullYear().toString();
 
-const Index = () => {
+interface IndexProps {
+  skipAutoOnboarding?: boolean;
+}
+
+const Index = ({ skipAutoOnboarding = false }: IndexProps) => {
   const { showAlert } = useAlert();
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
@@ -125,9 +129,11 @@ const Index = () => {
 
     if (searchParams.get("resetOnboarding") === "true") {
       localStorage.removeItem("ps_onboarding_completed");
-      navigate("/", { replace: true });
+      navigate("/app/onboarding", { replace: true });
       return;
     }
+    if (skipAutoOnboarding || searchParams.get("mode")) return;
+
     const isSearchCrawler =
       typeof navigator !== "undefined" &&
       /bot|googlebot|crawler|spider|robot|crawling|lighthouse|facebookexternalhit|whatsapp|twitterbot|linkedinbot/i.test(
@@ -137,7 +143,7 @@ const Index = () => {
     if (!hasCompleted && !isSearchCrawler) {
       navigate("/app/onboarding", { replace: true });
     }
-  }, [searchParams, navigate, loading]);
+  }, [searchParams, navigate, loading, skipAutoOnboarding]);
   // -------------------------------------
   const [isScanning, setIsScanning] = useState(false);
   const [searchPath, setSearchPath] = useState<SearchPath>(null);

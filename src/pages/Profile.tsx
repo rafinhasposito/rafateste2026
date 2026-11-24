@@ -51,13 +51,37 @@ const Profile = () => {
         .select("full_name, birth_date, birth_time, birth_city, birth_lat, birth_lon")
         .eq("user_id", user.id)
         .maybeSingle();
+      const ssDate = sessionStorage.getItem("ps_natal_date") || "";
+      const ssTime = sessionStorage.getItem("ps_natal_time") || "";
+      const ssPlace = sessionStorage.getItem("ps_natal_place") || "";
+      const ssLat = sessionStorage.getItem("ps_natal_lat");
+      const ssLon = sessionStorage.getItem("ps_natal_lon");
+      const ssUnknown = sessionStorage.getItem("ps_natal_unknown_time") === "1";
+
       if (data) {
         setFullName(data.full_name || profile?.display_name || "");
-        setBirthDate(data.birth_date || "");
-        setBirthTime(data.birth_time ? String(data.birth_time).slice(0, 5) : "");
-        setBirthCity(data.birth_city || "");
-        if (data.birth_city) setBirthCityValid(true);
-        if (data.birth_lat && data.birth_lon) setBirthCoords({ lat: Number(data.birth_lat), lon: Number(data.birth_lon) });
+        setBirthDate(data.birth_date || ssDate);
+        const resolvedTime = data.birth_time ? String(data.birth_time).slice(0, 5) : ssTime;
+        setBirthTime(resolvedTime);
+        if (!data.birth_time && ssUnknown) setUnknownBirthTime(true);
+        const resolvedCity = data.birth_city || ssPlace;
+        setBirthCity(resolvedCity);
+        if (resolvedCity) setBirthCityValid(true);
+        if (data.birth_lat && data.birth_lon) {
+          setBirthCoords({ lat: Number(data.birth_lat), lon: Number(data.birth_lon) });
+        } else if (ssLat && ssLon) {
+          setBirthCoords({ lat: Number(ssLat), lon: Number(ssLon) });
+        }
+      } else {
+        setFullName(profile?.display_name || "");
+        if (ssDate) setBirthDate(ssDate);
+        if (ssTime) setBirthTime(ssTime);
+        if (ssUnknown) setUnknownBirthTime(true);
+        if (ssPlace) {
+          setBirthCity(ssPlace);
+          setBirthCityValid(true);
+        }
+        if (ssLat && ssLon) setBirthCoords({ lat: Number(ssLat), lon: Number(ssLon) });
       }
       const { data: cons } = await supabase
         .from("consultations")

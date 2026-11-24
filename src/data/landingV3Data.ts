@@ -68,6 +68,7 @@ export interface HeroBoardingDestination {
   houseLabel: string;
   themeShort: string;
   image: string;
+  video: string;
 }
 
 export const HERO_BOARDING_DESTINATIONS: HeroBoardingDestination[] = [
@@ -80,6 +81,7 @@ export const HERO_BOARDING_DESTINATIONS: HeroBoardingDestination[] = [
     houseLabel: "Casa 02 • Exemplo ilustrativo",
     themeShort: "Vida financeira, margens & reserva",
     image: "/images/abertura/zurich.jpg",
+    video: "/assets/zurich.mp4",
   },
   {
     id: "roma",
@@ -90,6 +92,7 @@ export const HERO_BOARDING_DESTINATIONS: HeroBoardingDestination[] = [
     houseLabel: "Casa 07 • Exemplo ilustrativo",
     themeShort: "Relacionamentos, acordos & parcerias",
     image: "/images/abertura/roma.jpg",
+    video: "/assets/roma.mp4",
   },
   {
     id: "ny",
@@ -100,6 +103,7 @@ export const HERO_BOARDING_DESTINATIONS: HeroBoardingDestination[] = [
     houseLabel: "Casa 10 • Exemplo ilustrativo",
     themeShort: "Carreira, reputação & liderança",
     image: "/images/abertura/ny.jpg",
+    video: "/assets/ny.mp4",
   },
   {
     id: "paris",
@@ -110,6 +114,7 @@ export const HERO_BOARDING_DESTINATIONS: HeroBoardingDestination[] = [
     houseLabel: "Casa 05 • Exemplo ilustrativo",
     themeShort: "Criatividade, autoria & leveza",
     image: "/images/abertura/paris.jpg",
+    video: "/assets/paris.mp4",
   },
 ];
 

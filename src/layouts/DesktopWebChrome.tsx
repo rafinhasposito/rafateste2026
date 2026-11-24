@@ -56,10 +56,22 @@ export function DesktopWebChrome() {
             <Link 
               to="/" 
               className={`text-sm font-ps-ui font-medium transition-colors ${
-                location.pathname === "/" ? "text-[#F5DE98]" : "text-white/65 hover:text-white"
+                location.pathname === "/" && !location.search.includes("mode=")
+                  ? "text-[#F5DE98]"
+                  : "text-white/65 hover:text-white"
               }`}
             >
-              Descobrir
+              Início
+            </Link>
+            <Link 
+              to="/consultar" 
+              className={`text-sm font-ps-ui font-medium transition-colors ${
+                location.pathname === "/consultar" || (location.pathname === "/" && location.search.includes("mode="))
+                  ? "text-[#F5DE98]"
+                  : "text-white/65 hover:text-white"
+              }`}
+            >
+              Consultar
             </Link>
             <Link 
               to="/casas" 
