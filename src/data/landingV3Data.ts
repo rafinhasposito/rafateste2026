@@ -81,7 +81,7 @@ export const HERO_BOARDING_DESTINATIONS: HeroBoardingDestination[] = [
     houseLabel: "Casa 02 • Exemplo ilustrativo",
     themeShort: "Vida financeira, margens & reserva",
     image: "/images/abertura/zurich.jpg",
-    video: "/assets/zurich.mp4",
+    video: "/videos/v3/voo-embarque-zurique.mp4",
   },
   {
     id: "roma",
@@ -130,9 +130,34 @@ export interface DemoCharacterCity {
   headline: string;
   interpretation: string;
   portraitImage: string;
+  portraitVideo: string;
   skylineImage: string;
   highlights: { label: string; detail: string }[];
 }
+
+export interface NeurosciencePillar {
+  step: string;
+  title: string;
+  body: string;
+}
+
+export const NEUROSCIENCE_PILLARS: NeurosciencePillar[] = [
+  {
+    step: "01 • O Sinal Invisível",
+    title: "Como o Wi-Fi ou a gravidade",
+    body: "Você não enxerga o sinal no ar, mas sente na prática por que certos anos fluem com leveza e outros parecem travar.",
+  },
+  {
+    step: "02 • A Antena do Ciclo",
+    title: "Sinal cheio em uma área",
+    body: "No minuto do seu aniversário, o Sol reinicia seu ciclo. A cidade onde você está funciona como uma antena, dando sinal cheio para uma das suas 12 Casas.",
+  },
+  {
+    step: "03 • Você Segue no Leme",
+    title: "Possibilidades, não mágica",
+    body: "Nada acontece sem a sua ação. Essa coordenada abre terreno fértil — você continua no comando, só para de remar contra a maré.",
+  },
+];
 
 export const DEMO_CHARACTER_PROFILE = {
   name: "Lucas M. (personagem demonstrativo)",
@@ -156,6 +181,7 @@ export const DEMO_CHARACTER_CITIES: DemoCharacterCity[] = [
     interpretation:
       "Para Lucas, passar a virada solar em Zurique desloca o Sol anual para a Casa 02. O ano pede decisões objetivas sobre fluxo de caixa, valor da própria hora e construção de patrimônio tangível.",
     portraitImage: "/images/v3/demo-zurique-casa2.jpg",
+    portraitVideo: "/videos/v3/demo-zurique-casa2.mp4",
     skylineImage: "/images/abertura/zurich.jpg",
     highlights: [
       { label: "Vida financeira", detail: "Revisão de contratos, corte de desperdícios e foco em margem real." },
@@ -176,6 +202,7 @@ export const DEMO_CHARACTER_CITIES: DemoCharacterCity[] = [
     interpretation:
       "Com exatamente a mesma data e hora de nascimento, estar em Roma no retorno solar leva o Sol de Lucas para a Casa 07. O ciclo deixa de ser solo e passa a girar em torno de alianças, clientes-chave e vida afetiva.",
     portraitImage: "/images/v3/demo-roma-casa7.jpg",
+    portraitVideo: "/videos/v3/demo-roma-casa7.mp4",
     skylineImage: "/images/abertura/roma.jpg",
     highlights: [
       { label: "Relacionamentos", detail: "Conversas decisivas sobre compromisso, reciprocidade e planos juntos." },
@@ -196,6 +223,7 @@ export const DEMO_CHARACTER_CITIES: DemoCharacterCity[] = [
     interpretation:
       "Se Lucas passa o mesmo minuto da virada em Nova York, o Sol anual sobe ao topo do mapa (Casa 10). A leitura muda para exposição profissional, responsabilidade maior e consolidação de reputação.",
     portraitImage: "/images/v3/demo-ny-casa10.jpg",
+    portraitVideo: "/videos/v3/demo-ny-casa10.mp4",
     skylineImage: "/images/abertura/ny.jpg",
     highlights: [
       { label: "Carreira", detail: "Projetos de vitrine, promoções ou reposicionamento de marca pessoal." },

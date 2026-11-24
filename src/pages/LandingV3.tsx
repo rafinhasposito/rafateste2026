@@ -18,6 +18,8 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
@@ -33,6 +35,7 @@ import {
   DEMO_CHARACTER_PROFILE,
   HERO_BOARDING_DESTINATIONS,
   HOME_CITY_DEFENSE,
+  NEUROSCIENCE_PILLARS,
   TRAVEL_RADIUS_OPTIONS,
   V3_ANGLES,
   V3_FAQ_ITEMS,
@@ -109,14 +112,28 @@ const LandingV3 = ({ embeddedInShell = false }: LandingV3Props) => {
   }, [prefersReducedMotion, heroPaused]);
   const activeHeroDest = HERO_BOARDING_DESTINATIONS[heroDestIdx];
 
-  // 2. Demonstração interativa: personagem fixo mudando de cidade
+  // 2. Demonstração interativa: personagem fixo mudando de cidade + vídeo falado de 14s do Theo
   const [demoCityId, setDemoCityId] = useState<string>(DEMO_CHARACTER_CITIES[0].id);
+  const [theoMuted, setTheoMuted] = useState(true);
+  const theoVideoRef = useRef<HTMLVideoElement | null>(null);
   const activeDemoCity = useMemo(
     () =>
       DEMO_CHARACTER_CITIES.find((c) => c.id === demoCityId) ||
       DEMO_CHARACTER_CITIES[0],
     [demoCityId]
   );
+
+  const toggleTheoSound = () => {
+    const vid = theoVideoRef.current;
+    if (!vid) return;
+    const nextMuted = !theoMuted;
+    vid.muted = nextMuted;
+    setTheoMuted(nextMuted);
+    if (!nextMuted) {
+      vid.currentTime = 0;
+      vid.play().catch(() => {});
+    }
+  };
 
   // 3. Consulta Gratuita em 4 etapas curtas (inline na página)
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
@@ -786,23 +803,95 @@ const LandingV3 = ({ embeddedInShell = false }: LandingV3Props) => {
       </section>
 
       {/* =====================================================================
-          DOBRA 2 — FAIXA EDITORIAL CLARA: DEMONSTRAÇÃO VISUAL CONFERIDA
-          "Mesmo aniversário. Cidades diferentes. Outras leituras."
+          DOBRA 2 — FAIXA EDITORIAL CLARA: EXPLICAÇÃO EM VÍDEO + DEMONSTRAÇÃO CONFERIDA
+          Pace & Lead (Wi-Fi/Gravidade) + Antena de Sinal Cheio + Leme vs. Maré
          ===================================================================== */}
       <section
         id="como-funciona"
         className="bg-[#F6F3EB] text-[#0B192C] py-16 sm:py-24 scroll-mt-20 border-b border-[#0B192C]/10"
       >
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="max-w-3xl mb-8 space-y-3">
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] font-semibold block text-[#9A6F11]">
-              Entenda em 15 segundos • Demonstração Visual
+          {/* Bloco Neurocientífico de Compreensão Imediata + Vídeo de 14s do Theo */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-14">
+            <div className="lg:col-span-7 space-y-5">
+              <span className="font-mono text-[11px] uppercase tracking-[0.2em] font-semibold block text-[#9A6F11]">
+                Entenda em 15 segundos • Sem Misticismo
+              </span>
+              <h2 className="font-ps-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B192C] leading-tight">
+                Você não vê o Wi-Fi nem a gravidade — mas sente na hora quando um ano flui e outro trava.
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+                {NEUROSCIENCE_PILLARS.map((pillar) => (
+                  <div
+                    key={pillar.step}
+                    className="p-4 rounded-2xl bg-white border border-[#0B192C]/10 shadow-[0_10px_28px_rgba(11,25,44,0.05)] space-y-1.5"
+                  >
+                    <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#9A6F11] font-bold block">
+                      {pillar.step}
+                    </span>
+                    <h3 className="font-ps-display text-base font-bold text-[#0B192C]">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-xs leading-relaxed text-[#475569]">
+                      {pillar.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Vídeo curto de 14s do Theo atravessando Estúdio -> Zurique -> Paris -> NY */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-[26px] overflow-hidden bg-[#0B192C] border border-[#C9A227]/45 shadow-[0_20px_50px_rgba(11,25,44,0.18)] aspect-video">
+                <video
+                  ref={theoVideoRef}
+                  src="/videos/v3/theo-explica-14s.mp4"
+                  poster="/videos/v3/theo-explica-poster.jpg"
+                  autoPlay={!prefersReducedMotion}
+                  muted={theoMuted}
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#071120]/90 via-transparent to-[#071120]/20 pointer-events-none" />
+
+                <button
+                  type="button"
+                  onClick={toggleTheoSound}
+                  className="absolute top-3.5 right-3.5 px-3.5 py-1.5 rounded-full bg-[#0B192C]/90 hover:bg-[#0B192C] text-[#F5DE98] border border-[#C9A227]/55 text-[11px] font-semibold inline-flex items-center gap-1.5 shadow-lg transition-transform active:scale-95"
+                >
+                  {theoMuted ? (
+                    <>
+                      <VolumeX className="w-3.5 h-3.5 text-[#E5C158]" />
+                      <span>Ouvir explicação (14s)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Volume2 className="w-3.5 h-3.5 text-emerald-300" />
+                      <span>Som ligado</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="absolute bottom-3 left-3.5 right-3.5 pointer-events-none">
+                  <p className="text-[11px] sm:text-xs text-white/95 bg-[#071120]/80 backdrop-blur-md rounded-xl px-3 py-2 border border-white/10 leading-snug">
+                    “Mesmo dia, mesma pessoa. O lugar do seu aniversário define qual área da vida ganha sinal cheio nos próximos 12 meses.”
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-w-3xl mb-6 space-y-2">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] font-semibold block text-[#9A6F11]">
+              Demonstração Prática Conferida
             </span>
-            <h2 className="font-ps-display text-2xl sm:text-4xl font-bold tracking-tight text-[#0B192C]">
+            <h3 className="font-ps-display text-xl sm:text-3xl font-bold tracking-tight text-[#0B192C]">
               Mesmo aniversário. Cidades diferentes. Outras leituras.
-            </h2>
+            </h3>
             <p className="text-sm sm:text-base leading-relaxed text-[#1E293B]">
-              Na astrologia da Revolução Solar, a latitude e a longitude onde você está no instante do retorno solar reposicionam as Casas do novo ciclo. Toque nas cidades abaixo e veja o que muda na prática para uma mesma pessoa:
+              Toque nas cidades abaixo e veja como a cena e a Casa Solar mudam para os mesmos dados natais:
             </p>
           </div>
 
@@ -877,11 +966,25 @@ const LandingV3 = ({ embeddedInShell = false }: LandingV3Props) => {
               className="rounded-[28px] border border-[#0B192C]/10 bg-white shadow-[0_20px_55px_rgba(11,25,44,0.08)] overflow-hidden grid grid-cols-1 lg:grid-cols-12"
             >
               <div className="lg:col-span-6 relative min-h-[260px] sm:min-h-[360px] bg-[#0B192C]">
-                <img
-                  src={activeDemoCity.portraitImage}
-                  alt={`Aniversário em ${activeDemoCity.city}`}
-                  className="w-full h-full object-cover"
-                />
+                {prefersReducedMotion ? (
+                  <img
+                    src={activeDemoCity.portraitImage}
+                    alt={`Aniversário em ${activeDemoCity.city}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <video
+                    key={activeDemoCity.id}
+                    src={activeDemoCity.portraitVideo}
+                    poster={activeDemoCity.portraitImage}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-full object-cover"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#071120]/90 via-transparent to-[#071120]/25" />
                 <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-end justify-between gap-2 text-white">
                   <div>
@@ -931,7 +1034,7 @@ const LandingV3 = ({ embeddedInShell = false }: LandingV3Props) => {
                 </div>
 
                 <p className="text-xs leading-relaxed border-t border-[#0B192C]/10 pt-4 text-[#475569]">
-                  <strong>Importante:</strong> não existe “Paris = amor” ou “Nova York = dinheiro” igual para todos. Para outra data e horário de nascimento, Zurique pode ativar outra Casa completamente diferente.
+                  <strong>Não existe cidade mágica:</strong> quem manda são as suas 12 Casas. Zurique pode abrir prosperidade para uma pessoa — ou apenas um ano de recolhimento e silêncio para o amigo que nasceu em outro horário.
                 </p>
               </div>
             </motion.div>
@@ -956,10 +1059,10 @@ const LandingV3 = ({ embeddedInShell = false }: LandingV3Props) => {
                 Primeiro Passo • Experiência Gratuita na Página
               </span>
               <h2 className="font-ps-display text-2xl sm:text-3xl font-bold text-white mb-1.5">
-                Comece por um aniversário que você já viveu.
+                Qual área teve sinal cheio no seu último aniversário?
               </h2>
               <p className="text-sm text-white/75 max-w-2xl">
-                Escolha um aniversário passado e conheça gratuitamente a leitura astrológica daquele ciclo — seus dados já ficam pré-preenchidos caso decida explorar o próximo ano.
+                Comece por um aniversário que você já viveu — e veja também qual Casa você vai ativar se passar o próximo no mesmo lugar. Sem cartão e sem pedir e-mail antes do resultado.
               </p>
             </div>
 
