@@ -1,80 +1,70 @@
-# Protocolo Solar V3 — Playbook de Lançamento, Testes A/B (7 Dias) e Expansão Global
+# Protocolo Solar V3 — Playbook Completo (Produto Visual, Tráfego Pago & Expansão Global)
 
-> **Regra de Preservação**: A V1 permanece 100% intacta em `https://protocolosolar.com.br/`. Toda a nova jornada de aquisição (Quiz Interativo de 5 etapas + Validação Reversa Gratuita + Duplo Contraste) roda em prévia dedicada em `https://protocolosolar.com.br/v3`.
+> **Regra de Preservação**: A V1 permanece 100% intacta em `https://protocolosolar.com.br/`. A nova Home/Landing Page visual de alta conversão roda em prévia dedicada em `https://protocolosolar.com.br/v3` (com alternância entre **Claro Editorial & Azul Profundo** e **Azul Noturno** `?tema=escuro`).
 
 ---
 
-## 1. O que a V3 Resolve (Baseado no Piloto MiroFish + Análise Estratégica)
+## 1. Arquitetura Visual da Nova `/v3` (Fim da Página "Só Texto")
 
-| Objeção Real (Tráfego Frio) | Solução Implementada na V3 (`/v3`) e Checkout |
+| Dobra | Função de Conversão & Direção de Arte |
 | :--- | :--- |
-| *"Por que pagar se existe mapa astral grátis?"* | Selo **Swiss Ephemeris** (efemérides astronômicas reais) + diferenciação clara: não é horóscopo natal estático, é relocalização anual de aniversário. |
-| Ceticismo antes de tirar o cartão | **Validação Reversa Gratuita** (Etapa 3→5): prova com cálculo real via `/audit_past` qual Casa esteve ativa no último aniversário que a pessoa já viveu. |
-| *"Não sei meu horário exato de nascimento"* | Checkbox **"Não sei meu horário exato (usar 12:00 aproximado)"** em `/v3` e `/perfil` com aviso técnico transparente sobre fronteira de Casas. |
-| *"Não tenho dinheiro para viajar para fora"* | Filtro de raio (**Ficar na cidade**, **até 300 km**, **até 3.000 km**, **Mundo**) + **Manual de Defesa da Cidade Natal** (força + ponto cego caso fique em casa). |
-| Confusão na escada de preço | Padronização total (`R$ 19,90` 1 Casa/Cidade • `R$ 49,90` Pacote 3 Consultas • `R$ 99,90` Mapa Completo 12 Casas) com todas as **8 áreas da vida** sempre inclusas. |
-| Desconfiança no programa de afiliados (20% Pix) | Protocolo **SENTIR → MEDIR → RECOMENDAR** + aviso `#publi` (CONAR) + selo de **Indicação Verificada** no checkout garantindo preço oficial idêntico. |
+| **1. Hero Visual + Cartão de Embarque** | Fundo claro marfim (`#F7F4EC`), azul profundo (`#0B192C`), detalhes dourados, fotografia real de destinos e **Cartão de Embarque Solar** vivo. No celular, título, explicação curta e botão `[Consultar meu aniversário passado grátis]` vêm **antes** da imagem. |
+| **2. Demonstração Visual Conferida** | *"Mesmo aniversário. Cidades diferentes. Outras leituras."* — Personagem fixo (`Lucas M. • 28/10 • 14:20 • São Paulo`) com retratos reais em **Zurique (Casa 02)**, **Roma (Casa 07)** e **Nova York (Casa 10)** mostrando na hora o que muda, sem prometer "Paris = amor" genérico. |
+| **3. Consulta Gratuita Inline (4 Etapas)** | Data → Horário (com opção `12:00 aproximado` e aviso ético) → Cidade natal → Ano + Cidade onde passou o aniversário → **Resultado gratuito liberado ANTES de pedir e-mail** (com campo opcional pós-resultado). |
+| **4. Passagem para o Próximo Ciclo** | 4 cartões fotográficos de prioridade (Carreira, Relacionamentos, Vida Financeira, Rotina & Bem-Estar) + filtros reais de distância (Cidade atual com **Manual de Defesa**, até ~300 km, Brasil/LatAm, Mundo). |
+| **5. Amostra Real Ampliável do Relatório** | 3 páginas visuais reais clicáveis/ampliáveis no celular (Radar de Destinos & Defesa, As 8 Áreas Explicadas e Cartão de Embarque 9:16) + *O que recebe / Como usar / Acesso imediato*. |
+| **6. Planos Padronizados Sem Ruído** | `R$ 19,90` (1 Leitura — compra completa de entrada), `R$ 49,90` (Comparador de 3 Cidades) e `R$ 99,90` (Dossiê Completo 12 Casas), **sem selo artificial de "mais vendido"**, + selo **Swiss Ephemeris** e compliance CONAR (`#publi` • `SENTIR → MEDIR → RECOMENDAR`). |
+| **7. FAQ Direto + Fechamento** | 7 objeções reais respondidas com transparência (incluindo *"A leitura garante que algo vai acontecer?"* → resposta ética direta: não há garantia determinista de acontecimentos). |
 
 ---
 
-## 2. Plano de 3 Testes A/B Reais para TikTok / Instagram Reels (Próximos 7 Dias)
+## 2. Segmentação de Público-Alvo (Dados Globais de Mercado)
 
-Todos os roteiros abaixo respeitam **Meta Ads** (zero *Personal Attributes* acusatórios) e **TikTok Ads** (zero promessa mágica, zero uso indevido de nomes de celebridades).
-
-### Teste A — Ângulo Fitness & Rotina (Casa 06)
-- **URL de Destino**: `https://protocolosolar.com.br/v3?angulo=fitness`
-- **Público-alvo**: 24–42 anos, interesses em corrida, academia, rotina, produtividade, hábitos saudáveis e planejamento anual.
-- **Gancho (0–3s)**: *"Já reparou que em alguns anos a disciplina flui sem esforço e em outros tudo parece travar na mesma rotina?"*
-- **Roteiro (15–30s)**:
-  - **3–10s**: *"Na astrologia de relocalização, o lugar onde você passa a virada exata do seu aniversário define qual área da vida fica em destaque pelos próximos 12 meses."*
-  - **10–20s**: *"E você não precisa acreditar: coloca a data do seu nascimento e a cidade do seu último aniversário no Protocolo Solar para conferir de graça o ano que você já viveu."*
-  - **20–28s**: *"Depois, o sistema mostra o que ativa se você ficar na sua cidade — ou opções até 300 km de carro para o próximo ciclo."*
-- **Métrica de Decisão (7 dias)**:
-  - Thumbstop (3s view) ≥ 30% | CTR de saída ≥ 1,5% | Conclusão da Etapa 5 (Validação Reversa) ≥ 35% | CAC de entrada (`R$ 19,90+`) ≤ R$ 22,00.
-
-### Teste B — Ângulo Carreira & Expansão Profissional (Casa 10)
-- **URL de Destino**: `https://protocolosolar.com.br/v3?angulo=carreira`
-- **Público-alvo**: 26–45 anos, profissionais liberais, empreendedores, transição de carreira, viagens planejadas.
-- **Gancho (0–3s)**: *"Antes de escolher onde passar o próximo aniversário, veja o cálculo que mostra qual área do ano vai ganhar protagonismo."*
-- **Roteiro (15–30s)**:
-  - **3–10s**: *"O Protocolo Solar usa efemérides astronômicas Swiss Ephemeris para cruzar seu nascimento com as coordenadas da cidade do seu aniversário."*
-  - **10–20s**: *"Primeiro, você testa gratuitamente um aniversário que já passou e mede na prática se a leitura descreve o ano que você viveu."*
-  - **20–28s**: *"Se fizer sentido, você compara sua cidade atual com destinos alinhados ao foco de carreira e visibilidade — sem precisar sair do país."*
-- **Métrica de Decisão (7 dias)**:
-  - CTR ≥ 1,4% | Início de Checkout (`/credits`) ≥ 8% dos que concluem a Etapa 5 | Ticket médio (mix R$ 19,90 / 49,90 / 99,90) ≥ R$ 42,00.
-
-### Teste C — Ângulo Cético & Prova Reversa (Aniversário Passado)
-- **URL de Destino**: `https://protocolosolar.com.br/v3?angulo=cetico`
-- **Público-alvo**: Aberto (23–44 anos) + lookalike de visitantes/engajamento, pessoas curiosas mas desconfiadas de astrologia genérica.
-- **Gancho (0–3s)**: *"Não acredite em astrologia de aniversário: teste no ano que você JÁ viveu e tire sua própria conclusão em 40 segundos."*
-- **Roteiro (15–30s)**:
-  - **3–12s**: *"Coloque sua data, horário (ou 12:00 aproximado se não lembrar) e a cidade onde você passou seu último aniversário."*
-  - **12–22s**: *"O cálculo é gratuito e mostra em texto direto quais temas dominaram seus últimos 12 meses — trabalho, rotina, finanças ou recomeço."*
-  - **22–30s**: *"Só se bater com a sua história real você decide se quer ver as cidades para o próximo aniversário."*
-- **Métrica de Decisão (7 dias)**:
-  - Taxa de clique no botão `"Sim, bateu muito!"` na Etapa 5 ≥ 45% | Conversão pós-validação para `/credits` ≥ 10% | CPA global ≤ R$ 28,00.
+1. **Mulheres Millennials (28 a 44 anos) — Núcleo Principal de Receita**:
+   - Maior autonomia financeira para viagens regionais/internacionais e foco em transição de carreira, monetização, estabilidade material e parcerias.
+2. **Mulheres Geração Z (18 a 27 anos) — Motor de Viralidade e Volume**:
+   - Compra rápida de entrada (`R$ 19,90`), forte compartilhamento do **Cartão de Embarque 9:16** nos Stories e preferência por destinos próximos (até 300–1.000 km).
+3. **Mulheres Geração X & Boomers (45 a 65+ anos) — Segmento de Crescimento Rápido e Leilão Mais Barato**:
+   - Alto poder aquisitivo, agenda flexível para viajar na data do aniversário e menor concorrência direta nos leilões de Meta Ads.
+4. **Polos Geográficos Prioritários**:
+   - **Brasil**: São Paulo, Rio de Janeiro, Brasília, Belo Horizonte, Curitiba e Florianópolis (ou Brasil aberto com otimização automática de conversão).
+   - **LatAm & Ibéria**: Cidade do México, Buenos Aires, Bogotá, Santiago, Lisboa, Madrid e Barcelona.
+   - **EUA, Canadá & Europa**: Califórnia (LA/SF), Nova York, Miami, Austin, Londres, Dublin e Toronto.
 
 ---
 
-## 3. Roteiro de Expansão Global (3 Fases — Sem Quebrar o BR Atual)
+## 3. Os 3 Testes A/B para TikTok & Instagram Reels (Próximos 7 Dias)
 
-1. **Fase 1 — Brasil & PT-BR (Agora — V3 em validação)**:
-   - Stack atual intacta: React + Supabase + Python Swiss Ephemeris + Mercado Pago (Pix & Cartão em BRL: `R$ 19,90 / R$ 49,90 / R$ 99,90`).
-   - Meta de validação: 300+ validações reversas concluídas em `/v3` + taxa de conversão paga sustentável antes de escalar verba ou substituir `/`.
-2. **Fase 2 — LatAm & Espanha (ES)**:
-   - Localização i18n dos textos do Quiz `/v3`, 12 Casas (`housesShowcase.ts`) e Bilhete de Embarque Cósmico em espanhol neutro.
-   - Preço sugerido em USD (`$4.90 / $12.90 / $24.90`) com checkout local + cartão internacional.
-3. **Fase 3 — EUA & Europa (EN)**:
-   - Adoção de **Merchant of Record (MoR)** (Lemon Squeezy ou Paddle) para absorver VAT/Sales Tax internacional automaticamente sem fricção fiscal no Brasil.
-   - Posicionamento: *Solar Return Relocation Intelligence (Swiss Ephemeris)* com foco em *Birthday Relocation Audit* (free past-year proof → paid city unlock).
+> **Compliance Meta & TikTok Ads (2026)**: Segmentação 18+, zero *Atributos Pessoais* acusatórios (*"Você está sem dinheiro?"*), zero promessas mágicas deterministas e zero nomes de celebridades.
+
+### Teste 1 — Rotina & Bem-Estar (Casa 06)
+- **Destino**: `https://protocolosolar.com.br/v3?angulo=fitness`
+- **Gancho (0–3s)**: Cena de tênis de corrida + café da manhã. *"Já reparou como em certos anos manter treino e rotina parece fluir — e em outros exige o dobro de esforço?"*
+- **Corpo (4–25s)**: Mostra como a coordenada do aniversário muda a Casa Solar do ciclo (Casa 06 = hábitos e organização) e convida a testar grátis um aniversário já vivido.
+- **Meta**: Custo por Consulta Gratuita Concluída < R$ 2,50 | CPA em R$ 19,90 < R$ 15,00.
+
+### Teste 2 — Carreira & Posicionamento (Casa 10 / Casa 02)
+- **Destino**: `https://protocolosolar.com.br/v3?angulo=carreira`
+- **Gancho (0–3s)**: Fechando o notebook no fim do dia. *"Antes de escolher onde passar seu próximo aniversário, veja o cálculo que mostra qual área do novo ciclo ganha destaque."*
+- **Corpo (4–25s)**: Demonstra a diferença entre Casa 02 (estrutura financeira) e Casa 10 (projeção profissional) e chama para a consulta gratuita do aniversário passado.
+- **Meta**: Conversão Página → Checkout > 8% | Ticket médio mix (R$ 19,90 / 49,90 / 99,90) ≥ R$ 38,00.
+
+### Teste 3 — Validação Reversa do Passado (Quebra de Ceticismo)
+- **Destino**: `https://protocolosolar.com.br/v3?angulo=cetico`
+- **Gancho (0–3s)**: Gravação de tela abrindo `/v3`. *"Eu era cético com Revolução Solar até testar gratuitamente a cidade onde passei meu aniversário passado..."*
+- **Corpo (4–25s)**: Mostra as 4 etapas rápidas na tela, a revelação gratuita sem pedir cartão/e-mail antes, e a comparação com o próximo aniversário.
+- **Meta**: Volume de Consultas Gratuitas Concluídas + Transição para Relatório Pago > 10%.
 
 ---
 
-## 4. Checklist Pré-Tráfego (Compliance & Operação)
+## 4. Passo a Passo de Expansão Global em 3 Fases
 
-- [x] V1 preservada intacta em `/`
-- [x] V3 isolada em `/v3` com suporte a `?angulo=fitness|carreira|cetico` e `?ref=CODIGO`
-- [x] Opção `"Não sei meu horário exato (usar 12:00 aproximado)"` com aviso técnico ético em `/v3` e `/perfil`
-- [x] Padronização `"Pacote 3 Consultas"` (`R$ 49,90`) em `/credits` e `/parceiros` (zero resquício de `"Pacote Expansão"`)
-- [x] Protocolo CONAR (`#publi` + `SENTIR → MEDIR → RECOMENDAR`) em `/parceiros` e `/v3`
-- [x] Selo técnico Swiss Ephemeris + banner de indicação verificada em `/credits`
+1. **Fase 1 — Brasil & Portugal (Validação de Baixo Custo em BRL/EUR)**:
+   - Termos: *"Revolução Solar"*, *"Onde passar o aniversário"*.
+   - Pagamento atual em produção: Pix e Cartão via Mercado Pago (`R$ 19,90 / R$ 49,90 / R$ 99,90`), entrega digital instantânea frente a concorrentes manuais mais caros.
+2. **Fase 2 — Espanha & América Latina Hispânica (Oceano Azul)**:
+   - Termos: *"Revolución Solar"*, *"Retorno Solar"*, *"Dónde pasar tu cumpleaños"*.
+   - Oferta sugerida: `$9,90–$14,90 USD` na LatAm e `€19,90` na Espanha com entrega imediata na tela.
+3. **Fase 3 — EUA, Reino Unido, Canadá & Europa Ocidental (Tier-1)**:
+   - Termos: *"Solar Return Relocation"*, *"Birthday Map"*, *"Astrocartography Birthday Travel"*.
+   - Infraestrutura fiscal obrigatória: **Merchant of Record (Lemon Squeezy ou Paddle)** para recolhimento automático de VAT/Sales Tax internacional (`$19,90 USD / €19,90 EUR / £19,90 GBP`).

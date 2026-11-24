@@ -15,49 +15,190 @@ export interface V3AngleConfig {
 export const V3_ANGLES: Record<V3AngleKey, V3AngleConfig> = {
   padrao: {
     key: "padrao",
-    label: "Padrão • Quiz + Passado Grátis",
-    badge: "Cálculo Astronômico Swiss Ephemeris • Zero Horóscopo Genérico",
-    headline: "Descubra grátis qual Casa a cidade do seu último aniversário",
-    highlight: "ativou no seu ano.",
+    label: "Home Editorial • Destinos + Passado Grátis",
+    badge: "PROTOCOLO SOLAR • REVOLUÇÃO SOLAR PERSONALIZADA",
+    headline: "Onde você quer começar",
+    highlight: "seu próximo ano de vida?",
     subcopy:
-      "Explore como a localização geográfica da virada do aniversário altera qual das 12 áreas ganha destaque nos próximos 12 meses. Faça o teste gratuito do seu último ano antes de decidir qualquer plano.",
-    ctaLabel: "Começar Teste Grátis (2 min)",
+      "Explore destinos para o seu aniversário com uma leitura personalizada de Revolução Solar. Comece conhecendo gratuitamente a interpretação de um aniversário que você já viveu.",
+    ctaLabel: "Consultar meu aniversário passado grátis",
     featuredHouseId: null,
   },
   fitness: {
     key: "fitness",
-    label: "Teste 1 • Rotina & Fitness (Casa 06)",
-    badge: "Casa 06 • Rotina, Disciplina & Alta Performance",
-    headline: "Como o mapa do aniversário influencia o ritmo da rotina,",
-    highlight: "dos treinos e da disciplina.",
+    label: "Teste 1 • Rotina & Bem-Estar (Casa 06)",
+    badge: "Casa 06 • Rotina, Disciplina & Vitalidade",
+    headline: "Como o destino do aniversário conversa com",
+    highlight: "sua rotina, treinos e bem-estar.",
     subcopy:
-      "Na Revolução Solar relocada, cada cidade destaca um setor diferente do ano — e a Casa 06 concentra o foco em hábitos, constância e saúde física. Teste grátis qual Casa rodou no seu último aniversário.",
-    ctaLabel: "Fazer Teste Grátis da Minha Rotina",
+      "Na Revolução Solar relocada, cada coordenada destaca um tema diferente do ciclo — e a Casa 06 coloca foco em hábitos, constância e saúde física. Comece testando grátis seu último aniversário.",
+    ctaLabel: "Consultar meu aniversário passado grátis",
     featuredHouseId: 6,
   },
   carreira: {
     key: "carreira",
     label: "Teste 2 • Carreira & Visibilidade (Casa 10)",
-    badge: "Casa 10 & Casa 02 • Posicionamento, Carreira & Caixa",
-    headline: "Veja como a cidade do aniversário muda o foco em",
-    highlight: "carreira, visibilidade e finanças.",
+    badge: "Casa 10 & Casa 02 • Carreira, Posicionamento & Finanças",
+    headline: "Explore destinos de aniversário com foco em",
+    highlight: "carreira, visibilidade e estrutura.",
     subcopy:
-      "O Protocolo Solar calcula em quais coordenadas do Brasil ou do mundo a Casa 10 (reconhecimento e liderança) e a Casa 02 (caixa e patrimônio) entram em destaque. Valide primeiro no seu último aniversário grátis.",
-    ctaLabel: "Simular Meu Ano Profissional Grátis",
+      "Veja em quais coordenadas a Casa 10 (projeção profissional) e a Casa 02 (organização financeira) ganham protagonismo no seu mapa anual. Confira grátis o que seu último aniversário ativou.",
+    ctaLabel: "Consultar meu aniversário passado grátis",
     featuredHouseId: 10,
   },
   cetico: {
     key: "cetico",
-    label: "Teste 3 • Cético / Prova do Passado",
-    badge: "Validação Reversa Gratuita • Teste Às Cegas",
-    headline: "Antes de planejar o próximo aniversário, teste grátis",
-    highlight: "onde você já passou.",
+    label: "Teste 3 • Validação do Passado",
+    badge: "Consulta Gratuita • Teste em um Ciclo Já Vivido",
+    headline: "Antes de planejar o próximo aniversário, consulte grátis",
+    highlight: "um ano que você já viveu.",
     subcopy:
-      "Coloque a cidade do seu último aniversário e confira se o cálculo astronômico da Casa ativada bate com o que realmente aconteceu nos últimos 12 meses — sem cartão e sem criar senha antes.",
-    ctaLabel: "Fazer Teste Cego do Passado Grátis",
+      "Informe onde você passou um aniversário anterior e veja a leitura astrológica daquele ciclo calculada via Swiss Ephemeris — sem cartão e sem pedir e-mail antes do resultado.",
+    ctaLabel: "Consultar meu aniversário passado grátis",
     featuredHouseId: null,
   },
 };
+
+export interface HeroBoardingDestination {
+  id: string;
+  city: string;
+  country: string;
+  iata: string;
+  coords: string;
+  houseLabel: string;
+  themeShort: string;
+  image: string;
+}
+
+export const HERO_BOARDING_DESTINATIONS: HeroBoardingDestination[] = [
+  {
+    id: "zurich",
+    city: "Zurique",
+    country: "Suíça",
+    iata: "ZRH",
+    coords: "47°22' N • 08°33' E",
+    houseLabel: "Casa 02 • Exemplo ilustrativo",
+    themeShort: "Vida financeira, margens & reserva",
+    image: "/images/abertura/zurich.jpg",
+  },
+  {
+    id: "roma",
+    city: "Roma",
+    country: "Itália",
+    iata: "FCO",
+    coords: "41°54' N • 12°29' E",
+    houseLabel: "Casa 07 • Exemplo ilustrativo",
+    themeShort: "Relacionamentos, acordos & parcerias",
+    image: "/images/abertura/roma.jpg",
+  },
+  {
+    id: "ny",
+    city: "Nova York",
+    country: "Estados Unidos",
+    iata: "JFK",
+    coords: "40°43' N • 74°00' W",
+    houseLabel: "Casa 10 • Exemplo ilustrativo",
+    themeShort: "Carreira, reputação & liderança",
+    image: "/images/abertura/ny.jpg",
+  },
+  {
+    id: "paris",
+    city: "Paris",
+    country: "França",
+    iata: "CDG",
+    coords: "48°51' N • 02°21' E",
+    houseLabel: "Casa 05 • Exemplo ilustrativo",
+    themeShort: "Criatividade, autoria & leveza",
+    image: "/images/abertura/paris.jpg",
+  },
+];
+
+export interface DemoCharacterCity {
+  id: string;
+  city: string;
+  country: string;
+  iata: string;
+  coords: string;
+  houseNumber: number;
+  houseLabel: string;
+  solarAscendant: string;
+  headline: string;
+  interpretation: string;
+  portraitImage: string;
+  skylineImage: string;
+  highlights: { label: string; detail: string }[];
+}
+
+export const DEMO_CHARACTER_PROFILE = {
+  name: "Lucas M. (personagem demonstrativo)",
+  birthDate: "28 de outubro",
+  birthTime: "14:20",
+  birthCity: "São Paulo, SP",
+  note: "Cálculos reais conferidos via Swiss Ephemeris para os mesmos dados natais.",
+};
+
+export const DEMO_CHARACTER_CITIES: DemoCharacterCity[] = [
+  {
+    id: "zurique",
+    city: "Zurique",
+    country: "Suíça",
+    iata: "ZRH",
+    coords: "47°22' N • 08°33' E",
+    houseNumber: 2,
+    houseLabel: "Sol na Casa 02",
+    solarAscendant: "Ascendente anual em Libra",
+    headline: "Foco em estrutura material, precificação e autonomia financeira",
+    interpretation:
+      "Para Lucas, passar a virada solar em Zurique desloca o Sol anual para a Casa 02. O ano pede decisões objetivas sobre fluxo de caixa, valor da própria hora e construção de patrimônio tangível.",
+    portraitImage: "/images/v3/demo-zurique-casa2.jpg",
+    skylineImage: "/images/abertura/zurich.jpg",
+    highlights: [
+      { label: "Vida financeira", detail: "Revisão de contratos, corte de desperdícios e foco em margem real." },
+      { label: "Trabalho", detail: "Menos volume disperso, mais entregas bem pagas e previsíveis." },
+      { label: "Ritmo pessoal", detail: "Busca por segurança concreta, conforto e rotina estável." },
+    ],
+  },
+  {
+    id: "roma",
+    city: "Roma",
+    country: "Itália",
+    iata: "FCO",
+    coords: "41°54' N • 12°29' E",
+    houseNumber: 7,
+    houseLabel: "Sol na Casa 07",
+    solarAscendant: "Ascendente anual em Escorpião",
+    headline: "Foco em relacionamentos, sociedades e acordos a dois",
+    interpretation:
+      "Com exatamente a mesma data e hora de nascimento, estar em Roma no retorno solar leva o Sol de Lucas para a Casa 07. O ciclo deixa de ser solo e passa a girar em torno de alianças, clientes-chave e vida afetiva.",
+    portraitImage: "/images/v3/demo-roma-casa7.jpg",
+    skylineImage: "/images/abertura/roma.jpg",
+    highlights: [
+      { label: "Relacionamentos", detail: "Conversas decisivas sobre compromisso, reciprocidade e planos juntos." },
+      { label: "Negócios", detail: "Crescimento via sócios, parcerias comerciais e negociações diretas." },
+      { label: "Ponto de atenção", detail: "Posicionar limites claros sem anular a própria vontade." },
+    ],
+  },
+  {
+    id: "ny",
+    city: "Nova York",
+    country: "EUA",
+    iata: "JFK",
+    coords: "40°43' N • 74°00' W",
+    houseNumber: 10,
+    houseLabel: "Sol na Casa 10",
+    solarAscendant: "Ascendente anual em Leão",
+    headline: "Foco em carreira, visibilidade pública e tomada de comando",
+    interpretation:
+      "Se Lucas passa o mesmo minuto da virada em Nova York, o Sol anual sobe ao topo do mapa (Casa 10). A leitura muda para exposição profissional, responsabilidade maior e consolidação de reputação.",
+    portraitImage: "/images/v3/demo-ny-casa10.jpg",
+    skylineImage: "/images/abertura/ny.jpg",
+    highlights: [
+      { label: "Carreira", detail: "Projetos de vitrine, promoções ou reposicionamento de marca pessoal." },
+      { label: "Autoridade", detail: "Mais cobrança por entrega real, liderança e postura estratégica." },
+      { label: "Equilíbrio", detail: "Proteger descanso para não transformar ambição em exaustão." },
+    ],
+  },
+];
 
 export interface V3PriorityOption {
   id: string;
@@ -65,50 +206,41 @@ export interface V3PriorityOption {
   title: string;
   subtitle: string;
   tag: string;
+  image: string;
 }
 
 export const V3_PRIORITY_OPTIONS: V3PriorityOption[] = [
   {
-    id: "dinheiro",
-    houseId: 2,
-    title: "Dinheiro & Caixa Forte",
-    subtitle: "Precificar melhor, organizar finanças e construir reserva",
-    tag: "Casa 02",
-  },
-  {
     id: "carreira",
     houseId: 10,
-    title: "Carreira, Fama & Modo CEO",
-    subtitle: "Ganhar visibilidade, autoridade no nicho e grandes contratos",
+    title: "Carreira & Posicionamento",
+    subtitle: "Visibilidade profissional, liderança, metas e reputação no mercado",
     tag: "Casa 10",
+    image: "/images/abertura/ny.jpg",
+  },
+  {
+    id: "relacionamentos",
+    houseId: 7,
+    title: "Relacionamentos & Parcerias",
+    subtitle: "Vida a dois, encontros maduros, acordos e sociedades estratégicas",
+    tag: "Casa 07",
+    image: "/images/abertura/roma.jpg",
+  },
+  {
+    id: "dinheiro",
+    houseId: 2,
+    title: "Vida Financeira & Estrutura",
+    subtitle: "Organizar ganhos, valorizar seu trabalho e fortalecer reserva",
+    tag: "Casa 02",
+    image: "/images/abertura/zurich.jpg",
   },
   {
     id: "fitness",
     houseId: 6,
-    title: "Rotina Fit, Dieta & Saúde",
-    subtitle: "Manter treinos, alimentação e agenda rodando no ritmo",
+    title: "Rotina, Saúde & Bem-Estar",
+    subtitle: "Constância nos treinos, organização diária, energia e hábitos",
     tag: "Casa 06",
-  },
-  {
-    id: "amor",
-    houseId: 7,
-    title: "Amor, Casamento & Alianças",
-    subtitle: "Relacionamento sério ou sociedades estratégicas de valor",
-    tag: "Casa 07",
-  },
-  {
-    id: "virada",
-    houseId: 9,
-    title: "Viagens, Exterior & Expansão",
-    subtitle: "Sair da bolha, estudar, viajar ou expandir fronteiras",
-    tag: "Casa 09",
-  },
-  {
-    id: "cetico",
-    houseId: 1,
-    title: "Só quero testar meu passado primeiro",
-    subtitle: "Validar grátis se o último aniversário bateu com a vida real",
-    tag: "Teste Cego",
+    image: "/images/abertura/tokyo.jpg",
   },
 ];
 
@@ -122,27 +254,99 @@ export interface TravelRadiusOption {
 export const TRAVEL_RADIUS_OPTIONS: TravelRadiusOption[] = [
   {
     id: "home",
-    title: "Vou passar na minha cidade atual",
-    subtitle: "Quero ver minha Casa local + Manual de Defesa da Cidade Natal",
-    badge: "Custo R$ 0 viagem",
+    title: "Considerar minha cidade atual",
+    subtitle: "Ver a leitura de passar na minha cidade + Manual de Defesa local",
+    badge: "Sem viagem",
   },
   {
     id: "300km",
-    title: "Até ~300 km de carro ou ônibus",
-    subtitle: "Bate-volta regional ou cidades vizinhas no fim de semana",
+    title: "Destinos próximos (até ~300 km)",
+    subtitle: "Avaliar cidades vizinhas de carro/ônibus quando houver mudança de Casa",
     badge: "Regional",
   },
   {
     id: "3000km",
-    title: "Até 3.000 km (Brasil / América do Sul)",
-    subtitle: "Capitais, praias ou destinos nacionais e vizinhos",
+    title: "Brasil & América do Sul (até 3.000 km)",
+    subtitle: "Capitais brasileiras e países vizinhos com voos diretos",
     badge: "Nacional / LatAm",
   },
   {
     id: "world",
-    title: "Qualquer lugar do mundo",
-    subtitle: "Europa, EUA, Ásia e rotas internacionais completas",
+    title: "Qualquer destino no mundo",
+    subtitle: "Comparar coordenadas globais na Europa, América do Norte, Ásia e Oceania",
     badge: "Global",
+  },
+];
+
+export interface V3PlanSpec {
+  pkg: "1" | "3" | "full";
+  badge: string;
+  name: string;
+  forWhom: string;
+  exactQuantity: string;
+  includedContent: string[];
+  accessFormat: string;
+  priceInt: string;
+  priceDec: string;
+  ctaLabel: string;
+  featured?: boolean;
+}
+
+export const V3_PLANS: V3PlanSpec[] = [
+  {
+    pkg: "1",
+    badge: "Plano de Entrada • Compra Completa",
+    name: "1 Destino ou 1 Casa",
+    forWhom:
+      "Para quem já tem 1 cidade em mente para o aniversário ou quer descobrir os destinos de 1 tema específico.",
+    exactQuantity: "1 leitura completa (1 Cidade específica ou 1 Casa Solar à sua escolha)",
+    includedContent: [
+      "Cálculo exato do retorno solar (data, horário UTC e coordenadas)",
+      "Interpretação completa das 8 áreas da vida naquele destino",
+      "Manual de Defesa prático (pontos fortes + pontos de atenção do ciclo)",
+      "Cartão de Embarque Solar personalizado para salvar",
+    ],
+    accessFormat: "Acesso online imediato na tela (celular e computador), sem assinatura.",
+    priceInt: "19",
+    priceDec: "90",
+    ctaLabel: "Escolher 1 Leitura (R$ 19,90)",
+  },
+  {
+    pkg: "3",
+    badge: "Comparação • 3 Leituras",
+    name: "Comparador de 3 Cidades",
+    forWhom:
+      "Para quem está em dúvida entre até 3 viagens possíveis (ex.: ficar em casa, ir para uma praia próxima ou viajar para fora).",
+    exactQuantity: "3 créditos de leitura (use em até 3 Cidades ou 3 Casas Solares)",
+    includedContent: [
+      "Comparação objetiva entre até 3 coordenadas diferentes",
+      "Todas as 8 áreas da vida detalhadas em cada uma das 3 leituras",
+      "Filtro de distância regional, nacional ou internacional",
+      "Manual de Defesa da Cidade Atual + Cartões de Embarque",
+    ],
+    accessFormat: "Acesso online imediato • você pode usar os 3 créditos juntos ou quando quiser.",
+    priceInt: "49",
+    priceDec: "90",
+    ctaLabel: "Comparar 3 Destinos (R$ 49,90)",
+    featured: true,
+  },
+  {
+    pkg: "full",
+    badge: "Visão Integral • 12 Casas",
+    name: "Dossiê Completo (12 Casas)",
+    forWhom:
+      "Para quem quer enxergar o mapa inteiro de possibilidades no mundo antes de bater o martelo no destino do ano.",
+    exactQuantity: "Todas as 12 Casas Solares do seu próximo aniversário desbloqueadas",
+    includedContent: [
+      "Mapeamento global de destinos sugeridos para cada uma das 12 Casas",
+      "Leitura completa das 8 áreas da vida nas 12 Casas do ciclo",
+      "Visão panorâmica para cruzar orçamento, distância e prioridade pessoal",
+      "Acesso permanente ao seu histórico de consultas na conta",
+    ],
+    accessFormat: "Acesso online imediato e completo na sua área logada • pagamento único.",
+    priceInt: "99",
+    priceDec: "90",
+    ctaLabel: "Liberar as 12 Casas (R$ 99,90)",
   },
 ];
 
@@ -229,28 +433,38 @@ export const HOME_CITY_DEFENSE: Record<number, HomeCityDefenseGuide> = {
 
 export const V3_FAQ_ITEMS = [
   {
-    id: "v3-faq-free-map",
-    q: "Por que pagar se existe mapa astral grátis na internet?",
-    a: "Mapa astral natal grátis mostra apenas o céu estático do dia em que você nasceu. O Protocolo Solar executa cálculos astronômicos geográficos (Swiss Ephemeris) para o minuto exato da sua Revolução Solar anual em diferentes cidades do mundo — e traduz tudo em linguagem prática, sem jargão. Por isso liberamos a validação gratuita do seu aniversário passado e da sua cidade atual antes de qualquer pagamento.",
-  },
-  {
     id: "v3-faq-no-time",
-    q: "Não sei meu horário exato de nascimento. Consigo usar?",
-    a: "Sim. Basta marcar “Não sei meu horário exato” no passo 2 do quiz. O sistema usa 12:00 como referência solar e informa com transparência que a cúspide exata do Ascendente pode variar alguns graus sem a certidão — assim você não trava agora e pode atualizar depois.",
+    q: "Não sei meu horário de nascimento. Consigo usar?",
+    a: "Sim. Na etapa de horário basta marcar “Não sei meu horário exato (usar 12:00 aproximado)”. O sistema utiliza o meio-dia como referência solar e avisa com transparência que, sem o minuto da certidão, cidades na fronteira entre duas Casas podem variar alguns graus. Você conhece a experiência agora e pode atualizar o horário depois se encontrar a certidão.",
   },
   {
     id: "v3-faq-no-travel",
-    q: "Não tenho dinheiro para viajar para a Europa. Serve para mim?",
-    a: "Sim. A relocalização funciona com destinos regionais (muitas vezes até ~300 km de carro), capitais brasileiras ou exterior. E se você decidir ficar na sua cidade natal, o relatório já entrega o Manual de Defesa da Cidade Natal mostrando como aproveitar o melhor da Casa local.",
+    q: "Preciso viajar para outro país?",
+    a: "Não. Você pode consultar a leitura de passar o aniversário na sua própria cidade atual (incluindo o Manual de Defesa local) ou avaliar cidades regionais e nacionais. Não prometemos que sempre haverá uma mudança de Casa a poucos quilômetros — porque isso depende da geometria astronômica real do seu mapa —, mas você confere opções próximas e distantes antes de decidir.",
   },
   {
-    id: "v3-faq-pricing",
-    q: "Qual a diferença exata entre R$ 19,90, R$ 49,90 e R$ 99,90?",
-    a: "Todas as consultas já incluem todas as 8 áreas da vida abertas. R$ 19,90 libera 1 Casa escolhida ou 1 Cidade específica; R$ 49,90 libera 3 Consultas para comparar até 3 destinos ou Casas antes da viagem; R$ 99,90 libera o Mapa Completo com todas as 12 Casas do seu próximo aniversário de uma só vez.",
+    id: "v3-faq-free-vs-paid",
+    q: "Qual a diferença entre a consulta gratuita e o relatório pago?",
+    a: "A consulta gratuita permite testar um aniversário que você já viveu, mostrando a Casa Solar ativada naquele ano e um resumo dos temas centrais para você conhecer o método na prática. Os relatórios pagos calculam o seu próximo aniversário, revelam os destinos compatíveis com seus objetivos, comparam cidades e liberam a leitura detalhada das 8 áreas da vida.",
+  },
+  {
+    id: "v3-faq-natal-diff",
+    q: "Isso é diferente do mapa natal?",
+    a: "Sim. O mapa natal é fixo — retrata o céu do momento em que você nasceu. A Revolução Solar calcula o instante exato em que o Sol retorna àquela mesma posição a cada aniversário, considerando a latitude e longitude da cidade onde você estiver naquele momento (via tabelas astronômicas Swiss Ephemeris).",
+  },
+  {
+    id: "v3-faq-delivery",
+    q: "Como recebo meu relatório?",
+    a: "O acesso é 100% digital e imediato, direto na tela do celular ou computador assim que o pagamento via Pix ou Cartão é confirmado. Sua leitura também fica salva na sua conta para consultar durante todo o ano.",
+  },
+  {
+    id: "v3-faq-guarantee-events",
+    q: "A leitura garante que algo vai acontecer?",
+    a: "Não. Trata-se de uma interpretação astrológica tradicional de Revolução Solar calculada com precisão astronômica, voltada para reflexão pessoal e planejamento de viagem e metas — sem garantia determinista de acontecimentos financeiros, profissionais ou afetivos.",
   },
   {
     id: "v3-faq-affiliate",
     q: "Como funciona a indicação de parceiros (20% no Pix)?",
-    a: "Qualquer usuário ou criador pode ativar seu link exclusivo (/i/CODIGO) gratuitamente e receber 20% via Pix por vendas confirmadas, mantendo o mesmo preço oficial para quem compra. Seguimos protocolo transparente: testar primeiro o próprio Aniversário Passado e sinalizar #publi conforme o CONAR.",
+    a: "Clientes e criadores podem ativar gratuitamente um link identificado (/i/CODIGO) e receber 20% no Pix sobre compras confirmadas, sem aumentar um centavo no preço pago por quem entra. Exigimos protocolo ético: testar primeiro o próprio aniversário passado e sinalizar #publi conforme normas do CONAR.",
   },
 ];
