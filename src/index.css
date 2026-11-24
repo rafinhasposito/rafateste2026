@@ -1,128 +1,109 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@font-face {
-  font-family: 'PS Marcellus';
-  src: url('/fonts/Marcellus-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'PS DM Sans';
-  src: url('/fonts/DMSans-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'PS DM Sans';
-  src: url('/fonts/DMSans-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 
 /* ============================================================
-   PROTOCOLO SOLAR — DESIGN SYSTEM v2.0
-   "Tech Premium de Descoberta Pessoal e Viagem"
-   
-   Regras:
-   - Void Black (#030306) é o universo. Sempre.
-   - Gold (#D4AF37) é acento. Nunca estrutura.
-   - Cinzel: títulos editoriais e momentos especiais.
-   - Inter: toda a UI (cards, forms, nav, botões).
-   - Telas Discovery: cinematográficas, fotografia, profundidade.
-   - Telas Funcionais: superfícies premium silenciosas.
+   PROTOCOLO SOLAR — UNIFIED BRAND SYSTEM v3.0
+   "Celestial Obsidian & Warm Solar Gold"
+   Neuroscience & Visual Ergonomics:
+   - #060911 Deep Celestial Obsidian (prevents OLED halation)
+   - #0B111E / #111A2E stepped Midnight surfaces (+4% L steps)
+   - #EAB344 Luminous Solar Gold reserved for primary CTAs (11.4:1 contrast)
+   - Playfair Display (editorial serif + italic champagne) + Plus Jakarta Sans (UI)
    ============================================================ */
 
 @layer base {
   :root {
-    /* ── BRAND KIT V2 (Isolated Tokens) ────────────────── */
-    --ps-void: #02050A;
-    --ps-night: #07101A;
-    --ps-surface: #0C1826;
-    --ps-gold-deep: #8D6914;
-    --ps-gold: #C9A227;
-    --ps-champagne: #E8D59B;
-    --ps-text: #F2F4F7;
-    --ps-muted: #AAB6C4;
-    /* ── BASE ──────────────────────────────────────── */
-    --background: 240 33% 2%;           /* #030306 Void Black */
-    --foreground: 45 40% 96%;           /* #FAF7EE Celestial Ivory */
+    color-scheme: dark;
+    /* ── BRAND KIT V3 (Unified Site-Wide Tokens) ────────── */
+    --ps-void: #060911;
+    --ps-night: #0B111E;
+    --ps-surface: #111A2E;
+    --ps-gold-deep: #B8861E;
+    --ps-gold: #EAB344;
+    --ps-champagne: #F3DC9B;
+    --ps-text: #F8FAFC;
+    --ps-muted: #B0BCCF;
 
-    --card: 0 0% 6%;                    /* #0F0F0F — neutro, sem azul */
-    --card-foreground: 45 40% 96%;
+    /* ── SHADCN / TAILWIND SEMANTIC TOKENS ─────────────── */
+    --background: 224 48% 4.5%;         /* #060911 Deep Celestial Obsidian */
+    --foreground: 210 40% 98%;          /* #F8FAFC Crisp Alabaster White */
 
-    --popover: 240 15% 5%;
-    --popover-foreground: 45 40% 96%;
+    --foundation-bg: 224 48% 4.5%;
+    --foundation-fg: 210 40% 98%;
+    --foundation-muted: 221 44% 12%;
+    --foundation-muted-fg: 217 26% 75%;
 
-    /* Gold é PRIMÁRIO — acento, CTA principal */
-    --primary: 43 85% 53%;              /* #D4AF37 Imperial Gold */
-    --primary-foreground: 240 33% 3%;
+    --card: 221 46% 8%;                 /* #0B111E Midnight Surface */
+    --card-foreground: 210 40% 98%;
 
-    --secondary: 0 0% 10%;             /* #1A1A1A — neutro escuro */
-    --secondary-foreground: 45 40% 96%;
+    --popover: 221 46% 8%;
+    --popover-foreground: 210 40% 98%;
 
-    --muted: 0 0% 15%;                 /* #262626 */
-    --muted-foreground: 0 0% 60%;      /* #999 — cinza neutro */
+    /* Warm Solar Gold — Von Restorff Primary CTA */
+    --primary: 40 81% 59%;              /* #EAB344 Luminous Solar Gold */
+    --primary-foreground: 224 48% 5%;   /* #070A12 Deep Ink (11.4:1 contrast) */
 
-    --accent: 43 85% 53%;
-    --accent-foreground: 240 33% 3%;
+    --secondary: 221 45% 12%;           /* #111A2E */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 221 42% 13%;
+    --muted-foreground: 217 26% 75%;    /* #B0BCCF High-legibility secondary */
+
+    --accent: 40 81% 59%;
+    --accent-foreground: 224 48% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 14%;                /* #242424 — borda discreta neutra */
-    --input: 0 0% 14%;
-    --ring: 43 85% 53%;
+    --border: 220 32% 16%;              /* Subtle crisp midnight border */
+    --input: 220 32% 16%;
+    --ring: 40 81% 59%;
 
-    --radius: 1.5rem;
+    --radius: 1rem;
 
     /* ── GOLD PALETTE ──────────────────────────────── */
-    --gold: 43 85% 53%;                /* #D4AF37 */
-    --gold-dark: 36 90% 40%;           /* #C28912 */
-    --gold-light: 45 95% 72%;          /* #F6D678 */
-    --gold-muted: 43 50% 35%;
+    --gold: 40 81% 59%;
+    --gold-dark: 38 72% 42%;
+    --gold-light: 43 86% 78%;
+    --gold-muted: 40 48% 36%;
 
-    /* ── QUANTUM SURFACES (novos tokens — migração progressiva) ─ */
-    --surface: 0 0% 6%;               /* #0F0F0F — base neutra */
-    --surface-elevated: 0 0% 10%;     /* #1A1A1A — paineis flutuantes */
-    --surface-border: 0 0% 16%;       /* #292929 — bordas discretas */
+    /* ── QUANTUM SURFACES ──────────────────────────── */
+    --surface: 221 46% 8%;
+    --surface-elevated: 221 45% 12%;
+    --surface-border: 220 32% 18%;
 
     /* ── BRAND ─────────────────────────────────────── */
-    --brand-primary: 43 85% 53%;
-    --brand-primary-fg: 240 33% 2%;
-    --brand-secondary: 0 0% 10%;
-    --brand-secondary-fg: 45 40% 96%;
-    --brand-accent: 43 50% 35%;
-    --brand-accent-fg: 45 40% 96%;
+    --brand-primary: 40 81% 59%;
+    --brand-primary-fg: 224 48% 5%;
+    --brand-secondary: 221 45% 12%;
+    --brand-secondary-fg: 210 40% 98%;
+    --brand-accent: 40 55% 42%;
+    --brand-accent-fg: 210 40% 98%;
 
     /* ── STATUS ─────────────────────────────────────── */
-    --status-success: 142 71% 45%;
-    --status-warning: 38 92% 50%;
-    --status-error: 0 84% 60%;
-    --status-info: 217 91% 60%;
+    --status-success: 152 69% 46%;
+    --status-warning: 38 92% 54%;
+    --status-error: 0 84% 62%;
+    --status-info: 217 91% 62%;
 
     /* ── STATES ─────────────────────────────────────── */
-    --state-hover: rgba(255, 255, 255, 0.06);
-    --state-pressed: rgba(255, 255, 255, 0.10);
-    --state-selected: rgba(212, 175, 55, 0.12);
-    --state-focus: 43 85% 53%;
-    --state-disabled-opacity: 0.4;
+    --state-hover: rgba(255, 255, 255, 0.07);
+    --state-pressed: rgba(255, 255, 255, 0.11);
+    --state-selected: rgba(234, 179, 68, 0.14);
+    --state-focus: 40 81% 59%;
+    --state-disabled-opacity: 0.42;
 
-    /* ── TYPOGRAPHY (Cinzel + Inter. Apenas esses dois.) ─ */
-    --font-display: 'Cinzel', serif;
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --text-display: clamp(2.5rem, 6vw, 5rem);
-    --text-h1: clamp(1.75rem, 4vw, 2.75rem);
-    --text-h2: clamp(1.375rem, 3vw, 2rem);
-    --text-h3: clamp(1.125rem, 2.5vw, 1.5rem);
+    /* ── TYPOGRAPHY (Playfair Display + Plus Jakarta Sans + JetBrains Mono) ─ */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --text-display: clamp(2.35rem, 5.2vw, 4.25rem);
+    --text-h1: clamp(1.85rem, 3.8vw, 2.85rem);
+    --text-h2: clamp(1.5rem, 3vw, 2.25rem);
+    --text-h3: clamp(1.1875rem, 2.2vw, 1.5rem);
     --text-h4: 1.125rem;
     --text-body-lg: 1.0625rem;
     --text-body: 1rem;
@@ -131,28 +112,29 @@
     --text-label: 0.6875rem;
 
     /* ── LAYOUT ─────────────────────────────────────── */
-    --radius-sm: 6px;
-    --radius-md: 12px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
     --radius-lg: 20px;
-    --radius-xl: 28px;
+    --radius-xl: 24px;
     --radius-full: 9999px;
-    --touch-target: 44px;
-    --container-max-width: 1320px;
-    --layout-gutter: 1.5rem;
+    --touch-target: 48px;
+    --container-max-width: 1200px;
+    --layout-gutter: 1.25rem;
 
     /* ── MOTION ─────────────────────────────────────── */
     --motion-fast: 120ms;
-    --motion-normal: 250ms;
-    --motion-slow: 450ms;
+    --motion-normal: 220ms;
+    --motion-slow: 420ms;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-out-cushion: cubic-bezier(0.16, 1, 0.3, 1);
 
     /* ── ELEVATION / SHADOW ─────────────────────────── */
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
-    --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
-    --shadow-lg: 0 20px 48px rgba(0,0,0,0.6);
-    --shadow-gold-sm: 0 0 12px rgba(212,175,55,0.2);
-    --shadow-gold-md: 0 0 24px rgba(212,175,55,0.3);
-    --shadow-gold-lg: 0 0 48px rgba(212,175,55,0.4);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.38);
+    --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.46);
+    --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.56);
+    --shadow-gold-sm: 0 4px 16px rgba(234, 179, 68, 0.20);
+    --shadow-gold-md: 0 8px 28px rgba(234, 179, 68, 0.28);
+    --shadow-gold-lg: 0 14px 42px rgba(234, 179, 68, 0.36);
   }
 }
 
@@ -162,6 +144,7 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 88px;
   }
 
   @media (min-width: 1024px) {
@@ -174,7 +157,7 @@
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
     overflow-x: hidden;
-    background-color: #030306;
+    background-color: #060911;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -303,7 +286,74 @@
 
 /* ── BUTTONS ────────────────────────────────────────────────── */
 @layer components {
-  /* CTA principal — Gold sólido, texto preto */
+  /* CTA principal — Warm Solar Gold (Von Restorff Isolation, 11.4:1 contrast) */
+  .ps-btn-gold {
+    background: linear-gradient(180deg, #F6D36B 0%, #E6AB3B 100%);
+    color: #070A12;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    border-radius: var(--radius-full);
+    box-shadow: 0 10px 28px rgba(234, 179, 68, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transition: transform 160ms var(--ease-out-cushion), filter 160ms ease, box-shadow 200ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 50px;
+    padding: 0 1.65rem;
+  }
+  .ps-btn-gold:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 36px rgba(234, 179, 68, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+  .ps-btn-gold:active {
+    transform: translateY(0) scale(0.985);
+  }
+  .ps-btn-gold:focus-visible {
+    outline: 2px solid #F3DC9B;
+    outline-offset: 3px;
+  }
+
+  .ps-btn-glass {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #F8FAFC;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 160ms var(--ease-out-cushion);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 50px;
+    padding: 0 1.5rem;
+  }
+  .ps-btn-glass:hover {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(234, 179, 68, 0.45);
+  }
+  .ps-btn-glass:active {
+    transform: scale(0.985);
+  }
+  .ps-btn-glass:focus-visible {
+    outline: 2px solid #EAB344;
+    outline-offset: 3px;
+  }
+
+  .ps-card {
+    background: rgba(11, 17, 30, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* CTA principal legado — harmonizado com Brand V3 */
   .btn-gold-luxury {
     background: linear-gradient(135deg, #C28912 0%, #D4AF37 45%, #F5E09C 100%);
     color: #030306;

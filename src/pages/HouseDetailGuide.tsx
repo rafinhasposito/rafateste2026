@@ -21,6 +21,7 @@ import { FOCUS_MATRIX } from "@/data/focusMatrix";
 import { HOUSES_SHOWCASE } from "@/data/housesShowcase";
 import { interpolateCityCopy } from "@/lib/cityCopy";
 import { houseThemes } from "@/data/houseThemes";
+import { getHouseVideoAssets } from "@/components/HouseVideoPreview";
 
 const LIFE_AREAS = [
   { id: "amor", icon: Heart, label: "Amor e Relacionamento", color: "#f43f5e", teaser: "Ative o melhor alinhamento para viver conexões afetivas mais verdadeiras e leves neste novo ciclo." },
@@ -119,18 +120,19 @@ export default function HouseDetailGuide() {
           }}
         >
           <div
-            className="absolute inset-0 z-10 mix-blend-color transition-colors duration-1000"
+            className="absolute inset-0 z-10 mix-blend-soft-light opacity-45 transition-colors duration-1000"
             style={{ backgroundColor: theme.themeColor }}
           />
           <video
+            key={`house-detail-video-${currentHouse}`}
+            src={getHouseVideoAssets(currentHouse).videoSrc}
+            poster={getHouseVideoAssets(currentHouse).posterSrc}
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover mix-blend-screen opacity-20 grayscale"
-          >
-            <source src="/videos/teste-fundo.mp4" type="video/mp4" />
-          </video>
+            className="w-full h-full object-cover opacity-55"
+          />
         </div>
         <motion.div
           className="absolute inset-0 z-10 pointer-events-none transition-colors duration-1000"

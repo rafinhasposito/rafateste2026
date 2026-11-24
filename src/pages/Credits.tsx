@@ -61,39 +61,39 @@ function getPackageChecklist(credits: number): {
 } {
   if (credits <= 1) {
     return {
-      badge: "Crédito Avulso • 1 Casa Completa",
-      displayTitle: "1 Casa ou Cidade",
-      subtitle: "Para consultar 1 Cidade ou revelar as melhores cidades de 1 Casa (já com todas as 8 áreas da vida liberadas).",
-      ctaLabel: "Comprar 1 Crédito Avulso",
+      badge: "1 Consulta",
+      displayTitle: "1 Cidade",
+      subtitle: "Ideal se você já tem 1 destino específico em mente para o aniversário.",
+      ctaLabel: "Escolher 1 Cidade",
       bullets: [
-        "Libera 1 Casa ou 1 Cidade escolhida",
-        "Inclui todas as 8 áreas da vida",
-        "Rotas principais + leitura de 12 meses completa",
+        "Análise completa de 1 cidade ou 1 Casa",
+        "As 8 áreas da sua vida explicadas",
+        "Guia prático caso decida não viajar",
       ],
     };
   }
   if (credits <= 5) {
     return {
-      badge: "3 Consultas • Comparar Destinos",
-      displayTitle: "Pacote 3 Casas / Cidades",
-      subtitle: "Para testar até 3 Cidades diferentes ou desbloquear 3 Casas completas (todas com as 8 áreas da vida abertas).",
-      ctaLabel: "Escolher Pacote 3 Consultas",
+      badge: "Mais Escolhido • 3 Consultas",
+      displayTitle: "Comparar 3 Cidades",
+      subtitle: "Ideal para comparar até 3 viagens possíveis antes de decidir.",
+      ctaLabel: "Comparar 3 Cidades",
       bullets: [
-        "Libera 3 Casas ou 3 Cidades completas à sua escolha",
-        "Inclui TODAS as 8 áreas da vida liberadas em cada uma",
-        "Perfeito para comparar 3 destinos de aniversário",
+        "Compare até 3 cidades ou 3 Casas",
+        "As 8 áreas abertas nas 3 opções",
+        "Use tudo agora ou quando quiser",
       ],
     };
   }
   return {
-    badge: "Super Promoção • Acesso Total",
+    badge: "Acesso Integral • 12 Casas",
     displayTitle: "Mapa Completo (12 Casas)",
-    subtitle: "Desbloqueia TODAS as 12 Casas do seu aniversário de uma só vez (com todas as 8 áreas da vida abertas).",
-    ctaLabel: "Desbloquear Todas as 12 Casas",
+    subtitle: "Suas melhores cidades no Brasil e no mundo nos 12 temas do ano.",
+    ctaLabel: "Liberar as 12 Casas",
     bullets: [
-      "Libera TODAS as 12 Casas do seu aniversário de uma vez",
-      "Inclui TODAS as 8 áreas da vida em todas as 12 Casas",
-      "Visão 360º completa de todos os seus destinos no mundo",
+      "Todas as 12 Casas abertas de uma vez",
+      "Ranking global e regional de destinos",
+      "Histórico completo salvo na sua conta",
     ],
   };
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
@@ -10,22 +10,25 @@ import {
   Globe,
   HeartHandshake,
   Home,
+  MapPin,
   Megaphone,
   Moon,
   Network,
+  Play,
   RefreshCw,
   Sparkles,
-  Target,
   Trophy,
   Wallet,
-  Zap,
 } from "lucide-react";
 import {
   ELEMENT_STYLES,
   HOUSES_SHOWCASE,
+  type HouseElement,
   type HouseIconKey,
 } from "@/data/housesShowcase";
 import { houseThemes } from "@/data/houseThemes";
+import { HouseVideoPreview } from "@/components/HouseVideoPreview";
+import { useI18n } from "@/lib/i18n";
 
 const ICON_MAP: Record<HouseIconKey, typeof Crown> = {
   crown: Crown,
@@ -42,9 +45,13 @@ const ICON_MAP: Record<HouseIconKey, typeof Crown> = {
   moon: Moon,
 };
 
+const ELEMENTS_ORDER: ("ALL" | HouseElement)[] = ["ALL", "Fogo", "Terra", "Ar", "Água"];
+
 export default function HousesGuide() {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
+  const { t } = useI18n();
+  const [selectedElement, setSelectedElement] = useState<"ALL" | HouseElement>("ALL");
   const [showStickyCta, setShowStickyCta] = useState(false);
 
   useEffect(() => {
@@ -53,62 +60,89 @@ export default function HousesGuide() {
 
   useEffect(() => {
     const onScroll = () => {
-      setShowStickyCta(window.scrollY > 220);
+      setShowStickyCta(window.scrollY > 260);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const filteredHouses = useMemo(() => {
+    if (selectedElement === "ALL") return HOUSES_SHOWCASE;
+    return HOUSES_SHOWCASE.filter((item) => item.element === selectedElement);
+  }, [selectedElement]);
+
   return (
-    <div className="min-h-screen bg-[#02050A] text-white pt-20 pb-40 lg:pt-28 lg:pb-32 relative overflow-x-hidden">
-      {/* Ambient Solar Mesh Glow */}
+    <div className="min-h-screen bg-[#060911] text-[#F8FAFC] pt-20 pb-36 lg:pt-12 lg:pb-28 relative overflow-x-hidden">
+      {/* Subtle Celestial Gold Mesh */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            "radial-gradient(ellipse 68% 42% at 50% 0%, rgba(201,162,39,0.14) 0%, rgba(10,16,30,0.4) 52%, transparent 78%)",
+            "radial-gradient(ellipse 65% 40% at 50% 0%, rgba(234,179,68,0.12) 0%, rgba(11,17,30,0.45) 55%, transparent 80%)",
         }}
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8">
-        {/* 1. HERO & EXPLICAÇÃO EM 15 SEGUNDOS */}
+        {/* 1. CENTERED SYMMETRIC EDITORIAL HEADER */}
         <motion.header
           initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-center max-w-2xl mx-auto mb-10 md:mb-14"
+          className="text-center max-w-2xl mx-auto mb-8 md:mb-10"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#C9A227]/35 bg-[#C9A227]/10 text-[#F5DE98] text-[10px] font-ps-ui font-bold uppercase tracking-[0.22em] mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-[#C9A227]" />
-            <span>Painel do Seu Novo Ano</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#EAB344]/35 bg-[#EAB344]/10 text-[#F3DC9B] text-[11px] font-sans font-semibold uppercase tracking-[0.16em] mb-4">
+            <Sparkles className="w-3.5 h-3.5 text-[#EAB344]" />
+            <span>{t.housesSection.badge}</span>
           </div>
 
-          <h1 className="font-ps-display text-3xl sm:text-5xl md:text-[54px] font-bold text-white tracking-[-0.03em] leading-[1.06] mb-3">
-            As 12 Casas Solares
+          <h1 className="font-display text-3xl sm:text-5xl font-bold text-[#F8FAFC] tracking-[-0.02em] leading-[1.08] mb-3">
+            {t.housesSection.titleStart}
+            <span className="italic text-[#F3DC9B] font-semibold">
+              {t.housesSection.titleHighlight}
+            </span>
           </h1>
 
-          <p className="font-ps-display text-base sm:text-xl text-[#F5DE98] font-medium mb-4">
-            O painel de controle do seu próximo ano pessoal.
+          <p className="font-sans text-sm sm:text-base text-[#B0BCCF] leading-relaxed max-w-xl mx-auto">
+            {t.housesSection.subtitle}
           </p>
 
-          <p className="font-ps-ui text-sm sm:text-base text-white/70 leading-relaxed max-w-xl mx-auto">
-            O seu mapa de nascimento é fixo, mas a cidade onde você passa o
-            aniversário destaca qual dessas 12 áreas ganha os holofotes nos
-            próximos 12 meses. Toque em qualquer Casa para ver a página
-            completa dela.
-          </p>
+          {/* Element Filter Bar — Symmetric Centered Pills */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            {ELEMENTS_ORDER.map((elKey) => {
+              const isSelected = selectedElement === elKey;
+              const label =
+                elKey === "ALL"
+                  ? t.housesSection.filterAll
+                  : t.housesSection.elements[elKey];
+              return (
+                <button
+                  key={elKey}
+                  type="button"
+                  onClick={() => setSelectedElement(elKey)}
+                  className={`px-4 py-2 rounded-full text-xs font-sans font-semibold transition-all active:scale-95 ${
+                    isSelected
+                      ? "bg-gradient-to-b from-[#F6D36B] to-[#E6AB3B] text-[#070A12] shadow-[0_6px_18px_rgba(234,179,68,0.28)]"
+                      : "bg-[#0B111E]/90 border border-white/12 text-[#B0BCCF] hover:text-white hover:border-[#EAB344]/40"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </motion.header>
 
-        {/* 2. GRID MOBILE-FIRST DE 12 CASAS (CLIQUE ABRE PÁGINA COMPLETA /casas/:id) */}
+        {/* 2. SYMMETRIC 3x4 LIVING VIDEO HOUSE GRID */}
         <section
           aria-label="Vitrine das 12 Casas Solares"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
         >
-          {HOUSES_SHOWCASE.map((house, index) => {
+          {filteredHouses.map((house, index) => {
             const Icon = ICON_MAP[house.iconKey];
-            const themeHex = houseThemes[house.id]?.themeColor || "#C9A227";
+            const themeHex = houseThemes[house.id]?.themeColor || "#EAB344";
             const elStyle = ELEMENT_STYLES[house.element];
+            const localized = t.houses[house.id];
 
             return (
               <motion.button
@@ -117,138 +151,122 @@ export default function HousesGuide() {
                 onClick={() => navigate(`/casas/${house.id}`)}
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: Math.min(index * 0.025, 0.28) }}
-                className="group relative w-full min-h-[212px] text-left p-5 sm:p-6 rounded-[24px] bg-[#08101E]/85 hover:bg-[#0D182C]/95 border border-white/[0.08] hover:border-white/[0.22] active:scale-[0.985] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-[0_14px_34px_rgba(0,0,0,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A227]"
+                transition={{ duration: 0.3, delay: Math.min(index * 0.025, 0.25) }}
+                className="group relative w-full h-full text-left rounded-2xl bg-[#0B111E]/92 hover:bg-[#111A2E]/95 border border-white/[0.09] hover:border-[#EAB344]/45 active:scale-[0.985] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#EAB344]"
               >
-                {/* Spotlight sutil na cor da Casa */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(circle at top right, ${themeHex}, transparent 68%)`,
-                  }}
-                />
-                {/* Linha superior luminosa 1px */}
-                <div
-                  className="absolute top-0 left-6 right-6 h-px opacity-45 group-hover:opacity-90 transition-opacity pointer-events-none"
-                  style={{
-                    background: `linear-gradient(90deg, transparent, ${themeHex}, transparent)`,
-                  }}
-                />
+                {/* TOP CINEMA VIDEO HEADER (16:10 uniform aspect ratio) */}
+                <div className="relative w-full aspect-[16/10] overflow-hidden bg-[#060911] shrink-0">
+                  <HouseVideoPreview
+                    houseId={house.id}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    overlayClassName="absolute inset-0 bg-gradient-to-t from-[#0B111E] via-[#060911]/25 to-black/25 pointer-events-none"
+                  />
 
-                <div className="relative z-10 w-full">
-                  {/* Topo: Número + Ícone + Badge Elemento */}
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <div className="flex items-center gap-2.5">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 transition-transform duration-300 group-hover:scale-105"
-                        style={{
-                          backgroundColor: `${themeHex}18`,
-                          borderColor: `${themeHex}42`,
-                        }}
-                      >
-                        <Icon className="w-4.5 h-4.5" style={{ color: themeHex }} />
-                      </div>
-                      <span
-                        className="font-mono text-xs font-bold uppercase tracking-[0.18em]"
-                        style={{ color: themeHex }}
-                      >
-                        Casa {house.numberLabel}
-                      </span>
-                    </div>
+                  {/* Top Row Badges over Video */}
+                  <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#060911]/80 backdrop-blur-md border border-white/15 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-[#F8FAFC]">
+                      <Icon className="w-3.5 h-3.5" style={{ color: themeHex }} />
+                      <span>Casa {house.numberLabel}</span>
+                    </span>
 
                     <span
-                      className="px-2.5 py-1 rounded-full text-[10px] font-ps-ui font-semibold uppercase tracking-[0.14em] border"
+                      className="px-2.5 py-1 rounded-full text-[10px] font-sans font-semibold uppercase tracking-[0.12em] border backdrop-blur-md"
                       style={{
                         color: elStyle.text,
-                        backgroundColor: elStyle.bg,
+                        backgroundColor: "rgba(6, 9, 17, 0.72)",
                         borderColor: elStyle.border,
                       }}
                     >
-                      {elStyle.label}
+                      {t.housesSection.elements[house.element]}
                     </span>
                   </div>
 
-                  {/* Tema da Casa */}
-                  <h2 className="font-ps-display text-lg sm:text-[19px] font-bold text-white leading-snug mb-3.5 group-hover:text-[#F5DE98] transition-colors">
-                    {house.title}
-                  </h2>
-
-                  {/* Para quem é (identificação no 1º segundo) */}
-                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 mb-3">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <Target className="w-3.5 h-3.5 shrink-0" style={{ color: themeHex }} />
-                      <span
-                        className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em]"
-                        style={{ color: themeHex }}
-                      >
-                        Para quem é
+                  {/* Bottom Symbol City Pill + Live Indicator */}
+                  <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#060911]/75 backdrop-blur-md border border-white/12 text-[11px] font-sans font-medium text-[#F3DC9B]">
+                      <MapPin className="w-3 h-3 text-[#EAB344]" />
+                      <span>
+                        {localized?.city || house.symbolCity.name} · {localized?.shortTag}
                       </span>
-                    </div>
-                    <p className="font-ps-ui text-[13px] text-white/90 leading-snug font-medium">
-                      {house.profile}
-                    </p>
-                  </div>
+                    </span>
 
-                  {/* A energia da cidade (direto ao ponto) */}
-                  <div className="px-0.5">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <Zap className="w-3.5 h-3.5 shrink-0 text-[#F5DE98]" />
-                      <span className="text-[10px] font-ps-ui font-bold uppercase tracking-[0.16em] text-white/55">
-                        A energia da cidade
-                      </span>
-                    </div>
-                    <p className="font-ps-ui text-[13px] text-white/75 leading-relaxed">
-                      {house.cycleFocus}
-                    </p>
+                    <span className="w-7 h-7 rounded-full bg-[#060911]/75 backdrop-blur-md border border-white/15 flex items-center justify-center text-[#F3DC9B] group-hover:bg-[#EAB344] group-hover:text-[#070A12] transition-colors">
+                      <Play className="w-3 h-3 fill-current ml-0.5" />
+                    </span>
                   </div>
                 </div>
 
-                {/* Rodapé sutil de ação */}
-                <div className="relative z-10 pt-4 mt-5 border-t border-white/[0.06] flex items-center justify-between w-full">
-                  <span className="text-[11px] font-ps-ui font-semibold uppercase tracking-[0.16em] text-white/55 group-hover:text-white transition-colors">
-                    Ver detalhes desta área
-                  </span>
-                  <div className="w-7 h-7 rounded-full bg-white/[0.05] group-hover:bg-[#C9A227]/20 border border-white/[0.08] group-hover:border-[#C9A227]/45 flex items-center justify-center transition-all">
-                    <ArrowRight className="w-3.5 h-3.5 text-white/65 group-hover:text-[#F5DE98] group-hover:translate-x-0.5 transition-all" />
+                {/* EQUAL-HEIGHT CARD BODY */}
+                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between gap-4 w-full">
+                  <div className="space-y-3">
+                    <h2 className="font-display text-xl font-bold text-[#F8FAFC] leading-snug group-hover:text-[#F3DC9B] transition-colors">
+                      {localized?.title || house.title}
+                    </h2>
+
+                    <p className="font-sans text-[13.5px] text-[#B0BCCF] leading-relaxed line-clamp-2">
+                      {localized?.profile || house.profile}
+                    </p>
+
+                    <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5">
+                      <span className="block text-[10px] font-mono font-semibold uppercase tracking-[0.14em] text-[#EAB344] mb-1">
+                        {t.housesSection.activatesLabel}
+                      </span>
+                      <p className="font-sans text-xs text-[#F8FAFC]/90 leading-relaxed line-clamp-2">
+                        {localized?.focus || house.cycleFocus}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Card Footer Action */}
+                  <div className="pt-3 border-t border-white/[0.07] flex items-center justify-between text-xs font-sans font-semibold text-[#F3DC9B] group-hover:text-[#EAB344] transition-colors">
+                    <span>
+                      {t.housesSection.exploreHouse} {house.numberLabel}
+                    </span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
               </motion.button>
             );
           })}
         </section>
+
+        {/* 3. BOTTOM CALLOUT CARD — SYMMETRIC */}
+        <div className="mt-12 rounded-2xl border border-[#EAB344]/30 bg-[#0B111E]/95 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left shadow-[0_18px_45px_rgba(0,0,0,0.45)]">
+          <div>
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#EAB344] font-semibold">
+              {t.checkIn.badge}
+            </span>
+            <h3 className="font-display text-2xl sm:text-3xl font-bold text-[#F8FAFC] mt-1">
+              {t.hero.titleStart}
+              <span className="italic text-[#F3DC9B]">{t.hero.titleHighlight}</span>
+            </h3>
+          </div>
+          <Link to="/#consulta-gratuita" className="ps-btn-gold text-sm shrink-0 w-full sm:w-auto">
+            <Compass className="w-4 h-4" />
+            <span>{t.hero.ctaPrimary}</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
 
-      {/* BARRA FIXA DISCRETA NO RODAPÉ (Aparece após rolar a Hero) */}
+      {/* 4. FLOATING MOBILE CTA */}
       <AnimatePresence>
         {showStickyCta && (
           <motion.div
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.25 }}
-            className="fixed bottom-[76px] lg:bottom-5 left-0 right-0 z-40 px-3 sm:px-6 pointer-events-none flex justify-center"
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.22 }}
+            className="fixed left-4 right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:hidden z-40 flex justify-center pointer-events-none"
           >
-            <div
-              className="pointer-events-auto w-full max-w-xl rounded-2xl border border-[#C9A227]/30 px-4 py-2.5 sm:px-5 sm:py-3 flex items-center justify-between gap-3 shadow-[0_16px_48px_rgba(0,0,0,0.75)]"
-              style={{
-                background: "rgba(7, 13, 25, 0.92)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-              }}
+            <Link
+              to="/#consulta-gratuita"
+              className="pointer-events-auto ps-btn-gold w-full max-w-md text-xs sm:text-sm shadow-[0_14px_34px_rgba(0,0,0,0.65)]"
             >
-              <p className="font-ps-ui text-xs sm:text-sm font-medium text-white/85 whitespace-nowrap">
-                <span className="sm:hidden">Em dúvida?</span>
-                <span className="hidden sm:inline">Ficou em dúvida de qual Casa escolher?</span>
-              </p>
-              <Link
-                to="/?mode=futuro"
-                className="shrink-0 inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-[#C9A227] hover:bg-[#E5C158] active:scale-[0.98] text-[#02050A] font-ps-ui text-[11px] sm:text-xs font-bold uppercase tracking-[0.1em] transition-all"
-              >
-                <Compass className="w-3.5 h-3.5 shrink-0" />
-                <span className="sm:hidden">Descobrir Destino Ideal</span>
-                <span className="hidden sm:inline">Descobrir Meu Destino Ideal</span>
-              </Link>
-            </div>
+              <Compass className="w-4 h-4 shrink-0" />
+              <span>{t.hero.ctaPrimary}</span>
+              <ArrowRight className="w-4 h-4 shrink-0" />
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

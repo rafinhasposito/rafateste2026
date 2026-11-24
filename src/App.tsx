@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
+import { I18nProvider } from "@/lib/i18n";
 import { captureAffiliateRefCode, captureAffiliateRefFromUrl } from "@/lib/affiliates";
 
 // Shells
@@ -21,6 +22,7 @@ import HouseTrailerApp from "./pages/HouseTrailerApp";
 import HousesGuide from "./pages/HousesGuide";
 import HouseDetailGuide from "./pages/HouseDetailGuide";
 import LandingV3 from "./pages/LandingV3";
+import FreePastResult from "./pages/FreePastResult";
 import DossierSandbox from "./pages/DossierSandbox";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -101,6 +103,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const App = () => (
   <ErrorBoundary>
+    <I18nProvider>
     <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
@@ -121,6 +124,7 @@ const App = () => (
             {/* 1. Consumer Shell (Main App - Preserves state across resize) */}
             <Route element={<ConsumerShell />}>
               <Route path="/" element={<HomeEntry />} />
+              <Route path="/meu-passado" element={<FreePastResult />} />
               <Route path="/consultar" element={<Index skipAutoOnboarding />} />
               <Route path="/v1-arquivo" element={<Index skipAutoOnboarding />} />
               <Route path="/dashboard" element={<Dashboard />} />
@@ -179,6 +183,7 @@ const App = () => (
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
+    </I18nProvider>
   </ErrorBoundary>
 );
 

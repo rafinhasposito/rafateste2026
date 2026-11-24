@@ -28,18 +28,16 @@ export default {
         "16": "64px",
       },
       fontFamily: {
-        /* BRAND KIT V2 (Isolated Aliases) */
-        "ps-display": ['"PS Marcellus"', 'serif'],
-        "ps-ui": ['"PS DM Sans"', 'sans-serif'],
-
-        /* DESIGN SYSTEM v2.0: apenas Cinzel + Inter */
-        display: ['Cinzel', 'serif'],
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        /* Aliases semânticos */
-        inter: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        cinzel: ['Cinzel', 'serif'],
-        /* LEGADO (não usar em componentes novos) */
-        sfpro: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+        /* UNIFIED BRAND SYSTEM V3 */
+        "ps-display": ['"Playfair Display"', 'Georgia', 'serif'],
+        "ps-ui": ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
+        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+        /* Aliases semânticos harmonizados */
+        inter: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        cinzel: ['"Playfair Display"', 'Georgia', 'serif'],
+        sfpro: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       fontSize: {
         "display": "var(--text-display)",
