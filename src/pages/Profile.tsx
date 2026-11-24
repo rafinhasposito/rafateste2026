@@ -222,7 +222,7 @@ const Profile = () => {
               >
                 <div className="flex items-center gap-2.5">
                   <Handshake className="w-4 h-4 text-[#E5C158]" />
-                  <span>{isAffiliate ? "Painel de Parceiro (Afiliado)" : "Indique & Ganhe 20% no Pix"}</span>
+                  <span>{isAffiliate ? "Painel de Parceiro" : "Programa de Parceiros"}</span>
                 </div>
                 <span className="text-[#C9A227] text-xs">→</span>
               </button>

@@ -40,22 +40,22 @@ interface MobileStoryExample {
 const STORY_EXAMPLES: MobileStoryExample[] = [
   {
     id: "zurich",
-    videoSrc: "/videos/v3/ana-zurique.mp4",
-    posterSrc: "/videos/v3/ana-zurique-poster.jpg",
+    videoSrc: "/videos/v3/theo-zurique-v3.mp4",
+    posterSrc: "/videos/v3/theo-zurique-v3-poster.jpg",
     city: { pt: "Zurique", es: "Zúrich", en: "Zurich", fr: "Zurich", it: "Zurigo" },
     theme: { pt: "Dinheiro", es: "Dinero", en: "Wealth", fr: "Argent", it: "Denaro" },
   },
   {
     id: "rome",
-    videoSrc: "/videos/v3/demo-roma-casa7.mp4",
-    posterSrc: "/images/v3/demo-roma-casa7.jpg",
+    videoSrc: "/videos/v3/theo-roma-v3.mp4",
+    posterSrc: "/videos/v3/theo-roma-v3-poster.jpg",
     city: { pt: "Roma", es: "Roma", en: "Rome", fr: "Rome", it: "Roma" },
     theme: { pt: "Amor", es: "Amor", en: "Love", fr: "Amour", it: "Amore" },
   },
   {
     id: "ny",
-    videoSrc: "/videos/v3/demo-ny-casa10.mp4",
-    posterSrc: "/images/v3/demo-ny-casa10.jpg",
+    videoSrc: "/videos/v3/theo-ny-v3.mp4",
+    posterSrc: "/videos/v3/theo-ny-v3-poster.jpg",
     city: { pt: "Nova York", es: "Nueva York", en: "New York", fr: "New York", it: "New York" },
     theme: { pt: "Carreira", es: "Carrera", en: "Career", fr: "Carrière", it: "Carriera" },
   },
@@ -113,7 +113,7 @@ const MOBILE_COPY: Record<SupportedLocale, MobileCopy> = {
     headlineStart: "A cidade do seu aniversário ",
     headlineHighlight: "muda o seu ano.",
     subline: "Descubra grátis o que ativou no seu último aniversário e veja se bateu com o que você viveu.",
-    samePersonHint: "Exemplo no mapa da Ana (as suas cidades mudam):",
+    samePersonHint: "Exemplo real do Theo (suas cidades mudam):",
     ctaFree: "Fazer meu teste grátis",
     ctaVideo: "Vídeo (1m30)",
     ctaNextYear: "Próximo aniversário",
@@ -517,8 +517,8 @@ export function MobileHomeFlow() {
 
   const openSampleReport = () => {
     const samplePayload: StoredFreePastPayload = {
-      userName: firstName.trim() || "Ana",
-      birthDate: "1994-08-19",
+      userName: firstName.trim() || "Theo",
+      birthDate: "1990-08-19",
       birthTime: "14:35",
       birthPlace: "São Paulo, Brasil",
       pastYear: String(currentYear - 1),
@@ -527,7 +527,7 @@ export function MobileHomeFlow() {
       pastCountry: "Itália",
       pastLat: 41.9028,
       pastLon: 12.4964,
-      pastHouse: 7,
+      pastHouse: 5,
       sunSign: "Leão",
       ascendant: "Escorpião",
       returnDate: `19/08/${currentYear - 1}`,
@@ -585,7 +585,7 @@ export function MobileHomeFlow() {
           <video
             ref={reelVideoRef}
             src="/videos/v3/filme-protocolo-9x16.mp4"
-            poster="/videos/v3/filme-protocolo-9x16-poster.jpg"
+            poster="/videos/v3/filme-protocolo-9x16-v3-poster.jpg"
             playsInline
             onTimeUpdate={(e) => {
               const el = e.currentTarget;
@@ -1074,6 +1074,16 @@ export function MobileHomeFlow() {
               {c.plansTitle}
             </h2>
             <p className="text-xs text-[#B0BCCF] mt-1">{c.plansSub}</p>
+
+            {/* Concise MiroFish Contrast Pill for Cold Mobile Visitors */}
+            <div className="mt-3 rounded-xl bg-[#111A2E]/85 border border-[#EAB344]/30 px-3.5 py-2.5 text-xs leading-snug">
+              <span className="block font-semibold text-[#F3DC9B]">
+                {t.pricing.contrast.solarLabel} ≠ {t.pricing.contrast.freeLabel}
+              </span>
+              <span className="block text-[#B0BCCF] mt-0.5">
+                {t.pricing.contrast.solarDesc}
+              </span>
+            </div>
           </div>
 
           <div className="space-y-3.5">

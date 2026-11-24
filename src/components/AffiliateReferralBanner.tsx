@@ -33,6 +33,10 @@ export const AffiliateReferralBanner = ({
     setTimeout(() => setCopied(false), 2400);
   };
 
+  if (!isAffiliate || !shareLink) {
+    return null;
+  }
+
   if (variant === "post-purchase") {
     return (
       <div className="mt-7 w-full max-w-lg mx-auto p-5 rounded-2xl border border-[#C9A227]/30 bg-[#07101A]/90 text-left space-y-3.5">

@@ -1,5 +1,16 @@
-import { useEffect, useRef } from "react";
-import { useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+
+export function getHouseVideoAssets(houseId: number): {
+  videoSrc: string;
+  posterSrc: string;
+} {
+  const safeId = houseId >= 1 && houseId <= 12 ? houseId : 1;
+  const padded = String(safeId).padStart(2, "0");
+  return {
+    videoSrc: `/videos/v3/casa-${padded}-v3.mp4`,
+    posterSrc: `/videos/v3/casa-${padded}-v3-poster.jpg`,
+  };
+}
 
 interface HouseVideoPreviewProps {
   houseId: number;
@@ -7,76 +18,56 @@ interface HouseVideoPreviewProps {
   overlayClassName?: string;
 }
 
-export function getHouseVideoAssets(houseId: number) {
-  const safeId = houseId >= 1 && houseId <= 12 ? houseId : 1;
-  const padded = String(safeId).padStart(2, "0");
-  return {
-    videoSrc: `/videos/houses/casa-${padded}.mp4`,
-    posterSrc: `/videos/houses/casa-${padded}-poster.jpg`,
-    storyFallback: `/images/stories/casa-${safeId}.jpg`,
-  };
-}
-
 export function HouseVideoPreview({
   houseId,
   className = "w-full h-full object-cover",
   overlayClassName,
 }: HouseVideoPreviewProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const prefersReducedMotion = useReducedMotion();
+  const [inView, setInView] = useState(false);
+
   const { videoSrc, posterSrc } = getHouseVideoAssets(houseId);
 
   useEffect(() => {
-    const el = videoRef.current;
-    if (!el || prefersReducedMotion) return;
-
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            void el.play().catch(() => {
-              // Silent fallback to poster when battery saver blocks autoplay
-            });
+            setInView(true);
+            videoRef.current?.play().catch(() => {});
           } else {
-            el.pause();
+            videoRef.current?.pause();
           }
         }
       },
-      { threshold: 0.15, rootMargin: "120px" }
+      { rootMargin: "220px" }
     );
-
     observer.observe(el);
     return () => observer.disconnect();
-  }, [houseId, prefersReducedMotion]);
-
-  if (prefersReducedMotion) {
-    return (
-      <div className="relative w-full h-full overflow-hidden">
-        <img
-          src={posterSrc}
-          alt={`Casa ${String(houseId).padStart(2, "0")}`}
-          loading="lazy"
-          className={className}
-        />
-        {overlayClassName && <div className={overlayClassName} />}
-      </div>
-    );
-  }
+  }, []);
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-[#060911]">
       <video
         ref={videoRef}
-        key={videoSrc}
-        src={videoSrc}
+        src={inView ? videoSrc : undefined}
         poster={posterSrc}
-        muted
+        autoPlay
         loop
+        muted
         playsInline
         preload="metadata"
         className={className}
       />
-      {overlayClassName && <div className={overlayClassName} />}
+      {overlayClassName ? <div className={overlayClassName} /> : null}
     </div>
   );
 }
+
+export default HouseVideoPreview;

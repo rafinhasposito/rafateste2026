@@ -97,16 +97,18 @@ export function DesktopWebChrome() {
                 {t.nav.myConsultations}
               </Link>
             )}
-            <Link 
-              to={isAffiliate ? "/afiliado" : "/parceiros"} 
-              className={`text-sm font-sans font-medium whitespace-nowrap transition-colors ${
-                location.pathname === "/parceiros" || location.pathname === "/afiliado"
-                  ? "text-[#F3DC9B]"
-                  : "text-[#B0BCCF] hover:text-white"
-              }`}
-            >
-              {t.nav.partners}
-            </Link>
+            {isAffiliate && (
+              <Link 
+                to="/afiliado" 
+                className={`text-sm font-sans font-medium whitespace-nowrap transition-colors ${
+                  location.pathname === "/afiliado"
+                    ? "text-[#F3DC9B]"
+                    : "text-[#B0BCCF] hover:text-white"
+                }`}
+              >
+                Painel Parceiro
+              </Link>
+            )}
           </nav>
         </div>
 
@@ -161,9 +163,9 @@ export function DesktopWebChrome() {
                     <Settings className="w-4 h-4 mr-2 text-[#EAB344]" />
                     {t.nav.myAccount}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/afiliado")} className="text-[#F3DC9B] hover:bg-white/5 focus:bg-white/5 focus:text-[#F3DC9B] cursor-pointer rounded-xl">
+                  <DropdownMenuItem onClick={() => navigate("/afiliado")} className="text-white/85 hover:bg-white/5 focus:bg-white/5 focus:text-white cursor-pointer rounded-xl">
                     <Handshake className="w-4 h-4 mr-2 text-[#EAB344]" />
-                    {isAffiliate ? "Painel de Parceiro" : "Indique e Ganhe 20%"}
+                    {isAffiliate ? "Painel de Parceiro" : "Programa de Parceiros"}
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")} className="text-[#F3DC9B] font-bold hover:bg-white/5 focus:bg-white/5 cursor-pointer rounded-xl">

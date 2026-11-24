@@ -48,7 +48,7 @@ interface BoardingDestination {
   posterSrc: string;
 }
 
-// Exemplo específico da personagem Ana (19/08, 14:35, SP) — deixa claro que são cidades do mapa DELA
+// Exemplo específico do personagem Theo (19/08, 14:35, SP) — deixa claro que são cidades do mapa DELE
 const BOARDING_DESTINATIONS: BoardingDestination[] = [
   {
     id: "zurich",
@@ -56,8 +56,8 @@ const BOARDING_DESTINATIONS: BoardingDestination[] = [
     cityLabel: { pt: "Zurique", es: "Zúrich", en: "Zurich", fr: "Zurich", it: "Zurigo" },
     houseNum: 2,
     houseCode: "02",
-    videoSrc: "/videos/v3/ana-zurique.mp4",
-    posterSrc: "/videos/v3/ana-zurique-poster.jpg",
+    videoSrc: "/videos/v3/theo-zurique-v3.mp4",
+    posterSrc: "/videos/v3/theo-zurique-v3-poster.jpg",
   },
   {
     id: "rome",
@@ -65,8 +65,8 @@ const BOARDING_DESTINATIONS: BoardingDestination[] = [
     cityLabel: { pt: "Roma", es: "Roma", en: "Rome", fr: "Rome", it: "Roma" },
     houseNum: 5,
     houseCode: "05",
-    videoSrc: "/videos/v3/demo-roma-casa7.mp4",
-    posterSrc: "/images/v3/demo-roma-casa7.jpg",
+    videoSrc: "/videos/v3/theo-roma-v3.mp4",
+    posterSrc: "/videos/v3/theo-roma-v3-poster.jpg",
   },
   {
     id: "paris",
@@ -74,8 +74,8 @@ const BOARDING_DESTINATIONS: BoardingDestination[] = [
     cityLabel: { pt: "Paris", es: "París", en: "Paris", fr: "Paris", it: "Parigi" },
     houseNum: 7,
     houseCode: "07",
-    videoSrc: "/assets/cities/paris.mp4",
-    posterSrc: "/images/abertura/paris.jpg",
+    videoSrc: "/videos/v3/theo-paris-v3.mp4",
+    posterSrc: "/videos/v3/theo-paris-v3-poster.jpg",
   },
   {
     id: "ny",
@@ -83,8 +83,8 @@ const BOARDING_DESTINATIONS: BoardingDestination[] = [
     cityLabel: { pt: "Nova York", es: "Nueva York", en: "New York", fr: "New York", it: "New York" },
     houseNum: 10,
     houseCode: "10",
-    videoSrc: "/videos/v3/demo-ny-casa10.mp4",
-    posterSrc: "/images/v3/demo-ny-casa10.jpg",
+    videoSrc: "/videos/v3/theo-ny-v3.mp4",
+    posterSrc: "/videos/v3/theo-ny-v3-poster.jpg",
   },
 ];
 
@@ -94,24 +94,24 @@ const COMPARISON_REELS = [
     cityLabel: { pt: "Zurique (Suíça)", es: "Zúrich (Suiza)", en: "Zurich (Switzerland)", fr: "Zurich (Suisse)", it: "Zurigo (Svizzera)" },
     houseNum: 2,
     houseLabel: "02",
-    videoSrc: "/videos/v3/ana-zurique.mp4",
-    posterSrc: "/videos/v3/ana-zurique-poster.jpg",
+    videoSrc: "/videos/v3/theo-zurique-v3.mp4",
+    posterSrc: "/videos/v3/theo-zurique-v3-poster.jpg",
   },
   {
     id: "rome",
     cityLabel: { pt: "Roma (Itália)", es: "Roma (Italia)", en: "Rome (Italy)", fr: "Rome (Italie)", it: "Roma (Italia)" },
     houseNum: 5,
     houseLabel: "05",
-    videoSrc: "/videos/v3/demo-roma-casa7.mp4",
-    posterSrc: "/images/v3/demo-roma-casa7.jpg",
+    videoSrc: "/videos/v3/theo-roma-v3.mp4",
+    posterSrc: "/videos/v3/theo-roma-v3-poster.jpg",
   },
   {
     id: "ny",
     cityLabel: { pt: "Nova York (EUA)", es: "Nueva York (EE. UU.)", en: "New York (USA)", fr: "New York (USA)", it: "New York (USA)" },
     houseNum: 10,
     houseLabel: "10",
-    videoSrc: "/videos/v3/demo-ny-casa10.mp4",
-    posterSrc: "/images/v3/demo-ny-casa10.jpg",
+    videoSrc: "/videos/v3/theo-ny-v3.mp4",
+    posterSrc: "/videos/v3/theo-ny-v3-poster.jpg",
   },
 ];
 
@@ -277,8 +277,8 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
 
   const handleOpenSamplePastReport = () => {
     const samplePayload: StoredFreePastPayload = {
-      userName: firstName.trim() || "Ana",
-      birthDate: "1994-08-19",
+      userName: firstName.trim() || "Theo",
+      birthDate: "1990-08-19",
       birthTime: "14:35",
       birthPlace: "São Paulo, Brasil",
       pastYear: String(currentYear - 1),
@@ -287,7 +287,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
       pastCountry: "Itália",
       pastLat: 41.9028,
       pastLon: 12.4964,
-      pastHouse: 7,
+      pastHouse: 5,
       sunSign: "Leão",
       ascendant: "Escorpião",
       returnDate: `19/08/${currentYear - 1}`,
@@ -557,7 +557,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
           ===================================================================== */}
       <section
         id="filme-oficial"
-        className="py-16 lg:py-24 border-b border-white/[0.06] bg-[#080D18]"
+        className="scroll-mt-20 py-16 lg:py-24 border-b border-white/[0.06] bg-[#080D18]"
       >
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           {/* Symmetric Centered Header */}
@@ -586,7 +586,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
               <video
                 ref={desktopFilmRef}
                 src="/videos/v3/filme-protocolo-16x9.mp4"
-                poster="/videos/v3/filme-protocolo-16x9-poster.jpg"
+                poster="/videos/v3/filme-protocolo-16x9-v3-poster.jpg"
                 playsInline
                 preload="metadata"
                 onEnded={() => setFilmPlaying(false)}
@@ -641,7 +641,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
               <video
                 ref={mobileFilmRef}
                 src="/videos/v3/filme-protocolo-9x16.mp4"
-                poster="/videos/v3/filme-protocolo-9x16-poster.jpg"
+                poster="/videos/v3/filme-protocolo-9x16-v3-poster.jpg"
                 playsInline
                 preload="metadata"
                 onEnded={() => setFilmPlaying(false)}
@@ -722,7 +722,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B111E] via-transparent to-black/25" />
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
                       <span className="px-2.5 py-1 rounded-full bg-[#060911]/85 backdrop-blur-md border border-white/15 font-sans text-[10px] font-semibold text-[#F3DC9B]">
-                        Ana · Casa {reel.houseLabel}
+                        Theo · Casa {reel.houseLabel}
                       </span>
                     </div>
                   </div>
@@ -761,7 +761,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
           ===================================================================== */}
       <section
         id="consulta-gratuita"
-        className="relative py-16 lg:py-24 border-b border-white/[0.06] overflow-hidden"
+        className="scroll-mt-20 relative py-16 lg:py-24 border-b border-white/[0.06] overflow-hidden"
       >
         {/* Bright Earth Sunrise Backdrop */}
         <img
@@ -1042,7 +1042,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
           ===================================================================== */}
       <section
         id="as-12-casas"
-        className="py-16 lg:py-24 border-b border-white/[0.06] bg-[#060911]"
+        className="scroll-mt-20 py-16 lg:py-24 border-b border-white/[0.06] bg-[#060911]"
       >
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10">
@@ -1118,7 +1118,7 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
           ===================================================================== */}
       <section
         id="planos"
-        className="py-16 lg:py-24 border-b border-white/[0.06] bg-[#080D18]"
+        className="scroll-mt-20 py-16 lg:py-24 border-b border-white/[0.06] bg-[#080D18]"
       >
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div className="text-center max-w-2xl mx-auto mb-10">
@@ -1142,6 +1142,38 @@ function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
                 {t.pricing.currencyHint}
               </p>
             )}
+          </div>
+
+          {/* Symmetric 2-Column MiroFish Contrast: Free Static Chart vs. Protocolo Solar */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto mb-10">
+            <div className="rounded-2xl bg-[#0B111E]/75 border border-white/10 p-5 flex flex-col justify-between">
+              <div>
+                <span className="inline-block font-mono text-[10px] uppercase tracking-[0.14em] text-[#B0BCCF] mb-1">
+                  {t.pricing.contrast.freeLabel}
+                </span>
+                <h3 className="font-display text-lg font-bold text-[#F8FAFC]/85">
+                  {t.pricing.contrast.freeTitle}
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-[#B0BCCF] leading-relaxed mt-1.5">
+                  {t.pricing.contrast.freeDesc}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-[#111A2E]/90 border border-[#EAB344]/40 p-5 flex flex-col justify-between shadow-[0_12px_32px_rgba(234,179,68,0.12)]">
+              <div>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#EAB344] font-semibold mb-1">
+                  <Sparkles className="w-3 h-3 text-[#EAB344]" />
+                  <span>{t.pricing.contrast.solarLabel}</span>
+                </span>
+                <h3 className="font-display text-lg font-bold text-[#F8FAFC]">
+                  {t.pricing.contrast.solarTitle}
+                </h3>
+                <p className="font-sans text-xs sm:text-sm text-[#E2E8F0] leading-relaxed mt-1.5">
+                  {t.pricing.contrast.solarDesc}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* 3 Equal-Height Symmetric Pricing Cards */}

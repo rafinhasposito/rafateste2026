@@ -40,6 +40,16 @@ const FreePastResult = () => {
   const [checkedStorage, setCheckedStorage] = useState(false);
   const [nextDrawerOpen, setNextDrawerOpen] = useState(false);
   const [targetFutureHouse, setTargetFutureHouse] = useState<number | null>(null);
+  const [showFloatingBridge, setShowFloatingBridge] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowFloatingBridge(window.scrollY > 180);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     try {
@@ -278,20 +288,20 @@ const FreePastResult = () => {
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <Link
             to="/#consulta-gratuita"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#B0BCCF] hover:text-white"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#B0BCCF] hover:text-white shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-[#EAB344]" />
             <span>{t.pastReport.backOtherYear}</span>
           </Link>
 
-          <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.14em] text-[#F3DC9B] truncate">
-            {payload.pastCityShort} · {payload.pastYear}
+          <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.14em] text-[#F3DC9B] truncate text-right sm:text-center">
+            {payload.pastCityShort} · {payload.pastYear} · Casa {String(houseNum).padStart(2, "0")}
           </span>
 
           <button
             type="button"
             onClick={() => openFutureBridge()}
-            className="shrink-0 px-4 py-1.5 rounded-full bg-gradient-to-b from-[#F6D36B] to-[#E6AB3B] text-[#070A12] font-bold text-xs"
+            className="hidden sm:inline-flex shrink-0 px-4 py-1.5 rounded-full bg-gradient-to-b from-[#F6D36B] to-[#E6AB3B] text-[#070A12] font-bold text-xs"
           >
             {t.pastReport.planNextYearBtn} ({payload.nextYear})
           </button>
@@ -335,26 +345,36 @@ const FreePastResult = () => {
         }}
       />
 
-      {/* Floating Gold Conversion Bridge */}
-      <div className="fixed bottom-[72px] lg:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-2xl pointer-events-auto">
-        <div className="rounded-2xl bg-[#0B111E]/95 backdrop-blur-2xl border border-[#EAB344]/55 px-4 sm:px-6 py-3.5 shadow-[0_20px_60px_rgba(0,0,0,0.82)] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-center sm:text-left">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#F3DC9B] block">
-              {t.pastReport.bridgeQuestion} {payload.pastYear}?
-            </span>
-            <p className="text-xs sm:text-sm font-semibold text-[#F8FAFC]">
-              {t.pastReport.bridgeSub} ({payload.nextYear})
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => openFutureBridge()}
-            className="ps-btn-gold w-full sm:w-auto shrink-0 text-xs"
+      {/* Floating Gold Conversion Bridge (glides in smoothly after Hero scroll) */}
+      <AnimatePresence>
+        {showFloatingBridge && (
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 18 }}
+            transition={{ duration: 0.25 }}
+            className="fixed bottom-[72px] lg:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-2xl pointer-events-auto"
           >
-            {t.pastReport.planNextYearBtn} ({payload.nextYear})
-          </button>
-        </div>
-      </div>
+            <div className="rounded-2xl bg-[#0B111E]/95 backdrop-blur-2xl border border-[#EAB344]/55 px-4 sm:px-6 py-3.5 shadow-[0_20px_60px_rgba(0,0,0,0.82)] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="text-center sm:text-left">
+                <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#F3DC9B] block">
+                  {t.pastReport.bridgeQuestion} {payload.pastYear}?
+                </span>
+                <p className="text-xs sm:text-sm font-semibold text-[#F8FAFC]">
+                  {t.pastReport.bridgeSub} ({payload.nextYear})
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => openFutureBridge()}
+                className="ps-btn-gold w-full sm:w-auto shrink-0 text-xs"
+              >
+                {t.pastReport.planNextYearBtn} ({payload.nextYear})
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {typeof document !== "undefined" ? createPortal(drawerModal, document.body) : null}
     </div>
