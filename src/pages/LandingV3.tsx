@@ -21,6 +21,8 @@ import {
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import ScanningOverlay from "@/components/ScanningOverlay";
 import { HouseVideoPreview } from "@/components/HouseVideoPreview";
+import { MobileHomeFlow } from "@/components/mobile/MobileHomeFlow";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { HOUSES_SHOWCASE } from "@/data/housesShowcase";
 import { API_URL, getCurrentSolarYear, getNextBirthdayYear } from "@/lib/astro";
 import { saveStoredAffiliateRef } from "@/lib/affiliates";
@@ -112,6 +114,16 @@ const COMPARISON_REELS = [
 ];
 
 export default function LandingV3({ embeddedInShell = true }: LandingV3Props) {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
+  if (!isDesktop) {
+    return <MobileHomeFlow />;
+  }
+
+  return <DesktopLandingV3 embeddedInShell={embeddedInShell} />;
+}
+
+function DesktopLandingV3({ embeddedInShell = true }: LandingV3Props) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useI18n();

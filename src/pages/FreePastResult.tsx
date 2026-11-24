@@ -272,9 +272,9 @@ const FreePastResult = () => {
   );
 
   return (
-    <div className="relative min-h-screen bg-[#060911]">
+    <div className="relative min-h-screen bg-[#060911] pt-14 lg:pt-0">
       {/* Top Action Bar */}
-      <div className="sticky top-0 lg:top-20 z-40 bg-[#060911]/90 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 py-2.5">
+      <div className="sticky top-[52px] lg:top-20 z-30 bg-[#060911]/92 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 py-2.5">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <Link
             to="/#consulta-gratuita"
