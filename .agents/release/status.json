@@ -1,20 +1,20 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-25T08:51:00-03:00 — Redesign completo de Marca e Produto V3 publicado em https://protocolosolar.com.br/: (1) Fim do visual monótono de cor única — alternância rítmica entre Horizonte Orbital (#05070D + terra-sunrise.mp4), Travertino Solar Quente (#F4EFE6 / Espresso #111520) e Palco Cromático Vivo das 12 Casas (08-paleta-casas.md com as 12 cores oficiais); (2) Grid arquitetônico único de 1240px sem buracos laterais nem cabeçalhos órfãos; (3) Bilhetes de Embarque Solar físicos picotados (inspirados nas referências de aviação/viagem) + 12 novos loops arquitetônicos 8K (casa-01-lux.mp4 a casa-12-lux.mp4) sem rosto repetido do Theo e sem cidades fixas; (4) Mobile nativo estilo app de viagem com sheet em travertino quente, carrossel cromático das 12 Casas, check-in gratuito /audit_past e separação total entre Clientes, Céticos e Afiliados. 43/43 testes PASS, Build PASS, Playwright Desktop + Mobile 0 erros.",
+  "last_verification": "2026-11-25T10:22:00-03:00 — Arquitetura Oficial V3 publicada em https://protocolosolar.com.br/ unificando 100% do Manual de Identidade Visual V2 (Marcellus + DM Sans + Paleta B #02050A / #07101A / #C9A227 / #E8D59B + Pérola Editorial #FAF7F2 + Roda Oficial das 12 Casas), o Estudo de Viabilidade Global e o Relatório MiroFish: (1) Quiz Funnel interativo estilo Nebula acima da dobra no Mobile e Desktop com pergunta decisora imediata, micro-recompensa de Sol Tropical, filtro real de raio de viagem (até 1.000 km, até 3.000 km e Global) e diagnóstico gratuito da cidade atual / último aniversário (/audit_past); (2) Fim total de caixas aninhadas e remoção total de fotos do personagem de IA nas páginas, usando fotografia/vídeo aéreo real de cidades (Florianópolis, Roma, Zurique, NY) + anéis radiais 0-100 + Roda Solar interativa I-XII; (3) HTML semântico pré-hidratado + JSON-LD em index.html e copy 100% em conformidade com Meta Ads e TikTok Ads 2026. 43/43 testes PASS, Build PASS, Layoza WCAG 2.2 AA 0 violações, Playwright 0 erros.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br) + Render Python API + Supabase Edge Functions",
   "blockers_open": [],
   "blockers_fixed": [
-    "Eliminação completa da monotonia visual de cor única e caixas escuras estilo template: nova arquitetura editorial alternando Horizonte Orbital, Travertino Solar (#F4EFE6) e as 12 cores oficiais de 08-paleta-casas.md",
-    "Unificação do grid arquitetônico em 1240px (DesktopWebChrome + todos os 6 atos) eliminando buracos laterais e desalinhamentos",
-    "Substituição dos vídeos repetidos do Theo nas 12 Casas por 12 loops cinematográficos exclusivos de arquitetura celestial de luxo (casa-01-lux.mp4 a casa-12-lux.mp4), mantendo o Theo apenas na simulação individual (Zurique, Roma, Paris, NY)",
-    "Redesign Mobile nativo inspirado nas referências de apps de viagem (janela luminosa + sheet travertino arredondado + bilhetes picotados + check-in em 4 passos)",
-    "Separação estrita entre Clientes, Céticos e Afiliados + cálculo gratuito /audit_past validado E2E"
+    "Restauração integral da Identidade Visual Oficial V2 (Marcellus + DM Sans auto-hospedadas em /brand/fonts + Paleta B #02050A/#07101A/#C9A227/#E8D59B + Pérola #FAF7F2 + Roda Oficial das 12 Casas, zero ícones proibidos e zero cores dissonantes)",
+    "Eliminação de 'caixas dentro de caixas' e remoção do personagem de IA Theo da vitrine do site, substituído por fotografia/vídeo aéreo real de destinos, divisórias hairline de 1px e anéis radiais 0–100",
+    "Implementação do Quiz Funnel interativo estilo Nebula (pergunta de prioridade nº 1 acima da dobra + micro-recompensa + filtro de distância 1.000 km / 3.000 km / Global + diagnóstico gratuito da cidade atual e validação cega do aniversário passado)",
+    "Conformidade técnica Meta Ads & TikTok Ads 2026: HTML semântico pré-hidratado + AggregateOffer JSON-LD em index.html para rastreadores sem JS e revisão integral de copy sem Atributos Pessoais",
+    "Critério público transparente dos 3 níveis (R$ 19,90 / R$ 49,90 / R$ 99,90) resolvendo os riscos apontados na simulação MiroFish"
   ],
   "v1_1_backlog": [
-    "Code splitting: reduzir bundle de 3.1MB (chunk size warning)",
-    "Browserslist: atualizar caniuse-lite",
-    "Otimizar imagens de voucher (11MB → compressão)"
+    "Integração futura de Merchant of Record (Lemon Squeezy / Paddle) para Fase 2 (LatAm/Espanha EUR/USD) e Fase 3 (EUA/UK/Europa Tier-1)",
+    "Code splitting: reduzir bundle de 3.1MB",
+    "Otimizar imagens de voucher"
   ]
 }

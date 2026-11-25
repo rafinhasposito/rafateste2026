@@ -31,24 +31,24 @@ export function MobileAppChrome() {
 
   return (
     <>
-      {/* Top Header — Unified Celestial Obsidian Glass */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 sm:px-6 pt-3 pb-2.5 bg-[#060911]/90 backdrop-blur-xl pointer-events-none border-b border-white/[0.07]">
+      {/* Top Header — Official Brand Kit V2 Void Glass */}
+      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 sm:px-6 pt-3 pb-2.5 bg-[#02050A]/90 backdrop-blur-xl pointer-events-none border-b border-[#C9A227]/12">
         {/* Left Side */}
         <div className="flex items-center gap-2 pointer-events-auto">
           {!showBottomBar ? (
             <button
               onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0B111E]/95 border border-white/15 text-[#F8FAFC] active:scale-95 transition-all text-xs font-sans font-semibold shadow-md"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#07101A]/95 border border-[#C9A227]/25 text-[#F2F4F7] active:scale-95 transition-all text-xs font-sans font-medium"
             >
-              <ChevronLeft className="w-4 h-4 text-[#EAB344]" />
+              <ChevronLeft className="w-4 h-4 text-[#C9A227]" />
               <span>{t.nav.back}</span>
             </button>
           ) : (
             <Link to="/" className="flex items-center active:opacity-80 transition-opacity">
               <img
-                src="/brand/protocolo-solar-logo-horizontal.svg"
+                src="/brand/protocolo-solar-logo-horizontal-4096.png"
                 alt="Protocolo Solar"
-                className="w-[136px] h-auto opacity-95 drop-shadow-sm"
+                className="w-[148px] h-auto opacity-95"
                 draggable={false}
               />
             </Link>
@@ -62,15 +62,15 @@ export function MobileAppChrome() {
           {session ? (
             <Link
               to="/credits"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#EAB344]/35 bg-[#EAB344]/12 text-[#F3DC9B] text-[11px] font-mono font-semibold active:scale-95 transition-all backdrop-blur-xl"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#C9A227]/35 bg-[#07101A] text-[#E8D59B] text-[11px] font-sans font-semibold active:scale-95 transition-all"
             >
-              <Coins className="w-3.5 h-3.5 text-[#EAB344]" />
+              <Coins className="w-3.5 h-3.5 text-[#C9A227]" />
               <span>{profile?.credits ?? 0}</span>
             </Link>
           ) : (
             <Link
               to="/auth?mode=signin"
-              className="inline-flex items-center px-3 py-1.5 rounded-full border border-[#EAB344]/35 bg-[#EAB344]/12 text-[#F3DC9B] text-[11px] font-sans font-semibold active:scale-95 transition-all backdrop-blur-xl"
+              className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#C9A227] text-[#02050A] text-[11px] font-sans font-semibold active:scale-95 transition-all"
             >
               {t.nav.signIn}
             </Link>
@@ -81,27 +81,30 @@ export function MobileAppChrome() {
       {/* Bottom Navigation Bar */}
       {showBottomBar && (
         <nav
-          className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] shadow-[0_-8px_30px_rgba(0,0,0,0.7)]"
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#C9A227]/14 shadow-[0_-8px_30px_rgba(0,0,0,0.7)]"
           style={{
-            background: "rgba(6, 9, 17, 0.96)",
+            background: "rgba(2, 5, 10, 0.96)",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
             paddingBottom: "max(env(safe-area-inset-bottom, 0px), 8px)",
           }}
         >
           <div className="flex items-center justify-around h-16 px-2">
-            {/* 1. Descobrir */}
+            {/* 1. Descobrir (Solar Ring — zero compass per Brand Manual V2) */}
             <Link
               to="/"
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
-                isHome ? "text-[#F3DC9B]" : "text-[#B0BCCF] hover:text-white"
+                isHome ? "text-[#E8D59B]" : "text-[#AAB6C4] hover:text-[#F2F4F7]"
               )}
             >
               {isHome && (
-                <div className="absolute top-0 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#EAB344] to-transparent rounded-full" />
+                <div className="absolute top-0 w-8 h-[1.5px] bg-[#C9A227]" />
               )}
-              <Compass className="w-5 h-5" />
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <circle cx="12" cy="12" r="8.5" />
+                <circle cx="12" cy="12" r="2.8" fill="currentColor" stroke="none" />
+              </svg>
               <span className="text-[10px] font-sans font-medium tracking-wide">{t.nav.discover}</span>
             </Link>
 
@@ -110,14 +113,21 @@ export function MobileAppChrome() {
               to="/casas"
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
-                isHousesGuide ? "text-[#F3DC9B]" : "text-[#B0BCCF] hover:text-white"
+                isHousesGuide ? "text-[#E8D59B]" : "text-[#AAB6C4] hover:text-[#F2F4F7]"
               )}
             >
               {isHousesGuide && (
-                <div className="absolute top-0 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#EAB344] to-transparent rounded-full" />
+                <div className="absolute top-0 w-8 h-[1.5px] bg-[#C9A227]" />
               )}
-              <Crown className="w-5 h-5 text-[#EAB344]" />
-              <span className="text-[10px] font-sans font-semibold tracking-wide">{t.nav.houses}</span>
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="9" />
+                <circle cx="12" cy="12" r="4" />
+                <line x1="12" y1="3" x2="12" y2="8" />
+                <line x1="12" y1="16" x2="12" y2="21" />
+                <line x1="3" y1="12" x2="8" y2="12" />
+                <line x1="16" y1="12" x2="21" y2="12" />
+              </svg>
+              <span className="text-[10px] font-sans font-medium tracking-wide">{t.nav.houses}</span>
             </Link>
 
             {/* 3. Consultas */}
@@ -125,13 +135,13 @@ export function MobileAppChrome() {
               to="/history"
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
-                location.pathname === "/history" ? "text-[#F3DC9B]" : "text-[#B0BCCF] hover:text-white"
+                location.pathname === "/history" ? "text-[#E8D59B]" : "text-[#AAB6C4] hover:text-[#F2F4F7]"
               )}
             >
               {location.pathname === "/history" && (
-                <div className="absolute top-0 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#EAB344] to-transparent rounded-full" />
+                <div className="absolute top-0 w-8 h-[1.5px] bg-[#C9A227]" />
               )}
-              <Scroll className="w-5 h-5" />
+              <Scroll className="w-5 h-5 stroke-[1.6]" />
               <span className="text-[10px] font-sans font-medium tracking-wide">{t.nav.myConsultations}</span>
             </Link>
 
@@ -140,13 +150,13 @@ export function MobileAppChrome() {
               to="/perfil"
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors relative",
-                location.pathname === "/perfil" ? "text-[#F3DC9B]" : "text-[#B0BCCF] hover:text-white"
+                location.pathname === "/perfil" ? "text-[#E8D59B]" : "text-[#AAB6C4] hover:text-[#F2F4F7]"
               )}
             >
               {location.pathname === "/perfil" && (
-                <div className="absolute top-0 w-8 h-[2px] bg-gradient-to-r from-transparent via-[#EAB344] to-transparent rounded-full" />
+                <div className="absolute top-0 w-8 h-[1.5px] bg-[#C9A227]" />
               )}
-              <User className="w-5 h-5" />
+              <User className="w-5 h-5 stroke-[1.6]" />
               <span className="text-[10px] font-sans font-medium tracking-wide">{t.nav.account}</span>
             </Link>
           </div>

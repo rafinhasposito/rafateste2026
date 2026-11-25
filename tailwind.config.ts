@@ -28,16 +28,16 @@ export default {
         "16": "64px",
       },
       fontFamily: {
-        /* UNIFIED BRAND SYSTEM V3 */
-        "ps-display": ['"Playfair Display"', 'Georgia', 'serif'],
-        "ps-ui": ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['"Playfair Display"', 'Georgia', 'serif'],
-        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        /* OFFICIAL BRAND KIT V2 (Marcellus + DM Sans) */
+        "ps-display": ['"Marcellus"', 'Georgia', 'serif'],
+        "ps-ui": ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['"Marcellus"', 'Georgia', 'serif'],
+        sans: ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['"DM Sans"', 'monospace'],
         /* Aliases semânticos harmonizados */
-        inter: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        cinzel: ['"Playfair Display"', 'Georgia', 'serif'],
-        sfpro: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        inter: ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        cinzel: ['"Marcellus"', 'Georgia', 'serif'],
+        sfpro: ['"DM Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       fontSize: {
         "display": "var(--text-display)",

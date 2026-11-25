@@ -36,53 +36,52 @@ export function DesktopWebChrome() {
     <header
       className="fixed top-0 left-0 right-0 h-20 z-50"
       style={{
-        background: "rgba(6, 9, 17, 0.88)",
-        backdropFilter: "blur(24px) saturate(1.3)",
-        WebkitBackdropFilter: "blur(24px) saturate(1.3)",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+        background: "rgba(2, 5, 10, 0.88)",
+        backdropFilter: "blur(24px) saturate(1.2)",
+        WebkitBackdropFilter: "blur(24px) saturate(1.2)",
+        borderBottom: "1px solid rgba(201, 162, 39, 0.14)",
       }}
     >
       <div className="max-w-[1240px] mx-auto h-full flex items-center justify-between px-6 lg:px-8">
         
-        {/* Left: Logo + Navigation */}
-        <div className="flex items-center gap-8">
+        {/* Left: Official Logo + Clean Typographic Navigation */}
+        <div className="flex items-center gap-10">
           <Link to="/" className="flex items-center shrink-0">
             <img
               src="/brand/protocolo-solar-logo-horizontal-4096.png"
               alt="Protocolo Solar"
-              className="w-[235px] h-auto opacity-95 hover:opacity-100 transition-opacity drop-shadow-md"
+              className="w-[228px] h-auto opacity-95 hover:opacity-100 transition-opacity"
               draggable={false}
             />
           </Link>
 
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-7">
             <Link 
               to="/" 
-              className={`text-sm font-sans font-medium whitespace-nowrap transition-colors ${
+              className={`text-[13px] font-sans tracking-[0.04em] whitespace-nowrap transition-colors ${
                 location.pathname === "/" && !location.search.includes("mode=")
-                  ? "text-[#F3DC9B]"
-                  : "text-[#B0BCCF] hover:text-white"
+                  ? "text-[#E8D59B] font-medium"
+                  : "text-[#AAB6C4] hover:text-[#F2F4F7]"
               }`}
             >
               {t.nav.home}
             </Link>
             <Link 
               to="/casas" 
-              className={`inline-flex items-center gap-1.5 text-sm font-sans font-semibold whitespace-nowrap transition-colors ${
+              className={`text-[13px] font-sans tracking-[0.04em] whitespace-nowrap transition-colors ${
                 location.pathname.startsWith("/casas")
-                  ? "text-[#F3DC9B]"
-                  : "text-[#F8FAFC]/90 hover:text-[#F3DC9B]"
+                  ? "text-[#E8D59B] font-medium"
+                  : "text-[#AAB6C4] hover:text-[#F2F4F7]"
               }`}
             >
-              <Crown className="w-3.5 h-3.5 text-[#EAB344]" />
-              <span>{t.nav.houses}</span>
+              {t.nav.houses}
             </Link>
             <Link 
               to="/consultar" 
-              className={`text-sm font-sans font-medium whitespace-nowrap transition-colors ${
+              className={`text-[13px] font-sans tracking-[0.04em] whitespace-nowrap transition-colors ${
                 location.pathname === "/consultar" || (location.pathname === "/" && location.search.includes("mode="))
-                  ? "text-[#F3DC9B]"
-                  : "text-[#B0BCCF] hover:text-white"
+                  ? "text-[#E8D59B] font-medium"
+                  : "text-[#AAB6C4] hover:text-[#F2F4F7]"
               }`}
             >
               {t.nav.consult}
@@ -90,8 +89,8 @@ export function DesktopWebChrome() {
             {session && (
               <Link 
                 to="/history" 
-                className={`text-sm font-sans font-medium whitespace-nowrap transition-colors ${
-                  location.pathname === "/history" ? "text-[#F3DC9B]" : "text-[#B0BCCF] hover:text-white"
+                className={`text-[13px] font-sans tracking-[0.04em] whitespace-nowrap transition-colors ${
+                  location.pathname === "/history" ? "text-[#E8D59B] font-medium" : "text-[#AAB6C4] hover:text-[#F2F4F7]"
                 }`}
               >
                 {t.nav.myConsultations}
@@ -100,10 +99,10 @@ export function DesktopWebChrome() {
             {isAffiliate && (
               <Link 
                 to="/afiliado" 
-                className={`text-sm font-sans font-medium whitespace-nowrap transition-colors ${
+                className={`text-[13px] font-sans tracking-[0.04em] whitespace-nowrap transition-colors ${
                   location.pathname === "/afiliado"
-                    ? "text-[#F3DC9B]"
-                    : "text-[#B0BCCF] hover:text-white"
+                    ? "text-[#E8D59B] font-medium"
+                    : "text-[#AAB6C4] hover:text-[#F2F4F7]"
                 }`}
               >
                 Painel Parceiro
@@ -113,23 +112,22 @@ export function DesktopWebChrome() {
         </div>
 
         {/* Right: Language + Actions */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <LanguageSwitcher />
 
           <Link
             to="/app/onboarding"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/14 bg-white/[0.04] hover:bg-white/[0.08] hover:border-[#EAB344]/45 text-[#F8FAFC]/90 hover:text-[#F3DC9B] text-xs font-sans font-medium whitespace-nowrap transition-all"
+            className="text-[12px] font-sans tracking-[0.06em] uppercase text-[#AAB6C4] hover:text-[#E8D59B] px-3 py-1.5 whitespace-nowrap transition-colors"
           >
-            <BookOpen className="w-3.5 h-3.5 text-[#EAB344]" />
-            <span>{t.nav.quickGuide}</span>
+            {t.nav.quickGuide}
           </Link>
 
           {session ? (
             <>
               <Link to="/credits">
-                <div className="flex items-center gap-2 bg-[#0B111E] border border-[#EAB344]/35 rounded-full px-3.5 py-1.5 hover:border-[#EAB344]/70 hover:bg-[#111A2E] transition-all">
-                  <Coins className="w-4 h-4 text-[#EAB344]" />
-                  <span className="text-sm font-mono font-semibold text-[#F3DC9B]">
+                <div className="flex items-center gap-2 bg-[#07101A] border border-[#C9A227]/35 rounded-full px-3.5 py-1.5 hover:border-[#C9A227]/70 transition-all">
+                  <Coins className="w-3.5 h-3.5 text-[#C9A227]" />
+                  <span className="text-xs font-sans font-semibold text-[#E8D59B]">
                     {credits}
                   </span>
                 </div>
@@ -183,7 +181,7 @@ export function DesktopWebChrome() {
           ) : (
             <button
               onClick={() => navigate("/auth")}
-              className="px-4 py-1.5 rounded-full border border-[#EAB344]/45 bg-[#EAB344]/12 hover:bg-[#EAB344]/22 text-[#F3DC9B] text-xs font-sans font-semibold whitespace-nowrap transition-all"
+              className="px-4 py-1.5 rounded-full bg-[#C9A227] hover:bg-[#D8B338] text-[#02050A] text-xs font-sans font-semibold tracking-[0.04em] whitespace-nowrap transition-all"
             >
               {t.nav.signIn}
             </button>

@@ -2,499 +2,73 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  Compass,
-  Gift,
-  Pause,
-  Plane,
-  Play,
-  Sparkles,
-  Volume2,
-  VolumeX,
-  X,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Play, Volume2, VolumeX, X } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import ScanningOverlay from "@/components/ScanningOverlay";
-import { HOUSES_SHOWCASE } from "@/data/housesShowcase";
-import { getHousePalette } from "@/data/housePalette";
 import { getCurrentSolarYear } from "@/lib/astro";
 import { prewarmSolarApi, runFreePastAudit } from "@/lib/pastAuditClient";
-import { type SupportedLocale, useI18n } from "@/lib/i18n";
+import {
+  getTargetHouseForPriority,
+  getTropicalSunSign,
+  HOUSE_PILLAR_SCORES,
+  type QuizPriority,
+  type TravelRadius,
+} from "@/lib/solarQuizUtils";
+import { useI18n } from "@/lib/i18n";
 import {
   FREE_PAST_STORAGE_KEY,
   type StoredFreePastPayload,
 } from "@/pages/FreePastResult";
 import { toast } from "sonner";
 
-type MobileView = "hook" | "quiz" | "plans";
+type MobileScreen = "quiz" | "plans";
 
-interface MobileStoryExample {
-  id: string;
-  code: string;
-  houseNum: number;
-  houseCode: string;
-  videoSrc: string;
-  posterSrc: string;
-  city: Record<SupportedLocale, string>;
-  theme: Record<SupportedLocale, string>;
+function MobileRing({ value, label }: { value: number; label: string }) {
+  const r = 22;
+  const circ = 2 * Math.PI * r;
+  const off = circ - (value / 100) * circ;
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-14 h-14">
+        <svg viewBox="0 0 56 56" className="w-full h-full -rotate-90">
+          <circle cx="28" cy="28" r={r} fill="none" stroke="rgba(7,16,26,0.09)" strokeWidth="3.5" />
+          <circle
+            cx="28"
+            cy="28"
+            r={r}
+            fill="none"
+            stroke="#C9A227"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeDasharray={circ}
+            strokeDashoffset={off}
+          />
+        </svg>
+        <span className="absolute inset-0 flex items-center justify-center font-sans text-xs font-bold text-[#07101A] tabular-nums">
+          {value}
+        </span>
+      </div>
+      <span className="text-[10px] uppercase tracking-[0.14em] text-[#07101A]/60 mt-1.5 font-semibold">
+        {label}
+      </span>
+    </div>
+  );
 }
-
-const STORY_EXAMPLES: MobileStoryExample[] = [
-  {
-    id: "zurich",
-    code: "ZRH",
-    houseNum: 2,
-    houseCode: "02",
-    videoSrc: "/videos/v3/theo-zurique-v3.mp4",
-    posterSrc: "/videos/v3/theo-zurique-v3-poster.jpg",
-    city: { pt: "Zurique", es: "Zúrich", en: "Zurich", fr: "Zurich", it: "Zurigo" },
-    theme: { pt: "Dinheiro", es: "Dinero", en: "Wealth", fr: "Argent", it: "Denaro" },
-  },
-  {
-    id: "rome",
-    code: "FCO",
-    houseNum: 5,
-    houseCode: "05",
-    videoSrc: "/videos/v3/theo-roma-v3.mp4",
-    posterSrc: "/videos/v3/theo-roma-v3-poster.jpg",
-    city: { pt: "Roma", es: "Roma", en: "Rome", fr: "Rome", it: "Roma" },
-    theme: { pt: "Amor", es: "Amor", en: "Love", fr: "Amour", it: "Amore" },
-  },
-  {
-    id: "ny",
-    code: "JFK",
-    houseNum: 10,
-    houseCode: "10",
-    videoSrc: "/videos/v3/theo-ny-v3.mp4",
-    posterSrc: "/videos/v3/theo-ny-v3-poster.jpg",
-    city: { pt: "Nova York", es: "Nueva York", en: "New York", fr: "New York", it: "New York" },
-    theme: { pt: "Carreira", es: "Carrera", en: "Career", fr: "Carrière", it: "Carriera" },
-  },
-];
-
-interface MobileCopy {
-  badge: string;
-  headlineStart: string;
-  headlineHighlight: string;
-  subline: string;
-  samePersonHint: string;
-  ctaFree: string;
-  ctaVideo: string;
-  ctaNextYear: string;
-  sampleLink: string;
-  stepLabel: string;
-  q1Title: string;
-  q1NameLabel: string;
-  q1NamePlaceholder: string;
-  q1DateLabel: string;
-  q2Title: string;
-  q2TimeLabel: string;
-  q2UnknownTitle: string;
-  q2UnknownSub: string;
-  q3Title: string;
-  q3Placeholder: string;
-  q4Title: string;
-  q4YearLabel: string;
-  q4CityLabel: string;
-  q4Placeholder: string;
-  nextBtn: string;
-  revealBtn: string;
-  calculatingBtn: string;
-  plansTitle: string;
-  plansSub: string;
-  oneTime: string;
-  popular: string;
-  plans: {
-    pkg: "1" | "3" | "full";
-    featured?: boolean;
-    priceInt: string;
-    priceDec: string;
-    title: string;
-    desc: string;
-    cta: string;
-  }[];
-  giftText: string;
-  giftLink: string;
-  closeLabel: string;
-}
-
-const MOBILE_COPY: Record<SupportedLocale, MobileCopy> = {
-  pt: {
-    badge: "Teste Grátis em 30s",
-    headlineStart: "A cidade do seu aniversário ",
-    headlineHighlight: "muda o seu ano.",
-    subline: "Descubra grátis o que ativou no seu último aniversário e veja se bateu com o que você viveu.",
-    samePersonHint: "Exemplo real do Theo (suas cidades mudam):",
-    ctaFree: "Fazer meu teste grátis",
-    ctaVideo: "Vídeo (1m30)",
-    ctaNextYear: "Próximo aniversário",
-    sampleLink: "Ver um exemplo pronto agora",
-    stepLabel: "Passo",
-    q1Title: "Qual seu primeiro nome e data de nascimento?",
-    q1NameLabel: "Primeiro nome",
-    q1NamePlaceholder: "Ex.: Rafael",
-    q1DateLabel: "Data de nascimento",
-    q2Title: "Que horas você nasceu?",
-    q2TimeLabel: "Horário de nascimento",
-    q2UnknownTitle: "Não sei a hora exata",
-    q2UnknownSub: "Usar 12:00 como estimativa aproximada",
-    q3Title: "Em qual cidade você nasceu?",
-    q3Placeholder: "Digite e escolha sua cidade natal...",
-    q4Title: "Onde você passou seu último aniversário?",
-    q4YearLabel: "Ano",
-    q4CityLabel: "Cidade onde você estava",
-    q4Placeholder: "Digite e escolha a cidade...",
-    nextBtn: "Continuar",
-    revealBtn: "Ver meu resultado grátis",
-    calculatingBtn: "Calculando...",
-    plansTitle: "Onde passar seu próximo aniversário?",
-    plansSub: "Pagamento único · Acesso na hora · 8 áreas da vida incluídas",
-    oneTime: "único",
-    popular: "Mais escolhido",
-    plans: [
-      {
-        pkg: "1",
-        priceInt: "19",
-        priceDec: "90",
-        title: "Testar 1 Cidade",
-        desc: "Já tenho 1 cidade em mente para o aniversário (+ guia se não viajar).",
-        cta: "Escolher 1 Cidade",
-      },
-      {
-        pkg: "3",
-        featured: true,
-        priceInt: "49",
-        priceDec: "90",
-        title: "Comparar 3 Cidades",
-        desc: "Compare até 3 destinos diferentes antes de decidir sua viagem.",
-        cta: "Comparar 3 Cidades",
-      },
-      {
-        pkg: "full",
-        priceInt: "99",
-        priceDec: "90",
-        title: "Melhores Cidades no Mundo",
-        desc: "Descubra seus melhores destinos no Brasil e no mundo nos 12 temas.",
-        cta: "Liberar Mapa Completo",
-      },
-    ],
-    giftText: "Ganhou um presente?",
-    giftLink: "Resgatar código",
-    closeLabel: "Fechar",
-  },
-  es: {
-    badge: "Prueba Gratis en 30s",
-    headlineStart: "La ciudad de tu cumpleaños ",
-    headlineHighlight: "cambia tu año.",
-    subline: "Descubre gratis qué se activó en tu último cumpleaños y compruébalo con lo que viviste.",
-    samePersonHint: "Misma persona en su cumpleaños — toca para ver:",
-    ctaFree: "Hacer mi prueba gratis",
-    ctaVideo: "Video (1m30)",
-    ctaNextYear: "Próximo cumpleaños",
-    sampleLink: "Ver un ejemplo completo ahora",
-    stepLabel: "Paso",
-    q1Title: "¿Cuál es tu nombre y fecha de nacimiento?",
-    q1NameLabel: "Primer nombre",
-    q1NamePlaceholder: "Ej.: Mateo",
-    q1DateLabel: "Fecha de nacimiento",
-    q2Title: "¿A qué hora naciste?",
-    q2TimeLabel: "Hora de nacimiento",
-    q2UnknownTitle: "No sé la hora exacta",
-    q2UnknownSub: "Usar 12:00 como hora aproximada",
-    q3Title: "¿En qué ciudad naciste?",
-    q3Placeholder: "Escribe y elige tu ciudad natal...",
-    q4Title: "¿Dónde pasaste tu último cumpleaños?",
-    q4YearLabel: "Año",
-    q4CityLabel: "Ciudad donde estabas",
-    q4Placeholder: "Escribe y elige la ciudad...",
-    nextBtn: "Continuar",
-    revealBtn: "Ver mi resultado gratis",
-    calculatingBtn: "Calculando...",
-    plansTitle: "¿Dónde pasar tu próximo cumpleaños?",
-    plansSub: "Pago único · Acceso inmediato · 8 áreas incluidas",
-    oneTime: "único",
-    popular: "Más elegido",
-    plans: [
-      {
-        pkg: "1",
-        priceInt: "19",
-        priceDec: "90",
-        title: "Probar 1 Ciudad",
-        desc: "Ya tengo 1 destino en mente (+ guía si decides no viajar).",
-        cta: "Elegir 1 Ciudad",
-      },
-      {
-        pkg: "3",
-        featured: true,
-        priceInt: "49",
-        priceDec: "90",
-        title: "Comparar 3 Ciudades",
-        desc: "Compara hasta 3 viajes posibles antes de decidir.",
-        cta: "Comparar 3 Ciudades",
-      },
-      {
-        pkg: "full",
-        priceInt: "99",
-        priceDec: "90",
-        title: "Mejores Ciudades del Mundo",
-        desc: "Descubre tus mejores destinos globales en los 12 temas del año.",
-        cta: "Desbloquear Todo",
-      },
-    ],
-    giftText: "¿Tienes un código?",
-    giftLink: "Canjear regalo",
-    closeLabel: "Cerrar",
-  },
-  en: {
-    badge: "Free 30-Second Check",
-    headlineStart: "Your birthday city ",
-    headlineHighlight: "shapes your year.",
-    subline: "Check for free what your last birthday activated and see if it matches the year you lived.",
-    samePersonHint: "Same person on their birthday — tap to preview:",
-    ctaFree: "Start my free check",
-    ctaVideo: "Watch (1m30)",
-    ctaNextYear: "Next birthday",
-    sampleLink: "Preview a sample report now",
-    stepLabel: "Step",
-    q1Title: "What is your first name and birth date?",
-    q1NameLabel: "First name",
-    q1NamePlaceholder: "e.g., Alex",
-    q1DateLabel: "Birth date",
-    q2Title: "What time were you born?",
-    q2TimeLabel: "Time of birth",
-    q2UnknownTitle: "I don't know the exact time",
-    q2UnknownSub: "Use 12:00 noon as an approximate estimate",
-    q3Title: "Which city were you born in?",
-    q3Placeholder: "Type and select your birth city...",
-    q4Title: "Where did you spend your last birthday?",
-    q4YearLabel: "Year",
-    q4CityLabel: "City on that birthday",
-    q4Placeholder: "Type and select the city...",
-    nextBtn: "Continue",
-    revealBtn: "Reveal my free result",
-    calculatingBtn: "Calculating...",
-    plansTitle: "Where to spend your next birthday?",
-    plansSub: "One-time payment · Instant access · All 8 life areas unlocked",
-    oneTime: "one-time",
-    popular: "Most popular",
-    plans: [
-      {
-        pkg: "1",
-        priceInt: "19",
-        priceDec: "90",
-        title: "Test 1 City",
-        desc: "You already have 1 specific city in mind (+ home city guide).",
-        cta: "Choose 1 City",
-      },
-      {
-        pkg: "3",
-        featured: true,
-        priceInt: "49",
-        priceDec: "90",
-        title: "Compare 3 Cities",
-        desc: "Compare up to 3 possible destinations side by side.",
-        cta: "Compare 3 Cities",
-      },
-      {
-        pkg: "full",
-        priceInt: "99",
-        priceDec: "90",
-        title: "Best Cities Worldwide",
-        desc: "Unlock your best destinations worldwide across all 12 themes.",
-        cta: "Unlock Full Map",
-      },
-    ],
-    giftText: "Have a gift code?",
-    giftLink: "Redeem code",
-    closeLabel: "Close",
-  },
-  fr: {
-    badge: "Test Gratuit en 30s",
-    headlineStart: "La ville de votre anniversaire ",
-    headlineHighlight: "change votre année.",
-    subline: "Vérifiez gratuitement ce que votre dernier anniversaire a activé dans votre vie.",
-    samePersonHint: "Même personne le jour de son anniversaire :",
-    ctaFree: "Faire mon test gratuit",
-    ctaVideo: "Vidéo (1m30)",
-    ctaNextYear: "Prochain anniversaire",
-    sampleLink: "Voir un exemple complet",
-    stepLabel: "Étape",
-    q1Title: "Quel est votre prénom et date de naissance ?",
-    q1NameLabel: "Prénom",
-    q1NamePlaceholder: "Ex. : Camille",
-    q1DateLabel: "Date de naissance",
-    q2Title: "À quelle heure êtes-vous né(e) ?",
-    q2TimeLabel: "Heure de naissance",
-    q2UnknownTitle: "Je ne connais pas l'heure exacte",
-    q2UnknownSub: "Utiliser 12h00 à titre indicatif",
-    q3Title: "Dans quelle ville êtes-vous né(e) ?",
-    q3Placeholder: "Saisissez et choisissez votre ville...",
-    q4Title: "Où avez-vous fêté votre dernier anniversaire ?",
-    q4YearLabel: "Année",
-    q4CityLabel: "Ville ce jour-là",
-    q4Placeholder: "Saisissez et choisissez la ville...",
-    nextBtn: "Continuer",
-    revealBtn: "Voir mon bilan gratuit",
-    calculatingBtn: "Calcul...",
-    plansTitle: "Où fêter votre prochain anniversaire ?",
-    plansSub: "Paiement unique · Accès immédiat · 8 domaines inclus",
-    oneTime: "unique",
-    popular: "Le plus choisi",
-    plans: [
-      {
-        pkg: "1",
-        priceInt: "19",
-        priceDec: "90",
-        title: "Tester 1 Ville",
-        desc: "Vous avez déjà 1 destination précise en tête.",
-        cta: "Choisir 1 Ville",
-      },
-      {
-        pkg: "3",
-        featured: true,
-        priceInt: "49",
-        priceDec: "90",
-        title: "Comparer 3 Villes",
-        desc: "Comparez jusqu'à 3 voyages possibles avant de choisir.",
-        cta: "Comparer 3 Villes",
-      },
-      {
-        pkg: "full",
-        priceInt: "99",
-        priceDec: "90",
-        title: "Meilleures Villes du Monde",
-        desc: "Découvrez vos meilleures destinations sur les 12 thèmes.",
-        cta: "Tout Débloquer",
-      },
-    ],
-    giftText: "Un code cadeau ?",
-    giftLink: "Utiliser un code",
-    closeLabel: "Fermer",
-  },
-  it: {
-    badge: "Prova Gratuita in 30s",
-    headlineStart: "La città del tuo compleanno ",
-    headlineHighlight: "cambia il tuo anno.",
-    subline: "Scopri gratis cosa ha attivato il tuo ultimo compleanno e confrontalo con ciò che hai vissuto.",
-    samePersonHint: "Stessa persona nel giorno del compleanno:",
-    ctaFree: "Fai il test gratuito",
-    ctaVideo: "Video (1m30)",
-    ctaNextYear: "Prossimo compleanno",
-    sampleLink: "Guarda un esempio completo",
-    stepLabel: "Passo",
-    q1Title: "Qual è il tuo nome e data di nascita?",
-    q1NameLabel: "Nome",
-    q1NamePlaceholder: "Es.: Giulia",
-    q1DateLabel: "Data di nascita",
-    q2Title: "A che ora sei nato/a?",
-    q2TimeLabel: "Ora di nascita",
-    q2UnknownTitle: "Non conosco l'ora esatta",
-    q2UnknownSub: "Usa le 12:00 come stima indicativa",
-    q3Title: "In quale città sei nato/a?",
-    q3Placeholder: "Scrivi e scegli la città di nascita...",
-    q4Title: "Dove hai festeggiato l'ultimo compleanno?",
-    q4YearLabel: "Anno",
-    q4CityLabel: "Città in quel giorno",
-    q4Placeholder: "Scrivi e scegli la città...",
-    nextBtn: "Continua",
-    revealBtn: "Vedi il mio risultato gratis",
-    calculatingBtn: "Calcolo...",
-    plansTitle: "Dove festeggiare il prossimo compleanno?",
-    plansSub: "Pagamento unico · Accesso immediato · 8 aree incluse",
-    oneTime: "unico",
-    popular: "Più scelto",
-    plans: [
-      {
-        pkg: "1",
-        priceInt: "19",
-        priceDec: "90",
-        title: "Prova 1 Città",
-        desc: "Hai già 1 meta precisa in mente per il compleanno.",
-        cta: "Scegli 1 Città",
-      },
-      {
-        pkg: "3",
-        featured: true,
-        priceInt: "49",
-        priceDec: "90",
-        title: "Confronta 3 Città",
-        desc: "Confronta fino a 3 possibili viaggi prima di decidere.",
-        cta: "Confronta 3 Città",
-      },
-      {
-        pkg: "full",
-        priceInt: "99",
-        priceDec: "90",
-        title: "Migliori Città nel Mondo",
-        desc: "Scopri le tue mete ideali nel mondo in tutti i 12 temi.",
-        cta: "Sblocca Tutto",
-      },
-    ],
-    giftText: "Hai un codice regalo?",
-    giftLink: "Riscatta codice",
-    closeLabel: "Chiudi",
-  },
-};
 
 export function MobileHomeFlow() {
   const navigate = useNavigate();
-  const { locale, t } = useI18n();
-  const c = MOBILE_COPY[locale] || MOBILE_COPY.pt;
+  const { t } = useI18n();
 
   useEffect(() => {
     prewarmSolarApi();
   }, []);
 
-  // Determine initial mobile view from URL hash (#consulta-gratuita or #planos)
-  const [view, setView] = useState<MobileView>(() => {
-    if (typeof window === "undefined") return "hook";
-    if (window.location.hash === "#consulta-gratuita") return "quiz";
-    if (window.location.hash === "#planos") return "plans";
-    return "hook";
-  });
+  const [screen, setScreen] = useState<MobileScreen>("quiz");
+  const [mode, setMode] = useState<"next" | "past">("next");
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [priority, setPriority] = useState<QuizPriority>("money");
+  const [radius, setRadius] = useState<TravelRadius>("1000km");
 
-  useEffect(() => {
-    const onHash = () => {
-      if (window.location.hash === "#consulta-gratuita") setView("quiz");
-      else if (window.location.hash === "#planos") setView("plans");
-    };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-
-  // Story preview chip state on Hook screen
-  const [storyIdx, setStoryIdx] = useState(0);
-  const activeStory = STORY_EXAMPLES[storyIdx] || STORY_EXAMPLES[0];
-
-  // Full-screen 9:16 Vertical Reels Film Modal
-  const [reelOpen, setReelOpen] = useState(false);
-  const [reelMuted, setReelMuted] = useState(false);
-  const [reelPlaying, setReelPlaying] = useState(true);
-  const [reelProgress, setReelProgress] = useState(0);
-  const reelVideoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    if (!reelOpen) return;
-    const vid = reelVideoRef.current;
-    if (!vid) return;
-    vid.currentTime = 0;
-    vid.muted = false;
-    setReelMuted(false);
-    void vid
-      .play()
-      .then(() => setReelPlaying(true))
-      .catch(() => {
-        vid.muted = true;
-        setReelMuted(true);
-        void vid.play().then(() => setReelPlaying(true));
-      });
-  }, [reelOpen]);
-
-  // 4-Step Quiz state
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [firstName, setFirstName] = useState(() => sessionStorage.getItem("ps_natal_name") || "");
   const [birthDate, setBirthDate] = useState(() => sessionStorage.getItem("ps_natal_date") || "");
   const [birthTime, setBirthTime] = useState(() => sessionStorage.getItem("ps_natal_time") || "12:00");
@@ -522,42 +96,44 @@ export function MobileHomeFlow() {
     if (birthDate) setPastYear(getCurrentSolarYear(birthDate));
   }, [birthDate]);
 
-  const [pastCity, setPastCity] = useState("");
-  const [pastCityValid, setPastCityValid] = useState(false);
-  const [pastCoords, setPastCoords] = useState<CityCoords | undefined>(undefined);
+  const [refCity, setRefCity] = useState("");
+  const [refCoords, setRefCoords] = useState<CityCoords | undefined>(undefined);
   const [calculating, setCalculating] = useState(false);
+  const [contrastResult, setContrastResult] = useState<StoredFreePastPayload | null>(null);
 
-  const yearOptions = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
+  // Optional vertical 9:16 video explainer modal
+  const [reelOpen, setReelOpen] = useState(false);
+  const [reelMuted, setReelMuted] = useState(false);
+  const reelVideoRef = useRef<HTMLVideoElement | null>(null);
 
-  const openSampleReport = () => {
-    const samplePayload: StoredFreePastPayload = {
-      userName: firstName.trim() || "Theo",
-      birthDate: "1990-08-19",
-      birthTime: "14:35",
-      birthPlace: "São Paulo, Brasil",
-      pastYear: String(currentYear - 1),
-      pastCityDisplay: "Roma, Itália",
-      pastCityShort: "Roma",
-      pastCountry: "Itália",
-      pastLat: 41.9028,
-      pastLon: 12.4964,
-      pastHouse: 5,
-      sunSign: "Leão",
-      ascendant: "Escorpião",
-      returnDate: `19/08/${currentYear - 1}`,
-      returnTimeUtc: "18:42 UTC",
-      nextYear: String(currentYear),
-      nextStayHouse: 4,
-      usedApproximateTime: false,
-    };
-    sessionStorage.setItem(FREE_PAST_STORAGE_KEY, JSON.stringify(samplePayload));
-    navigate("/meu-passado");
-  };
+  useEffect(() => {
+    if (!reelOpen) return;
+    const el = reelVideoRef.current;
+    if (!el) return;
+    el.currentTime = 0;
+    el.muted = false;
+    setReelMuted(false);
+    void el.play().catch(() => {
+      el.muted = true;
+      setReelMuted(true);
+      void el.play();
+    });
+  }, [reelOpen]);
 
-  const handleSubmitPast = async (e: React.FormEvent) => {
+  const detectedSign = useMemo(() => getTropicalSunSign(birthDate), [birthDate]);
+  const yearOptions = [
+    String(currentYear),
+    String(currentYear - 1),
+    String(currentYear - 2),
+    String(currentYear - 3),
+    String(currentYear - 4),
+    String(currentYear - 5),
+  ];
+
+  const handleSubmitStep4 = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pastCity.trim()) {
-      toast.error("Informe a cidade onde passou seu aniversário.");
+    if (!refCity.trim()) {
+      toast.error("Informe a cidade para concluir o cálculo.");
       return;
     }
 
@@ -571,706 +147,696 @@ export function MobileHomeFlow() {
         birthCity,
         birthCoords,
         pastYear,
-        pastCity,
-        pastCoords,
+        pastCity: refCity,
+        pastCoords: refCoords,
       });
       sessionStorage.setItem(FREE_PAST_STORAGE_KEY, JSON.stringify(payload));
-      navigate("/meu-passado");
+      if (mode === "past") {
+        navigate("/meu-passado");
+      } else {
+        setContrastResult(payload);
+        setStep(5);
+      }
     } catch (err: any) {
-      toast.error(
-        err?.message ||
-          "Não foi possível calcular agora. Confira as cidades informadas e tente novamente."
-      );
+      toast.error(err?.message || "Confira as cidades informadas e tente novamente.");
     } finally {
       setCalculating(false);
     }
   };
 
-  // Full-screen 9:16 Reels Modal Portal
-  const reelOverlay = (
+  const handleCheckout = (pkg: "1" | "3" | "full") => {
+    const targetHouse = getTargetHouseForPriority(priority);
+    navigate(
+      `/credits?pkg=${pkg}&returnTo=${encodeURIComponent(
+        `/?mode=futuro&path=casa&house=${targetHouse}`
+      )}`
+    );
+  };
+
+  const stayHouseNum = contrastResult?.nextStayHouse || 6;
+  const stayScores = HOUSE_PILLAR_SCORES[stayHouseNum] || HOUSE_PILLAR_SCORES[6];
+  const stayCopy = t.houses[stayHouseNum];
+  const targetHouseCopy = t.houses[getTargetHouseForPriority(priority)];
+
+  const reelModal = (
     <AnimatePresence>
       {reelOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[130] bg-black flex flex-col justify-between overflow-hidden"
+          className="fixed inset-0 z-[130] bg-black flex flex-col justify-between"
         >
           <video
             ref={reelVideoRef}
             src="/videos/v3/filme-protocolo-9x16.mp4"
             poster="/videos/v3/filme-protocolo-9x16-v3-poster.jpg"
             playsInline
-            onTimeUpdate={(e) => {
-              const el = e.currentTarget;
-              if (el.duration > 0) setReelProgress((el.currentTime / el.duration) * 100);
-            }}
-            onEnded={() => setReelPlaying(false)}
-            onClick={() => {
-              const el = reelVideoRef.current;
-              if (!el) return;
-              if (el.paused) {
-                void el.play();
-                setReelPlaying(true);
-              } else {
-                el.pause();
-                setReelPlaying(false);
-              }
-            }}
+            controls
             className="absolute inset-0 w-full h-full object-contain bg-black"
           />
-
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/80" />
-
-          {/* Top Reels Progress + Controls */}
           <div
-            className="relative z-10 px-4 pt-3 space-y-3"
-            style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 12px)" }}
+            className="relative z-10 px-4 pt-4 flex items-center justify-between"
+            style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 14px)" }}
           >
-            <div className="w-full h-1 rounded-full bg-white/25 overflow-hidden">
-              <div
-                className="h-full bg-[#EAB344] transition-all duration-150"
-                style={{ width: `${reelProgress}%` }}
-              />
+            <span className="text-xs uppercase tracking-[0.18em] text-[#E8D59B]">
+              Protocolo Solar
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const el = reelVideoRef.current;
+                  if (!el) return;
+                  el.muted = !reelMuted;
+                  setReelMuted(!reelMuted);
+                }}
+                aria-label="Som"
+                className="w-10 h-10 rounded-full bg-black/65 border border-white/20 flex items-center justify-center text-white"
+              >
+                {reelMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  reelVideoRef.current?.pause();
+                  setReelOpen(false);
+                }}
+                aria-label="Fechar"
+                className="w-10 h-10 rounded-full bg-black/65 border border-white/20 flex items-center justify-center text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#F3DC9B]">
-                Protocolo Solar
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const el = reelVideoRef.current;
-                    if (!el) return;
-                    el.muted = !reelMuted;
-                    setReelMuted(!reelMuted);
-                  }}
-                  aria-label="Áudio"
-                  className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white"
-                >
-                  {reelMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    reelVideoRef.current?.pause();
-                    setReelOpen(false);
-                  }}
-                  aria-label={c.closeLabel}
-                  className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {!reelPlaying && (
-            <button
-              type="button"
-              onClick={() => {
-                void reelVideoRef.current?.play();
-                setReelPlaying(true);
-              }}
-              aria-label="Play"
-              className="relative z-10 mx-auto w-16 h-16 rounded-full bg-[#EAB344] text-[#070A12] flex items-center justify-center shadow-2xl"
-            >
-              <Play className="w-7 h-7 fill-current ml-0.5" />
-            </button>
-          )}
-
-          {/* Bottom Reels Thumb CTA */}
-          <div
-            className="relative z-10 px-5 pb-6"
-            style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 24px)" }}
-          >
-            <button
-              type="button"
-              onClick={() => {
-                reelVideoRef.current?.pause();
-                setReelOpen(false);
-                setStep(1);
-                setView("quiz");
-              }}
-              className="ps-btn-gold w-full h-14 text-base"
-            >
-              <Compass className="w-5 h-5 shrink-0" />
-              <span>{c.ctaFree}</span>
-              <ArrowRight className="w-5 h-5 shrink-0" />
-            </button>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 
-  const activePalette = getHousePalette(activeStory.houseNum);
-
   return (
-    <div className="relative w-full min-h-[calc(100svh-4rem)] bg-[#F4EFE6] text-[#111520] font-sans overflow-x-hidden flex flex-col pb-24">
+    <div className="relative w-full min-h-[calc(100svh-4rem)] bg-[#FAF7F2] text-[#07101A] font-sans overflow-x-hidden flex flex-col pb-20">
       <ScanningOverlay visible={calculating} mode="passado" />
 
       {/* =====================================================================
-          VIEW 1: NATIVE TRAVEL-APP HOOK + TACTILE TRAVERTINE BOARDING SHEET
+          SCREEN 1: NEBULA-STYLE MOBILE QUIZ FUNNEL (ABOVE THE FOLD, HARMONIOUS)
           ===================================================================== */}
-      {view === "hook" && (
-        <div className="flex flex-col">
-          {/* Top Luminous Cinema Window (Curving into Warm Travertine Sheet) */}
-          <div className="relative h-[46svh] min-h-[310px] max-h-[410px] w-full overflow-hidden bg-[#060911]">
-            <video
-              key={activeStory.videoSrc}
-              src={activeStory.videoSrc}
-              poster={activeStory.posterSrc}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover transition-opacity duration-500"
+      {screen === "quiz" && (
+        <div className="flex-1 flex flex-col">
+          {/* Compact Celestial Brand Header Zone (#02050A Void + Official Solar Wheel) */}
+          <div className="relative pt-16 pb-9 px-6 bg-[#02050A] overflow-hidden flex items-center justify-between">
+            <div className="relative z-10 max-w-[235px]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#E8D59B]">
+                O GPS DO SEU NOVO CICLO
+              </p>
+              <p className="font-display text-lg text-[#F2F4F7] leading-snug mt-1">
+                {mode === "past"
+                  ? "Validação gratuita do seu último aniversário"
+                  : step === 1
+                  ? "Planejamento anual por coordenadas"
+                  : `Passo 0${step} de 04`}
+              </p>
+            </div>
+
+            <img
+              src="/brand/protocolo-solar-simbolo-transparente-2048.png"
+              alt="Roda Solar"
+              className="w-20 h-20 object-contain opacity-90 shrink-0"
             />
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(6,9,17,0.62) 0%, rgba(6,9,17,0.12) 45%, rgba(6,9,17,0.78) 100%)",
-              }}
-            />
-
-            {/* Bottom-of-Video Route Telemetry + 3 Color-Coded City Switchers (Keeps Theo's face 100% clear!) */}
-            <div className="absolute bottom-9 left-4 right-4 z-10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-medium text-white/90 drop-shadow">
-                  {c.samePersonHint}
-                </span>
-                <span
-                  className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold text-white shadow"
-                  style={{ backgroundColor: activePalette.hex }}
-                >
-                  GRU ✈ {activeStory.code} · C{activeStory.houseCode}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                {STORY_EXAMPLES.map((item, idx) => {
-                  const isActive = idx === storyIdx;
-                  const pal = getHousePalette(item.houseNum);
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setStoryIdx(idx)}
-                      className={`rounded-2xl py-2 px-2.5 text-left backdrop-blur-xl transition-all active:scale-95 border ${
-                        isActive
-                          ? "bg-white text-[#111520] border-white shadow-lg"
-                          : "bg-black/50 border-white/20 text-white"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="text-xs font-bold truncate">
-                          {item.city[locale]}
-                        </span>
-                        <span
-                          className="w-2 h-2 rounded-full shrink-0"
-                          style={{ backgroundColor: pal.hex }}
-                        />
-                      </div>
-                      <span
-                        className="block text-[10px] font-bold truncate mt-0.5"
-                        style={{ color: isActive ? pal.lightText : pal.softHex }}
-                      >
-                        → {item.theme[locale]}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
 
-          {/* Rounded [30px] Warm Travertine Sheet overlapping Video */}
-          <div className="relative z-20 -mt-7 rounded-t-[30px] bg-[#F4EFE6] px-5 pt-6 pb-4 shadow-[0_-16px_40px_rgba(0,0,0,0.22)]">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111520] text-[#F7D774] text-[10px] font-mono font-bold uppercase tracking-[0.14em] mb-3">
-              <Sparkles className="w-3 h-3" />
-              <span>{c.badge}</span>
-            </div>
-
-            <h1 className="font-display text-[30px] font-bold text-[#111520] leading-[1.08] tracking-[-0.02em]">
-              {c.headlineStart}
-              <span className="italic text-[#92400E]">{c.headlineHighlight}</span>
-            </h1>
-
-            <p className="font-sans text-[14.5px] text-[#111520]/75 leading-relaxed mt-2.5 mb-5">
-              {c.subline}
-            </p>
-
-            {/* Primary High-Contrast Check-In Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setStep(1);
-                setView("quiz");
-              }}
-              className="w-full h-14 rounded-2xl bg-[#111520] text-[#F7D774] font-bold text-[15px] shadow-[0_14px_30px_rgba(17,21,32,0.22)] inline-flex items-center justify-center gap-2.5 active:scale-[0.985] transition-transform"
-            >
-              <Compass className="w-5 h-5 shrink-0" />
-              <span>{c.ctaFree}</span>
-              <ArrowRight className="w-5 h-5 shrink-0" />
-            </button>
-
-            {/* Dual Tactile Pills: Film 1m30 + Plans */}
-            <div className="grid grid-cols-2 gap-2.5 mt-3">
-              <button
-                type="button"
-                onClick={() => setReelOpen(true)}
-                className="h-12 rounded-2xl bg-[#FFFDF9] border border-[#111520]/14 text-xs font-bold text-[#111520] inline-flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm"
-              >
-                <span className="w-6 h-6 rounded-full bg-[#F7D774] flex items-center justify-center">
-                  <Play className="w-3 h-3 text-[#111520] fill-[#111520] ml-0.5" />
-                </span>
-                <span className="truncate">{c.ctaVideo}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setView("plans")}
-                className="h-12 rounded-2xl bg-[#FFFDF9] border border-[#111520]/14 text-xs font-bold text-[#111520] inline-flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm"
-              >
-                <Plane className="w-4 h-4 text-[#065F46] shrink-0" />
-                <span className="truncate">{c.ctaNextYear}</span>
-              </button>
-            </div>
-
-            {/* 12-House Chromatic Horizontal Carousel (Snap Scroll, Zero Fixed Cities!) */}
-            <div className="mt-8 pt-6 border-t border-[#111520]/10">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#92400E]">
-                    AS 12 ÁREAS DO ANO
-                  </p>
-                  <h2 className="font-display text-xl font-bold text-[#111520]">
-                    Qual tema você quer destravar?
-                  </h2>
-                </div>
-                <Link
-                  to="/casas"
-                  className="text-xs font-bold text-[#111520] underline shrink-0"
-                >
-                  Ver todas →
-                </Link>
-              </div>
-
-              <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory">
-                {HOUSES_SHOWCASE.map((house) => {
-                  const pal = getHousePalette(house.id);
-                  const copy = t.houses[house.id];
-                  const padded = String(house.id).padStart(2, "0");
-                  return (
-                    <Link
-                      key={house.id}
-                      to={`/casas/${house.id}`}
-                      className="snap-start shrink-0 w-[220px] rounded-2xl bg-[#FFFDF9] border border-[#111520]/12 overflow-hidden shadow-sm active:scale-[0.98] transition-transform"
-                    >
-                      <div className="h-1.5 w-full" style={{ backgroundColor: pal.hex }} />
-                      <div className="relative aspect-[16/10] bg-[#060911]">
-                        <img
-                          src={`/videos/v3/casa-${padded}-lux-poster.jpg`}
-                          alt={`Casa ${house.numberLabel}`}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                        <span
-                          className="absolute top-2 left-2 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold text-white shadow"
-                          style={{ backgroundColor: pal.hex }}
-                        >
-                          CASA {house.numberLabel}
-                        </span>
-                      </div>
-                      <div className="p-3.5">
-                        <p
-                          className="font-mono text-[10px] font-bold uppercase tracking-[0.1em]"
-                          style={{ color: pal.lightText }}
-                        >
-                          {copy.shortTag}
-                        </p>
-                        <h3 className="font-display text-base font-bold text-[#111520] leading-snug mt-0.5 line-clamp-1">
-                          {copy.title}
-                        </h3>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================================
-          VIEW 2: WARM TRAVERTINE 4-STEP CHECK-IN WIZARD (Keyboard Safe!)
-          ===================================================================== */}
-      {view === "quiz" && (
-        <div className="flex-1 pt-16 pb-8 px-5 flex flex-col">
-          <div className="pt-2 pb-5">
-            <div className="flex items-center justify-between mb-3">
-              <button
-                type="button"
-                onClick={() => {
-                  if (step > 1) setStep((step - 1) as 1 | 2 | 3 | 4);
-                  else setView("hook");
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111520] py-1"
-              >
-                <ArrowLeft className="w-4 h-4 text-[#92400E]" />
-                <span>{t.nav.back}</span>
-              </button>
-
-              <span className="font-mono text-xs font-bold text-[#92400E]">
-                {c.stepLabel} {step}/4
-              </span>
-            </div>
-
-            <div className="grid grid-cols-4 gap-1.5">
-              {[1, 2, 3, 4].map((idx) => (
-                <div
-                  key={idx}
-                  className={`h-1.5 rounded-full transition-colors ${
-                    idx <= step ? "bg-[#111520]" : "bg-[#111520]/15"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmitPast} className="space-y-5">
-            {step === 1 && (
-              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
-                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
-                  {c.q1Title}
-                </h2>
-
-                <div>
-                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
-                    {c.q1NameLabel}
-                  </label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder={c.q1NamePlaceholder}
-                    autoComplete="given-name"
-                    className="w-full h-12 rounded-xl bg-white border border-[#111520]/15 px-4 text-base text-[#111520] placeholder:text-[#111520]/35 focus:outline-none focus:border-[#B8861E]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
-                    {c.q1DateLabel}
-                  </label>
-                  <input
-                    type="date"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    max={`${currentYear - 1}-12-31`}
-                    className="w-full h-12 rounded-xl bg-white border border-[#111520]/15 px-4 text-base text-[#111520] focus:outline-none focus:border-[#B8861E] [color-scheme:light]"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!firstName.trim()) {
-                      toast.error("Digite seu primeiro nome.");
-                      return;
-                    }
-                    if (!birthDate) {
-                      toast.error("Escolha sua data de nascimento.");
-                      return;
-                    }
-                    setStep(2);
-                  }}
-                  className="w-full h-13 py-3.5 rounded-xl bg-[#111520] text-[#F7D774] font-bold text-[15px] inline-flex items-center justify-center gap-2"
-                >
-                  <span>{c.nextBtn}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <div className="pt-1 text-center">
+          {/* Seamless Warm Pearl Sheet (#FAF7F2 — Apitex Clean Tonal Surface) */}
+          <div className="flex-1 -mt-4 rounded-t-[30px] bg-[#FAF7F2] px-5 pt-6 pb-8">
+            {/* Step Progress Hairline when inside steps 2..4 */}
+            {step > 1 && step < 5 && (
+              <div className="mb-5">
+                <div className="flex items-center justify-between mb-2.5">
                   <button
                     type="button"
-                    onClick={openSampleReport}
-                    className="text-xs font-bold text-[#92400E] underline underline-offset-4"
-                  >
-                    {c.sampleLink}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
-                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
-                  {c.q2Title}
-                </h2>
-
-                <div>
-                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
-                    {c.q2TimeLabel}
-                  </label>
-                  <input
-                    type="time"
-                    value={unknownTime ? "12:00" : birthTime}
-                    disabled={unknownTime}
-                    onChange={(e) => setBirthTime(e.target.value)}
-                    className="w-full h-12 rounded-xl bg-white border border-[#111520]/15 px-4 text-base text-[#111520] disabled:opacity-45 focus:outline-none focus:border-[#B8861E] [color-scheme:light]"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = !unknownTime;
-                    setUnknownTime(next);
-                    if (next) setBirthTime("12:00");
-                  }}
-                  className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between gap-3 ${
-                    unknownTime
-                      ? "bg-[#111520] border-[#111520] text-white"
-                      : "bg-[#F4EFE6] border-[#111520]/12 text-[#111520]"
-                  }`}
-                >
-                  <div>
-                    <span className="block text-sm font-bold">{c.q2UnknownTitle}</span>
-                    <span
-                      className={`block text-xs mt-0.5 ${
-                        unknownTime ? "text-white/75" : "text-[#111520]/65"
-                      }`}
-                    >
-                      {c.q2UnknownSub}
-                    </span>
-                  </div>
-                  <CheckCircle2
-                    className={`w-5 h-5 shrink-0 ${
-                      unknownTime ? "text-[#F7D774]" : "text-[#111520]/30"
-                    }`}
-                  />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setStep(3)}
-                  className="w-full py-3.5 rounded-xl bg-[#111520] text-[#F7D774] font-bold text-[15px] inline-flex items-center justify-center gap-2"
-                >
-                  <span>{c.nextBtn}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
-                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
-                  {c.q3Title}
-                </h2>
-
-                <div className="h-12">
-                  <CityAutocomplete
-                    variant="light"
-                    value={birthCity}
-                    onChange={(val, valid, coords) => {
-                      setBirthCity(val);
-                      setBirthCityValid(valid);
-                      if (coords) setBirthCoords(coords);
+                    onClick={() => {
+                      if (mode === "past" && step === 2) {
+                        setMode("next");
+                        setStep(1);
+                      } else {
+                        setStep((prev) => (prev - 1) as 1 | 2 | 3 | 4);
+                      }
                     }}
-                    placeholder={c.q3Placeholder}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#07101A]/75 py-1"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-[#8D6914]" />
+                    <span>Voltar</span>
+                  </button>
+                  <span className="text-[11px] uppercase tracking-[0.16em] text-[#8D6914] font-semibold">
+                    {mode === "past" ? "Teste Grátis" : `Etapa ${step}/4`}
+                  </span>
+                </div>
+                <div className="h-[2px] w-full bg-[#07101A]/10 overflow-hidden">
+                  <div
+                    className="h-full bg-[#C9A227] transition-all duration-300"
+                    style={{ width: `${(step / 4) * 100}%` }}
                   />
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!birthCity.trim() || (!birthCityValid && birthCity.trim().length < 3)) {
-                      toast.error("Escolha sua cidade natal na lista.");
-                      return;
-                    }
-                    setStep(4);
-                  }}
-                  className="w-full py-3.5 rounded-xl bg-[#111520] text-[#F7D774] font-bold text-[15px] inline-flex items-center justify-center gap-2"
-                >
-                  <span>{c.nextBtn}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
               </div>
             )}
 
-            {step === 4 && (
-              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
-                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
-                  {c.q4Title}
-                </h2>
+            <AnimatePresence mode="wait">
+              {/* STEP 1 — Decision Question Immediately Visible Without Scrolling */}
+              {step === 1 && (
+                <motion.div
+                  key="m1"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  <h1 className="font-display text-[28px] text-[#07101A] leading-[1.12]">
+                    Qual área é sua prioridade nº 1 nos próximos 12 meses?
+                  </h1>
+                  <p className="text-sm text-[#07101A]/65 mt-2 mb-5 leading-relaxed">
+                    Toque em um objetivo para calcularmos suas melhores cidades perto de casa e pelo mundo.
+                  </p>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
-                    {c.q4YearLabel}
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {yearOptions.map((yr) => (
+                  {/* 3 Clean Tonal Touch Rows (Zero Heavy Borders, Soft Apitex Surface) */}
+                  <div className="space-y-2.5">
+                    {[
+                      {
+                        id: "money" as QuizPriority,
+                        roman: "II · X",
+                        title: "Dinheiro & Carreira",
+                        sub: "Patrimônio, valorização e projeção profissional",
+                      },
+                      {
+                        id: "love" as QuizPriority,
+                        roman: "V · VII",
+                        title: "Amor & Relacionamentos",
+                        sub: "Encontros, magnetismo pessoal e alianças sérias",
+                      },
+                      {
+                        id: "life" as QuizPriority,
+                        roman: "I · VI · IX",
+                        title: "Mudança de Vida & Bem-Estar",
+                        sub: "Saúde, constância na rotina, viagens e paz",
+                      },
+                    ].map((opt) => (
                       <button
-                        key={yr}
+                        key={opt.id}
                         type="button"
-                        onClick={() => setPastYear(yr)}
-                        className={`h-10 rounded-xl font-mono text-xs font-bold border transition-all ${
-                          pastYear === yr
-                            ? "bg-[#111520] border-[#111520] text-[#F7D774]"
-                            : "bg-white border-[#111520]/15 text-[#111520]"
-                        }`}
+                        onClick={() => {
+                          setMode("next");
+                          setPriority(opt.id);
+                          setStep(2);
+                        }}
+                        className="w-full rounded-2xl bg-white px-5 py-4 text-left flex items-center justify-between gap-3 shadow-[0_6px_20px_rgba(7,16,26,0.04)] active:scale-[0.985] transition-transform"
                       >
-                        {yr}
+                        <div>
+                          <span className="block text-[10px] uppercase tracking-[0.18em] text-[#8D6914] font-semibold">
+                            CASAS {opt.roman}
+                          </span>
+                          <span className="block font-display text-lg text-[#07101A] mt-0.5">
+                            {opt.title}
+                          </span>
+                          <span className="block text-xs text-[#07101A]/60 mt-0.5">{opt.sub}</span>
+                        </div>
+                        <span className="w-9 h-9 rounded-full bg-[#07101A] text-[#E8D59B] flex items-center justify-center shrink-0">
+                          <ArrowRight className="w-4 h-4" />
+                        </span>
                       </button>
                     ))}
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
-                    {c.q4CityLabel}
-                  </label>
-                  <div className="h-12">
-                    <CityAutocomplete
-                      variant="light"
-                      value={pastCity}
-                      onChange={(val, valid, coords) => {
-                        setPastCity(val);
-                        setPastCityValid(valid);
-                        if (coords) setPastCoords(coords);
+                  {/* Clean Hairline Actions: Free Past Validation + Video + Plans */}
+                  <div className="mt-6 pt-5 border-t border-[#07101A]/10 space-y-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode("past");
+                        setStep(2);
                       }}
-                      placeholder={c.q4Placeholder}
+                      className="w-full h-12 rounded-full bg-[#07101A] text-[#E8D59B] text-xs font-semibold uppercase tracking-[0.1em] flex items-center justify-center gap-2 active:scale-[0.985] transition-transform"
+                    >
+                      <span>Testar grátis meu último aniversário</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <div className="flex items-center justify-between px-1 pt-1 text-xs text-[#07101A]/70">
+                      <button
+                        type="button"
+                        onClick={() => setReelOpen(true)}
+                        className="inline-flex items-center gap-1.5 font-semibold text-[#07101A]"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-[#C9A227] text-[#C9A227]" />
+                        <span>Explicação em vídeo (1m30)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setScreen("plans")}
+                        className="font-semibold text-[#8D6914] underline underline-offset-4"
+                      >
+                        Planos a partir de R$ 19,90
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* STEP 2 — Name + Birth Date + Tropical Sun Micro-Reward */}
+              {step === 2 && (
+                <motion.div
+                  key="m2"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}
+                  className="space-y-5"
+                >
+                  <h2 className="font-display text-2xl text-[#07101A] leading-snug">
+                    Como podemos te chamar e quando você nasceu?
+                  </h2>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#07101A]/70 mb-1.5">
+                      Primeiro nome
+                    </label>
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Ex.: Mariana"
+                      autoComplete="given-name"
+                      className="w-full h-12 rounded-xl bg-white border border-[#07101A]/14 px-4 text-base text-[#07101A] placeholder:text-[#07101A]/35 focus:outline-none focus:border-[#C9A227]"
                     />
                   </div>
-                </div>
 
-                <button
-                  type="submit"
-                  disabled={calculating || pastCity.trim().length < 2}
-                  className="w-full h-14 rounded-xl bg-gradient-to-b from-[#F7D774] to-[#E5A935] text-[#080B12] font-bold text-[15px] shadow-lg inline-flex items-center justify-center gap-2 disabled:opacity-50"
+                  <div>
+                    <label className="block text-xs font-semibold text-[#07101A]/70 mb-1.5">
+                      Data de nascimento
+                    </label>
+                    <input
+                      type="date"
+                      value={birthDate}
+                      onChange={(e) => setBirthDate(e.target.value)}
+                      max={`${currentYear - 1}-12-31`}
+                      className="w-full h-12 rounded-xl bg-white border border-[#07101A]/14 px-4 text-base text-[#07101A] focus:outline-none focus:border-[#C9A227] [color-scheme:light]"
+                    />
+                  </div>
+
+                  {detectedSign && (
+                    <div className="py-3 border-y border-[#07101A]/10 flex items-center justify-between text-xs">
+                      <span className="text-[#07101A]/65">Sol Tropical identificado</span>
+                      <span className="font-display text-base text-[#8D6914] font-semibold">
+                        {detectedSign}
+                      </span>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!firstName.trim()) {
+                        toast.error("Informe seu primeiro nome.");
+                        return;
+                      }
+                      if (!birthDate) {
+                        toast.error("Selecione sua data de nascimento.");
+                        return;
+                      }
+                      setStep(3);
+                    }}
+                    className="w-full h-13 py-3.5 rounded-full bg-[#07101A] text-[#E8D59B] font-semibold text-sm flex items-center justify-center gap-2"
+                  >
+                    <span>Continuar</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </motion.div>
+              )}
+
+              {/* STEP 3 — Birth Time + Natal City */}
+              {step === 3 && (
+                <motion.div
+                  key="m3"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}
+                  className="space-y-5"
                 >
-                  <span>{calculating ? c.calculatingBtn : c.revealBtn}</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
-            )}
-          </form>
+                  <h2 className="font-display text-2xl text-[#07101A] leading-snug">
+                    Horário e cidade de nascimento
+                  </h2>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-xs font-semibold text-[#07101A]/70">
+                        Horário na certidão
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = !unknownTime;
+                          setUnknownTime(next);
+                          if (next) setBirthTime("12:00");
+                        }}
+                        className="text-xs font-semibold text-[#8D6914] underline underline-offset-4"
+                      >
+                        {unknownTime ? "Informar hora exata" : "Usar 12:00 aproximado"}
+                      </button>
+                    </div>
+                    <input
+                      type="time"
+                      value={unknownTime ? "12:00" : birthTime}
+                      disabled={unknownTime}
+                      onChange={(e) => setBirthTime(e.target.value)}
+                      className="w-full h-12 rounded-xl bg-white border border-[#07101A]/14 px-4 text-base text-[#07101A] disabled:opacity-45 focus:outline-none focus:border-[#C9A227] [color-scheme:light]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#07101A]/70 mb-1.5">
+                      Cidade natal
+                    </label>
+                    <div className="h-12">
+                      <CityAutocomplete
+                        variant="light"
+                        value={birthCity}
+                        onChange={(val, valid, coords) => {
+                          setBirthCity(val);
+                          setBirthCityValid(valid);
+                          if (coords) setBirthCoords(coords);
+                        }}
+                        placeholder="Digite e selecione sua cidade natal..."
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!birthCity.trim() || (!birthCityValid && birthCity.trim().length < 3)) {
+                        toast.error("Escolha sua cidade natal na lista.");
+                        return;
+                      }
+                      setStep(4);
+                    }}
+                    className="w-full py-3.5 rounded-full bg-[#07101A] text-[#E8D59B] font-semibold text-sm flex items-center justify-center gap-2"
+                  >
+                    <span>Continuar</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </motion.div>
+              )}
+
+              {/* STEP 4 — Travel Radius + Current City OR Past Birthday City */}
+              {step === 4 && (
+                <motion.form
+                  key="m4"
+                  onSubmit={handleSubmitStep4}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18 }}
+                  className="space-y-5"
+                >
+                  {mode === "next" ? (
+                    <>
+                      <h2 className="font-display text-2xl text-[#07101A] leading-snug">
+                        Qual raio de distância você prefere avaliar?
+                      </h2>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { id: "1000km" as TravelRadius, label: "1.000 km", sub: "Perto" },
+                          { id: "3000km" as TravelRadius, label: "3.000 km", sub: "Continental" },
+                          { id: "global" as TravelRadius, label: "Global", sub: "Mundo" },
+                        ].map((r) => (
+                          <button
+                            key={r.id}
+                            type="button"
+                            onClick={() => setRadius(r.id)}
+                            className={`py-3 px-2 rounded-2xl text-center transition-all ${
+                              radius === r.id
+                                ? "bg-[#07101A] text-[#E8D59B] font-semibold"
+                                : "bg-white text-[#07101A]/75 border border-[#07101A]/12"
+                            }`}
+                          >
+                            <span className="block text-xs">{r.label}</span>
+                            <span className="block text-[10px] opacity-70">{r.sub}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-[#07101A]/70 mb-1.5">
+                          Em qual cidade você mora hoje? (comparativo gratuito)
+                        </label>
+                        <div className="h-12">
+                          <CityAutocomplete
+                            variant="light"
+                            value={refCity}
+                            onChange={(val, _valid, coords) => {
+                              setRefCity(val);
+                              if (coords) setRefCoords(coords);
+                            }}
+                            placeholder="Ex.: São Paulo, Rio, Lisboa..."
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="font-display text-2xl text-[#07101A] leading-snug">
+                        Onde você passou seu último aniversário?
+                      </h2>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-[#07101A]/70 mb-1.5">
+                          Ano do aniversário
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {yearOptions.map((yr) => (
+                            <button
+                              key={yr}
+                              type="button"
+                              onClick={() => setPastYear(yr)}
+                              className={`h-10 rounded-xl text-xs font-semibold transition-all ${
+                                pastYear === yr
+                                  ? "bg-[#07101A] text-[#E8D59B]"
+                                  : "bg-white border border-[#07101A]/12 text-[#07101A]"
+                              }`}
+                            >
+                              {yr}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-[#07101A]/70 mb-1.5">
+                          Cidade onde você estava
+                        </label>
+                        <div className="h-12">
+                          <CityAutocomplete
+                            variant="light"
+                            value={refCity}
+                            onChange={(val, _valid, coords) => {
+                              setRefCity(val);
+                              if (coords) setRefCoords(coords);
+                            }}
+                            placeholder="Digite e selecione a cidade..."
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={calculating}
+                    className="w-full h-14 rounded-full bg-[#C9A227] text-[#02050A] font-semibold text-sm flex items-center justify-center gap-2 shadow-md disabled:opacity-55"
+                  >
+                    <span>
+                      {calculating
+                        ? "Calculando coordenadas..."
+                        : mode === "past"
+                        ? "Revelar meu ano passado grátis"
+                        : "Gerar meu diagnóstico gratuito"}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </motion.form>
+              )}
+
+              {/* STEP 5 — Free Contrast Diagnosis + Clean R$ 19,90 Impulse Paywall */}
+              {step === 5 && contrastResult && (
+                <motion.div
+                  key="m5"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6914]">
+                      DIAGNÓSTICO GRATUITO · SE FICAR EM {contrastResult.pastCityShort.toUpperCase()}
+                    </p>
+                    <h2 className="font-display text-2xl text-[#07101A] mt-1">
+                      Casa {stayScores.roman} · {stayCopy.title}
+                    </h2>
+                    <p className="text-xs text-[#07101A]/70 mt-1.5 leading-relaxed">
+                      {stayCopy.focus}
+                    </p>
+                  </div>
+
+                  {/* 3 Clean Radial Rings (Apitex / Mockup Precision) */}
+                  <div className="py-5 border-y border-[#07101A]/10 grid grid-cols-3 gap-2">
+                    <MobileRing value={stayScores.money} label="Dinheiro" />
+                    <MobileRing value={stayScores.love} label="Amor" />
+                    <MobileRing value={stayScores.life} label="Bem-Estar" />
+                  </div>
+
+                  {/* Locked Ideal Cities Escalated by Distance */}
+                  <div className="space-y-2.5">
+                    <p className="text-xs font-semibold text-[#07101A]">
+                      Pronto para liberar para {firstName} ({targetHouseCopy.shortTag}):
+                    </p>
+                    <div className="divide-y divide-[#07101A]/8 bg-white rounded-2xl px-4">
+                      {[
+                        "Melhor destino até 1.000 km de casa",
+                        "Melhor destino continental até 3.000 km",
+                        "Melhor coordenada global + minuto UTC exato",
+                      ].map((row, idx) => (
+                        <div key={idx} className="py-3 flex items-center gap-2.5 text-xs text-[#07101A]/85">
+                          <Check className="w-4 h-4 text-[#8D6914] shrink-0" />
+                          <span>{row}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleCheckout("1")}
+                    className="w-full h-14 rounded-full bg-[#C9A227] text-[#02050A] font-semibold text-sm flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    <span>Liberar meus destinos · R$ 19,90</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center justify-between text-xs text-[#07101A]/70 px-1">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/meu-passado")}
+                      className="underline underline-offset-4"
+                    >
+                      Ler meu último ano grátis
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScreen("plans")}
+                      className="font-semibold text-[#8D6914] underline underline-offset-4"
+                    >
+                      Ver pacotes 3 ou 12 Casas
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       )}
 
       {/* =====================================================================
-          VIEW 3: PERFORATED MOBILE PASS TICKETS (Zero Wall of Text!)
+          SCREEN 2: CLEAN HARMONIOUS PLANS LEDGER (ZERO RAINBOW BOXES)
           ===================================================================== */}
-      {view === "plans" && (
-        <div className="flex-1 pt-16 pb-12 px-5 flex flex-col">
-          <div className="pt-2 pb-4">
+      {screen === "plans" && (
+        <div className="flex-1 pt-16 bg-[#FAF7F2] px-5 pb-10">
+          <div className="pt-3 pb-5 border-b border-[#07101A]/10">
             <button
               type="button"
-              onClick={() => setView("hook")}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111520] py-1"
+              onClick={() => setScreen("quiz")}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#07101A]/75 py-1"
             >
-              <ArrowLeft className="w-4 h-4 text-[#92400E]" />
-              <span>{t.nav.back}</span>
+              <ArrowLeft className="w-4 h-4 text-[#8D6914]" />
+              <span>Voltar</span>
             </button>
-
-            <h2 className="font-display text-2xl font-bold text-[#111520] mt-2 leading-tight">
-              {c.plansTitle}
+            <h2 className="font-display text-2xl text-[#07101A] mt-2">
+              Escolha seu acesso imediato
             </h2>
-            <p className="text-xs text-[#111520]/70 mt-1">{c.plansSub}</p>
+            <p className="text-xs text-[#07101A]/65 mt-1">
+              Pagamento único via Pix ou cartão, sem assinatura.
+            </p>
           </div>
 
-          <div className="space-y-3.5">
-            {c.plans.map((plan) => {
-              const stubColor =
-                plan.pkg === "1" ? "#10B981" : plan.pkg === "3" ? "#EAB344" : "#8B5CF6";
-              return (
-                <div
-                  key={plan.pkg}
-                  className={`relative rounded-3xl overflow-hidden border ${
-                    plan.featured
-                      ? "bg-[#111520] text-white border-2 border-[#EAB344] shadow-xl"
-                      : "bg-[#FFFDF9] text-[#111520] border-[#111520]/14 shadow-sm"
-                  }`}
-                >
-                  <div
-                    className="px-4 py-2 flex items-center justify-between font-mono text-[10px] font-bold uppercase tracking-[0.14em]"
-                    style={{
-                      backgroundColor: stubColor,
-                      color: plan.featured ? "#111520" : "#FFFFFF",
-                    }}
-                  >
-                    <span>
-                      PASS · {plan.pkg === "full" ? "12 CASAS" : `0${plan.pkg}`}
-                    </span>
-                    {plan.featured && <span>★ {c.popular}</span>}
-                  </div>
-
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <h3 className="font-display text-lg font-bold leading-snug">
-                        {plan.title}
-                      </h3>
-                      <div className="text-right shrink-0">
-                        <div className="flex items-baseline justify-end gap-0.5">
-                          <span className="text-xs font-bold opacity-75">R$</span>
-                          <span className="font-display text-3xl font-bold tabular-nums leading-none">
-                            {plan.priceInt}
-                          </span>
-                          <span className="text-xs font-bold opacity-75">,{plan.priceDec}</span>
-                        </div>
-                        <span className="block text-[10px] opacity-65">{c.oneTime}</span>
-                      </div>
-                    </div>
-
-                    <p
-                      className={`text-xs leading-relaxed mb-3.5 ${
-                        plan.featured ? "text-white/80" : "text-[#111520]/70"
-                      }`}
-                    >
-                      {plan.desc}
+          <div className="divide-y divide-[#07101A]/10">
+            {[
+              {
+                pkg: "1" as const,
+                tag: "01 · ENTRADA INDIVIDUAL",
+                title: "1 Objetivo ou 1 Cidade",
+                price: "19",
+                desc: "Sugestões até 1.000 km, 3.000 km e Global + 8 áreas da vida.",
+                primary: false,
+              },
+              {
+                pkg: "3" as const,
+                tag: "02 · COMPARAÇÃO DE VIAGEM",
+                title: "Comparador de 3 Destinos",
+                price: "49",
+                desc: "Compare até 3 cidades reais lado a lado com pontuação 0–100.",
+                primary: true,
+              },
+              {
+                pkg: "full" as const,
+                tag: "03 · VISÃO INTEGRAL",
+                title: "Mapa Completo (12 Casas)",
+                price: "99",
+                desc: "Todas as 12 Casas Solares do próximo aniversário liberadas.",
+                primary: false,
+              },
+            ].map((p) => (
+              <div key={p.pkg} className="py-5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8D6914]">
+                      {p.tag}
                     </p>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigate(
-                          `/credits?pkg=${plan.pkg}&returnTo=${encodeURIComponent("/?mode=futuro")}`
-                        )
-                      }
-                      className={`w-full h-11 rounded-xl font-bold text-xs inline-flex items-center justify-center gap-2 ${
-                        plan.featured
-                          ? "bg-[#F7D774] text-[#111520]"
-                          : "bg-[#111520] text-white"
-                      }`}
-                    >
-                      <span>{plan.cta}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <h3 className="font-display text-xl text-[#07101A] mt-0.5">{p.title}</h3>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-xs text-[#07101A]/60">R$ </span>
+                    <span className="font-display text-3xl text-[#07101A]">{p.price}</span>
+                    <span className="text-xs font-semibold text-[#07101A]">,90</span>
                   </div>
                 </div>
-              );
-            })}
+
+                <p className="text-xs text-[#07101A]/68 mt-1.5 mb-3.5 leading-relaxed">{p.desc}</p>
+
+                <button
+                  type="button"
+                  onClick={() => handleCheckout(p.pkg)}
+                  className={`w-full h-11 rounded-full text-xs font-semibold transition-all ${
+                    p.primary
+                      ? "bg-[#07101A] text-[#E8D59B]"
+                      : "bg-white border border-[#07101A]/20 text-[#07101A]"
+                  }`}
+                >
+                  Selecionar · R$ {p.price},90
+                </button>
+              </div>
+            ))}
           </div>
 
-          <div className="mt-5 pt-4 border-t border-[#111520]/12 flex items-center justify-center gap-2 text-xs text-[#111520]/75">
-            <Gift className="w-4 h-4 text-[#92400E]" />
-            <span>{c.giftText}</span>
+          <div className="pt-5 border-t border-[#07101A]/10 text-center">
             <Link
               to="/resgatar"
-              className="font-bold text-[#111520] underline underline-offset-4"
+              className="text-xs font-semibold text-[#8D6914] underline underline-offset-4"
             >
-              {c.giftLink}
+              Possui código de presente ou convite VIP? Resgatar aqui →
             </Link>
           </div>
         </div>
       )}
 
-      {typeof document !== "undefined" ? createPortal(reelOverlay, document.body) : null}
+      {typeof document !== "undefined" ? createPortal(reelModal, document.body) : null}
     </div>
   );
 }

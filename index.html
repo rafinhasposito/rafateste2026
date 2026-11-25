@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#060911" />
+    <meta name="theme-color" content="#02050A" />
 
-    <title>Protocolo Solar | Descubra onde passar seu próximo aniversário</title>
+    <title>Protocolo Solar | O GPS do seu novo ciclo — Onde passar seu próximo aniversário</title>
     <meta
       name="description"
-      content="Descubra a cidade ideal para comemorar seu próximo aniversário. O Protocolo Solar cruza sua data, hora e local de nascimento para indicar onde viver os próximos 12 meses com mais dinheiro, amor e carreira."
+      content="Explore como a coordenada geográfica do seu aniversário altera as 12 Casas Solares do seu próximo ciclo anual. Cálculo astronômico Swiss Ephemeris com sugestões escalonadas por distância (até 1.000 km, até 3.000 km e Global) a partir de R$ 19,90."
     />
     <meta name="author" content="Protocolo Solar" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -17,24 +17,26 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=3" />
     <link rel="shortcut icon" href="/favicon.ico?v=3" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
-    <link rel="preload" as="image" href="/assets/earth-blue.jpg" />
+
+    <link rel="preload" href="/brand/fonts/Marcellus-Regular.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="/brand/fonts/DMSans-Variable.ttf" as="font" type="font/ttf" crossorigin />
 
     <meta property="og:site_name" content="Protocolo Solar" />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://protocolosolar.com.br/" />
-    <meta property="og:title" content="Protocolo Solar | Onde passar seu próximo aniversário" />
+    <meta property="og:title" content="Protocolo Solar | O GPS do seu novo ciclo" />
     <meta
       property="og:description"
-      content="Descubra a cidade do mundo que ativa o ano que você quer viver. Calculado a partir da sua data, hora e local de nascimento."
+      content="Cruze data, hora e cidade de nascimento para descobrir onde passar seu próximo aniversário — perto de casa ou pelo mundo — e valide gratuitamente seu último ciclo."
     />
     <meta property="og:image" content="https://protocolosolar.com.br/earth-orbital-hires.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Protocolo Solar | Onde passar seu próximo aniversário" />
+    <meta name="twitter:title" content="Protocolo Solar | O GPS do seu novo ciclo" />
     <meta
       name="twitter:description"
-      content="Descubra a cidade do mundo que ativa o ano que você quer viver."
+      content="Planejamento geográfico de aniversário por Revolução Solar com entrega imediata na tela."
     />
     <meta name="twitter:image" content="https://protocolosolar.com.br/earth-orbital-hires.jpg" />
 
@@ -43,45 +45,79 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "Protocolo Solar",
+        "alternateName": "O GPS do seu novo ciclo",
         "url": "https://protocolosolar.com.br/",
-        "inLanguage": "pt-BR",
+        "inLanguage": ["pt-BR", "es", "en", "fr", "it"],
         "applicationCategory": "LifestyleApplication",
         "operatingSystem": "Web",
-        "description": "Aplicativo que indica a melhor cidade para passar o próximo aniversário, a partir da data, hora e local de nascimento (Revolução Solar)."
+        "description": "Plataforma digital de planejamento anual por Revolução Solar relocada que calcula, via Swiss Ephemeris, quais cidades favorecem carreira, finanças, relacionamentos ou bem-estar no próximo aniversário.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "priceCurrency": "BRL",
+          "lowPrice": "19.90",
+          "highPrice": "99.90",
+          "offerCount": "3"
+        }
       }
     </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Mercado Pago SDK v2 for Embedded Modal Checkout -->
     <script src="https://sdk.mercadopago.com/js/v2" defer></script>
 
     <!-- GitHub Pages SPA routing script -->
     <script type="text/javascript">
-      (function(l) {
-        if (l.search[1] === '/' ) {
-          var decoded = l.search.slice(1).split('&').map(function(s) { 
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
-          );
+      (function (l) {
+        if (l.search[1] === "/") {
+          var decoded = l.search
+            .slice(1)
+            .split("&")
+            .map(function (s) {
+              return s.replace(/~and~/g, "&");
+            })
+            .join("?");
+          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
         }
-      }(window.location))
+      })(window.location);
     </script>
   </head>
 
   <body>
-    <div id="root"></div>
-    <noscript>
-      <h1>Protocolo Solar: descubra onde passar seu próximo aniversário</h1>
-      <p>
-        O Protocolo Solar cruza sua data, hora e local de nascimento para indicar a cidade ideal para comemorar
-        seu aniversário e viver os próximos 12 meses com mais dinheiro, amor e carreira. Ative o JavaScript para usar.
-      </p>
-    </noscript>
+    <!-- Conteúdo inicial acessível a rastreadores e revisão de anúncios (substituído pelo React na hidratação) -->
+    <div id="root">
+      <main style="max-width: 960px; margin: 0 auto; padding: 48px 24px; color: #F2F4F7; background: #02050A; font-family: 'DM Sans', system-ui, sans-serif;">
+        <p style="letter-spacing: 0.2em; text-transform: uppercase; color: #E8D59B; font-size: 12px;">Protocolo Solar · O GPS do seu novo ciclo</p>
+        <h1 style="font-family: 'Marcellus', Georgia, serif; font-size: 38px; line-height: 1.12; margin: 12px 0 16px;">
+          Explore como a localização geográfica do seu aniversário altera as Casas Solares do seu novo ano
+        </h1>
+        <p style="color: #AAB6C4; font-size: 16px; line-height: 1.65;">
+          O Protocolo Solar utiliza efemérides astronômicas de precisão (Swiss Ephemeris) a partir da sua data, horário e cidade de nascimento para calcular a Revolução Solar relocada. Valide gratuitamente a cidade onde passou seu último aniversário ou planeje seu próximo ciclo com sugestões escalonadas por distância (até 1.000 km, até 3.000 km e destinos globais), comparativo com a cidade atual e horário exato do retorno solar.
+        </p>
+        <section aria-label="Estrutura transparente de planos" style="margin-top: 28px;">
+          <h2 style="font-family: 'Marcellus', Georgia, serif; font-size: 24px;">Acesso Digital Imediato — Pagamento Único (Sem Assinatura)</h2>
+          <ul style="color: #AAB6C4; line-height: 1.8;">
+            <li><strong>Validação do Aniversário Passado:</strong> Gratuito na tela, sem necessidade de cartão.</li>
+            <li><strong>1 Leitura Completa (1 Objetivo ou 1 Cidade) — R$ 19,90:</strong> Sugestões de destinos por distância, pontuação de alinhamento e leitura das 8 áreas da vida.</li>
+            <li><strong>Comparador de 3 Destinos — R$ 49,90:</strong> Comparação direta entre até 3 cidades para o próximo aniversário.</li>
+            <li><strong>Mapa Completo das 12 Casas — R$ 99,90:</strong> Visão integral das 12 Casas Solares do ciclo com arquivo na conta.</li>
+          </ul>
+          <p style="font-size: 13px; color: #AAB6C4; margin-top: 16px;">
+            Nota de transparência: ferramenta informativa e cultural de planejamento pessoal baseada na tradição astrológica ocidental tropical, destinada a maiores de 18 anos, sem garantias determinísticas de acontecimentos futuros.
+          </p>
+          <nav style="margin-top: 20px; display: flex; gap: 16px; font-size: 14px;">
+            <a href="/casas" style="color: #E8D59B;">As 12 Casas Solares</a>
+            <a href="/termos" style="color: #E8D59B;">Termos de Uso</a>
+            <a href="/privacidade" style="color: #E8D59B;">Política de Privacidade</a>
+          </nav>
+        </section>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

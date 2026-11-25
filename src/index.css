@@ -1,115 +1,144 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@font-face {
+  font-family: 'Marcellus';
+  src: url('/brand/fonts/Marcellus-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/brand/fonts/DMSans-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/brand/fonts/DMSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/brand/fonts/DMSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================
-   PROTOCOLO SOLAR — UNIFIED BRAND SYSTEM v3.0
-   "Celestial Obsidian & Warm Solar Gold"
-   Neuroscience & Visual Ergonomics:
-   - #060911 Deep Celestial Obsidian (prevents OLED halation)
-   - #0B111E / #111A2E stepped Midnight surfaces (+4% L steps)
-   - #EAB344 Luminous Solar Gold reserved for primary CTAs (11.4:1 contrast)
-   - Playfair Display (editorial serif + italic champagne) + Plus Jakarta Sans (UI)
+   PROTOCOLO SOLAR — OFFICIAL BRAND IDENTITY V2 (Paleta B)
+   Fonts: Marcellus (Display) + DM Sans (UI)
+   Colors: Void #02050A · Night #07101A · Surface #0C1826
+           Gold Deep #8D6914 · Gold #C9A227 · Champagne #E8D59B
+           Text #F2F4F7 · Muted #AAB6C4
    ============================================================ */
 
 @layer base {
   :root {
     color-scheme: dark;
-    /* ── BRAND KIT V3 (Unified Site-Wide Tokens) ────────── */
-    --ps-void: #060911;
-    --ps-night: #0B111E;
-    --ps-surface: #111A2E;
-    --ps-gold-deep: #B8861E;
-    --ps-gold: #EAB344;
-    --ps-champagne: #F3DC9B;
-    --ps-text: #F8FAFC;
-    --ps-muted: #B0BCCF;
+    /* ── BRAND KIT V2 OFFICIAL TOKENS ───────────────────── */
+    --ps-void: #02050A;
+    --ps-night: #07101A;
+    --ps-surface: #0C1826;
+    --ps-gold-deep: #8D6914;
+    --ps-gold: #C9A227;
+    --ps-champagne: #E8D59B;
+    --ps-text: #F2F4F7;
+    --ps-muted: #AAB6C4;
+    --ps-pearl: #FAF7F2;
+    --ps-sand: #F2ECE1;
 
     /* ── SHADCN / TAILWIND SEMANTIC TOKENS ─────────────── */
-    --background: 224 48% 4.5%;         /* #060911 Deep Celestial Obsidian */
-    --foreground: 210 40% 98%;          /* #F8FAFC Crisp Alabaster White */
+    --background: 218 67% 2.4%;         /* #02050A Void */
+    --foreground: 216 20% 96%;          /* #F2F4F7 Text */
 
-    --foundation-bg: 224 48% 4.5%;
-    --foundation-fg: 210 40% 98%;
-    --foundation-muted: 221 44% 12%;
-    --foundation-muted-fg: 217 26% 75%;
+    --foundation-bg: 218 67% 2.4%;
+    --foundation-fg: 216 20% 96%;
+    --foundation-muted: 212 52% 10%;
+    --foundation-muted-fg: 212 18% 72%;
 
-    --card: 221 46% 8%;                 /* #0B111E Midnight Surface */
-    --card-foreground: 210 40% 98%;
+    --card: 212 58% 6.5%;               /* #07101A Night */
+    --card-foreground: 216 20% 96%;
 
-    --popover: 221 46% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 212 58% 6.5%;
+    --popover-foreground: 216 20% 96%;
 
-    /* Warm Solar Gold — Von Restorff Primary CTA */
-    --primary: 40 81% 59%;              /* #EAB344 Luminous Solar Gold */
-    --primary-foreground: 224 48% 5%;   /* #070A12 Deep Ink (11.4:1 contrast) */
+    --primary: 45 69% 47%;              /* #C9A227 Refined Gold */
+    --primary-foreground: 218 67% 2.4%; /* #02050A Void */
 
-    --secondary: 221 45% 12%;           /* #111A2E */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 212 52% 10%;           /* #0C1826 Surface */
+    --secondary-foreground: 216 20% 96%;
 
-    --muted: 221 42% 13%;
-    --muted-foreground: 217 26% 75%;    /* #B0BCCF High-legibility secondary */
+    --muted: 212 52% 10%;
+    --muted-foreground: 212 18% 72%;    /* #AAB6C4 Muted */
 
-    --accent: 40 81% 59%;
-    --accent-foreground: 224 48% 5%;
+    --accent: 45 69% 47%;
+    --accent-foreground: 218 67% 2.4%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 32% 16%;              /* Subtle crisp midnight border */
-    --input: 220 32% 16%;
-    --ring: 40 81% 59%;
+    --border: 212 36% 15%;
+    --input: 212 36% 15%;
+    --ring: 45 69% 47%;
 
-    --radius: 1rem;
+    --radius: 0.875rem;
 
-    /* ── GOLD PALETTE ──────────────────────────────── */
-    --gold: 40 81% 59%;
-    --gold-dark: 38 72% 42%;
-    --gold-light: 43 86% 78%;
-    --gold-muted: 40 48% 36%;
+    /* ── GOLD PALETTE (Paleta B) ──────────────────────── */
+    --gold: 45 69% 47%;
+    --gold-dark: 42 75% 32%;
+    --gold-light: 45 63% 76%;
+    --gold-muted: 42 52% 36%;
 
     /* ── QUANTUM SURFACES ──────────────────────────── */
-    --surface: 221 46% 8%;
-    --surface-elevated: 221 45% 12%;
-    --surface-border: 220 32% 18%;
+    --surface: 212 58% 6.5%;
+    --surface-elevated: 212 52% 10%;
+    --surface-border: 212 36% 16%;
 
     /* ── BRAND ─────────────────────────────────────── */
-    --brand-primary: 40 81% 59%;
-    --brand-primary-fg: 224 48% 5%;
-    --brand-secondary: 221 45% 12%;
-    --brand-secondary-fg: 210 40% 98%;
-    --brand-accent: 40 55% 42%;
-    --brand-accent-fg: 210 40% 98%;
+    --brand-primary: 45 69% 47%;
+    --brand-primary-fg: 218 67% 2.4%;
+    --brand-secondary: 212 52% 10%;
+    --brand-secondary-fg: 216 20% 96%;
+    --brand-accent: 42 75% 32%;
+    --brand-accent-fg: 216 20% 96%;
 
     /* ── STATUS ─────────────────────────────────────── */
     --status-success: 152 69% 46%;
-    --status-warning: 38 92% 54%;
+    --status-warning: 45 69% 47%;
     --status-error: 0 84% 62%;
     --status-info: 217 91% 62%;
 
     /* ── STATES ─────────────────────────────────────── */
-    --state-hover: rgba(255, 255, 255, 0.07);
-    --state-pressed: rgba(255, 255, 255, 0.11);
-    --state-selected: rgba(234, 179, 68, 0.14);
-    --state-focus: 40 81% 59%;
+    --state-hover: rgba(255, 255, 255, 0.06);
+    --state-pressed: rgba(255, 255, 255, 0.10);
+    --state-selected: rgba(201, 162, 39, 0.14);
+    --state-focus: 45 69% 47%;
     --state-disabled-opacity: 0.42;
 
-    /* ── TYPOGRAPHY (Playfair Display + Plus Jakarta Sans + JetBrains Mono) ─ */
-    --font-display: 'Playfair Display', Georgia, serif;
-    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    --text-display: clamp(2.35rem, 5.2vw, 4.25rem);
-    --text-h1: clamp(1.85rem, 3.8vw, 2.85rem);
-    --text-h2: clamp(1.5rem, 3vw, 2.25rem);
-    --text-h3: clamp(1.1875rem, 2.2vw, 1.5rem);
+    /* ── TYPOGRAPHY (Marcellus + DM Sans) ──────────── */
+    --font-display: 'Marcellus', Georgia, serif;
+    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'DM Sans', monospace;
+    --text-display: clamp(2.5rem, 4.8vw, 4.35rem);
+    --text-h1: clamp(1.95rem, 3.4vw, 2.9rem);
+    --text-h2: clamp(1.45rem, 2.4vw, 2.1rem);
+    --text-h3: clamp(1.1875rem, 1.8vw, 1.45rem);
     --text-h4: 1.125rem;
     --text-body-lg: 1.0625rem;
     --text-body: 1rem;
     --text-body-sm: 0.875rem;
     --text-caption: 0.75rem;
-    --text-label: 0.6875rem;
+    --text-label: 0.75rem;
 
     /* ── LAYOUT ─────────────────────────────────────── */
     --radius-sm: 10px;
