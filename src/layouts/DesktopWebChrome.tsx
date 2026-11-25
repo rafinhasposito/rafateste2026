@@ -42,7 +42,7 @@ export function DesktopWebChrome() {
         borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
       }}
     >
-      <div className="max-w-6xl mx-auto h-full flex items-center justify-between px-8">
+      <div className="max-w-[1240px] mx-auto h-full flex items-center justify-between px-6 lg:px-8">
         
         {/* Left: Logo + Navigation */}
         <div className="flex items-center gap-8">

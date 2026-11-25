@@ -1,14 +1,16 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-21T18:23:00-03:00 — Auditoria completa de páginas/conexões (Frankenstein cleanup) + Sistema de Afiliados (20% padrão, /afiliado, /admin?tab=affiliates, ?ref= 30 dias, cálculo atômico em process_mercadopago_payment). TSC PASS, 40/40 testes PASS, Build PASS, QA Build/Functional/Responsive PASS (0 blockers). Pendente apenas rodar migration SQL 20261121183000_affiliate_system.sql no Supabase SQL Editor.",
+  "last_verification": "2026-11-25T08:51:00-03:00 — Redesign completo de Marca e Produto V3 publicado em https://protocolosolar.com.br/: (1) Fim do visual monótono de cor única — alternância rítmica entre Horizonte Orbital (#05070D + terra-sunrise.mp4), Travertino Solar Quente (#F4EFE6 / Espresso #111520) e Palco Cromático Vivo das 12 Casas (08-paleta-casas.md com as 12 cores oficiais); (2) Grid arquitetônico único de 1240px sem buracos laterais nem cabeçalhos órfãos; (3) Bilhetes de Embarque Solar físicos picotados (inspirados nas referências de aviação/viagem) + 12 novos loops arquitetônicos 8K (casa-01-lux.mp4 a casa-12-lux.mp4) sem rosto repetido do Theo e sem cidades fixas; (4) Mobile nativo estilo app de viagem com sheet em travertino quente, carrossel cromático das 12 Casas, check-in gratuito /audit_past e separação total entre Clientes, Céticos e Afiliados. 43/43 testes PASS, Build PASS, Playwright Desktop + Mobile 0 erros.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br) + Render Python API + Supabase Edge Functions",
   "blockers_open": [],
   "blockers_fixed": [
-    "Limpeza completa de inconsistências (Frankenstein): cabeçalhos/fundos duplicados, cobrança indevida de 3/7 créditos em cliques de 1 crédito, ano solar vigente (getCurrentSolarYear), preposições de cidade (cityCopy), redirects de auth/returnTo, cálculos de receita no Admin, e banners mobile colidindo com bottom-nav",
-    "Sistema de Afiliados V1: comissão padrão 20% sem alterar preços (R$ 19,90 / R$ 49,90 / R$ 99,90), rastreamento ?ref= por 30 dias, painel /afiliado (LGPD-safe + Pix + WhatsApp) e gestão completa no /admin?tab=affiliates",
-    "Integração atômica e idempotente de comissão no RPC process_mercadopago_payment (ON CONFLICT order_id, proteção anti-autoindicação e trigger anti-tampering em profiles)"
+    "Eliminação completa da monotonia visual de cor única e caixas escuras estilo template: nova arquitetura editorial alternando Horizonte Orbital, Travertino Solar (#F4EFE6) e as 12 cores oficiais de 08-paleta-casas.md",
+    "Unificação do grid arquitetônico em 1240px (DesktopWebChrome + todos os 6 atos) eliminando buracos laterais e desalinhamentos",
+    "Substituição dos vídeos repetidos do Theo nas 12 Casas por 12 loops cinematográficos exclusivos de arquitetura celestial de luxo (casa-01-lux.mp4 a casa-12-lux.mp4), mantendo o Theo apenas na simulação individual (Zurique, Roma, Paris, NY)",
+    "Redesign Mobile nativo inspirado nas referências de apps de viagem (janela luminosa + sheet travertino arredondado + bilhetes picotados + check-in em 4 passos)",
+    "Separação estrita entre Clientes, Céticos e Afiliados + cálculo gratuito /audit_past validado E2E"
   ],
   "v1_1_backlog": [
     "Code splitting: reduzir bundle de 3.1MB (chunk size warning)",

@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import ScanningOverlay from "@/components/ScanningOverlay";
+import { HOUSES_SHOWCASE } from "@/data/housesShowcase";
+import { getHousePalette } from "@/data/housePalette";
 import { getCurrentSolarYear } from "@/lib/astro";
 import { prewarmSolarApi, runFreePastAudit } from "@/lib/pastAuditClient";
 import { type SupportedLocale, useI18n } from "@/lib/i18n";
@@ -31,6 +33,9 @@ type MobileView = "hook" | "quiz" | "plans";
 
 interface MobileStoryExample {
   id: string;
+  code: string;
+  houseNum: number;
+  houseCode: string;
   videoSrc: string;
   posterSrc: string;
   city: Record<SupportedLocale, string>;
@@ -40,6 +45,9 @@ interface MobileStoryExample {
 const STORY_EXAMPLES: MobileStoryExample[] = [
   {
     id: "zurich",
+    code: "ZRH",
+    houseNum: 2,
+    houseCode: "02",
     videoSrc: "/videos/v3/theo-zurique-v3.mp4",
     posterSrc: "/videos/v3/theo-zurique-v3-poster.jpg",
     city: { pt: "Zurique", es: "Zúrich", en: "Zurich", fr: "Zurich", it: "Zurigo" },
@@ -47,6 +55,9 @@ const STORY_EXAMPLES: MobileStoryExample[] = [
   },
   {
     id: "rome",
+    code: "FCO",
+    houseNum: 5,
+    houseCode: "05",
     videoSrc: "/videos/v3/theo-roma-v3.mp4",
     posterSrc: "/videos/v3/theo-roma-v3-poster.jpg",
     city: { pt: "Roma", es: "Roma", en: "Rome", fr: "Rome", it: "Roma" },
@@ -54,6 +65,9 @@ const STORY_EXAMPLES: MobileStoryExample[] = [
   },
   {
     id: "ny",
+    code: "JFK",
+    houseNum: 10,
+    houseCode: "10",
     videoSrc: "/videos/v3/theo-ny-v3.mp4",
     posterSrc: "/videos/v3/theo-ny-v3-poster.jpg",
     city: { pt: "Nova York", es: "Nueva York", en: "New York", fr: "New York", it: "New York" },
@@ -692,126 +706,211 @@ export function MobileHomeFlow() {
     </AnimatePresence>
   );
 
+  const activePalette = getHousePalette(activeStory.houseNum);
+
   return (
-    <div className="relative w-full min-h-[calc(100svh-4rem)] bg-[#060911] text-[#F8FAFC] font-sans overflow-x-hidden flex flex-col">
+    <div className="relative w-full min-h-[calc(100svh-4rem)] bg-[#F4EFE6] text-[#111520] font-sans overflow-x-hidden flex flex-col pb-24">
       <ScanningOverlay visible={calculating} mode="passado" />
 
       {/* =====================================================================
-          VIEW 1: COLD-TRAFFIC NATIVE HOOK SCREEN (Fits 100svh, Zero Scroll!)
+          VIEW 1: NATIVE TRAVEL-APP HOOK + TACTILE TRAVERTINE BOARDING SHEET
           ===================================================================== */}
       {view === "hook" && (
-        <div className="relative flex-1 min-h-[calc(100svh-4rem)] flex flex-col justify-between pt-16 pb-5 px-5 overflow-hidden">
-          {/* Full-Bleed Live Cinema Video Background */}
-          <video
-            key={activeStory.videoSrc}
-            src={activeStory.videoSrc}
-            poster={activeStory.posterSrc}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-500"
-          />
-          {/* Clean Cinema Vignette: bright upper half, deep legible thumb zone */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(6,9,17,0.50) 0%, rgba(6,9,17,0.12) 32%, rgba(6,9,17,0.82) 64%, #060911 96%)",
-            }}
-          />
+        <div className="flex flex-col">
+          {/* Top Luminous Cinema Window (Curving into Warm Travertine Sheet) */}
+          <div className="relative h-[46svh] min-h-[310px] max-h-[410px] w-full overflow-hidden bg-[#060911]">
+            <video
+              key={activeStory.videoSrc}
+              src={activeStory.videoSrc}
+              poster={activeStory.posterSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover transition-opacity duration-500"
+            />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(6,9,17,0.62) 0%, rgba(6,9,17,0.12) 45%, rgba(6,9,17,0.78) 100%)",
+              }}
+            />
 
-          {/* Top Interactive 3-City Proof Pills (Zero Jargon!) */}
-          <div className="relative z-10 pt-1">
-            <p className="text-[11px] font-medium text-white/90 drop-shadow mb-2 text-center">
-              {c.samePersonHint}
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              {STORY_EXAMPLES.map((item, idx) => {
-                const isActive = idx === storyIdx;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setStoryIdx(idx)}
-                    className={`rounded-2xl py-2 px-2 text-center backdrop-blur-xl transition-all active:scale-95 border ${
-                      isActive
-                        ? "bg-[#060911]/85 border-[#EAB344] text-[#F3DC9B] shadow-[0_6px_20px_rgba(0,0,0,0.45)]"
-                        : "bg-[#060911]/55 border-white/20 text-white/85"
-                    }`}
-                  >
-                    <span className="block text-xs font-bold truncate">
-                      {item.city[locale]}
-                    </span>
-                    <span className="block text-[11px] text-[#EAB344] font-semibold truncate">
-                      → {item.theme[locale]}
-                    </span>
-                  </button>
-                );
-              })}
+            {/* Bottom-of-Video Route Telemetry + 3 Color-Coded City Switchers (Keeps Theo's face 100% clear!) */}
+            <div className="absolute bottom-9 left-4 right-4 z-10">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-medium text-white/90 drop-shadow">
+                  {c.samePersonHint}
+                </span>
+                <span
+                  className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold text-white shadow"
+                  style={{ backgroundColor: activePalette.hex }}
+                >
+                  GRU ✈ {activeStory.code} · C{activeStory.houseCode}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                {STORY_EXAMPLES.map((item, idx) => {
+                  const isActive = idx === storyIdx;
+                  const pal = getHousePalette(item.houseNum);
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setStoryIdx(idx)}
+                      className={`rounded-2xl py-2 px-2.5 text-left backdrop-blur-xl transition-all active:scale-95 border ${
+                        isActive
+                          ? "bg-white text-[#111520] border-white shadow-lg"
+                          : "bg-black/50 border-white/20 text-white"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-xs font-bold truncate">
+                          {item.city[locale]}
+                        </span>
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: pal.hex }}
+                        />
+                      </div>
+                      <span
+                        className="block text-[10px] font-bold truncate mt-0.5"
+                        style={{ color: isActive ? pal.lightText : pal.softHex }}
+                      >
+                        → {item.theme[locale]}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Bottom Thumb Zone: Crystal-Clear Copy + Primary CTA */}
-          <div className="relative z-10 space-y-4 mt-auto pt-8">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAB344]/15 border border-[#EAB344]/40 backdrop-blur-md text-[#F3DC9B] text-[11px] font-semibold uppercase tracking-[0.12em]">
-              <Sparkles className="w-3.5 h-3.5 text-[#EAB344]" />
+          {/* Rounded [30px] Warm Travertine Sheet overlapping Video */}
+          <div className="relative z-20 -mt-7 rounded-t-[30px] bg-[#F4EFE6] px-5 pt-6 pb-4 shadow-[0_-16px_40px_rgba(0,0,0,0.22)]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111520] text-[#F7D774] text-[10px] font-mono font-bold uppercase tracking-[0.14em] mb-3">
+              <Sparkles className="w-3 h-3" />
               <span>{c.badge}</span>
             </div>
 
-            <h1 className="font-display text-[32px] sm:text-4xl font-bold text-[#F8FAFC] leading-[1.08] tracking-[-0.02em]">
+            <h1 className="font-display text-[30px] font-bold text-[#111520] leading-[1.08] tracking-[-0.02em]">
               {c.headlineStart}
-              <span className="italic text-[#F3DC9B]">{c.headlineHighlight}</span>
+              <span className="italic text-[#92400E]">{c.headlineHighlight}</span>
             </h1>
 
-            <p className="font-sans text-[15px] text-[#E2E8F0] leading-snug">
+            <p className="font-sans text-[14.5px] text-[#111520]/75 leading-relaxed mt-2.5 mb-5">
               {c.subline}
             </p>
 
-            {/* #1 Thumb-Zone Gold CTA (56px height) */}
+            {/* Primary High-Contrast Check-In Button */}
             <button
               type="button"
               onClick={() => {
                 setStep(1);
                 setView("quiz");
               }}
-              className="ps-btn-gold w-full h-14 text-[15px]"
+              className="w-full h-14 rounded-2xl bg-[#111520] text-[#F7D774] font-bold text-[15px] shadow-[0_14px_30px_rgba(17,21,32,0.22)] inline-flex items-center justify-center gap-2.5 active:scale-[0.985] transition-transform"
             >
               <Compass className="w-5 h-5 shrink-0" />
               <span>{c.ctaFree}</span>
               <ArrowRight className="w-5 h-5 shrink-0" />
             </button>
 
-            {/* 2 Clean Secondary Actions: 1m30 Reels Video | Next Birthday Plans */}
-            <div className="grid grid-cols-2 gap-2.5">
+            {/* Dual Tactile Pills: Film 1m30 + Plans */}
+            <div className="grid grid-cols-2 gap-2.5 mt-3">
               <button
                 type="button"
                 onClick={() => setReelOpen(true)}
-                className="h-11 rounded-full bg-white/[0.08] border border-white/16 backdrop-blur-md text-xs font-semibold text-[#F8FAFC] inline-flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                className="h-12 rounded-2xl bg-[#FFFDF9] border border-[#111520]/14 text-xs font-bold text-[#111520] inline-flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm"
               >
-                <Play className="w-3.5 h-3.5 text-[#EAB344] fill-[#EAB344] shrink-0" />
+                <span className="w-6 h-6 rounded-full bg-[#F7D774] flex items-center justify-center">
+                  <Play className="w-3 h-3 text-[#111520] fill-[#111520] ml-0.5" />
+                </span>
                 <span className="truncate">{c.ctaVideo}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setView("plans")}
-                className="h-11 rounded-full bg-white/[0.08] border border-white/16 backdrop-blur-md text-xs font-semibold text-[#F3DC9B] inline-flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
+                className="h-12 rounded-2xl bg-[#FFFDF9] border border-[#111520]/14 text-xs font-bold text-[#111520] inline-flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm"
               >
-                <Plane className="w-3.5 h-3.5 text-[#EAB344] shrink-0" />
+                <Plane className="w-4 h-4 text-[#065F46] shrink-0" />
                 <span className="truncate">{c.ctaNextYear}</span>
               </button>
+            </div>
+
+            {/* 12-House Chromatic Horizontal Carousel (Snap Scroll, Zero Fixed Cities!) */}
+            <div className="mt-8 pt-6 border-t border-[#111520]/10">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#92400E]">
+                    AS 12 ÁREAS DO ANO
+                  </p>
+                  <h2 className="font-display text-xl font-bold text-[#111520]">
+                    Qual tema você quer destravar?
+                  </h2>
+                </div>
+                <Link
+                  to="/casas"
+                  className="text-xs font-bold text-[#111520] underline shrink-0"
+                >
+                  Ver todas →
+                </Link>
+              </div>
+
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory">
+                {HOUSES_SHOWCASE.map((house) => {
+                  const pal = getHousePalette(house.id);
+                  const copy = t.houses[house.id];
+                  const padded = String(house.id).padStart(2, "0");
+                  return (
+                    <Link
+                      key={house.id}
+                      to={`/casas/${house.id}`}
+                      className="snap-start shrink-0 w-[220px] rounded-2xl bg-[#FFFDF9] border border-[#111520]/12 overflow-hidden shadow-sm active:scale-[0.98] transition-transform"
+                    >
+                      <div className="h-1.5 w-full" style={{ backgroundColor: pal.hex }} />
+                      <div className="relative aspect-[16/10] bg-[#060911]">
+                        <img
+                          src={`/videos/v3/casa-${padded}-lux-poster.jpg`}
+                          alt={`Casa ${house.numberLabel}`}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                        <span
+                          className="absolute top-2 left-2 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold text-white shadow"
+                          style={{ backgroundColor: pal.hex }}
+                        >
+                          CASA {house.numberLabel}
+                        </span>
+                      </div>
+                      <div className="p-3.5">
+                        <p
+                          className="font-mono text-[10px] font-bold uppercase tracking-[0.1em]"
+                          style={{ color: pal.lightText }}
+                        >
+                          {copy.shortTag}
+                        </p>
+                        <h3 className="font-display text-base font-bold text-[#111520] leading-snug mt-0.5 line-clamp-1">
+                          {copy.title}
+                        </h3>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* =====================================================================
-          VIEW 2: 1-QUESTION-PER-SCREEN WIZARD (Top-aligned for mobile keyboard!)
+          VIEW 2: WARM TRAVERTINE 4-STEP CHECK-IN WIZARD (Keyboard Safe!)
           ===================================================================== */}
       {view === "quiz" && (
         <div className="flex-1 pt-16 pb-8 px-5 flex flex-col">
-          {/* Top Navigation & Progress */}
           <div className="pt-2 pb-5">
             <div className="flex items-center justify-between mb-3">
               <button
@@ -820,13 +919,13 @@ export function MobileHomeFlow() {
                   if (step > 1) setStep((step - 1) as 1 | 2 | 3 | 4);
                   else setView("hook");
                 }}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#B0BCCF] active:text-white py-1"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111520] py-1"
               >
-                <ArrowLeft className="w-4 h-4 text-[#EAB344]" />
+                <ArrowLeft className="w-4 h-4 text-[#92400E]" />
                 <span>{t.nav.back}</span>
               </button>
 
-              <span className="font-mono text-xs text-[#F3DC9B]">
+              <span className="font-mono text-xs font-bold text-[#92400E]">
                 {c.stepLabel} {step}/4
               </span>
             </div>
@@ -836,23 +935,22 @@ export function MobileHomeFlow() {
                 <div
                   key={idx}
                   className={`h-1.5 rounded-full transition-colors ${
-                    idx <= step ? "bg-[#EAB344]" : "bg-white/12"
+                    idx <= step ? "bg-[#111520]" : "bg-[#111520]/15"
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          {/* Question Card (Top-aligned so keyboard never hides inputs/dropdowns) */}
           <form onSubmit={handleSubmitPast} className="space-y-5">
             {step === 1 && (
-              <div className="ps-card p-5 space-y-4">
-                <h2 className="font-display text-2xl font-bold text-[#F8FAFC] leading-tight">
+              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
+                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
                   {c.q1Title}
                 </h2>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#B0BCCF] mb-1.5">
+                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
                     {c.q1NameLabel}
                   </label>
                   <input
@@ -861,12 +959,12 @@ export function MobileHomeFlow() {
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder={c.q1NamePlaceholder}
                     autoComplete="given-name"
-                    className="w-full h-12 rounded-xl bg-[#111A2E] border border-white/15 px-4 text-base text-[#F8FAFC] placeholder:text-white/35 focus:outline-none focus:border-[#EAB344]"
+                    className="w-full h-12 rounded-xl bg-white border border-[#111520]/15 px-4 text-base text-[#111520] placeholder:text-[#111520]/35 focus:outline-none focus:border-[#B8861E]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#B0BCCF] mb-1.5">
+                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
                     {c.q1DateLabel}
                   </label>
                   <input
@@ -874,7 +972,7 @@ export function MobileHomeFlow() {
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
                     max={`${currentYear - 1}-12-31`}
-                    className="w-full h-12 rounded-xl bg-[#111A2E] border border-white/15 px-4 text-base text-[#F8FAFC] focus:outline-none focus:border-[#EAB344]"
+                    className="w-full h-12 rounded-xl bg-white border border-[#111520]/15 px-4 text-base text-[#111520] focus:outline-none focus:border-[#B8861E] [color-scheme:light]"
                   />
                 </div>
 
@@ -891,17 +989,17 @@ export function MobileHomeFlow() {
                     }
                     setStep(2);
                   }}
-                  className="ps-btn-gold w-full h-13 text-[15px]"
+                  className="w-full h-13 py-3.5 rounded-xl bg-[#111520] text-[#F7D774] font-bold text-[15px] inline-flex items-center justify-center gap-2"
                 >
                   <span>{c.nextBtn}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
-                <div className="pt-2 text-center">
+                <div className="pt-1 text-center">
                   <button
                     type="button"
                     onClick={openSampleReport}
-                    className="text-xs font-semibold text-[#F3DC9B] underline underline-offset-4"
+                    className="text-xs font-bold text-[#92400E] underline underline-offset-4"
                   >
                     {c.sampleLink}
                   </button>
@@ -910,13 +1008,13 @@ export function MobileHomeFlow() {
             )}
 
             {step === 2 && (
-              <div className="ps-card p-5 space-y-4">
-                <h2 className="font-display text-2xl font-bold text-[#F8FAFC] leading-tight">
+              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
+                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
                   {c.q2Title}
                 </h2>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#B0BCCF] mb-1.5">
+                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
                     {c.q2TimeLabel}
                   </label>
                   <input
@@ -924,7 +1022,7 @@ export function MobileHomeFlow() {
                     value={unknownTime ? "12:00" : birthTime}
                     disabled={unknownTime}
                     onChange={(e) => setBirthTime(e.target.value)}
-                    className="w-full h-12 rounded-xl bg-[#111A2E] border border-white/15 px-4 text-base text-[#F8FAFC] disabled:opacity-45 focus:outline-none focus:border-[#EAB344]"
+                    className="w-full h-12 rounded-xl bg-white border border-[#111520]/15 px-4 text-base text-[#111520] disabled:opacity-45 focus:outline-none focus:border-[#B8861E] [color-scheme:light]"
                   />
                 </div>
 
@@ -937,17 +1035,23 @@ export function MobileHomeFlow() {
                   }}
                   className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                     unknownTime
-                      ? "bg-[#EAB344]/15 border-[#EAB344] text-[#F8FAFC]"
-                      : "bg-[#111A2E]/70 border-white/12 text-[#F8FAFC]/90"
+                      ? "bg-[#111520] border-[#111520] text-white"
+                      : "bg-[#F4EFE6] border-[#111520]/12 text-[#111520]"
                   }`}
                 >
                   <div>
-                    <span className="block text-sm font-semibold">{c.q2UnknownTitle}</span>
-                    <span className="block text-xs text-[#B0BCCF] mt-0.5">{c.q2UnknownSub}</span>
+                    <span className="block text-sm font-bold">{c.q2UnknownTitle}</span>
+                    <span
+                      className={`block text-xs mt-0.5 ${
+                        unknownTime ? "text-white/75" : "text-[#111520]/65"
+                      }`}
+                    >
+                      {c.q2UnknownSub}
+                    </span>
                   </div>
                   <CheckCircle2
                     className={`w-5 h-5 shrink-0 ${
-                      unknownTime ? "text-[#EAB344]" : "text-white/25"
+                      unknownTime ? "text-[#F7D774]" : "text-[#111520]/30"
                     }`}
                   />
                 </button>
@@ -955,7 +1059,7 @@ export function MobileHomeFlow() {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="ps-btn-gold w-full h-13 text-[15px]"
+                  className="w-full py-3.5 rounded-xl bg-[#111520] text-[#F7D774] font-bold text-[15px] inline-flex items-center justify-center gap-2"
                 >
                   <span>{c.nextBtn}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -964,21 +1068,23 @@ export function MobileHomeFlow() {
             )}
 
             {step === 3 && (
-              <div className="ps-card p-5 space-y-4">
-                <h2 className="font-display text-2xl font-bold text-[#F8FAFC] leading-tight">
+              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
+                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
                   {c.q3Title}
                 </h2>
 
-                <CityAutocomplete
-                  value={birthCity}
-                  onChange={(val, valid, coords) => {
-                    setBirthCity(val);
-                    setBirthCityValid(valid);
-                    if (coords) setBirthCoords(coords);
-                  }}
-                  placeholder={c.q3Placeholder}
-                  className="w-full h-12 rounded-xl bg-[#111A2E] border border-white/15 px-4 text-base text-[#F8FAFC]"
-                />
+                <div className="h-12">
+                  <CityAutocomplete
+                    variant="light"
+                    value={birthCity}
+                    onChange={(val, valid, coords) => {
+                      setBirthCity(val);
+                      setBirthCityValid(valid);
+                      if (coords) setBirthCoords(coords);
+                    }}
+                    placeholder={c.q3Placeholder}
+                  />
+                </div>
 
                 <button
                   type="button"
@@ -989,7 +1095,7 @@ export function MobileHomeFlow() {
                     }
                     setStep(4);
                   }}
-                  className="ps-btn-gold w-full h-13 text-[15px]"
+                  className="w-full py-3.5 rounded-xl bg-[#111520] text-[#F7D774] font-bold text-[15px] inline-flex items-center justify-center gap-2"
                 >
                   <span>{c.nextBtn}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -998,13 +1104,13 @@ export function MobileHomeFlow() {
             )}
 
             {step === 4 && (
-              <div className="ps-card p-5 space-y-4">
-                <h2 className="font-display text-2xl font-bold text-[#F8FAFC] leading-tight">
+              <div className="rounded-3xl bg-[#FFFDF9] border border-[#111520]/12 p-5 space-y-4 shadow-md">
+                <h2 className="font-display text-2xl font-bold text-[#111520] leading-tight">
                   {c.q4Title}
                 </h2>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#B0BCCF] mb-1.5">
+                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
                     {c.q4YearLabel}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -1013,10 +1119,10 @@ export function MobileHomeFlow() {
                         key={yr}
                         type="button"
                         onClick={() => setPastYear(yr)}
-                        className={`h-10 rounded-xl font-mono text-xs font-semibold border transition-all ${
+                        className={`h-10 rounded-xl font-mono text-xs font-bold border transition-all ${
                           pastYear === yr
-                            ? "bg-[#EAB344] border-[#EAB344] text-[#070A12]"
-                            : "bg-[#111A2E] border-white/12 text-[#F8FAFC]"
+                            ? "bg-[#111520] border-[#111520] text-[#F7D774]"
+                            : "bg-white border-[#111520]/15 text-[#111520]"
                         }`}
                       >
                         {yr}
@@ -1026,25 +1132,27 @@ export function MobileHomeFlow() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#B0BCCF] mb-1.5">
+                  <label className="block text-xs font-bold text-[#111520]/75 mb-1.5">
                     {c.q4CityLabel}
                   </label>
-                  <CityAutocomplete
-                    value={pastCity}
-                    onChange={(val, valid, coords) => {
-                      setPastCity(val);
-                      setPastCityValid(valid);
-                      if (coords) setPastCoords(coords);
-                    }}
-                    placeholder={c.q4Placeholder}
-                    className="w-full h-12 rounded-xl bg-[#111A2E] border border-white/15 px-4 text-base text-[#F8FAFC]"
-                  />
+                  <div className="h-12">
+                    <CityAutocomplete
+                      variant="light"
+                      value={pastCity}
+                      onChange={(val, valid, coords) => {
+                        setPastCity(val);
+                        setPastCityValid(valid);
+                        if (coords) setPastCoords(coords);
+                      }}
+                      placeholder={c.q4Placeholder}
+                    />
+                  </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={calculating || pastCity.trim().length < 2}
-                  className="ps-btn-gold w-full h-14 text-[15px] disabled:opacity-50"
+                  className="w-full h-14 rounded-xl bg-gradient-to-b from-[#F7D774] to-[#E5A935] text-[#080B12] font-bold text-[15px] shadow-lg inline-flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <span>{calculating ? c.calculatingBtn : c.revealBtn}</span>
                   <ArrowRight className="w-5 h-5" />
@@ -1056,94 +1164,105 @@ export function MobileHomeFlow() {
       )}
 
       {/* =====================================================================
-          VIEW 3: DEDICATED NATIVE MOBILE PLANS SCREEN (Zero Wall of Text!)
+          VIEW 3: PERFORATED MOBILE PASS TICKETS (Zero Wall of Text!)
           ===================================================================== */}
       {view === "plans" && (
-        <div className="flex-1 pt-16 pb-24 px-5 flex flex-col">
+        <div className="flex-1 pt-16 pb-12 px-5 flex flex-col">
           <div className="pt-2 pb-4">
             <button
               type="button"
               onClick={() => setView("hook")}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#B0BCCF] py-1"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111520] py-1"
             >
-              <ArrowLeft className="w-4 h-4 text-[#EAB344]" />
+              <ArrowLeft className="w-4 h-4 text-[#92400E]" />
               <span>{t.nav.back}</span>
             </button>
 
-            <h2 className="font-display text-2xl font-bold text-[#F8FAFC] mt-2 leading-tight">
+            <h2 className="font-display text-2xl font-bold text-[#111520] mt-2 leading-tight">
               {c.plansTitle}
             </h2>
-            <p className="text-xs text-[#B0BCCF] mt-1">{c.plansSub}</p>
-
-            {/* Concise MiroFish Contrast Pill for Cold Mobile Visitors */}
-            <div className="mt-3 rounded-xl bg-[#111A2E]/85 border border-[#EAB344]/30 px-3.5 py-2.5 text-xs leading-snug">
-              <span className="block font-semibold text-[#F3DC9B]">
-                {t.pricing.contrast.solarLabel} ≠ {t.pricing.contrast.freeLabel}
-              </span>
-              <span className="block text-[#B0BCCF] mt-0.5">
-                {t.pricing.contrast.solarDesc}
-              </span>
-            </div>
+            <p className="text-xs text-[#111520]/70 mt-1">{c.plansSub}</p>
           </div>
 
           <div className="space-y-3.5">
-            {c.plans.map((plan) => (
-              <div
-                key={plan.pkg}
-                className={`relative rounded-2xl p-4 border ${
-                  plan.featured
-                    ? "bg-[#111A2E] border-2 border-[#EAB344] shadow-[0_12px_30px_rgba(234,179,68,0.16)]"
-                    : "bg-[#0B111E] border-white/12"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div>
-                    {plan.featured && (
-                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#EAB344] text-[#070A12] font-mono text-[10px] font-bold uppercase tracking-[0.1em] mb-1.5">
-                        {c.popular}
-                      </span>
-                    )}
-                    <h3 className="font-display text-lg font-bold text-[#F8FAFC]">
-                      {plan.title}
-                    </h3>
-                  </div>
-
-                  <div className="text-right shrink-0">
-                    <div className="flex items-baseline justify-end gap-0.5">
-                      <span className="text-xs font-semibold text-[#F3DC9B]">R$</span>
-                      <span className="font-display text-3xl font-bold text-[#F8FAFC] tabular-nums leading-none">
-                        {plan.priceInt}
-                      </span>
-                      <span className="text-xs font-semibold text-[#B0BCCF]">,{plan.priceDec}</span>
-                    </div>
-                    <span className="block text-[10px] text-[#B0BCCF]">{c.oneTime}</span>
-                  </div>
-                </div>
-
-                <p className="text-xs text-[#B0BCCF] leading-relaxed mb-3.5">{plan.desc}</p>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate(`/credits?pkg=${plan.pkg}&returnTo=${encodeURIComponent("/?mode=futuro")}`)
-                  }
-                  className={`w-full h-11 text-xs ${
-                    plan.featured ? "ps-btn-gold" : "ps-btn-glass"
+            {c.plans.map((plan) => {
+              const stubColor =
+                plan.pkg === "1" ? "#10B981" : plan.pkg === "3" ? "#EAB344" : "#8B5CF6";
+              return (
+                <div
+                  key={plan.pkg}
+                  className={`relative rounded-3xl overflow-hidden border ${
+                    plan.featured
+                      ? "bg-[#111520] text-white border-2 border-[#EAB344] shadow-xl"
+                      : "bg-[#FFFDF9] text-[#111520] border-[#111520]/14 shadow-sm"
                   }`}
                 >
-                  <span>{plan.cta}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+                  <div
+                    className="px-4 py-2 flex items-center justify-between font-mono text-[10px] font-bold uppercase tracking-[0.14em]"
+                    style={{
+                      backgroundColor: stubColor,
+                      color: plan.featured ? "#111520" : "#FFFFFF",
+                    }}
+                  >
+                    <span>
+                      PASS · {plan.pkg === "full" ? "12 CASAS" : `0${plan.pkg}`}
+                    </span>
+                    {plan.featured && <span>★ {c.popular}</span>}
+                  </div>
+
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="font-display text-lg font-bold leading-snug">
+                        {plan.title}
+                      </h3>
+                      <div className="text-right shrink-0">
+                        <div className="flex items-baseline justify-end gap-0.5">
+                          <span className="text-xs font-bold opacity-75">R$</span>
+                          <span className="font-display text-3xl font-bold tabular-nums leading-none">
+                            {plan.priceInt}
+                          </span>
+                          <span className="text-xs font-bold opacity-75">,{plan.priceDec}</span>
+                        </div>
+                        <span className="block text-[10px] opacity-65">{c.oneTime}</span>
+                      </div>
+                    </div>
+
+                    <p
+                      className={`text-xs leading-relaxed mb-3.5 ${
+                        plan.featured ? "text-white/80" : "text-[#111520]/70"
+                      }`}
+                    >
+                      {plan.desc}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/credits?pkg=${plan.pkg}&returnTo=${encodeURIComponent("/?mode=futuro")}`
+                        )
+                      }
+                      className={`w-full h-11 rounded-xl font-bold text-xs inline-flex items-center justify-center gap-2 ${
+                        plan.featured
+                          ? "bg-[#F7D774] text-[#111520]"
+                          : "bg-[#111520] text-white"
+                      }`}
+                    >
+                      <span>{plan.cta}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-center gap-2 text-xs text-[#B0BCCF]">
-            <Gift className="w-4 h-4 text-[#EAB344]" />
+          <div className="mt-5 pt-4 border-t border-[#111520]/12 flex items-center justify-center gap-2 text-xs text-[#111520]/75">
+            <Gift className="w-4 h-4 text-[#92400E]" />
             <span>{c.giftText}</span>
             <Link
               to="/resgatar"
-              className="font-semibold text-[#F3DC9B] underline underline-offset-4"
+              className="font-bold text-[#111520] underline underline-offset-4"
             >
               {c.giftLink}
             </Link>

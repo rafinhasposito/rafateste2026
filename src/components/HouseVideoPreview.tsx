@@ -7,8 +7,8 @@ export function getHouseVideoAssets(houseId: number): {
   const safeId = houseId >= 1 && houseId <= 12 ? houseId : 1;
   const padded = String(safeId).padStart(2, "0");
   return {
-    videoSrc: `/videos/v3/casa-${padded}-v3.mp4`,
-    posterSrc: `/videos/v3/casa-${padded}-v3-poster.jpg`,
+    videoSrc: `/videos/v3/casa-${padded}-lux.mp4`,
+    posterSrc: `/videos/v3/casa-${padded}-lux-poster.jpg`,
   };
 }
 

@@ -13,6 +13,7 @@ interface CityAutocompleteProps {
   required?: boolean;
   className?: string;
   invalid?: boolean;
+  variant?: "dark" | "light";
 }
 
 interface CityFeature {
@@ -25,7 +26,7 @@ interface SuggestionItem {
   coords: CityCoords;
 }
 
-const CityAutocomplete = ({ value, onChange, placeholder, required, className, invalid }: CityAutocompleteProps) => {
+const CityAutocomplete = ({ value, onChange, placeholder, required, className, invalid, variant = "dark" }: CityAutocompleteProps) => {
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isValid, setIsValid] = useState(false);
@@ -83,6 +84,7 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
   }, []);
 
   const isUnstyled = Boolean(className?.includes("bg-transparent"));
+  const isLight = variant === "light";
 
   return (
     <div ref={containerRef} className="relative">
@@ -94,15 +96,31 @@ const CityAutocomplete = ({ value, onChange, placeholder, required, className, i
         required={required}
         className={
           isUnstyled
-            ? `w-full h-full text-white focus:outline-none transition-all duration-300 ${className || ""}`
+            ? `w-full h-full ${isLight ? "text-[#111520]" : "text-white"} focus:outline-none transition-all duration-300 ${className || ""}`
+            : isLight
+            ? `w-full h-full bg-white border rounded-xl px-4 text-[#111520] placeholder:text-[#111520]/40 text-base sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#D99B26]/35 transition-all duration-200 ${invalid && !isValid ? "border-red-500/60" : "border-[#111520]/15 focus:border-[#B8861E]"} ${className || ""}`
             : `w-full h-full bg-white/5 border rounded-xl px-4 text-white placeholder:text-white/30 text-base sm:text-sm focus:outline-none focus:bg-white/[0.08] transition-all duration-300 ${invalid && !isValid ? "border-red-500/50" : "border-white/10 focus:border-[#C9A227]/50"} ${className || ""}`
         }
         autoComplete="off"
       />
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0A0C10]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl">
+        <div
+          className={
+            isLight
+              ? "absolute top-full left-0 right-0 mt-2 bg-[#FFFDF9] border border-[#111520]/14 rounded-xl overflow-hidden z-50 shadow-[0_20px_50px_rgba(17,21,32,0.18)]"
+              : "absolute top-full left-0 right-0 mt-2 bg-[#0A0C10]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-50 shadow-2xl"
+          }
+        >
           {suggestions.map((item, i) => (
-            <div key={i} className="px-4 py-3 cursor-pointer hover:bg-white/5 flex items-center gap-3 text-white/80 text-sm transition-colors border-b border-white/5 last:border-0" onClick={() => selectCity(item)}>
+            <div
+              key={i}
+              className={
+                isLight
+                  ? "px-4 py-3 cursor-pointer hover:bg-[#F4EFE6] flex items-center gap-3 text-[#111520] text-sm font-medium transition-colors border-b border-[#111520]/8 last:border-0"
+                  : "px-4 py-3 cursor-pointer hover:bg-white/5 flex items-center gap-3 text-white/80 text-sm transition-colors border-b border-white/5 last:border-0"
+              }
+              onClick={() => selectCity(item)}
+            >
               <svg className="w-4 h-4 text-[#C9A227] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                 <circle cx="12" cy="10" r="3" />
