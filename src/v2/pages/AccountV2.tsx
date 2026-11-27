@@ -187,7 +187,7 @@ export default function AccountV2() {
 
   return (
     <div className="v2-root">
-      <V2TopNav activeTab="account" backTo={{ label: "← Home", to: "/v2" }} />
+      <V2TopNav activeTab="account" backTo={{ label: "← Home", to: "/" }} />
 
       <main
         style={{

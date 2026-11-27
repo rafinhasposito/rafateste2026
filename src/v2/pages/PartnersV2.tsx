@@ -36,7 +36,7 @@ export default function PartnersV2() {
 
   return (
     <div className="v2-root">
-      <V2TopNav activeTab="home" backTo={{ label: "← Home", to: "/v2" }} />
+      <V2TopNav activeTab="home" backTo={{ label: "← Home", to: "/" }} />
 
       <main style={{ background: "#F4EAE0", padding: "96px min(4vw, 56px) 84px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", flexDirection: "column", gap: 32 }}>

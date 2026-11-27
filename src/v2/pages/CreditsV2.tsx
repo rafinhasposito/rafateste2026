@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ import { AffiliateReferralBanner } from "@/components/AffiliateReferralBanner";
 import { HOUSES_V2 } from "../data/housesV2";
 import { getEnvelopeDataUrl } from "../components/envelopeCanvas";
 import { V2TopNav, V2IosTabBar, V2Footer } from "../components/V2Chrome";
+import { SolarLoadingOrb, SolarSuccessCheck, useSolarScrollReveal } from "../components/SolarMotion";
 import "../v2.css";
 
 interface PixState {
@@ -116,6 +117,8 @@ export default function CreditsV2() {
 
   const [isMob, setIsMob] = useState(() => typeof window !== "undefined" && window.innerWidth < 820);
   const envUrls = useMemo(() => HOUSES_V2.map((h) => getEnvelopeDataUrl(h)), []);
+  const rootRef = useRef<HTMLDivElement>(null);
+  useSolarScrollReveal(rootRef);
 
   const rawReturnTo = searchParams.get("returnTo");
   const safeReturnTo = rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : "/consultar";
@@ -256,8 +259,8 @@ export default function CreditsV2() {
   const current = TIERS[tier];
 
   return (
-    <div className="v2-root">
-      <V2TopNav activeTab="credits" backTo={{ label: "← Home", to: "/v2" }} />
+    <div className="v2-root" ref={rootRef}>
+      <V2TopNav activeTab="credits" backTo={{ label: "← Home", to: "/" }} />
 
       <main
         style={{
@@ -271,7 +274,7 @@ export default function CreditsV2() {
             <AffiliateReferralBanner />
           </div>
 
-          <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 28px" }}>
+          <div className="solar-hero-in" style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 28px" }}>
             <span
               style={{
                 display: "inline-flex",
@@ -403,7 +406,7 @@ export default function CreditsV2() {
               {!pixData && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <button type="button" disabled={loadingPix} className="v2-specular-btn" style={{ width: "100%" }} onClick={handleGeneratePix}>
-                    {loadingPix ? "Gerando QR Code Pix..." : user ? current.cta : "Entrar e pagar com Pix →"}
+                    {loadingPix ? <SolarLoadingOrb label="Gerando QR Code Pix..." /> : user ? current.cta : "Entrar e pagar com Pix →"}
                   </button>
                   <button
                     type="button"
@@ -426,10 +429,8 @@ export default function CreditsV2() {
                 <div style={{ marginTop: 12, padding: 18, borderRadius: 20, background: "#FAF6F0", border: "1.5px solid rgba(16,22,34,0.1)", textAlign: "center" }}>
                   {approved ? (
                     <div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: "#15803D", marginBottom: 10 }}>
-                        ✓ Pagamento aprovado! Créditos liberados.
-                      </div>
-                      <button type="button" className="v2-specular-btn" onClick={() => navigate(safeReturnTo)}>
+                      <SolarSuccessCheck title="Pagamento aprovado!" subtitle="Seus créditos já foram liberados na conta." />
+                      <button type="button" className="v2-specular-btn" style={{ marginTop: 12 }} onClick={() => navigate(safeReturnTo)}>
                         Ir para minha consulta →
                       </button>
                     </div>
@@ -514,8 +515,8 @@ export default function CreditsV2() {
               </button>
             </form>
             {redeemSuccess && (
-              <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 12, background: "#ECFDF5", color: "#065F46", fontSize: 13.5, fontWeight: 700 }}>
-                {redeemSuccess}
+              <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 18, background: "#ECFDF5", border: "1px solid #A7F3D0" }}>
+                <SolarSuccessCheck title="Cupom resgatado!" subtitle={redeemSuccess} />
               </div>
             )}
           </section>

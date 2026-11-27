@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AFFINITY_MATRIX_V2, HOUSES_V2, LIFE_AREAS_V2, getHouseV2 } from "../data/housesV2";
 import { getEnvelopeDataUrl } from "../components/envelopeCanvas";
 import { V2TopNav, V2IosTabBar, V2Footer } from "../components/V2Chrome";
+import { useSolarScrollReveal } from "../components/SolarMotion";
 import DecryptedText from "../components/reactbits/DecryptedText";
 import MagicBento, { type MagicBentoItem } from "../components/reactbits/MagicBento";
 import "../v2.css";
@@ -55,6 +56,8 @@ export default function ResultV2() {
   const [dbRow, setDbRow] = useState<any>(null);
   const [selectedAreaId, setSelectedAreaId] = useState<string>("dinheiro");
   const [isMob, setIsMob] = useState(() => typeof window !== "undefined" && window.innerWidth < 820);
+  const rootRef = useRef<HTMLDivElement>(null);
+  useSolarScrollReveal(rootRef, [numericHouse]);
 
   useEffect(() => {
     document.title = `Resultado Casa ${house.code} — ${house.title} | Protocolo Solar`;
@@ -130,7 +133,7 @@ export default function ResultV2() {
   );
 
   return (
-    <div className="v2-root">
+    <div className="v2-root" ref={rootRef}>
       <V2TopNav activeTab="consult" backTo={{ label: "← Nova Consulta", to: "/consultar" }} />
 
       <main
@@ -142,6 +145,7 @@ export default function ResultV2() {
         <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", flexDirection: "column", gap: 28 }}>
           {/* BOARDING PASS RESULT HERO */}
           <section
+            className="solar-hero-in"
             style={{
               background: "rgba(255,255,255,0.94)",
               border: "1.5px solid rgba(255,255,255,0.98)",
@@ -201,6 +205,7 @@ export default function ResultV2() {
 
           {/* CIDADES RECOMENDADAS (REAL DATA WHEN UNLOCKED, LOCKED GATE OTHERWISE) */}
           <section
+            className="solar-reveal"
             style={{
               background: "#0B101B",
               color: "#FFF8E6",
@@ -253,6 +258,7 @@ export default function ResultV2() {
 
           {/* 8 ÁREAS DA VIDA COM REACT BITS MAGIC BENTO */}
           <section
+            className="solar-reveal"
             style={{
               background: "rgba(255,255,255,0.94)",
               borderRadius: isMob ? 24 : 30,
@@ -313,7 +319,7 @@ export default function ResultV2() {
           </section>
 
           {/* PROTOCOLO DAS PRIMEIRAS 24H + CALENDÁRIO 12 MESES */}
-          <section style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "0.95fr 1.05fr", gap: 20 }}>
+          <section className="solar-reveal" style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "0.95fr 1.05fr", gap: 20 }}>
             <div style={{ background: "rgba(255,255,255,0.94)", borderRadius: 24, padding: 24 }}>
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: house.env, marginBottom: 8 }}>
                 ⏱ Primeiras 24 Horas do Ciclo

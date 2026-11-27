@@ -11,7 +11,7 @@ export default function LegalV2({ doc }: { doc: "terms" | "privacy" }) {
 
   return (
     <div className="v2-root">
-      <V2TopNav activeTab="home" backTo={{ label: "← Home", to: "/v2" }} />
+      <V2TopNav activeTab="home" backTo={{ label: "← Home", to: "/" }} />
 
       <main style={{ background: "#F4EAE0", padding: "96px 20px 84px" }}>
         <article

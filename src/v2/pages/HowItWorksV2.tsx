@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { V2TopNav, V2IosTabBar, V2Footer } from "../components/V2Chrome";
+import { useSolarScrollReveal } from "../components/SolarMotion";
 import "../v2.css";
 
 const FAQS = [
@@ -24,18 +25,20 @@ const FAQS = [
 
 export default function HowItWorksV2() {
   const [openIdx, setOpenIdx] = useState<number>(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  useSolarScrollReveal(rootRef);
 
   useEffect(() => {
     document.title = "Como Funciona a Revolução Solar — Protocolo Solar";
   }, []);
 
   return (
-    <div className="v2-root">
-      <V2TopNav activeTab="guide" backTo={{ label: "← Home", to: "/v2" }} />
+    <div className="v2-root" ref={rootRef}>
+      <V2TopNav activeTab="guide" backTo={{ label: "← Home", to: "/" }} />
 
       <main style={{ background: "#F4EAE0", padding: "96px min(4vw, 56px) 84px" }}>
         <div style={{ maxWidth: 980, margin: "0 auto", display: "flex", flexDirection: "column", gap: 36 }}>
-          <header style={{ textAlign: "center", maxWidth: 720, margin: "0 auto" }}>
+          <header className="solar-hero-in" style={{ textAlign: "center", maxWidth: 720, margin: "0 auto" }}>
             <span style={{ display: "inline-flex", padding: "6px 14px", borderRadius: 999, background: "rgba(255,255,255,0.86)", fontSize: 10.5, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "#101622", marginBottom: 14 }}>
               ✦ Guia Rápido · Revolução Solar na Prática
             </span>
@@ -48,7 +51,7 @@ export default function HowItWorksV2() {
           </header>
 
           {/* 3 PILARES */}
-          <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
+          <section className="solar-reveal" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
             {[
               {
                 step: "01 · O PRINCÍPIO",

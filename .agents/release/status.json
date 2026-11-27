@@ -1,20 +1,18 @@
 {
   "ready": true,
   "human_blocker": false,
-  "last_verification": "2026-11-25T10:22:00-03:00 — Arquitetura Oficial V3 publicada em https://protocolosolar.com.br/ unificando 100% do Manual de Identidade Visual V2 (Marcellus + DM Sans + Paleta B #02050A / #07101A / #C9A227 / #E8D59B + Pérola Editorial #FAF7F2 + Roda Oficial das 12 Casas), o Estudo de Viabilidade Global e o Relatório MiroFish: (1) Quiz Funnel interativo estilo Nebula acima da dobra no Mobile e Desktop com pergunta decisora imediata, micro-recompensa de Sol Tropical, filtro real de raio de viagem (até 1.000 km, até 3.000 km e Global) e diagnóstico gratuito da cidade atual / último aniversário (/audit_past); (2) Fim total de caixas aninhadas e remoção total de fotos do personagem de IA nas páginas, usando fotografia/vídeo aéreo real de cidades (Florianópolis, Roma, Zurique, NY) + anéis radiais 0-100 + Roda Solar interativa I-XII; (3) HTML semântico pré-hidratado + JSON-LD em index.html e copy 100% em conformidade com Meta Ads e TikTok Ads 2026. 43/43 testes PASS, Build PASS, Layoza WCAG 2.2 AA 0 violações, Playwright 0 erros.",
+  "last_verification": "2026-11-27T10:07:34-03:00 — Site oficial Protocolo Solar (Envelopes 3D + 12 Casas cinema + Consulta Grátis com Lanyard 3D + Consultar + Resultado MagicBento + Créditos Pix real + Conta + Como Funciona + Parceiros + Legal) publicado na raiz https://protocolosolar.com.br/ (commit b87727c, deploy GitHub Pages success). Topo mobile 390px harmonizado em 1 linha (logo 18px + 62px respiro + botão Consulta Grátis 36px, sem chip quebrado e sem pílula colidindo com contador 01). V1 preservada em /v1-arquivo. Build PASS, Playwright ao vivo 0 erros e 0px overflow.",
   "build_status": "PASS",
   "deploy_target": "GitHub Pages (protocolosolar.com.br) + Render Python API + Supabase Edge Functions",
   "blockers_open": [],
   "blockers_fixed": [
-    "Restauração integral da Identidade Visual Oficial V2 (Marcellus + DM Sans auto-hospedadas em /brand/fonts + Paleta B #02050A/#07101A/#C9A227/#E8D59B + Pérola #FAF7F2 + Roda Oficial das 12 Casas, zero ícones proibidos e zero cores dissonantes)",
-    "Eliminação de 'caixas dentro de caixas' e remoção do personagem de IA Theo da vitrine do site, substituído por fotografia/vídeo aéreo real de destinos, divisórias hairline de 1px e anéis radiais 0–100",
-    "Implementação do Quiz Funnel interativo estilo Nebula (pergunta de prioridade nº 1 acima da dobra + micro-recompensa + filtro de distância 1.000 km / 3.000 km / Global + diagnóstico gratuito da cidade atual e validação cega do aniversário passado)",
-    "Conformidade técnica Meta Ads & TikTok Ads 2026: HTML semântico pré-hidratado + AggregateOffer JSON-LD em index.html para rastreadores sem JS e revisão integral de copy sem Atributos Pessoais",
-    "Critério público transparente dos 3 níveis (R$ 19,90 / R$ 49,90 / R$ 99,90) resolvendo os riscos apontados na simulação MiroFish"
+    "Topo mobile harmonizado na Home 3D: removida pílula branca cortada que colidia com o contador 01/04, corrigido bug de profile?.credits indefinido e ocultado chip extra no mobile deixando apenas Logo (1 linha) + 62px de respiro + botão Consulta Grátis (1 linha)",
+    "Promoção de todas as páginas novas (Ondas 1–4) diretamente para a raiz oficial https://protocolosolar.com.br/ (/, /casas/:id, /consulta-gratis, /consultar, /resultado/:id, /creditos, /resgatar, /entrar, /perfil, /como-funciona, /parceiros, /termos, /privacidade) com backup integral da V1 em /v1-arquivo e redirecionamentos de /v2/*",
+    "Integração dos componentes React Bits (Lanyard3D, GradientText, DecryptedText, MagicBento) com moderação cirúrgica e zero spoiler do próximo ano na Consulta Grátis"
   ],
   "v1_1_backlog": [
-    "Integração futura de Merchant of Record (Lemon Squeezy / Paddle) para Fase 2 (LatAm/Espanha EUR/USD) e Fase 3 (EUA/UK/Europa Tier-1)",
-    "Code splitting: reduzir bundle de 3.1MB",
-    "Otimizar imagens de voucher"
+    "Tradução completa dos textos editoriais das páginas internas para ES/EN/FR/IT",
+    "Code splitting do bundle legado (index.js 3.1MB)",
+    "Merchant of Record (Stripe/Paddle) para vendas internacionais EUR/USD"
   ]
 }

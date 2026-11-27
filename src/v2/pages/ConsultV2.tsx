@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import CityAutocomplete, { type CityCoords } from "@/components/CityAutocomplete";
 import { API_URL, getNextBirthdayYear, normalizeBirthTime } from "@/lib/astro";
@@ -10,6 +10,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { HOUSES_V2, getHouseV2 } from "../data/housesV2";
 import { getEnvelopeDataUrl } from "../components/envelopeCanvas";
 import { V2TopNav, V2IosTabBar, V2Footer } from "../components/V2Chrome";
+import { SolarLoadingOrb, useSolarScrollReveal } from "../components/SolarMotion";
 import "../v2.css";
 
 type ConsultMode = "city" | "house" | "intent";
@@ -54,6 +55,8 @@ export default function ConsultV2() {
   const envUrls = useMemo(() => HOUSES_V2.map((h) => getEnvelopeDataUrl(h)), []);
   const activeHouseObj = getHouseV2(selectedHouse);
   const availableCredits = profile?.credits ?? 0;
+  const rootRef = useRef<HTMLDivElement>(null);
+  useSolarScrollReveal(rootRef);
 
   useEffect(() => {
     prewarmSolarApi();
@@ -285,8 +288,8 @@ export default function ConsultV2() {
   };
 
   return (
-    <div className="v2-root">
-      <V2TopNav activeTab="consult" backTo={{ label: "← Home", to: "/v2" }} />
+    <div className="v2-root" ref={rootRef}>
+      <V2TopNav activeTab="consult" backTo={{ label: "← Home", to: "/" }} />
 
       <main
         style={{
@@ -565,7 +568,7 @@ export default function ConsultV2() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 22 }}>
               <button type="submit" disabled={loading} className="v2-specular-btn" style={{ flex: "1 1 260px" }}>
                 {loading
-                  ? "Calculando seu mapa solar..."
+                  ? <SolarLoadingOrb label="Calculando seu mapa solar..." />
                   : !user
                     ? "Entrar e calcular meu ano →"
                     : !isAdmin && availableCredits < 1

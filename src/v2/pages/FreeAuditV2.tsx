@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { V2_UI, getHouseV2, type HouseV2 } from "../data/housesV2";
 import { Lanyard3D } from "../components/Lanyard3D";
 import { V2TopNav, V2IosTabBar } from "../components/V2Chrome";
+import { SolarLoadingOrb } from "../components/SolarMotion";
 import DecryptedText from "../components/reactbits/DecryptedText";
 import "../v2.css";
 
@@ -340,7 +341,7 @@ export default function FreeAuditV2() {
 
   return (
     <div className="v2-root">
-      <V2TopNav activeTab="free" backTo={{ label: "← Home", to: "/v2" }} />
+      <V2TopNav activeTab="free" backTo={{ label: "← Home", to: "/" }} />
 
       <main
         style={{
@@ -516,8 +517,8 @@ export default function FreeAuditV2() {
 
           {loading && (
             <div style={{ maxWidth: 640, margin: "0 auto", background: "#0B101B", color: "#FFF8E6", borderRadius: 28, padding: "48px 28px", textAlign: "center", boxShadow: "0 32px 72px -20px rgba(11,16,27,0.45)" }}>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#F5D993", marginBottom: 14 }}>
-                Calculando sua Revolução Solar
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 14, color: "#F5D993", fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+                <SolarLoadingOrb label="Calculando sua Revolução Solar" />
               </div>
               <div style={{ fontFamily: "ui-monospace, 'SF Mono', Menlo, monospace", fontSize: "clamp(22px, 4vw, 34px)", fontWeight: 800, letterSpacing: "0.14em", marginBottom: 12 }}>
                 {cipherText}
