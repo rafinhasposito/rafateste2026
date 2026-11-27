@@ -60,6 +60,14 @@ const OnboardingV2 = lazy(() => import("./components/onboarding-v2/OnboardingV2"
 const HomeV2 = lazy(() => import("./v2/pages/HomeV2"));
 const HouseV2 = lazy(() => import("./v2/pages/HouseV2"));
 const FreeAuditV2 = lazy(() => import("./v2/pages/FreeAuditV2"));
+const ConsultV2 = lazy(() => import("./v2/pages/ConsultV2"));
+const ResultV2 = lazy(() => import("./v2/pages/ResultV2"));
+const CreditsV2 = lazy(() => import("./v2/pages/CreditsV2"));
+const AuthV2 = lazy(() => import("./v2/pages/AuthV2"));
+const AccountV2 = lazy(() => import("./v2/pages/AccountV2"));
+const HowItWorksV2 = lazy(() => import("./v2/pages/HowItWorksV2"));
+const PartnersV2 = lazy(() => import("./v2/pages/PartnersV2"));
+const LegalV2 = lazy(() => import("./v2/pages/LegalV2"));
 
 const AdminShowcase = () => (
   <AdminLayout title="User management" description="Manage your team members and their account permissions here.">
@@ -157,10 +165,24 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/showcase-admin" element={<AdminShowcase />} />
             
-            {/* Prévia Isolada V2 — Onda 1 (V1 intacta em /) */}
+            {/* Prévia Isolada V2 — Completa (Ondas 1 a 4 — V1 intacta em /) */}
             <Route path="/v2" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HomeV2 /></Suspense>} />
             <Route path="/v2/casas/:houseId" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HouseV2 /></Suspense>} />
             <Route path="/v2/consulta-gratis" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><FreeAuditV2 /></Suspense>} />
+            <Route path="/v2/consultar" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><ConsultV2 /></Suspense>} />
+            <Route path="/v2/resultado/:houseId" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><ResultV2 /></Suspense>} />
+            <Route path="/v2/creditos" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><CreditsV2 /></Suspense>} />
+            <Route path="/v2/resgatar" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><CreditsV2 /></Suspense>} />
+            <Route path="/v2/entrar" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AuthV2 /></Suspense>} />
+            <Route path="/v2/perfil" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
+            <Route path="/v2/minha-conta" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
+            <Route path="/v2/dashboard" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
+            <Route path="/v2/historico" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
+            <Route path="/v2/como-funciona" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HowItWorksV2 /></Suspense>} />
+            <Route path="/v2/guia-rapido" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HowItWorksV2 /></Suspense>} />
+            <Route path="/v2/parceiros" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><PartnersV2 /></Suspense>} />
+            <Route path="/v2/termos" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><LegalV2 doc="terms" /></Suspense>} />
+            <Route path="/v2/privacidade" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><LegalV2 doc="privacy" /></Suspense>} />
 
             {/* Outros legados e protótipos intocados */}
             <Route path="/v2/game" element={<SolarGameV2 />} />

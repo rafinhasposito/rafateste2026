@@ -631,7 +631,7 @@ export default function FreeAuditV2() {
                     type="button"
                     className="v2-specular-btn"
                     style={{ flex: "1 1 210px", height: 52 }}
-                    onClick={() => navigate("/credits?pkg=single")}
+                    onClick={() => navigate("/v2/creditos?pkg=single")}
                   >
                     Liberar meu próximo ano →
                   </button>
@@ -639,7 +639,7 @@ export default function FreeAuditV2() {
                     type="button"
                     className="v2-pill-btn"
                     style={{ height: 52, padding: "0 18px", flex: isMob ? "1 1 100%" : undefined, justifyContent: "center" }}
-                    onClick={() => navigate("/credits?pkg=full")}
+                    onClick={() => navigate("/v2/creditos?pkg=full")}
                   >
                     Liberar mapa completo
                   </button>

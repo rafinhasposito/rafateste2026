@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useI18n, type Locale } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import GradientText from "../components/reactbits/GradientText";
+import { V2Footer } from "../components/V2Chrome";
 import { mountHome3D } from "../components/mountHome3D";
 import "../styles/home3d.css";
 
@@ -28,7 +29,7 @@ export default function HomeV2() {
     const cleanup = mountHome3D(root, {
       onOpenHouse: (houseId) => navigate(`/v2/casas/${houseId}`),
       onOpenFreeAudit: () => navigate("/v2/consulta-gratis"),
-      onBuyPackage: (pkg) => navigate(`/credits?pkg=${pkg}`)
+      onBuyPackage: (pkg) => navigate(`/v2/creditos?pkg=${pkg}`)
     });
 
     return cleanup;
@@ -98,9 +99,13 @@ export default function HomeV2() {
             ))}
           </select>
 
-          {user && (
-            <Link className="chip-btn" to="/dashboard" style={{ textDecoration: "none" }}>
+          {user ? (
+            <Link className="chip-btn" to="/v2/perfil" style={{ textDecoration: "none" }}>
               ✦ {credits} cr.
+            </Link>
+          ) : (
+            <Link className="chip-btn" to="/v2/entrar" style={{ textDecoration: "none" }}>
+              Entrar
             </Link>
           )}
 
@@ -337,6 +342,8 @@ export default function HomeV2() {
           </div>
         </div>
       </div>
+
+      <V2Footer />
 
       {/* Hidden video elements for Three.js VideoTexture */}
       <video id="vid1" src="/v2-assets/casa-01.mp4" muted loop playsInline preload="metadata" crossOrigin="anonymous" style={{ display: "none" }} />
