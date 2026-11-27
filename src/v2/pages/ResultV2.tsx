@@ -131,7 +131,7 @@ export default function ResultV2() {
 
   return (
     <div className="v2-root">
-      <V2TopNav activeTab="consult" backTo={{ label: "← Nova Consulta", to: "/v2/consultar" }} />
+      <V2TopNav activeTab="consult" backTo={{ label: "← Nova Consulta", to: "/consultar" }} />
 
       <main
         style={{
@@ -243,7 +243,7 @@ export default function ResultV2() {
                 <button
                   type="button"
                   className="v2-specular-btn v2-specular-gold"
-                  onClick={() => navigate(`/v2/creditos?pkg=single&returnTo=${encodeURIComponent(`/v2/consultar?house=${house.id}`)}`)}
+                  onClick={() => navigate(`/creditos?pkg=single&returnTo=${encodeURIComponent(`/consultar?house=${house.id}`)}`)}
                 >
                   Liberar minhas cidades →
                 </button>
@@ -351,7 +351,7 @@ export default function ResultV2() {
               {HOUSES_V2.map((h) => (
                 <Link
                   key={h.id}
-                  to={`/v2/resultado/${h.id}${consultationId ? `?consultationId=${consultationId}` : ""}`}
+                  to={`/resultado/${h.id}${consultationId ? `?consultationId=${consultationId}` : ""}`}
                   className="v2-pill-btn"
                   style={{
                     background: h.id === house.id ? "#101622" : "rgba(255,255,255,0.88)",

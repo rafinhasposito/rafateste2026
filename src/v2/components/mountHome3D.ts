@@ -962,7 +962,7 @@ export function mountHome3D(rootEl: HTMLElement, callbacks: Home3DCallbacks): ()
         <div>
           <p class="h-card-hook">${h.hook}</p>
           <div class="h-card-actions">
-            <a class="trailer-link" href="/v2/casas/${h.id}" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">Explorar Casa →</a>
+            <a class="trailer-link" href="/casas/${h.id}" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">Explorar Casa →</a>
           </div>
         </div>
       `;

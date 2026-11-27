@@ -31,7 +31,7 @@ export default function PartnersV2() {
 
   const handleOpenPanel = () => {
     if (user) navigate("/afiliado");
-    else navigate("/v2/entrar?returnTo=/afiliado");
+    else navigate("/entrar?returnTo=/afiliado");
   };
 
   return (

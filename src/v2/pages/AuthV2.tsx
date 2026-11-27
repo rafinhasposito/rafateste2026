@@ -12,7 +12,7 @@ export default function AuthV2() {
   const [searchParams] = useSearchParams();
 
   const rawReturnTo = searchParams.get("returnTo");
-  const safeReturnTo = rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : "/v2/perfil";
+  const safeReturnTo = rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : "/perfil";
 
   const [mode, setMode] = useState<"login" | "signup" | "reset">("login");
   const [name, setName] = useState(() => sessionStorage.getItem("ps_natal_name") || "");
@@ -241,7 +241,7 @@ export default function AuthV2() {
                 Voltar para login
               </button>
             )}
-            <Link to="/v2/consulta-gratis" style={{ fontSize: 13, fontWeight: 800, color: "#101622", textDecoration: "none" }}>
+            <Link to="/consulta-gratis" style={{ fontSize: 13, fontWeight: 800, color: "#101622", textDecoration: "none" }}>
               Prefere testar grátis sem cadastro? →
             </Link>
           </div>

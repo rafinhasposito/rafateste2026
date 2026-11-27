@@ -158,10 +158,10 @@ export default function HowItWorksV2() {
               Teste grátis com o seu último aniversário e confira se a Casa ativada bate exatamente com o ano que você viveu.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
-              <Link to="/v2/consulta-gratis" className="v2-specular-btn v2-specular-gold">
+              <Link to="/consulta-gratis" className="v2-specular-btn v2-specular-gold">
                 Fazer Consulta Grátis →
               </Link>
-              <Link to="/v2/consultar" className="v2-pill-btn" style={{ height: 54, padding: "0 22px" }}>
+              <Link to="/consultar" className="v2-pill-btn" style={{ height: 54, padding: "0 22px" }}>
                 Planejar próximo aniversário
               </Link>
             </div>

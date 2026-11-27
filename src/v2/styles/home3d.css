@@ -1783,6 +1783,13 @@
       overflow-x: clip;
       -webkit-font-smoothing: antialiased;
     }
+    .v2-home3d .brand-name {
+      white-space: nowrap;
+    }
+    .v2-home3d .chip-btn {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
     .v2-home3d .v2-lang-select {
       height: 36px;
       padding: 0 10px;
@@ -1796,51 +1803,32 @@
       letter-spacing: 0.06em;
       cursor: pointer;
     }
-    .v2-home3d .v2-hero-eyebrow {
-      position: absolute;
-      top: calc(82px + env(safe-area-inset-top, 0px));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 16px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.68);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(20, 25, 35, 0.1);
-      color: var(--stage-ink);
-      font-size: 11.5px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-      max-width: calc(100vw - 32px);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-decoration: none;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-    .v2-home3d .v2-hero-eyebrow:hover {
-      background: rgba(255, 255, 255, 0.92);
-      transform: translateX(-50%) translateY(-1px);
-    }
-    .v2-home3d .v2-hero-eyebrow strong {
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
     @media (max-width: 819px) {
-      .v2-home3d .v2-lang-select { display: none; }
-      .v2-home3d .v2-hero-eyebrow {
-        top: calc(74px + env(safe-area-inset-top, 0px));
-        left: 16px;
-        transform: none;
-        max-width: calc(100vw - 104px);
-        font-size: 10.5px;
-        padding: 6px 11px;
+      .v2-home3d #nav {
+        height: 60px;
+        padding: 0 18px;
+        gap: 10px;
       }
-      .v2-home3d .v2-hero-eyebrow:hover {
-        transform: translateY(-1px);
+      .v2-home3d .brand {
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .v2-home3d .brand-mark {
+        width: 30px;
+        height: 30px;
+      }
+      .v2-home3d .brand-name {
+        font-size: 12px;
+        letter-spacing: 0.12em;
+      }
+      .v2-home3d .v2-lang-select,
+      .v2-home3d .v2-nav-account-chip {
+        display: none !important;
+      }
+      .v2-home3d .chip-cta {
+        height: 36px;
+        padding: 0 14px;
+        font-size: 12px;
+        white-space: nowrap;
       }
     }

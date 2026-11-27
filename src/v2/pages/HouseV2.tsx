@@ -51,7 +51,7 @@ export default function HouseV2() {
 
   return (
     <div className="v2-root">
-      <V2TopNav activeTab="houses" backTo={{ label: "← 12 Casas", to: "/v2#colecao" }} />
+      <V2TopNav activeTab="houses" backTo={{ label: "← 12 Casas", to: "/#colecao" }} />
 
       {/* ATO 1: BOARDING PASS HERO COM VÍDEO REAL DA CASA */}
       <header
@@ -85,7 +85,7 @@ export default function HouseV2() {
               <a className="v2-specular-btn" style={{ height: 50, padding: "0 24px", flex: isMob ? "1 1 100%" : undefined }} href="#planos">
                 Ativar Casa {h.code} ↓
               </a>
-              <Link className="v2-pill-btn" style={{ height: 50, padding: "0 20px", display: isMob ? "none" : "inline-flex" }} to="/v2/consulta-gratis">
+              <Link className="v2-pill-btn" style={{ height: 50, padding: "0 20px", display: isMob ? "none" : "inline-flex" }} to="/consulta-gratis">
                 Consulta Grátis
               </Link>
             </div>
@@ -312,9 +312,9 @@ export default function HouseV2() {
 
       <div style={{ background: "#F4EAE0", padding: isMob ? "18px 20px 104px" : "22px min(4vw, 56px) 44px" }}>
         <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-          <Link className="v2-pill-btn" to={`/v2/casas/${prevId}`}>← Casa {String(prevId).padStart(2, "0")}</Link>
-          <Link className="v2-pill-btn" to="/v2#colecao">Todas as 12</Link>
-          <Link className="v2-pill-btn" to={`/v2/casas/${nextId}`}>Casa {String(nextId).padStart(2, "0")} →</Link>
+          <Link className="v2-pill-btn" to={`/casas/${prevId}`}>← Casa {String(prevId).padStart(2, "0")}</Link>
+          <Link className="v2-pill-btn" to="/#colecao">Todas as 12</Link>
+          <Link className="v2-pill-btn" to={`/casas/${nextId}`}>Casa {String(nextId).padStart(2, "0")} →</Link>
         </div>
       </div>
 

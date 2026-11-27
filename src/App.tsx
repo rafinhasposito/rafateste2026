@@ -95,14 +95,26 @@ const AffiliateShortLink = () => {
   return <Navigate to="/" replace />;
 };
 
-// Entrada inteligente em /: se vier com ?mode= (fluxo de consulta/retorno de checkout/auth),
-// abre o calculador Index sem forçar onboarding; caso contrário, renderiza a nova Home Editorial Visual integrada ao Shell.
+// Entrada oficial em /: Home 3D (se vier com ?mode=, encaminha direto para /consultar)
+const v2Fallback = <div style={{ minHeight: "100vh", background: "#F4EAE0" }} />;
+
 const HomeEntry = () => {
   const [searchParams] = useSearchParams();
-  if (searchParams.get("mode") || searchParams.get("resetOnboarding")) {
-    return <Index skipAutoOnboarding />;
+  if (searchParams.get("mode")) {
+    return <Navigate to={{ pathname: "/consultar", search: `?${searchParams.toString()}` }} replace />;
   }
-  return <LandingV3 embeddedInShell />;
+  return <Suspense fallback={v2Fallback}><HomeV2 /></Suspense>;
+};
+
+const V2HouseRedirect = () => {
+  const { houseId } = useParams<{ houseId: string }>();
+  return <Navigate to={`/casas/${houseId || 1}`} replace />;
+};
+
+const V2ResultRedirect = () => {
+  const { houseId } = useParams<{ houseId: string }>();
+  const location = useLocation();
+  return <Navigate to={{ pathname: `/resultado/${houseId || 1}`, search: location.search }} replace />;
 };
 
 const V3Redirect = () => {
@@ -132,57 +144,79 @@ const App = () => (
             <Route path="/i/:code" element={<AffiliateShortLink />} />
             <Route path="/r/:code" element={<AffiliateShortLink />} />
             
-            {/* 1. Consumer Shell (Main App - Preserves state across resize) */}
+            {/* 1. SITE OFICIAL PROTOCOLO SOLAR (Rotas limpas direto em www.protocolosolar.com.br) */}
+            <Route path="/" element={<HomeEntry />} />
+            <Route path="/casas" element={<Navigate to="/#colecao" replace />} />
+            <Route path="/casas/:houseId" element={<Suspense fallback={v2Fallback}><HouseV2 /></Suspense>} />
+            <Route path="/consulta-gratis" element={<Suspense fallback={v2Fallback}><FreeAuditV2 /></Suspense>} />
+            <Route path="/meu-passado" element={<Suspense fallback={v2Fallback}><FreeAuditV2 /></Suspense>} />
+            <Route path="/consultar" element={<Suspense fallback={v2Fallback}><ConsultV2 /></Suspense>} />
+            <Route path="/resultado/:houseId" element={<Suspense fallback={v2Fallback}><ResultV2 /></Suspense>} />
+            <Route path="/creditos" element={<Suspense fallback={v2Fallback}><CreditsV2 /></Suspense>} />
+            <Route path="/credits" element={<Suspense fallback={v2Fallback}><CreditsV2 /></Suspense>} />
+            <Route path="/resgatar" element={<Suspense fallback={v2Fallback}><CreditsV2 /></Suspense>} />
+            <Route path="/entrar" element={<Suspense fallback={v2Fallback}><AuthV2 /></Suspense>} />
+            <Route path="/auth" element={<Suspense fallback={v2Fallback}><AuthV2 /></Suspense>} />
+            <Route path="/perfil" element={<Suspense fallback={v2Fallback}><AccountV2 /></Suspense>} />
+            <Route path="/minha-conta" element={<Suspense fallback={v2Fallback}><AccountV2 /></Suspense>} />
+            <Route path="/dashboard" element={<Suspense fallback={v2Fallback}><AccountV2 /></Suspense>} />
+            <Route path="/history" element={<Suspense fallback={v2Fallback}><AccountV2 /></Suspense>} />
+            <Route path="/historico" element={<Suspense fallback={v2Fallback}><AccountV2 /></Suspense>} />
+            <Route path="/como-funciona" element={<Suspense fallback={v2Fallback}><HowItWorksV2 /></Suspense>} />
+            <Route path="/guia-rapido" element={<Suspense fallback={v2Fallback}><HowItWorksV2 /></Suspense>} />
+            <Route path="/tecnologia" element={<Suspense fallback={v2Fallback}><HowItWorksV2 /></Suspense>} />
+            <Route path="/parceiros" element={<Suspense fallback={v2Fallback}><PartnersV2 /></Suspense>} />
+            <Route path="/seja-afiliado" element={<Suspense fallback={v2Fallback}><PartnersV2 /></Suspense>} />
+            <Route path="/termos" element={<Suspense fallback={v2Fallback}><LegalV2 doc="terms" /></Suspense>} />
+            <Route path="/privacidade" element={<Suspense fallback={v2Fallback}><LegalV2 doc="privacy" /></Suspense>} />
+
+            {/* 2. Redirecionamentos limpos de /v2/* para as rotas oficiais (zero link quebrado) */}
+            <Route path="/v2" element={<Navigate to="/" replace />} />
+            <Route path="/v2/casas/:houseId" element={<V2HouseRedirect />} />
+            <Route path="/v2/consulta-gratis" element={<Navigate to="/consulta-gratis" replace />} />
+            <Route path="/v2/consultar" element={<Navigate to="/consultar" replace />} />
+            <Route path="/v2/resultado/:houseId" element={<V2ResultRedirect />} />
+            <Route path="/v2/creditos" element={<Navigate to="/creditos" replace />} />
+            <Route path="/v2/resgatar" element={<Navigate to="/resgatar" replace />} />
+            <Route path="/v2/entrar" element={<Navigate to="/entrar" replace />} />
+            <Route path="/v2/perfil" element={<Navigate to="/perfil" replace />} />
+            <Route path="/v2/minha-conta" element={<Navigate to="/perfil" replace />} />
+            <Route path="/v2/dashboard" element={<Navigate to="/perfil" replace />} />
+            <Route path="/v2/historico" element={<Navigate to="/perfil" replace />} />
+            <Route path="/v2/como-funciona" element={<Navigate to="/como-funciona" replace />} />
+            <Route path="/v2/guia-rapido" element={<Navigate to="/como-funciona" replace />} />
+            <Route path="/v2/parceiros" element={<Navigate to="/parceiros" replace />} />
+            <Route path="/v2/termos" element={<Navigate to="/termos" replace />} />
+            <Route path="/v2/privacidade" element={<Navigate to="/privacidade" replace />} />
+
+            {/* 3. Fluxos dedicados & Backup completo da V1 (/v1-arquivo/*) */}
             <Route element={<ConsumerShell />}>
-              <Route path="/" element={<HomeEntry />} />
-              <Route path="/meu-passado" element={<FreePastResult />} />
-              <Route path="/consultar" element={<Index skipAutoOnboarding />} />
-              <Route path="/v1-arquivo" element={<Index skipAutoOnboarding />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/perfil" element={<Profile />} />
               <Route path="/afiliado" element={<AffiliateDashboard />} />
-              <Route path="/parceiros" element={<PartnersLanding />} />
-              <Route path="/seja-afiliado" element={<PartnersLanding />} />
-              <Route path="/tecnologia" element={<Technology />} />
-              <Route path="/casas" element={<HousesGuide />} />
-              <Route path="/casas/:houseId" element={<HouseDetailGuide />} />
               <Route path="/app/trailer" element={<HouseTrailerApp />} />
+              <Route path="/v1-arquivo" element={<LandingV3 embeddedInShell />} />
+              <Route path="/v1-arquivo/consultar" element={<Index skipAutoOnboarding />} />
+              <Route path="/v1-arquivo/meu-passado" element={<FreePastResult />} />
+              <Route path="/v1-arquivo/dashboard" element={<Dashboard />} />
+              <Route path="/v1-arquivo/history" element={<History />} />
+              <Route path="/v1-arquivo/perfil" element={<Profile />} />
+              <Route path="/v1-arquivo/parceiros" element={<PartnersLanding />} />
+              <Route path="/v1-arquivo/tecnologia" element={<Technology />} />
+              <Route path="/v1-arquivo/casas" element={<HousesGuide />} />
+              <Route path="/v1-arquivo/casas/:houseId" element={<HouseDetailGuide />} />
             </Route>
 
-            {/* 2. Focused Shell (Immersive Flows) */}
             <Route element={<FocusedShell />}>
-              <Route path="/auth" element={<Auth />} />
+              <Route path="/checkout-cartao" element={<Credits />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/credits" element={<Credits />} />
-              <Route path="/resgatar" element={<Credits />} />
               <Route path="/app/onboarding" element={<MobileOnboarding />} />
-              <Route path="/termos" element={<Terms />} />
-              <Route path="/privacidade" element={<Privacy />} />
+              <Route path="/v1-arquivo/auth" element={<Auth />} />
+              <Route path="/v1-arquivo/termos" element={<Terms />} />
+              <Route path="/v1-arquivo/privacidade" element={<Privacy />} />
             </Route>
 
-            {/* 3. Intact Routes (Admin & Legacy/Prototypes - Outside Consumer Shell) */}
+            {/* 4. Admin & Sandboxes preservados */}
             <Route path="/admin" element={<Admin />} />
             <Route path="/showcase-admin" element={<AdminShowcase />} />
-            
-            {/* Prévia Isolada V2 — Completa (Ondas 1 a 4 — V1 intacta em /) */}
-            <Route path="/v2" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HomeV2 /></Suspense>} />
-            <Route path="/v2/casas/:houseId" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HouseV2 /></Suspense>} />
-            <Route path="/v2/consulta-gratis" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><FreeAuditV2 /></Suspense>} />
-            <Route path="/v2/consultar" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><ConsultV2 /></Suspense>} />
-            <Route path="/v2/resultado/:houseId" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><ResultV2 /></Suspense>} />
-            <Route path="/v2/creditos" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><CreditsV2 /></Suspense>} />
-            <Route path="/v2/resgatar" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><CreditsV2 /></Suspense>} />
-            <Route path="/v2/entrar" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AuthV2 /></Suspense>} />
-            <Route path="/v2/perfil" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
-            <Route path="/v2/minha-conta" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
-            <Route path="/v2/dashboard" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
-            <Route path="/v2/historico" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><AccountV2 /></Suspense>} />
-            <Route path="/v2/como-funciona" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HowItWorksV2 /></Suspense>} />
-            <Route path="/v2/guia-rapido" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HowItWorksV2 /></Suspense>} />
-            <Route path="/v2/parceiros" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><PartnersV2 /></Suspense>} />
-            <Route path="/v2/termos" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><LegalV2 doc="terms" /></Suspense>} />
-            <Route path="/v2/privacidade" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><LegalV2 doc="privacy" /></Suspense>} />
 
             {/* Outros legados e protótipos intocados */}
             <Route path="/v2/game" element={<SolarGameV2 />} />
@@ -195,7 +229,7 @@ const App = () => (
             <Route path="/v2-preview" element={<AppleResultPreview />} />
             <Route path="/v3-preview" element={<AppleResultPreviewV3 />} />
             <Route path="/v3-preview/:houseId" element={<AppleResultPreviewV3 />} />
-        <Route path="/resultado/:houseId" element={<HouseResult />} />
+            <Route path="/v1-arquivo/resultado/:houseId" element={<HouseResult />} />
             <Route path="/bloco3" element={<Block3Sandbox />} />
             <Route path="/bloco4" element={<Block4Sandbox />} />
             <Route path="/ritual" element={<RitualSandbox />} />

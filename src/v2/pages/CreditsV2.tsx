@@ -118,7 +118,7 @@ export default function CreditsV2() {
   const envUrls = useMemo(() => HOUSES_V2.map((h) => getEnvelopeDataUrl(h)), []);
 
   const rawReturnTo = searchParams.get("returnTo");
-  const safeReturnTo = rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : "/v2/consultar";
+  const safeReturnTo = rawReturnTo && rawReturnTo.startsWith("/") && !rawReturnTo.startsWith("//") ? rawReturnTo : "/consultar";
 
   useEffect(() => {
     document.title = isRedeem ? "Resgatar Cupom — Protocolo Solar" : "Créditos Solares — Protocolo Solar";
@@ -157,11 +157,11 @@ export default function CreditsV2() {
   const handleGeneratePix = async () => {
     const t = TIERS[tier];
     if (!user) {
-      navigate(`/v2/entrar?returnTo=${encodeURIComponent(`/v2/creditos?pkg=${t.pkgParam}&returnTo=${encodeURIComponent(safeReturnTo)}`)}`);
+      navigate(`/entrar?returnTo=${encodeURIComponent(`/creditos?pkg=${t.pkgParam}&returnTo=${encodeURIComponent(safeReturnTo)}`)}`);
       return;
     }
     if (!activePricingItem) {
-      navigate(`/credits?pkg=${t.pkgParam}&returnTo=${encodeURIComponent(safeReturnTo)}`);
+      navigate(`/checkout-cartao?pkg=${t.pkgParam}&returnTo=${encodeURIComponent(safeReturnTo)}`);
       return;
     }
 
@@ -173,7 +173,7 @@ export default function CreditsV2() {
     try {
       const token = await resolveToken();
       if (!token) {
-        navigate(`/v2/entrar?returnTo=${encodeURIComponent(`/v2/creditos?pkg=${t.pkgParam}`)}`);
+        navigate(`/entrar?returnTo=${encodeURIComponent(`/creditos?pkg=${t.pkgParam}`)}`);
         return;
       }
 
@@ -235,7 +235,7 @@ export default function CreditsV2() {
     if (!cleaned) return;
     if (!user) {
       savePendingGiftCode(cleaned);
-      navigate(`/v2/entrar?returnTo=${encodeURIComponent(`/v2/resgatar?code=${cleaned}`)}`);
+      navigate(`/entrar?returnTo=${encodeURIComponent(`/resgatar?code=${cleaned}`)}`);
       return;
     }
     setRedeeming(true);
@@ -409,7 +409,7 @@ export default function CreditsV2() {
                     type="button"
                     className="v2-pill-btn"
                     style={{ width: "100%", height: 48, justifyContent: "center" }}
-                    onClick={() => navigate(`/credits?pkg=${current.pkgParam}&returnTo=${encodeURIComponent(safeReturnTo)}`)}
+                    onClick={() => navigate(`/checkout-cartao?pkg=${current.pkgParam}&returnTo=${encodeURIComponent(safeReturnTo)}`)}
                   >
                     Preferir pagar no Cartão de Crédito →
                   </button>

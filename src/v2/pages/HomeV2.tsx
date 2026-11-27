@@ -19,7 +19,7 @@ export default function HomeV2() {
   const rootRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { locale, setLocale } = useI18n();
-  const { user, credits } = useAuth();
+  const { user, profile } = useAuth();
 
   useEffect(() => {
     document.title = "Protocolo Solar — Onde Passar Seu Aniversário";
@@ -27,9 +27,9 @@ export default function HomeV2() {
     if (!root) return undefined;
 
     const cleanup = mountHome3D(root, {
-      onOpenHouse: (houseId) => navigate(`/v2/casas/${houseId}`),
-      onOpenFreeAudit: () => navigate("/v2/consulta-gratis"),
-      onBuyPackage: (pkg) => navigate(`/v2/creditos?pkg=${pkg}`)
+      onOpenHouse: (houseId) => navigate(`/casas/${houseId}`),
+      onOpenFreeAudit: () => navigate("/consulta-gratis"),
+      onBuyPackage: (pkg) => navigate(`/creditos?pkg=${pkg}`)
     });
 
     return cleanup;
@@ -100,11 +100,11 @@ export default function HomeV2() {
           </select>
 
           {user ? (
-            <Link className="chip-btn" to="/v2/perfil" style={{ textDecoration: "none" }}>
-              ✦ {credits} cr.
+            <Link className="chip-btn v2-nav-account-chip" to="/perfil" style={{ textDecoration: "none" }}>
+              ✦ {profile?.credits ?? 0} cr.
             </Link>
           ) : (
-            <Link className="chip-btn" to="/v2/entrar" style={{ textDecoration: "none" }}>
+            <Link className="chip-btn v2-nav-account-chip" to="/entrar" style={{ textDecoration: "none" }}>
               Entrar
             </Link>
           )}
@@ -120,12 +120,6 @@ export default function HomeV2() {
         <div className="reveal" id="revealLayer" />
         <div className="rings" id="rings" />
         <div className="star-layer" id="starLayer" aria-hidden="true" />
-
-        {/* Subtle 1-line context eyebrow for cold ad traffic (never blocks 3D cards) */}
-        <Link to="/v2/consulta-gratis" className="v2-hero-eyebrow">
-          <span>✦ Onde passar seu aniversário muda o foco do seu ano ·</span>
-          <strong>Testar o último grátis →</strong>
-        </Link>
 
         <div className="arc-hit" id="arcHit" aria-label="Arraste para explorar os 12 Envelopes" />
         <div className="fallback-hero" id="fallbackHero">

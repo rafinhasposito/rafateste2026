@@ -112,11 +112,11 @@ export default function ConsultV2() {
 
     // Gate real: consulta do futuro exige conta + crédito (ou admin)
     if (!user) {
-      navigate(`/v2/entrar?returnTo=${encodeURIComponent(`/v2/consultar?mode=${mode}&house=${desiredHouse}`)}`);
+      navigate(`/entrar?returnTo=${encodeURIComponent(`/consultar?mode=${mode}&house=${desiredHouse}`)}`);
       return;
     }
     if (!isAdmin && availableCredits < 1) {
-      navigate(`/v2/creditos?pkg=single&returnTo=${encodeURIComponent(`/v2/consultar?mode=${mode}&house=${desiredHouse}`)}`);
+      navigate(`/creditos?pkg=single&returnTo=${encodeURIComponent(`/consultar?mode=${mode}&house=${desiredHouse}`)}`);
       return;
     }
 
@@ -207,7 +207,7 @@ export default function ConsultV2() {
           await refreshProfile();
         }
 
-        navigate(`/v2/resultado/${houseNum}${consultationId ? `?consultationId=${consultationId}` : ""}`, {
+        navigate(`/resultado/${houseNum}${consultationId ? `?consultationId=${consultationId}` : ""}`, {
           state: {
             consultationId,
             userName: cleanName,
@@ -268,7 +268,7 @@ export default function ConsultV2() {
         await refreshProfile();
       }
 
-      navigate(`/v2/resultado/${desiredHouse}${consultationId ? `?consultationId=${consultationId}` : ""}`, {
+      navigate(`/resultado/${desiredHouse}${consultationId ? `?consultationId=${consultationId}` : ""}`, {
         state: {
           consultationId,
           userName: cleanName,
@@ -572,7 +572,7 @@ export default function ConsultV2() {
                       ? "Liberar créditos e consultar →"
                       : "Calcular agora (1 crédito) →"}
               </button>
-              <Link to="/v2/consulta-gratis" className="v2-pill-btn" style={{ height: 54, padding: "0 20px", justifyContent: "center" }}>
+              <Link to="/consulta-gratis" className="v2-pill-btn" style={{ height: 54, padding: "0 20px", justifyContent: "center" }}>
                 Testar último aniversário grátis
               </Link>
             </div>

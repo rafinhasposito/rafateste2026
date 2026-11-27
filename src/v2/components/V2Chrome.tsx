@@ -29,7 +29,7 @@ export function V2TopNav({ activeTab, backTo }: V2ChromeProps) {
       {backTo ? (
         <Link className="v2-pill-btn" to={backTo.to}>{backTo.label}</Link>
       ) : (
-        <Link className="v2-brand" to="/v2">
+        <Link className="v2-brand" to="/">
           <span className="v2-brand-mark" aria-hidden="true">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="8.5" stroke="#C9A227" strokeWidth="1.3" />
@@ -41,11 +41,11 @@ export function V2TopNav({ activeTab, backTo }: V2ChromeProps) {
       )}
 
       <div className="v2-nav-center">
-        <Link className={`v2-nav-link${activeTab === "home" ? " active" : ""}`} to="/v2">{ui.navHome}</Link>
-        <Link className={`v2-nav-link${activeTab === "consult" ? " active" : ""}`} to="/v2/consultar">Consultar</Link>
-        <Link className={`v2-nav-link${activeTab === "free" ? " active" : ""}`} to="/v2/consulta-gratis">{ui.navFree}</Link>
-        <Link className={`v2-nav-link${activeTab === "credits" ? " active" : ""}`} to="/v2/creditos">{ui.navCredits}</Link>
-        <Link className={`v2-nav-link${activeTab === "guide" ? " active" : ""}`} to="/v2/como-funciona">Como Funciona</Link>
+        <Link className={`v2-nav-link${activeTab === "home" ? " active" : ""}`} to="/">{ui.navHome}</Link>
+        <Link className={`v2-nav-link${activeTab === "consult" ? " active" : ""}`} to="/consultar">Consultar</Link>
+        <Link className={`v2-nav-link${activeTab === "free" ? " active" : ""}`} to="/consulta-gratis">{ui.navFree}</Link>
+        <Link className={`v2-nav-link${activeTab === "credits" ? " active" : ""}`} to="/creditos">{ui.navCredits}</Link>
+        <Link className={`v2-nav-link${activeTab === "guide" ? " active" : ""}`} to="/como-funciona">Como Funciona</Link>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -61,11 +61,11 @@ export function V2TopNav({ activeTab, backTo }: V2ChromeProps) {
         </select>
 
         {user ? (
-          <Link className="v2-pill-btn v2-pill-dark" to="/v2/perfil">
+          <Link className="v2-pill-btn v2-pill-dark" to="/perfil">
             {typeof profile?.credits === "number" ? `${profile.credits} cr · Conta` : "Minha Conta"}
           </Link>
         ) : (
-          <Link className="v2-pill-btn v2-pill-dark" to="/v2/entrar">
+          <Link className="v2-pill-btn v2-pill-dark" to="/entrar">
             Entrar
           </Link>
         )}
@@ -78,31 +78,31 @@ export function V2IosTabBar({ activeTab }: { activeTab: V2Tab }) {
   const { locale } = useI18n();
   const ui = V2_UI[locale] || V2_UI.pt;
   const location = useLocation();
-  const isHome = location.pathname === "/v2";
+  const isHome = location.pathname === "/";
 
   return (
     <nav className="v2-ios-tabbar" aria-label="Navegação inferior">
-      <Link className={activeTab === "home" ? "on" : ""} to="/v2">
+      <Link className={activeTab === "home" ? "on" : ""} to="/">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
           <circle cx="12" cy="12" r="4" />
           <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41" />
         </svg>
         <span>{ui.navHome}</span>
       </Link>
-      <Link className={activeTab === "free" ? "on" : ""} to="/v2/consulta-gratis">
+      <Link className={activeTab === "free" ? "on" : ""} to="/consulta-gratis">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
           <circle cx="12" cy="12" r="9" />
           <path d="M12 7v5l3 2" />
         </svg>
         <span>Grátis</span>
       </Link>
-      <Link className={activeTab === "consult" || activeTab === "houses" ? "on" : ""} to={isHome ? "/v2/consultar" : "/v2/consultar"}>
+      <Link className={activeTab === "consult" || activeTab === "houses" ? "on" : ""} to={isHome ? "/consultar" : "/consultar"}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
         <span>Consultar</span>
       </Link>
-      <Link className={activeTab === "credits" || activeTab === "account" ? "on" : ""} to="/v2/creditos">
+      <Link className={activeTab === "credits" || activeTab === "account" ? "on" : ""} to="/creditos">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
           <rect x="2" y="5" width="20" height="14" rx="2.5" />
           <path d="M2 10h20" />
@@ -125,19 +125,19 @@ export function V2Footer() {
     >
       <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-          <Link to="/v2" style={{ fontFamily: "'Marcellus', Georgia, serif", fontSize: 16, letterSpacing: "0.16em", textTransform: "uppercase", color: "#FFF8E6", textDecoration: "none" }}>
+          <Link to="/" style={{ fontFamily: "'Marcellus', Georgia, serif", fontSize: 16, letterSpacing: "0.16em", textTransform: "uppercase", color: "#FFF8E6", textDecoration: "none" }}>
             ✦ Protocolo Solar
           </Link>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 13, fontWeight: 600 }}>
-            <Link to="/v2/consultar" style={{ color: "inherit", textDecoration: "none" }}>Consultar</Link>
-            <Link to="/v2/consulta-gratis" style={{ color: "inherit", textDecoration: "none" }}>Consulta Grátis</Link>
-            <Link to="/v2/creditos" style={{ color: "inherit", textDecoration: "none" }}>Créditos</Link>
-            <Link to="/v2/resgatar" style={{ color: "inherit", textDecoration: "none" }}>Resgatar Cupom</Link>
-            <Link to="/v2/como-funciona" style={{ color: "inherit", textDecoration: "none" }}>Como Funciona</Link>
-            <Link to="/v2/parceiros" style={{ color: "inherit", textDecoration: "none" }}>Parceiros</Link>
-            <Link to="/v2/perfil" style={{ color: "inherit", textDecoration: "none" }}>Minha Conta</Link>
-            <Link to="/v2/termos" style={{ color: "inherit", textDecoration: "none" }}>Termos</Link>
-            <Link to="/v2/privacidade" style={{ color: "inherit", textDecoration: "none" }}>Privacidade</Link>
+            <Link to="/consultar" style={{ color: "inherit", textDecoration: "none" }}>Consultar</Link>
+            <Link to="/consulta-gratis" style={{ color: "inherit", textDecoration: "none" }}>Consulta Grátis</Link>
+            <Link to="/creditos" style={{ color: "inherit", textDecoration: "none" }}>Créditos</Link>
+            <Link to="/resgatar" style={{ color: "inherit", textDecoration: "none" }}>Resgatar Cupom</Link>
+            <Link to="/como-funciona" style={{ color: "inherit", textDecoration: "none" }}>Como Funciona</Link>
+            <Link to="/parceiros" style={{ color: "inherit", textDecoration: "none" }}>Parceiros</Link>
+            <Link to="/perfil" style={{ color: "inherit", textDecoration: "none" }}>Minha Conta</Link>
+            <Link to="/termos" style={{ color: "inherit", textDecoration: "none" }}>Termos</Link>
+            <Link to="/privacidade" style={{ color: "inherit", textDecoration: "none" }}>Privacidade</Link>
           </div>
         </div>
         <div style={{ fontSize: 12, color: "rgba(255,248,230,0.48)", lineHeight: 1.55 }}>

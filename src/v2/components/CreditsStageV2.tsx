@@ -74,7 +74,7 @@ export function CreditsStageV2({ id = "creditos", focusHouseId = 1, initialPkg =
     // Preserva UTMs atuais ao ir direto para o checkout real V2 (/v2/creditos?pkg=...)
     const currentParams = new URLSearchParams(window.location.search);
     currentParams.set("pkg", pkg);
-    navigate(`/v2/creditos?${currentParams.toString()}`);
+    navigate(`/creditos?${currentParams.toString()}`);
   };
 
   return (

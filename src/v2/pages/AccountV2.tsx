@@ -109,7 +109,7 @@ export default function AccountV2() {
   }, []);
 
   useEffect(() => {
-    if (!loading && !user) navigate("/v2/entrar?returnTo=/v2/perfil", { replace: true });
+    if (!loading && !user) navigate("/entrar?returnTo=/v2/perfil", { replace: true });
   }, [loading, user, navigate]);
 
   useEffect(() => {
@@ -255,7 +255,7 @@ export default function AccountV2() {
                     </h1>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <Link to="/v2/creditos" className="v2-specular-btn" style={{ height: 42, padding: "0 16px", fontSize: 13 }}>
+                    <Link to="/creditos" className="v2-specular-btn" style={{ height: 42, padding: "0 16px", fontSize: 13 }}>
                       + Comprar créditos
                     </Link>
                   </div>
@@ -313,7 +313,7 @@ export default function AccountV2() {
                     <button type="submit" disabled={saving} className="v2-specular-btn" style={{ height: 48, padding: "0 22px" }}>
                       {saving ? "Salvando..." : "Salvar dados natais"}
                     </button>
-                    <Link to="/v2/consultar" className="v2-pill-btn" style={{ height: 48, padding: "0 18px" }}>
+                    <Link to="/consultar" className="v2-pill-btn" style={{ height: 48, padding: "0 18px" }}>
                       Nova consulta →
                     </Link>
                     {isAffiliate && (
@@ -332,7 +332,7 @@ export default function AccountV2() {
                       style={{ height: 48, padding: "0 18px" }}
                       onClick={async () => {
                         await signOut();
-                        navigate("/v2");
+                        navigate("/");
                       }}
                     >
                       Sair
@@ -364,7 +364,7 @@ export default function AccountV2() {
                 <p style={{ fontSize: 15, color: "#384357", marginBottom: 14 }}>
                   Você ainda não salvou nenhuma consulta paga nesta conta.
                 </p>
-                <Link to="/v2/consultar" className="v2-specular-btn">
+                <Link to="/consultar" className="v2-specular-btn">
                   Fazer minha primeira consulta →
                 </Link>
               </div>
@@ -375,7 +375,7 @@ export default function AccountV2() {
                   return (
                     <Link
                       key={row.id}
-                      to={`/v2/resultado/${targetHouse}?consultationId=${row.id}`}
+                      to={`/resultado/${targetHouse}?consultationId=${row.id}`}
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
