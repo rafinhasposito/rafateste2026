@@ -57,6 +57,9 @@ import { AdminLayout } from "./components/admin/AdminLayout";
 import { UsersTable } from "./components/admin/UsersTable";
 
 const OnboardingV2 = lazy(() => import("./components/onboarding-v2/OnboardingV2"));
+const HomeV2 = lazy(() => import("./v2/pages/HomeV2"));
+const HouseV2 = lazy(() => import("./v2/pages/HouseV2"));
+const FreeAuditV2 = lazy(() => import("./v2/pages/FreeAuditV2"));
 
 const AdminShowcase = () => (
   <AdminLayout title="User management" description="Manage your team members and their account permissions here.">
@@ -154,6 +157,11 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/showcase-admin" element={<AdminShowcase />} />
             
+            {/* Prévia Isolada V2 — Onda 1 (V1 intacta em /) */}
+            <Route path="/v2" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HomeV2 /></Suspense>} />
+            <Route path="/v2/casas/:houseId" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><HouseV2 /></Suspense>} />
+            <Route path="/v2/consulta-gratis" element={<Suspense fallback={<div style={{ minHeight: "100vh", background: "#F4EAE0" }} />}><FreeAuditV2 /></Suspense>} />
+
             {/* Outros legados e protótipos intocados */}
             <Route path="/v2/game" element={<SolarGameV2 />} />
             <Route path="/northstar" element={<NorthStarFlow />} />
